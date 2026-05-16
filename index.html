@@ -716,16 +716,82 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 // CANONICAL DATA STORE
 // ============================================================
 const CANONICAL = {
-  lastUpdated: "2026-05-16",
-  sessions: [],
-  recoveryLogs: [],
-  checks: {},
-  restDays: ["Sat"],
-  profile: { bodyweight: 225, phase: "Fat loss + strength base", blockWeek: 1, mode: "NORMAL" },
-  currentLifts: { benchE1RM: 255, squatE1RM: 215, deadliftE1RM: 215, ohpE1RM: 120, pullups: 5 },
-  cardioBaseline: { pace: "10:30", distance: 4.0, avgHR: 165 },
-  volumeBests: { bench: "190x5x5", ohp: "90x3x5", squat: "160x5x5", deadlift: "160x3x5" },
-  adherence: { planned: 5, completed: 0, missed: 0 }
+  "lastUpdated": "2026-05-16",
+  "sessions": [
+    {
+      "date": "2026-05-16",
+      "day": "1",
+      "rpe": null,
+      "duration": null,
+      "energy": null,
+      "bodyweight": null,
+      "sleep": null,
+      "notes": "",
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullups": {
+        "sets": null,
+        "reps": null
+      },
+      "cardio": {
+        "type": "Zone 2 Run",
+        "duration": null,
+        "distance": null,
+        "avgHR": null,
+        "pace": "",
+        "notes": ""
+      },
+      "ts": 1778970784276
+    }
+  ],
+  "recoveryLogs": [],
+  "checks": {},
+  "restDays": [
+    "Sat"
+  ],
+  "profile": {
+    "bodyweight": 225,
+    "phase": "Fat loss + strength base",
+    "blockWeek": 1,
+    "mode": "NORMAL"
+  },
+  "currentLifts": {
+    "benchE1RM": 255,
+    "squatE1RM": 215,
+    "deadliftE1RM": 215,
+    "ohpE1RM": 120,
+    "pullups": 5
+  },
+  "cardioBaseline": {
+    "pace": "10:30",
+    "distance": 4,
+    "avgHR": 165
+  },
+  "volumeBests": {
+    "bench": "190x5x5",
+    "ohp": "90x3x5",
+    "squat": "160x5x5",
+    "deadlift": "160x3x5"
+  },
+  "adherence": {
+    "planned": 5,
+    "completed": 1,
+    "missed": 0
+  }
 };
 // ============================================================
 // END CANONICAL DATA STORE
