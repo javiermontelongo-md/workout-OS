@@ -820,7 +820,8 @@ async function pushToGitHub(triggerEl, statusEl){
     if(!infoRes.ok) throw new Error('Could not read file. Check token and repo name.');
     const info=await infoRes.json();
     const sha=info.sha;
-    const currentContent=atob(info.content.replace(/\n/g,''));
+    const rawContent=info.content.replace(/\n/g,'');
+    const currentContent=decodeURIComponent(escape(atob(rawContent)));
     CANONICAL.lastUpdated=new Date().toISOString().split('T')[0];
     const canonicalStr=JSON.stringify(CANONICAL,null,2);
     const updated=currentContent.replace(
