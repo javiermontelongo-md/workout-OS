@@ -5,209 +5,159 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Javier Workout">
-<title>Javier Workout OS</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-title" content="Workout OS">
+<title>Workout OS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,400;0,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   DESIGN TOKENS — Navy / Amber (distinct from Academic OS)
-   ============================================================ */
-:root {
-  --bg:  #0a0c12;
-  --s1:  #111420;
-  --s2:  #171b2a;
-  --s3:  #1e2235;
-  --b:   rgba(255,255,255,0.07);
-  --b2:  rgba(255,255,255,0.13);
-  --a:   #ffb74d;   /* amber — primary accent */
-  --a2:  #4fc3f7;   /* sky blue — secondary */
-  --a3:  #7fff6e;   /* green — positive/PR */
-  --a4:  #ef9a9a;   /* red — warning */
-  --a5:  #ce93d8;   /* purple — recovery */
-  --t:   #e8eaf0;
-  --t2:  #8a90a8;
-  --t3:  #4a5068;
-  --red: #ef5350;
-  --mono:  'DM Mono', monospace;
-  --serif: 'Fraunces', serif;
-  --sans:  'DM Sans', sans-serif;
-  --r:  10px;
-  --rl: 16px;
-  --nav-h: 62px;
-  --safe: env(safe-area-inset-bottom, 0px);
+:root{
+  --bg:#0a0c12; --s1:#111420; --s2:#171b2a; --s3:#1e2235;
+  --b:rgba(255,255,255,0.07); --b2:rgba(255,255,255,0.13);
+  --a:#ffb74d; --a2:#4fc3f7; --a3:#7fff6e; --a4:#ef9a9a; --a5:#ce93d8;
+  --t:#e8eaf0; --t2:#8a90a8; --t3:#4a5068; --red:#ef5350;
+  --mono:'DM Mono',monospace; --serif:'Fraunces',serif; --sans:'DM Sans',sans-serif;
+  --r:10px; --rl:16px; --nav:62px; --safe:env(safe-area-inset-bottom,0px);
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: 100%; }
-body { background: var(--bg); color: var(--t); font-family: var(--sans); font-size: 14px; line-height: 1.6; min-height: 100%; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;}
+body{background:var(--bg);color:var(--t);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100%;}
+.app{display:flex;flex-direction:column;min-height:100vh;}
+.header{padding:18px 32px 0;border-bottom:1px solid var(--b);background:var(--s1);position:sticky;top:0;z-index:50;}
+.htop{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+.logo{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--a);letter-spacing:-.5px;}
+.logo span{color:var(--t2);font-style:italic;}
+.ptag{font-family:var(--mono);font-size:10px;background:rgba(255,183,77,.1);color:var(--a);border:1px solid rgba(255,183,77,.25);border-radius:4px;padding:2px 8px;letter-spacing:.06em;}
+.ptag.b{background:rgba(79,195,247,.1);color:var(--a2);border-color:rgba(79,195,247,.2);}
+.sync-pill{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--t3);display:flex;align-items:center;gap:6px;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);}
+.sync-dot.ok{background:var(--a3);}
+.sync-dot.saving{background:var(--a);animation:pulse 1s infinite;}
+.sync-dot.error{background:var(--red);}
+.tabs{display:flex;gap:2px;overflow-x:auto;padding-bottom:1px;}
+.tab{font-family:var(--mono);font-size:11px;padding:9px 14px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.04em;white-space:nowrap;border:none;background:none;}
+.tab:hover{color:var(--t2);}.tab.active{color:var(--a);border-bottom:2px solid var(--a);}
+.main{flex:1;padding:24px 32px;max-width:1100px;width:100%;}
+.panel{display:none;}.panel.active{display:block;}
+.bottom-nav{display:none;}.mobile-bar{display:none;}
+.card{background:var(--s1);border:1px solid var(--b);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px;}
+.csm{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:13px 15px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--t3);text-transform:uppercase;margin-bottom:8px;}
+.stitle{font-family:var(--serif);font-size:19px;font-weight:300;color:var(--t);margin-bottom:16px;}
+.stitle span{color:var(--a);}
+.stat{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:13px 15px;}
+.sv{font-family:var(--mono);font-size:24px;font-weight:500;line-height:1;margin-bottom:4px;}
+.sv.a{color:var(--a);}.sv.b{color:var(--a2);}.sv.g{color:var(--a3);}.sv.r{color:var(--a4);}
+.sl{font-size:11px;color:var(--t3);}
+input,select,textarea{background:var(--s2);border:1px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--sans);font-size:13px;padding:8px 11px;width:100%;outline:none;transition:border .15s;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--a);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5068' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;}
+select option{background:var(--s2);}
+textarea{resize:vertical;min-height:75px;line-height:1.5;}
+.ig{margin-bottom:12px;}.ig label{display:block;font-size:11px;color:var(--t2);margin-bottom:4px;font-family:var(--mono);letter-spacing:.04em;}
+.btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:9px 16px;border-radius:8px;border:none;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.bp{background:var(--a);color:#0a0c12;font-weight:500;}.bp:active{background:#ffc870;}
+.bs{background:transparent;color:var(--t2);border:1px solid var(--b2);}.bs:active{border-color:var(--a);color:var(--a);}
+.bd{background:transparent;color:var(--red);border:1px solid rgba(239,83,80,.3);}
+.brow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+input[type=range]{-webkit-appearance:none;height:4px;background:var(--s3);border:none;border-radius:2px;padding:0;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--a);cursor:pointer;box-shadow:0 2px 6px rgba(255,183,77,.3);}
+.badge{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;letter-spacing:.04em;}
+.ba{background:rgba(255,183,77,.12);color:var(--a);border:1px solid rgba(255,183,77,.25);}
+.bb{background:rgba(79,195,247,.12);color:var(--a2);border:1px solid rgba(79,195,247,.2);}
+.bg{background:rgba(127,255,110,.12);color:var(--a3);border:1px solid rgba(127,255,110,.2);}
+.br{background:rgba(239,83,80,.12);color:var(--a4);border:1px solid rgba(239,83,80,.2);}
+.bp2{background:rgba(206,147,216,.12);color:var(--a5);border:1px solid rgba(206,147,216,.2);}
+.bgr{background:var(--s3);color:var(--t2);border:1px solid var(--b);}
+.ci{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);}
+.ci:last-child{border-bottom:none;}
+.ci input[type=checkbox]{width:17px;height:17px;min-width:17px;margin-top:2px;accent-color:var(--a);cursor:pointer;}
+.ci label{font-size:13px;color:var(--t2);cursor:pointer;line-height:1.4;flex:1;}
+.ci.checked label{text-decoration:line-through;color:var(--t3);}
+.pbw{margin-bottom:9px;}.pbl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:4px;}.pbb{height:6px;background:var(--s3);border-radius:3px;overflow:hidden;}.pbf{height:100%;border-radius:3px;background:var(--a);transition:width .4s;}
+.bbar{height:8px;border-radius:4px;background:var(--s3);overflow:hidden;margin:8px 0;}
+.bfill{height:100%;border-radius:4px;transition:width .3s,background .3s;}
+.air{background:var(--s2);border:1px solid rgba(255,183,77,.2);border-radius:var(--r);padding:15px 17px;margin-top:12px;}
+.air .albl{font-family:var(--mono);font-size:10px;color:var(--a);letter-spacing:.08em;margin-bottom:8px;}
+.air p{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:8px;}
+.air p:last-child{margin-bottom:0;}.air strong{color:var(--t);font-weight:500;}
+.loading{display:flex;align-items:center;gap:8px;color:var(--t3);font-family:var(--mono);font-size:11px;padding:10px 0;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--a);animation:pulse 1.2s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+@keyframes pulse{0%,80%,100%{opacity:.2;}40%{opacity:1;}}
+.le{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:11px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;}
+.ld{font-family:var(--mono);font-size:10px;color:var(--t3);white-space:nowrap;min-width:65px;margin-top:2px;}
+.lc{flex:1;}.lt{font-size:13px;color:var(--t);margin-bottom:2px;}.ldt{font-size:11px;color:var(--t2);}
+.wk{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:18px;padding-bottom:4px;}
+.dc{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:11px 9px;min-height:110px;min-width:85px;flex:1;}
+.dc.today{border-color:var(--a);}.dc.rest{opacity:.45;}
+.dn{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.06em;margin-bottom:5px;}
+.dd{font-size:19px;font-weight:500;color:var(--t);margin-bottom:7px;}
+.dtask{font-size:10px;color:var(--t2);padding:3px 5px;border-radius:4px;margin-bottom:3px;background:var(--s3);}
+.dtask.st{border-left:2px solid var(--a);}.dtask.cd{border-left:2px solid var(--a2);}.dtask.hy{border-left:2px solid var(--a5);}.dtask.rt{border-left:2px solid var(--a4);color:var(--a4);background:rgba(239,83,80,.08);}
+.chip{display:inline-block;font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:20px;margin:3px;cursor:pointer;border:1px solid var(--b2);color:var(--t2);transition:all .15s;}
+.chip.sel{background:rgba(255,183,77,.12);color:var(--a);border-color:rgba(255,183,77,.3);}
+.tl{padding-left:15px;border-left:1px solid var(--b);}
+.tli{position:relative;padding:0 0 16px 18px;}
+.tli::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--s3);border:1px solid var(--b2);}
+.tli.done::before{background:var(--a3);border-color:var(--a3);}
+.tli.now::before{background:var(--a);border-color:var(--a);box-shadow:0 0 8px rgba(255,183,77,.4);}
+.tli-date{font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:2px;}
+.tli-title{font-size:13px;color:var(--t);margin-bottom:2px;}.tli-detail{font-size:11px;color:var(--t3);}
+.dvdr{height:1px;background:var(--b);margin:16px 0;}
+.ex-row{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;}
+.ex-name{font-size:13px;font-weight:500;color:var(--t);margin-bottom:4px;}
+.ex-plan{font-family:var(--mono);font-size:11px;color:var(--a);}
+.save-btn{background:var(--a);color:#0a0c12;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;padding:12px 20px;border-radius:8px;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;}
+.save-btn:active{background:#ffc870;}.save-btn.saving{opacity:.7;pointer-events:none;}
+.set-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:end;}
+.set-row-header{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:4px;}
+.set-row-header span{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.04em;}
+.add-set-btn{background:var(--s3);border:1px solid var(--b2);color:var(--t2);font-family:var(--mono);font-size:10px;padding:6px 10px;border-radius:6px;cursor:pointer;border:none;width:100%;margin-top:4px;transition:all .15s;}
+.add-set-btn:hover{border-color:var(--a);color:var(--a);}
+.remove-set{background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:16px;padding:0 4px;line-height:1;}
+.remove-set:hover{color:var(--red);}
+.api-info{background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.15);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.api-info p{font-size:13px;color:var(--t2);line-height:1.8;margin-bottom:8px;}.api-info p:last-child{margin-bottom:0;}.api-info strong{color:var(--t);}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
 
-/* ============================================================
-   DESKTOP LAYOUT
-   ============================================================ */
-.app { display: flex; flex-direction: column; min-height: 100vh; }
-.header { padding: 20px 32px 0; border-bottom: 1px solid var(--b); background: var(--s1); position: sticky; top: 0; z-index: 50; }
-.htop { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
-.logo { font-family: var(--serif); font-size: 22px; font-weight: 300; color: var(--a); letter-spacing: -.5px; }
-.logo span { color: var(--t2); font-style: italic; }
-.ptag { font-family: var(--mono); font-size: 10px; background: rgba(255,183,77,.1); color: var(--a); border: 1px solid rgba(255,183,77,.25); border-radius: 4px; padding: 2px 8px; letter-spacing: .06em; }
-.ptag.blue { background: rgba(79,195,247,.1); color: var(--a2); border-color: rgba(79,195,247,.2); }
-.dtag { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-left: auto; }
-.tabs { display: flex; gap: 2px; overflow-x: auto; padding-bottom: 1px; }
-.tab { font-family: var(--mono); font-size: 11px; padding: 10px 15px; color: var(--t3); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; letter-spacing: .04em; white-space: nowrap; border: none; background: none; }
-.tab:hover { color: var(--t2); }
-.tab.active { color: var(--a); border-bottom: 2px solid var(--a); }
-.main { flex: 1; padding: 28px 32px; max-width: 1120px; width: 100%; }
-.panel { display: none; }
-.panel.active { display: block; }
-.bottom-nav { display: none; }
-
-/* ============================================================
-   SHARED COMPONENTS
-   ============================================================ */
-.card { background: var(--s1); border: 1px solid var(--b); border-radius: var(--rl); padding: 20px 22px; margin-bottom: 16px; }
-.csm  { background: var(--s2); border: 1px solid var(--b); border-radius: var(--r); padding: 14px 16px; }
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
-.lbl   { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--t3); text-transform: uppercase; margin-bottom: 8px; }
-.stitle{ font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--t); margin-bottom: 18px; }
-.stitle span { color: var(--a); }
-.stat { background: var(--s2); border: 1px solid var(--b); border-radius: var(--r); padding: 14px 16px; }
-.sv   { font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--t); line-height: 1; margin-bottom: 4px; }
-.sv.a { color: var(--a); } .sv.b { color: var(--a2); } .sv.g { color: var(--a3); } .sv.r { color: var(--a4); } .sv.p { color: var(--a5); }
-.sl   { font-size: 11px; color: var(--t3); }
-input, select, textarea {
-  background: var(--s2); border: 1px solid var(--b2); border-radius: 8px;
-  color: var(--t); font-family: var(--sans); font-size: 13px;
-  padding: 9px 12px; width: 100%; outline: none; transition: border .15s;
-  -webkit-appearance: none;
+@media(max-width:768px){
+  .header{display:none;}
+  .mobile-bar{display:flex !important;background:var(--s1);border-bottom:1px solid var(--b);padding:11px 16px 9px;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .mobile-logo{font-family:var(--serif);font-size:19px;font-weight:300;color:var(--a);}
+  .mobile-logo span{color:var(--t2);font-style:italic;}
+  .app{height:100dvh;overflow:hidden;}
+  .main{padding:0;max-width:100%;flex:1;overflow:hidden;position:relative;}
+  .panel{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(var(--nav) + var(--safe) + 14px);display:none !important;}
+  .panel.active{display:block !important;}
+  .bottom-nav{display:flex !important;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b);padding-bottom:var(--safe);z-index:100;height:calc(var(--nav) + var(--safe));overflow-x:auto;}
+  .nav-item{flex:1;min-width:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 4px;cursor:pointer;gap:3px;border:none;background:none;}
+  .nav-icon{font-size:17px;line-height:1;}.nav-label{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:.04em;}
+  .nav-item.active .nav-label{color:var(--a);}
+  .g2,.g3,.g4{grid-template-columns:1fr;gap:10px;}
+  .g2.k2{grid-template-columns:1fr 1fr;}.g4.k2{grid-template-columns:1fr 1fr;}
+  .card{padding:15px;border-radius:13px;margin-bottom:12px;}
+  .btn{width:100%;justify-content:center;padding:12px 16px;font-size:12px;margin-bottom:8px;}
+  .brow{flex-direction:column;gap:0;}.btn-i{width:auto;}
+  input[type=range]::-webkit-slider-thumb{width:22px;height:22px;}
+  .ci{padding:10px 0;}
+  .ci input[type=checkbox]{width:20px;height:20px;min-width:20px;}.ci label{font-size:14px;}
+  input,select,textarea{font-size:16px;padding:11px 13px;border-radius:10px;}
+  .stitle{font-size:21px;}
+  .set-row{grid-template-columns:1fr 1fr 1fr auto;}
+  .wk{flex-wrap:nowrap;}.dc{min-width:78px;flex:0 0 78px;}
 }
-input:focus, select:focus, textarea:focus { border-color: var(--a); }
-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5068' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
-select option { background: var(--s2); }
-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
-.ig { margin-bottom: 14px; }
-.ig label { display: block; font-size: 11px; color: var(--t2); margin-bottom: 5px; font-family: var(--mono); letter-spacing: .04em; }
-.btn  { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
-.bp   { background: var(--a); color: #0a0c12; font-weight: 500; } .bp:hover  { background: #ffc870; }
-.bs   { background: transparent; color: var(--t2); border: 1px solid var(--b2); } .bs:hover { border-color: var(--a); color: var(--a); }
-.bd   { background: transparent; color: var(--red); border: 1px solid rgba(239,83,80,.3); } .bd:hover { background: rgba(239,83,80,.1); }
-.brow { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-input[type=range] { -webkit-appearance: none; height: 4px; background: var(--s3); border: none; border-radius: 2px; padding: 0; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--a); cursor: pointer; box-shadow: 0 2px 6px rgba(255,183,77,.3); }
-.badge { display: inline-block; font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 4px; letter-spacing: .04em; }
-.ba  { background: rgba(255,183,77,.12); color: var(--a);  border: 1px solid rgba(255,183,77,.25); }
-.bb  { background: rgba(79,195,247,.12); color: var(--a2); border: 1px solid rgba(79,195,247,.2); }
-.bg  { background: rgba(127,255,110,.12);color: var(--a3); border: 1px solid rgba(127,255,110,.2); }
-.br  { background: rgba(239,83,80,.12);  color: var(--a4); border: 1px solid rgba(239,83,80,.2); }
-.bp2 { background: rgba(206,147,216,.12);color: var(--a5); border: 1px solid rgba(206,147,216,.2); }
-.bgr { background: var(--s3); color: var(--t2); border: 1px solid var(--b); }
-.ci { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--b); }
-.ci:last-child { border-bottom: none; }
-.ci input[type=checkbox] { width: 17px; height: 17px; min-width: 17px; margin-top: 2px; accent-color: var(--a); cursor: pointer; }
-.ci label { font-size: 13px; color: var(--t2); cursor: pointer; line-height: 1.4; flex: 1; }
-.ci.checked label { text-decoration: line-through; color: var(--t3); }
-.pbw { margin-bottom: 10px; }
-.pbl { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--t3); margin-bottom: 4px; }
-.pbb { height: 6px; background: var(--s3); border-radius: 3px; overflow: hidden; }
-.pbf { height: 100%; border-radius: 3px; background: var(--a); transition: width .5s; }
-.bbar  { height: 8px; border-radius: 4px; background: var(--s3); overflow: hidden; margin: 8px 0; }
-.bfill { height: 100%; border-radius: 4px; transition: width .3s, background .3s; }
-.air { background: var(--s2); border: 1px solid rgba(255,183,77,.2); border-radius: var(--r); padding: 16px 18px; margin-top: 14px; }
-.air .albl { font-family: var(--mono); font-size: 10px; color: var(--a); letter-spacing: .08em; margin-bottom: 10px; }
-.air p { font-size: 13px; color: var(--t2); line-height: 1.7; margin-bottom: 10px; }
-.air p:last-child { margin-bottom: 0; }
-.air ul { padding-left: 18px; }
-.air li { font-size: 13px; color: var(--t2); line-height: 1.7; margin-bottom: 4px; }
-.air strong { color: var(--t); font-weight: 500; }
-.loading { display: flex; align-items: center; gap: 8px; color: var(--t3); font-family: var(--mono); font-size: 11px; padding: 12px 0; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--a); animation: pulse 1.2s ease-in-out infinite; }
-.dot:nth-child(2){ animation-delay: .2s; } .dot:nth-child(3){ animation-delay: .4s; }
-@keyframes pulse { 0%,80%,100%{ opacity: .2; } 40%{ opacity: 1; } }
-.le { background: var(--s2); border: 1px solid var(--b); border-radius: var(--r); padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 12px; }
-.ld { font-family: var(--mono); font-size: 10px; color: var(--t3); white-space: nowrap; min-width: 70px; margin-top: 2px; }
-.lc { flex: 1; } .lt { font-size: 13px; color: var(--t); margin-bottom: 2px; } .ldt { font-size: 11px; color: var(--t2); }
-.wk { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; padding-bottom: 4px; }
-.dc { background: var(--s2); border: 1px solid var(--b); border-radius: var(--r); padding: 12px 10px; min-height: 120px; min-width: 90px; flex: 1; }
-.dc.today { border-color: var(--a); }
-.dc.rest  { opacity: .45; }
-.dn { font-family: var(--mono); font-size: 10px; color: var(--t3); letter-spacing: .06em; margin-bottom: 6px; }
-.dd { font-size: 20px; font-weight: 500; color: var(--t); margin-bottom: 8px; }
-.dtask     { font-size: 10px; color: var(--t2); padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; background: var(--s3); }
-.dtask.st  { border-left: 2px solid var(--a); }
-.dtask.cd  { border-left: 2px solid var(--a2); }
-.dtask.hy  { border-left: 2px solid var(--a5); }
-.dtask.rt  { border-left: 2px solid var(--a4); color: var(--a4); background: rgba(239,83,80,.08); }
-.chip { display: inline-block; font-family: var(--mono); font-size: 10px; padding: 5px 11px; border-radius: 20px; margin: 3px; cursor: pointer; border: 1px solid var(--b2); color: var(--t2); transition: all .15s; }
-.chip.sel { background: rgba(255,183,77,.12); color: var(--a); border-color: rgba(255,183,77,.3); }
-.chip:hover { border-color: var(--a); color: var(--a); }
-.tl  { padding-left: 16px; border-left: 1px solid var(--b); }
-.tli { position: relative; padding: 0 0 18px 20px; }
-.tli::before { content: ''; position: absolute; left: -5px; top: 4px; width: 9px; height: 9px; border-radius: 50%; background: var(--s3); border: 1px solid var(--b2); }
-.tli.done::before { background: var(--a3); border-color: var(--a3); }
-.tli.now::before  { background: var(--a); border-color: var(--a); box-shadow: 0 0 8px rgba(255,183,77,.4); }
-.tli-date { font-family: var(--mono); font-size: 10px; color: var(--t3); margin-bottom: 3px; }
-.tli-title { font-size: 13px; color: var(--t); margin-bottom: 2px; }
-.tli-detail { font-size: 11px; color: var(--t3); }
-.dvdr { height: 1px; background: var(--b); margin: 18px 0; }
-code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding: 2px 6px; border-radius: 4px; color: var(--t2); }
-.rbanner { background: linear-gradient(135deg,rgba(255,183,77,.06) 0%,rgba(79,195,247,.06) 100%); border: 1px solid rgba(255,183,77,.15); border-radius: var(--rl); padding: 18px 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-.rname { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--a); }
-.ex-row { background: var(--s2); border: 1px solid var(--b); border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px; }
-.ex-name { font-size: 13px; font-weight: 500; color: var(--t); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-.ex-plan { font-family: var(--mono); font-size: 11px; color: var(--a); margin-bottom: 8px; }
-.api-box { background: rgba(255,183,77,.04); border: 1px solid rgba(255,183,77,.15); border-radius: var(--r); padding: 16px; margin-bottom: 14px; }
-.api-box p { font-size: 13px; color: var(--t2); line-height: 1.8; margin-bottom: 8px; }
-.api-box strong { color: var(--t); }
-
-/* ============================================================
-   MOBILE OVERRIDES (≤768px)
-   ============================================================ */
-@media (max-width: 768px) {
-  .header { display: none; }
-  .mobile-topbar { display: flex !important; }
-  .app { height: 100dvh; overflow: hidden; }
-  .main { padding: 0; max-width: 100%; flex: 1; overflow: hidden; position: relative; }
-  .panel { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 16px calc(var(--nav-h) + var(--safe) + 16px); display: none !important; }
-  .panel.active { display: block !important; }
-  .bottom-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; background: var(--s1); border-top: 1px solid var(--b); padding-bottom: var(--safe); z-index: 100; height: calc(var(--nav-h) + var(--safe)); overflow-x: auto; }
-  .nav-item { flex: 1; min-width: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; cursor: pointer; gap: 3px; border: none; background: none; }
-  .nav-icon  { font-size: 18px; line-height: 1; }
-  .nav-label { font-family: var(--mono); font-size: 8px; color: var(--t3); letter-spacing: .04em; }
-  .nav-item.active .nav-label { color: var(--a); }
-  .g2, .g3, .g4 { grid-template-columns: 1fr; gap: 10px; }
-  .g2.keep2 { grid-template-columns: 1fr 1fr; }
-  .card  { padding: 16px; border-radius: 14px; margin-bottom: 12px; }
-  .btn   { width: 100%; justify-content: center; padding: 13px 18px; font-size: 12px; margin-bottom: 8px; }
-  .brow  { flex-direction: column; gap: 0; }
-  .btn-inline { width: auto; }
-  input[type=range]::-webkit-slider-thumb { width: 22px; height: 22px; }
-  .ci { padding: 11px 0; }
-  .ci input[type=checkbox] { width: 20px; height: 20px; min-width: 20px; }
-  .ci label { font-size: 14px; }
-  input, select, textarea { font-size: 16px; padding: 12px 14px; border-radius: 10px; }
-  .stitle { font-size: 22px; }
-  .rbanner { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .rbanner > div:last-child { width: 100%; }
-  .wk { flex-wrap: nowrap; }
-  .dc { min-width: 80px; flex: 0 0 80px; }
-}
-
-.mobile-topbar { display: none; background: var(--s1); border-bottom: 1px solid var(--b); padding: 12px 18px 10px; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.mobile-logo { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--a); letter-spacing: -.3px; }
-.mobile-logo span { color: var(--t2); font-style: italic; }
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--s3); border-radius: 3px; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- MOBILE TOP BAR -->
-<div class="mobile-topbar">
-  <div class="mobile-logo">Javier <span>Workout OS</span></div>
+<!-- MOBILE BAR -->
+<div class="mobile-bar">
+  <div class="mobile-logo">Workout <span>OS</span></div>
   <div style="display:flex;gap:8px;align-items:center;">
-    <div class="ptag">HYBRID PROGRAM</div>
+    <div class="ptag" id="m-sync-tag">SYNCED</div>
     <div id="m-date" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
   </div>
 </div>
@@ -215,15 +165,19 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
 <!-- DESKTOP HEADER -->
 <div class="header">
   <div class="htop">
-    <div class="logo">Javier <span>Workout OS</span></div>
+    <div class="logo">Workout <span>OS</span></div>
     <div class="ptag">HYBRID PROGRAM</div>
-    <div class="ptag blue">IM RESIDENCY</div>
-    <div class="dtag" id="d-date"></div>
+    <div class="ptag b">IM RESIDENCY</div>
+    <div class="sync-pill">
+      <div class="sync-dot ok" id="sync-dot"></div>
+      <span id="sync-label">Synced</span>
+    </div>
+    <div id="d-date" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-left:8px;"></div>
   </div>
   <div class="tabs">
     <button class="tab active" onclick="goTab('today',this)">TODAY</button>
-    <button class="tab" onclick="goTab('week',this)">THIS WEEK</button>
     <button class="tab" onclick="goTab('log',this)">LOG SESSION</button>
+    <button class="tab" onclick="goTab('week',this)">THIS WEEK</button>
     <button class="tab" onclick="goTab('progress',this)">PROGRESS</button>
     <button class="tab" onclick="goTab('program',this)">PROGRAM</button>
     <button class="tab" onclick="goTab('recovery',this)">RECOVERY</button>
@@ -236,16 +190,15 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
 
 <!-- ===== TODAY ===== -->
 <div id="panel-today" class="panel active">
-  <div class="stitle">Today's <span>training plan</span></div>
-
-  <div class="rbanner">
+  <div class="stitle">Today's <span>training</span></div>
+  <div style="background:linear-gradient(135deg,rgba(255,183,77,.06) 0%,rgba(79,195,247,.06) 100%);border:1px solid rgba(255,183,77,.15);border-radius:var(--rl);padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
     <div>
       <div class="lbl">program state</div>
-      <div class="rname">Fat loss + strength base</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Block 1/4 · Volume accumulation · Week W20</div>
+      <div style="font-family:var(--serif);font-size:19px;font-weight:300;color:var(--a);">Fat loss + strength base</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Block 1/4 · Volume accumulation</div>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-      <select id="mode-sel" style="width:185px;" onchange="modeChange()">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select id="mode-sel" style="width:190px;" onchange="modeChange()">
         <option value="normal">NORMAL mode</option>
         <option value="stress">HIGH STRESS mode</option>
         <option value="maintenance">MAINTENANCE mode</option>
@@ -253,42 +206,40 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
         <option value="recovery">RECOVERY mode</option>
         <option value="minimum">MINIMUM VIABLE</option>
       </select>
-      <button class="btn bp btn-inline" onclick="genToday()">↻ Generate plan</button>
+      <button class="btn bp btn-i" onclick="genToday()">↻ AI plan</button>
     </div>
   </div>
 
-  <!-- Recovery check-in -->
   <div class="card">
     <div class="lbl">daily check-in</div>
-    <div style="display:flex;gap:20px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:130px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px;"><span>Energy</span><span id="v-e" style="font-family:var(--mono);color:var(--a);">7/10</span></div>
-        <input type="range" min="1" max="10" value="7" id="sl-e" oninput="upFatigue()" style="width:100%;">
+    <div style="display:flex;gap:18px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:110px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Energy</span><span id="v-e" style="font-family:var(--mono);color:var(--a);">7/10</span></div>
+        <input type="range" min="1" max="10" value="7" id="sl-e" oninput="upFat()" style="width:100%;">
       </div>
-      <div style="flex:1;min-width:130px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px;"><span>Sleep</span><span id="v-s" style="font-family:var(--mono);color:var(--a2);">7h</span></div>
-        <input type="range" min="0" max="9" value="7" id="sl-s" oninput="upFatigue()" style="width:100%;">
+      <div style="flex:1;min-width:110px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Sleep</span><span id="v-s" style="font-family:var(--mono);color:var(--a2);">7h</span></div>
+        <input type="range" min="0" max="9" value="7" id="sl-s" oninput="upFat()" style="width:100%;">
       </div>
-      <div style="flex:1;min-width:130px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px;"><span>Soreness</span><span id="v-sr" style="font-family:var(--mono);color:var(--a4);">3/10</span></div>
-        <input type="range" min="1" max="10" value="3" id="sl-sr" oninput="upFatigue()" style="width:100%;">
+      <div style="flex:1;min-width:110px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Soreness</span><span id="v-sr" style="font-family:var(--mono);color:var(--a4);">3/10</span></div>
+        <input type="range" min="1" max="10" value="3" id="sl-sr" oninput="upFat()" style="width:100%;">
       </div>
-      <div style="flex:1;min-width:130px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px;"><span>Motivation</span><span id="v-m" style="font-family:var(--mono);">7/10</span></div>
-        <input type="range" min="1" max="10" value="7" id="sl-m" oninput="upFatigue()" style="width:100%;">
+      <div style="flex:1;min-width:110px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Motivation</span><span id="v-m" style="font-family:var(--mono);">7/10</span></div>
+        <input type="range" min="1" max="10" value="7" id="sl-m" oninput="upFat()" style="width:100%;">
       </div>
     </div>
-    <div style="margin-top:14px;">
+    <div style="margin-top:12px;">
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:4px;"><span>Fatigue score</span><span id="f-lbl">LOW</span></div>
       <div class="bbar"><div class="bfill" id="f-fill" style="width:20%;background:var(--a3);"></div></div>
     </div>
   </div>
 
-  <!-- Today's session -->
   <div class="g2">
     <div class="card">
-      <div class="lbl">today's session</div>
-      <div class="ig" style="margin-bottom:10px;">
+      <div class="lbl">today's workout</div>
+      <div class="ig">
         <label>Select day</label>
         <select id="today-day" onchange="loadDayPreview()">
           <option value="1">Day 1 — Upper Strength</option>
@@ -300,85 +251,29 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
         </select>
       </div>
       <div id="day-preview"></div>
+      <button class="btn bp" style="width:100%;margin-top:10px;" onclick="goTab('log',document.querySelector('.tab:nth-child(2)'))">Start logging this session →</button>
     </div>
     <div class="card">
       <div class="lbl">session checklist</div>
-      <div class="ci" id="ci-warmup"><input type="checkbox" id="cb-warmup" onchange="chk('ci-warmup')"><label for="cb-warmup">🔥 Warm-up — 5–10 min mobility / light cardio</label></div>
-      <div class="ci" id="ci-main"><input type="checkbox" id="cb-main" onchange="chk('ci-main')"><label for="cb-main">💪 Main compound lifts completed</label></div>
+      <div class="ci" id="ci-warmup"><input type="checkbox" id="cb-warmup" onchange="chk('ci-warmup')"><label for="cb-warmup">🔥 Warm-up — 5–10 min mobility</label></div>
+      <div class="ci" id="ci-main"><input type="checkbox" id="cb-main" onchange="chk('ci-main')"><label for="cb-main">💪 Compound lifts completed</label></div>
       <div class="ci" id="ci-acc"><input type="checkbox" id="cb-acc" onchange="chk('ci-acc')"><label for="cb-acc">🎯 Accessory work completed</label></div>
-      <div class="ci" id="ci-cardio"><input type="checkbox" id="cb-cardio" onchange="chk('ci-cardio')"><label for="cb-cardio">🏃 Cardio / conditioning completed</label></div>
-      <div class="ci" id="ci-log"><input type="checkbox" id="cb-log" onchange="chk('ci-log')"><label for="cb-log">📝 Session logged (see Log Session tab)</label></div>
-      <div class="ci" id="ci-nutrition"><input type="checkbox" id="cb-nutrition" onchange="chk('ci-nutrition')"><label for="cb-nutrition">🥗 Post-workout nutrition — protein within 1 hour</label></div>
-      <div class="ci" id="ci-sleep"><input type="checkbox" id="cb-sleep" onchange="chk('ci-sleep')"><label for="cb-sleep">😴 Sleep target — 7+ hours tonight</label></div>
+      <div class="ci" id="ci-cardio"><input type="checkbox" id="cb-cardio" onchange="chk('ci-cardio')"><label for="cb-cardio">🏃 Cardio / conditioning done</label></div>
+      <div class="ci" id="ci-logged"><input type="checkbox" id="cb-logged" onchange="chk('ci-logged')"><label for="cb-logged">💾 Session saved to GitHub</label></div>
+      <div class="ci" id="ci-protein"><input type="checkbox" id="cb-protein" onchange="chk('ci-protein')"><label for="cb-protein">🥗 Post-workout protein within 1 hour</label></div>
+      <div class="ci" id="ci-sleep7"><input type="checkbox" id="cb-sleep7" onchange="chk('ci-sleep7')"><label for="cb-sleep7">😴 Sleep target — 7+ hours tonight</label></div>
     </div>
   </div>
 
   <div class="card">
-    <div class="lbl">ai coach — today's plan</div>
+    <div class="lbl">ai coach</div>
     <div id="today-out">
-      <div class="air">
-        <div class="albl">◆ TRAINING COACH</div>
-        <p>Current mode: Normal. Fatigue: Moderate. Recovery debt from residency stress is present — account for this before chasing PRs.</p>
-        <p><strong>Primary focus today:</strong> If it's an Upper Strength day, hit your Bench at 5x5 @ 190. This is your most important compound lift and the one to protect when fatigue rises. Everything else is secondary.</p>
-        <p><strong>Auto-regulation rule:</strong> If your warm-up sets feel heavy or your bar speed is slow, reduce working weight by 5–10%. A submaximal session today preserves next week's quality far better than grinding through fatigue.</p>
-        <p><strong>Residency note:</strong> You are in a high-stress environment. Sustainable training beats optimal training. A 70% effort session that gets done is worth more than a 100% effort session that doesn't happen.</p>
+      <div class="air"><div class="albl">◆ TRAINING COACH</div>
+        <p>Check your fatigue score above first. If it's moderate or higher, auto-regulate before you start — reduce working weight by 5-10% and protect bar speed over ego.</p>
+        <p><strong>Recovery rules the program.</strong> Sustainable training during residency beats optimal training every time. A 70% effort session that happens is worth more than a 100% session that doesn't.</p>
       </div>
     </div>
-    <div class="brow">
-      <button class="btn bs btn-inline" onclick="genToday()">↻ Regenerate with AI</button>
-      <button class="btn bs btn-inline" onclick="goTab('log',null)">Log session →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== THIS WEEK ===== -->
-<div id="panel-week" class="panel">
-  <div class="stitle">Weekly <span>schedule</span></div>
-  <div class="g2">
-    <div class="csm" style="margin-bottom:14px;">
-      <div class="lbl">this week's split</div>
-      <div style="font-size:13px;color:var(--t2);line-height:1.9;margin-bottom:14px;">
-        <div style="padding:6px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 1</strong> — Upper Strength</span><span class="badge ba">STRENGTH</span></div>
-        <div style="padding:6px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 2</strong> — Lower Strength</span><span class="badge ba">STRENGTH</span></div>
-        <div style="padding:6px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a2);">Day 3</strong> — Recovery / Cardio</span><span class="badge bb">CARDIO</span></div>
-        <div style="padding:6px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 4</strong> — Upper Hypertrophy</span><span class="badge bp2">HYPERTROPHY</span></div>
-        <div style="padding:6px 0;display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 5</strong> — Lower + Conditioning</span><span class="badge bp2">HYBRID</span></div>
-      </div>
-      <div class="lbl">rest days this week</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
-        <span class="chip" onclick="toggleRest(this,'Sun')">SUN</span>
-        <span class="chip sel" onclick="toggleRest(this,'Sat')">SAT</span>
-        <span class="chip" onclick="toggleRest(this,'Mon')">MON</span>
-        <span class="chip" onclick="toggleRest(this,'Tue')">TUE</span>
-        <span class="chip" onclick="toggleRest(this,'Wed')">WED</span>
-        <span class="chip" onclick="toggleRest(this,'Thu')">THU</span>
-        <span class="chip" onclick="toggleRest(this,'Fri')">FRI</span>
-      </div>
-    </div>
-    <div class="csm" style="margin-bottom:14px;">
-      <div class="lbl">weekly adherence</div>
-      <div class="pbw"><div class="pbl"><span>Sessions completed</span><span id="wk-sess-v">0 / 5</span></div><div class="pbb"><div class="pbf" id="wk-sess-b" style="width:0%;"></div></div></div>
-      <div class="pbw"><div class="pbl"><span>Cardio completed</span><span id="wk-card-v">0 / 3</span></div><div class="pbb"><div class="pbf" id="wk-card-b" style="width:0%;background:var(--a2);"></div></div></div>
-      <div class="pbw"><div class="pbl"><span>Volume days</span><span id="wk-vol-v">0 / 5</span></div><div class="pbb"><div class="pbf" id="wk-vol-b" style="width:0%;background:var(--a5);"></div></div></div>
-      <div class="dvdr" style="margin:12px 0;"></div>
-      <div class="lbl">update progress</div>
-      <div class="g2 keep2" style="gap:8px;">
-        <input type="number" id="inp-sess" placeholder="Sessions done" min="0" max="5" oninput="upWeekBars()">
-        <input type="number" id="inp-card" placeholder="Cardio done" min="0" max="5" oninput="upWeekBars()">
-      </div>
-    </div>
-  </div>
-  <div class="wk" id="wk-grid"></div>
-  <div class="card">
-    <div class="lbl">week guidance</div>
-    <div id="wk-guid" class="air">
-      <div class="albl">◆ WEEK COACH</div>
-      <p><strong>Volume accumulation week.</strong> Your goal this week is consistency and technique quality — not maximal loading.</p>
-      <p><strong>Bench:</strong> 5x5 @ 190. If all sets complete at RPE &lt;8, add 5 lbs next week. <strong>OHP:</strong> 3x5 @ 90. Same rule applies. <strong>Squat:</strong> 5x5 @ 160. <strong>Deadlift:</strong> 3x5 @ 160.</p>
-      <p><strong>Cardio:</strong> Zone 2 at 140–155 HR. If HR is elevated above normal, slow down. Don't chase pace during high-stress residency weeks.</p>
-      <p><strong>Recovery priority:</strong> Moderate fatigue + high residency stress = conservative approach. Protect your recovery debt this week.</p>
-    </div>
-    <div class="brow"><button class="btn bs btn-inline" onclick="genWeekGuidance()">↻ AI guidance</button></div>
+    <div class="brow"><button class="btn bs btn-i" onclick="genToday()">↻ Regenerate</button></div>
   </div>
 </div>
 
@@ -386,9 +281,9 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
 <div id="panel-log" class="panel">
   <div class="stitle">Log <span>session</span></div>
 
-  <div class="card">
-    <div class="lbl">session info</div>
-    <div class="g3" style="margin-bottom:12px;">
+  <div class="card" style="border:1px solid rgba(255,183,77,.25);">
+    <div class="lbl" style="color:var(--a);">session info</div>
+    <div class="g3" style="margin-bottom:10px;">
       <div class="ig"><label>Date</label><input type="date" id="log-date"></div>
       <div class="ig"><label>Day type</label>
         <select id="log-day">
@@ -399,75 +294,84 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
           <option value="5">Day 5 — Lower + Conditioning</option>
         </select>
       </div>
-      <div class="ig"><label>Session RPE (1-10)</label><input type="number" id="log-rpe" min="1" max="10" placeholder="e.g. 7"></div>
+      <div class="ig"><label>Session RPE (1–10)</label><input type="number" id="log-rpe" min="1" max="10" placeholder="e.g. 7"></div>
     </div>
-    <div class="g2 keep2" style="margin-bottom:12px;">
-      <div class="ig"><label>Duration (min)</label><input type="number" id="log-dur" min="1" placeholder="e.g. 65"></div>
-      <div class="ig"><label>Energy level (1-10)</label><input type="number" id="log-energy" min="1" max="10" placeholder="e.g. 7"></div>
+    <div class="g2 k2" style="margin-bottom:10px;">
+      <div class="ig"><label>Duration (min)</label><input type="number" id="log-dur" placeholder="e.g. 65"></div>
+      <div class="ig"><label>Energy (1–10)</label><input type="number" id="log-energy" min="1" max="10" placeholder="e.g. 7"></div>
+    </div>
+    <div class="g2 k2" style="margin-bottom:10px;">
+      <div class="ig"><label>Bodyweight (lb)</label><input type="number" id="log-bw" placeholder="225"></div>
+      <div class="ig"><label>Sleep last night (hrs)</label><input type="number" id="log-sleep" step="0.5" placeholder="7"></div>
     </div>
   </div>
 
-  <!-- Strength lifts -->
-  <div class="card" id="log-strength-card">
-    <div class="lbl">compound lifts</div>
-    <div class="g2">
-      <div>
-        <div class="ex-name">🏋️ Bench Press</div>
-        <div class="ex-plan">Planned: 5x5 @ 190</div>
-        <div class="g3" style="gap:8px;">
-          <div class="ig"><label>Weight (lb)</label><input type="number" id="bench-w" placeholder="190"></div>
-          <div class="ig"><label>Sets</label><input type="number" id="bench-sets" placeholder="5"></div>
-          <div class="ig"><label>Reps</label><input type="number" id="bench-reps" placeholder="5"></div>
-        </div>
-        <div class="ig"><label>RPE</label><input type="number" id="bench-rpe" min="1" max="10" placeholder="e.g. 7"></div>
-        <div class="ig"><label>Notes</label><input type="text" id="bench-notes" placeholder="Bar speed, form notes..."></div>
-      </div>
-      <div>
-        <div class="ex-name">🏋️ Overhead Press</div>
-        <div class="ex-plan">Planned: 3x5 @ 90</div>
-        <div class="g3" style="gap:8px;">
-          <div class="ig"><label>Weight (lb)</label><input type="number" id="ohp-w" placeholder="90"></div>
-          <div class="ig"><label>Sets</label><input type="number" id="ohp-sets" placeholder="3"></div>
-          <div class="ig"><label>Reps</label><input type="number" id="ohp-reps" placeholder="5"></div>
-        </div>
-        <div class="ig"><label>RPE</label><input type="number" id="ohp-rpe" min="1" max="10" placeholder="e.g. 7"></div>
-        <div class="ig"><label>Notes</label><input type="text" id="ohp-notes" placeholder="Notes..."></div>
-      </div>
-      <div>
-        <div class="ex-name">🏋️ Back Squat</div>
-        <div class="ex-plan">Planned: 5x5 @ 160</div>
-        <div class="g3" style="gap:8px;">
-          <div class="ig"><label>Weight (lb)</label><input type="number" id="sq-w" placeholder="160"></div>
-          <div class="ig"><label>Sets</label><input type="number" id="sq-sets" placeholder="5"></div>
-          <div class="ig"><label>Reps</label><input type="number" id="sq-reps" placeholder="5"></div>
-        </div>
-        <div class="ig"><label>RPE</label><input type="number" id="sq-rpe" min="1" max="10" placeholder="e.g. 7"></div>
-        <div class="ig"><label>Notes</label><input type="text" id="sq-notes" placeholder="Notes..."></div>
-      </div>
-      <div>
-        <div class="ex-name">🏋️ Deadlift</div>
-        <div class="ex-plan">Planned: 3x5 @ 160</div>
-        <div class="g3" style="gap:8px;">
-          <div class="ig"><label>Weight (lb)</label><input type="number" id="dl-w" placeholder="160"></div>
-          <div class="ig"><label>Sets</label><input type="number" id="dl-sets" placeholder="3"></div>
-          <div class="ig"><label>Reps</label><input type="number" id="dl-reps" placeholder="5"></div>
-        </div>
-        <div class="ig"><label>RPE</label><input type="number" id="dl-rpe" min="1" max="10" placeholder="e.g. 7"></div>
-        <div class="ig"><label>Notes</label><input type="text" id="dl-notes" placeholder="Notes..."></div>
-      </div>
+  <!-- BENCH PRESS — set-by-set logging -->
+  <div class="card" id="bench-card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span class="badge ba">BENCH PRESS</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5×5 @ 190</span>
     </div>
-    <div class="dvdr"></div>
-    <div class="lbl">pullups</div>
-    <div class="g2 keep2" style="gap:8px;margin-bottom:12px;">
+    <div class="set-row-header"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
+    <div id="bench-sets"></div>
+    <button class="add-set-btn" onclick="addSet('bench')">+ Add set</button>
+    <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="bench-notes" placeholder="Bar speed, form, anything to flag..."></div>
+  </div>
+
+  <!-- OHP -->
+  <div class="card" id="ohp-card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span class="badge ba">OVERHEAD PRESS</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3×5 @ 90</span>
+    </div>
+    <div class="set-row-header"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
+    <div id="ohp-sets"></div>
+    <button class="add-set-btn" onclick="addSet('ohp')">+ Add set</button>
+    <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="ohp-notes" placeholder="Notes..."></div>
+  </div>
+
+  <!-- SQUAT -->
+  <div class="card" id="squat-card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span class="badge ba">BACK SQUAT</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5×5 @ 160</span>
+    </div>
+    <div class="set-row-header"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
+    <div id="squat-sets"></div>
+    <button class="add-set-btn" onclick="addSet('squat')">+ Add set</button>
+    <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="squat-notes" placeholder="Notes..."></div>
+  </div>
+
+  <!-- DEADLIFT -->
+  <div class="card" id="dl-card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span class="badge ba">DEADLIFT</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3×5 @ 160</span>
+    </div>
+    <div class="set-row-header"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
+    <div id="dl-sets"></div>
+    <button class="add-set-btn" onclick="addSet('dl')">+ Add set</button>
+    <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="dl-notes" placeholder="Notes..."></div>
+  </div>
+
+  <!-- PULLUPS -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span class="badge ba">PULLUPS</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5 sets × 3 clean reps</span>
+    </div>
+    <div class="g2 k2" style="gap:8px;">
       <div class="ig"><label>Sets completed</label><input type="number" id="pu-sets" placeholder="5"></div>
       <div class="ig"><label>Reps per set</label><input type="number" id="pu-reps" placeholder="3"></div>
     </div>
   </div>
 
-  <!-- Cardio -->
+  <!-- CARDIO -->
   <div class="card">
-    <div class="lbl">cardio / conditioning</div>
-    <div class="g2 keep2" style="margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span class="badge bb">CARDIO</span>
+    </div>
+    <div class="g2 k2" style="margin-bottom:10px;">
       <div class="ig"><label>Type</label>
         <select id="card-type">
           <option>Zone 2 Run</option><option>Intervals</option>
@@ -476,7 +380,7 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
       </div>
       <div class="ig"><label>Duration (min)</label><input type="number" id="card-dur" placeholder="30"></div>
     </div>
-    <div class="g3" style="margin-bottom:12px;">
+    <div class="g3" style="margin-bottom:10px;">
       <div class="ig"><label>Distance (mi)</label><input type="number" id="card-dist" step="0.1" placeholder="3.5"></div>
       <div class="ig"><label>Avg HR (bpm)</label><input type="number" id="card-hr" placeholder="150"></div>
       <div class="ig"><label>Pace (min/mi)</label><input type="text" id="card-pace" placeholder="10:30"></div>
@@ -484,157 +388,161 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
     <div class="ig"><label>Notes</label><input type="text" id="card-notes" placeholder="Could hold conversation? Legs or lungs limiting?"></div>
   </div>
 
-  <!-- Bodyweight + notes -->
+  <!-- SESSION NOTES -->
   <div class="card">
-    <div class="lbl">additional data</div>
-    <div class="g2 keep2" style="margin-bottom:12px;">
-      <div class="ig"><label>Bodyweight (lb)</label><input type="number" id="log-bw" placeholder="225"></div>
-      <div class="ig"><label>Sleep last night (hrs)</label><input type="number" id="log-sleep" step="0.5" placeholder="7"></div>
-    </div>
-    <div class="ig"><label>Session notes — what happened?</label><textarea id="log-notes" placeholder="What went well? What felt off? Any PRs? Anything to flag for next session?"></textarea></div>
+    <div class="ig"><label>Session notes</label><textarea id="log-notes" placeholder="What went well? What felt off? Any PRs? Anything to flag for next session?"></textarea></div>
   </div>
 
-  <div class="brow">
-    <button class="btn bp btn-inline" onclick="logSession()">Save session</button>
-    <button class="btn bs btn-inline" onclick="getProgRec()">↻ Progression recommendation</button>
-  </div>
-  <div id="prog-rec"></div>
+  <!-- SAVE -->
+  <button class="save-btn" id="log-save-btn" onclick="saveSession()">💾 Save session to GitHub</button>
+  <div id="log-save-status" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;margin-bottom:16px;min-height:16px;"></div>
 
-  <div class="card" style="margin-top:16px;">
+  <div class="card">
     <div class="lbl">recent sessions</div>
     <div id="session-hist"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div>
+  </div>
+</div>
+
+<!-- ===== THIS WEEK ===== -->
+<div id="panel-week" class="panel">
+  <div class="stitle">This <span>week</span></div>
+  <div class="g2">
+    <div class="csm" style="margin-bottom:12px;">
+      <div class="lbl">weekly split</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.9;margin-bottom:12px;">
+        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 1</strong> — Upper Strength</span><span class="badge ba">STRENGTH</span></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 2</strong> — Lower Strength</span><span class="badge ba">STRENGTH</span></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a2);">Day 3</strong> — Recovery / Cardio</span><span class="badge bb">CARDIO</span></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 4</strong> — Upper Hypertrophy</span><span class="badge bp2">HYPERTROPHY</span></div>
+        <div style="padding:5px 0;display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 5</strong> — Lower + Conditioning</span><span class="badge bp2">HYBRID</span></div>
+      </div>
+      <div class="lbl">rest days</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;">
+        <span class="chip" onclick="toggleRest(this,'Sun')">SUN</span>
+        <span class="chip sel" onclick="toggleRest(this,'Sat')">SAT</span>
+        <span class="chip" onclick="toggleRest(this,'Mon')">MON</span>
+        <span class="chip" onclick="toggleRest(this,'Tue')">TUE</span>
+        <span class="chip" onclick="toggleRest(this,'Wed')">WED</span>
+        <span class="chip" onclick="toggleRest(this,'Thu')">THU</span>
+        <span class="chip" onclick="toggleRest(this,'Fri')">FRI</span>
+      </div>
+    </div>
+    <div class="csm" style="margin-bottom:12px;">
+      <div class="lbl">weekly adherence</div>
+      <div class="pbw"><div class="pbl"><span>Sessions done</span><span id="wk-sess-v">0 / 5</span></div><div class="pbb"><div class="pbf" id="wk-sess-b" style="width:0%;"></div></div></div>
+      <div class="pbw"><div class="pbl"><span>Cardio done</span><span id="wk-card-v">0 / 3</span></div><div class="pbb"><div class="pbf" id="wk-card-b" style="width:0%;background:var(--a2);"></div></div></div>
+      <div class="dvdr" style="margin:10px 0;"></div>
+      <div class="lbl">update progress</div>
+      <div class="g2 k2" style="gap:8px;">
+        <input type="number" id="inp-sess" placeholder="Sessions" min="0" max="5" oninput="upWeekBars()">
+        <input type="number" id="inp-card" placeholder="Cardio" min="0" max="5" oninput="upWeekBars()">
+      </div>
+    </div>
+  </div>
+  <div class="wk" id="wk-grid"></div>
+  <div class="card">
+    <div class="lbl">week guidance</div>
+    <div id="wk-guid" class="air">
+      <div class="albl">◆ WEEK COACH</div>
+      <p><strong>Volume accumulation week.</strong> Consistency and technique quality are the goals — not maximal loading.</p>
+      <p><strong>Bench:</strong> 5×5 @ 190. All sets complete at RPE &lt;8 → add 5 lbs next week. <strong>OHP:</strong> 3×5 @ 90. <strong>Squat:</strong> 5×5 @ 160. <strong>Deadlift:</strong> 3×5 @ 160.</p>
+      <p><strong>Cardio:</strong> Zone 2 at 140–155 HR. If HR elevated above normal, slow down — don't chase pace.</p>
+    </div>
+    <div class="brow"><button class="btn bs btn-i" onclick="genWeekGuidance()">↻ AI guidance</button></div>
   </div>
 </div>
 
 <!-- ===== PROGRESS ===== -->
 <div id="panel-progress" class="panel">
   <div class="stitle">Strength &amp; cardio <span>progress</span></div>
-
-  <!-- e1RM Stats -->
-  <div class="g4" style="margin-bottom:16px;">
+  <div class="g4 k2" style="margin-bottom:14px;">
     <div class="stat"><div class="sv a" id="pr-bench">255</div><div class="sl">Bench e1RM (lb)</div></div>
     <div class="stat"><div class="sv a" id="pr-squat">215</div><div class="sl">Squat e1RM (lb)</div></div>
     <div class="stat"><div class="sv a" id="pr-dl">215</div><div class="sl">Deadlift e1RM (lb)</div></div>
     <div class="stat"><div class="sv a" id="pr-ohp">120</div><div class="sl">OHP e1RM (lb)</div></div>
   </div>
-  <div class="g4" style="margin-bottom:16px;">
-    <div class="stat"><div class="sv b" id="pr-run-pace">10:30</div><div class="sl">Run pace (min/mi)</div></div>
-    <div class="stat"><div class="sv b" id="pr-run-hr">165</div><div class="sl">Zone 2 avg HR</div></div>
+  <div class="g4 k2" style="margin-bottom:14px;">
+    <div class="stat"><div class="sv b" id="pr-pace">10:30</div><div class="sl">Run pace (min/mi)</div></div>
+    <div class="stat"><div class="sv b" id="pr-hr">165</div><div class="sl">Zone 2 avg HR</div></div>
     <div class="stat"><div class="sv g" id="pr-pullups">5</div><div class="sl">Max clean pullups</div></div>
-    <div class="stat"><div class="sv p" id="pr-bw">225</div><div class="sl">Bodyweight (lb)</div></div>
+    <div class="stat"><div class="sv" id="pr-bw">225</div><div class="sl">Bodyweight (lb)</div></div>
   </div>
-
-  <!-- Volume bests -->
-  <div class="card" style="margin-bottom:16px;">
+  <div class="card" style="margin-bottom:14px;">
     <div class="lbl">best recent volume</div>
     <div class="g2">
       <div>
-        <div class="pbw"><div class="pbl"><span>Bench</span><span id="vol-bench">190x5x5</span></div><div class="pbb"><div class="pbf" style="width:75%;"></div></div></div>
-        <div class="pbw"><div class="pbl"><span>OHP</span><span id="vol-ohp">90x3x5</span></div><div class="pbb"><div class="pbf" style="width:45%;"></div></div></div>
+        <div class="pbw"><div class="pbl"><span>Bench</span><span id="vol-bench">190×5×5</span></div><div class="pbb"><div class="pbf" style="width:75%;"></div></div></div>
+        <div class="pbw"><div class="pbl"><span>OHP</span><span id="vol-ohp">90×3×5</span></div><div class="pbb"><div class="pbf" style="width:45%;"></div></div></div>
       </div>
       <div>
-        <div class="pbw"><div class="pbl"><span>Squat</span><span id="vol-squat">160x5x5</span></div><div class="pbb"><div class="pbf" style="width:60%;"></div></div></div>
-        <div class="pbw"><div class="pbl"><span>Deadlift</span><span id="vol-dl">160x3x5</span></div><div class="pbb"><div class="pbf" style="width:60%;"></div></div></div>
+        <div class="pbw"><div class="pbl"><span>Squat</span><span id="vol-squat">160×5×5</span></div><div class="pbb"><div class="pbf" style="width:60%;"></div></div></div>
+        <div class="pbw"><div class="pbl"><span>Deadlift</span><span id="vol-dl">160×3×5</span></div><div class="pbb"><div class="pbf" style="width:60%;"></div></div></div>
       </div>
     </div>
   </div>
-
-  <!-- Session history -->
   <div class="card">
     <div class="lbl">session history</div>
-    <div id="all-sessions"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet. Use the Log Session tab.</div></div>
+    <div id="all-sessions"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div>
   </div>
 </div>
 
 <!-- ===== PROGRAM ===== -->
 <div id="panel-program" class="panel">
   <div class="stitle">Program <span>structure</span></div>
-
-  <!-- Day 1 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><span class="badge ba">STRENGTH</span><div style="font-size:16px;font-weight:500;color:var(--t);">Day 1 — Upper Strength</div></div>
-    <div class="ex-row"><div class="ex-name">🏋️ Bench Press</div><div class="ex-plan">5x5 @ 190 · Primary compound · Protect this first</div></div>
-    <div class="ex-row"><div class="ex-name">🏋️ Barbell Row</div><div class="ex-plan">4x6-8 · Suggested: 115–145 lb</div></div>
-    <div class="ex-row"><div class="ex-name">🏋️ Overhead Press</div><div class="ex-plan">3x5 @ 90 · Second key compound</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Pullups</div><div class="ex-plan">5 sets of 3 clean reps · No kipping</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Incline DB Press</div><div class="ex-plan">3x8-10 · 65–80 lb DBs</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Lateral Raises</div><div class="ex-plan">4x15-20</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Face Pulls</div><div class="ex-plan">3x15-20 · Shoulder health priority</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ba">STRENGTH</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 1 — Upper Strength</div></div>
+    <div class="ex-row"><div class="ex-name">🏋️ Bench Press</div><div class="ex-plan">5×5 @ 190 · Primary compound — protect this first</div></div>
+    <div class="ex-row"><div class="ex-name">🏋️ Barbell Row</div><div class="ex-plan">4×6-8 · 115–145 lb</div></div>
+    <div class="ex-row"><div class="ex-name">🏋️ Overhead Press</div><div class="ex-plan">3×5 @ 90 · Second key compound</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Pullups</div><div class="ex-plan">5 sets × 3 clean reps · No kipping</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Incline DB Press</div><div class="ex-plan">3×8-10 · 65–80 lb DBs</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Lateral Raises</div><div class="ex-plan">4×15-20</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Face Pulls</div><div class="ex-plan">3×15-20 · Shoulder health</div></div>
     <div class="ex-row"><div class="ex-name">🏃 Cardio</div><div class="ex-plan">20-30 min Zone 2 · Target HR 140-155</div></div>
   </div>
-
-  <!-- Day 2 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><span class="badge ba">STRENGTH</span><div style="font-size:16px;font-weight:500;color:var(--t);">Day 2 — Lower Strength</div></div>
-    <div class="ex-row"><div class="ex-name">🏋️ Back Squat</div><div class="ex-plan">5x5 @ 160 · Primary lower compound</div></div>
-    <div class="ex-row"><div class="ex-name">🏋️ Deadlift</div><div class="ex-plan">3x5 @ 160 · Second key compound</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Romanian Deadlift</div><div class="ex-plan">3x8 · 95–135 lb · Hamstring development</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Split Squats / Lunges</div><div class="ex-plan">3x10 each leg · Lower body balance</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Calf Raises</div><div class="ex-plan">3x12-15</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ba">STRENGTH</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 2 — Lower Strength</div></div>
+    <div class="ex-row"><div class="ex-name">🏋️ Back Squat</div><div class="ex-plan">5×5 @ 160</div></div>
+    <div class="ex-row"><div class="ex-name">🏋️ Deadlift</div><div class="ex-plan">3×5 @ 160</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Romanian Deadlift</div><div class="ex-plan">3×8 · 95–135 lb</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Split Squats / Lunges</div><div class="ex-plan">3×10 each leg</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Calf Raises</div><div class="ex-plan">3×12-15</div></div>
     <div class="ex-row"><div class="ex-name">💪 Core</div><div class="ex-plan">2-3 exercises: Planks, hanging knee raises, cable crunches</div></div>
     <div class="ex-row"><div class="ex-name">🏃 Cardio</div><div class="ex-plan">20-40 min Zone 2</div></div>
   </div>
-
-  <!-- Day 3 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><span class="badge bb">CARDIO</span><div style="font-size:16px;font-weight:500;color:var(--t);">Day 3 — Recovery / Cardio</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bb">CARDIO</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 3 — Recovery / Cardio</div></div>
     <div class="ex-row"><div class="ex-name">🏃 Run</div><div class="ex-plan">20-45 min easy · Target HR 140-155 · Baseline: 10:30 pace @ 165 HR</div></div>
     <div class="ex-row"><div class="ex-name">🚴 Cycling (alternative)</div><div class="ex-plan">Same duration and HR targets</div></div>
-    <div style="background:rgba(79,195,247,.06);border:1px solid rgba(79,195,247,.15);border-radius:var(--r);padding:12px;margin-top:8px;font-size:12px;color:var(--t2);line-height:1.7;">
-      <strong style="color:var(--a2);">Zone 2 rule:</strong> You should be able to hold a conversation. If lungs are limiting — too fast. If legs are heavy — accumulated fatigue, reduce pace. Log pace, HR, and RPE every session to track aerobic adaptation.
-    </div>
+    <div style="background:rgba(79,195,247,.06);border:1px solid rgba(79,195,247,.15);border-radius:var(--r);padding:11px;margin-top:6px;font-size:12px;color:var(--t2);line-height:1.6;"><strong style="color:var(--a2);">Zone 2 rule:</strong> You should be able to hold a conversation. Log pace, HR, and RPE every session.</div>
   </div>
-
-  <!-- Day 4 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><span class="badge bp2">HYPERTROPHY</span><div style="font-size:16px;font-weight:500;color:var(--t);">Day 4 — Upper Hypertrophy</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Incline Machine Press</div><div class="ex-plan">4x8-12</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Lat Pulldown</div><div class="ex-plan">4x8-12</div></div>
-    <div class="ex-row"><div class="ex-name">💪 DB Shoulder Press</div><div class="ex-plan">3x8-10 · 45–60 lb DBs · Shoulder development priority</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Cable Fly</div><div class="ex-plan">3x12-15</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Lateral Raises</div><div class="ex-plan">5x15-20 · High volume shoulder focus</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Rear Delt Fly</div><div class="ex-plan">4x15-20 · Shoulder health + posture</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Biceps</div><div class="ex-plan">3x10-15</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Triceps</div><div class="ex-plan">3x10-15</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bp2">HYPERTROPHY</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 4 — Upper Hypertrophy</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Incline Machine Press</div><div class="ex-plan">4×8-12</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Lat Pulldown</div><div class="ex-plan">4×8-12</div></div>
+    <div class="ex-row"><div class="ex-name">💪 DB Shoulder Press</div><div class="ex-plan">3×8-10 · 45–60 lb DBs · Shoulder priority</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Cable Fly</div><div class="ex-plan">3×12-15</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Lateral Raises</div><div class="ex-plan">5×15-20 · High volume</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Rear Delt Fly</div><div class="ex-plan">4×15-20</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Biceps + Triceps</div><div class="ex-plan">3×10-15 each</div></div>
     <div class="ex-row"><div class="ex-name">💪 Dead Hangs</div><div class="ex-plan">3 sets · Grip + shoulder decompression</div></div>
     <div class="ex-row"><div class="ex-name">🏃 Cardio</div><div class="ex-plan">20-30 min easy</div></div>
   </div>
-
-  <!-- Day 5 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><span class="badge bp2">HYBRID</span><div style="font-size:16px;font-weight:500;color:var(--t);">Day 5 — Lower + Conditioning</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Leg Press / Front Squat</div><div class="ex-plan">3x8-10</div></div>
-    <div class="ex-row"><div class="ex-name">💪 RDL</div><div class="ex-plan">3x8-10 · 115–155 lb</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Walking Lunges</div><div class="ex-plan">3x12 each leg</div></div>
-    <div class="ex-row"><div class="ex-name">💪 Hamstring Curl</div><div class="ex-plan">3x12-15</div></div>
-    <div class="ex-row"><div class="ex-name">🏃 Intervals</div><div class="ex-plan">1 min hard / 2 min easy × 6-10 rounds · Run or bike</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bp2">HYBRID</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 5 — Lower + Conditioning</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Leg Press / Front Squat</div><div class="ex-plan">3×8-10</div></div>
+    <div class="ex-row"><div class="ex-name">💪 RDL</div><div class="ex-plan">3×8-10 · 115–155 lb</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Walking Lunges</div><div class="ex-plan">3×12 each leg</div></div>
+    <div class="ex-row"><div class="ex-name">💪 Hamstring Curl</div><div class="ex-plan">3×12-15</div></div>
+    <div class="ex-row"><div class="ex-name">🏃 Intervals</div><div class="ex-plan">1 min hard / 2 min easy × 6-10 rounds</div></div>
   </div>
-
-  <!-- Substitution matrix -->
-  <div class="card">
-    <div class="lbl">exercise substitution matrix</div>
-    <div class="g2">
-      <div style="font-size:13px;color:var(--t2);line-height:2.0;">
-        <div><strong style="color:var(--t);">Bench →</strong> DB Bench / Machine Press</div>
-        <div><strong style="color:var(--t);">OHP →</strong> DB Shoulder Press / Machine Shoulder Press</div>
-        <div><strong style="color:var(--t);">Squat →</strong> Hack Squat / Leg Press</div>
-      </div>
-      <div style="font-size:13px;color:var(--t2);line-height:2.0;">
-        <div><strong style="color:var(--t);">Deadlift →</strong> RDL / Trap Bar DL</div>
-        <div><strong style="color:var(--t);">Lat Pulldown →</strong> Assisted Pullups / Cable Pulldown</div>
-        <div><strong style="color:var(--t);">Running →</strong> Bike / Incline Walk</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Progression model -->
   <div class="card">
     <div class="lbl">4-week progression model</div>
     <div style="font-size:13px;color:var(--t2);line-height:1.8;">
-      <div style="padding:9px 0;border-bottom:1px solid var(--b);"><span class="badge ba" style="margin-right:8px;">WEEK 1</span><strong style="color:var(--t);">Volume accumulation</strong> — build work capacity, technique focus</div>
-      <div style="padding:9px 0;border-bottom:1px solid var(--b);"><span class="badge bb" style="margin-right:8px;">WEEK 2</span><strong style="color:var(--t);">Strength emphasis</strong> — increase intensity, maintain volume</div>
-      <div style="padding:9px 0;border-bottom:1px solid var(--b);"><span class="badge bg" style="margin-right:8px;">WEEK 3</span><strong style="color:var(--t);">Heavy exposure</strong> — peak intensity week</div>
-      <div style="padding:9px 0;"><span class="badge bp2" style="margin-right:8px;">WEEK 4</span><strong style="color:var(--t);">Deload / recovery</strong> — reduce 30-50%, consolidate adaptations</div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="badge ba" style="margin-right:8px;">WEEK 1</span><strong style="color:var(--t);">Volume accumulation</strong></div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="badge bb" style="margin-right:8px;">WEEK 2</span><strong style="color:var(--t);">Strength emphasis</strong></div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="badge bg" style="margin-right:8px;">WEEK 3</span><strong style="color:var(--t);">Heavy exposure</strong></div>
+      <div style="padding:8px 0;"><span class="badge bp2" style="margin-right:8px;">WEEK 4</span><strong style="color:var(--t);">Deload / recovery — reduce 30-50%</strong></div>
     </div>
   </div>
 </div>
@@ -642,37 +550,34 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
 <!-- ===== RECOVERY ===== -->
 <div id="panel-recovery" class="panel">
   <div class="stitle">Recovery &amp; <span>fatigue</span></div>
-
-  <!-- Recovery score -->
-  <div class="g4" style="margin-bottom:16px;">
+  <div class="g4 k2" style="margin-bottom:14px;">
     <div class="stat"><div class="sv g" id="rec-score">—</div><div class="sl">Recovery score</div></div>
     <div class="stat"><div class="sv r" id="fat-score">—</div><div class="sl">Fatigue score</div></div>
-    <div class="stat"><div class="sv b" id="rec-sleep">—</div><div class="sl">Sleep avg (hrs)</div></div>
-    <div class="stat"><div class="sv p" id="rec-rhr">—</div><div class="sl">Resting HR</div></div>
+    <div class="stat"><div class="sv b" id="rec-sleep-avg">—</div><div class="sl">Sleep avg (7d)</div></div>
+    <div class="stat"><div class="sv a" id="rec-count">0</div><div class="sl">Logs this week</div></div>
   </div>
 
-  <!-- Log recovery -->
-  <div class="card" style="margin-bottom:16px;">
-    <div class="lbl">log daily recovery</div>
-    <div class="g2 keep2" style="margin-bottom:12px;">
+  <div class="card" style="border:1px solid rgba(255,183,77,.25);">
+    <div class="lbl" style="color:var(--a);">log daily recovery — saves to github</div>
+    <div class="g2 k2" style="margin-bottom:12px;">
       <div class="ig"><label>Date</label><input type="date" id="rec-date"></div>
       <div class="ig"><label>Bodyweight (lb)</label><input type="number" id="rec-bw" placeholder="225"></div>
     </div>
-    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px;">
-      <div style="flex:1;min-width:120px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px;"><span>Sleep quality</span><span id="rv-sleep" style="font-family:var(--mono);color:var(--a2);">7/10</span></div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
+      <div style="flex:1;min-width:110px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Sleep quality</span><span id="rv-sleep" style="font-family:var(--mono);color:var(--a2);">7/10</span></div>
         <input type="range" min="1" max="10" value="7" id="rs-sleep" oninput="upRecScore()" style="width:100%;">
       </div>
-      <div style="flex:1;min-width:120px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px;"><span>Soreness</span><span id="rv-sor" style="font-family:var(--mono);color:var(--a4);">3/10</span></div>
+      <div style="flex:1;min-width:110px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Soreness</span><span id="rv-sor" style="font-family:var(--mono);color:var(--a4);">3/10</span></div>
         <input type="range" min="1" max="10" value="3" id="rs-sor" oninput="upRecScore()" style="width:100%;">
       </div>
-      <div style="flex:1;min-width:120px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px;"><span>Motivation</span><span id="rv-mot" style="font-family:var(--mono);">7/10</span></div>
+      <div style="flex:1;min-width:110px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Motivation</span><span id="rv-mot" style="font-family:var(--mono);">7/10</span></div>
         <input type="range" min="1" max="10" value="7" id="rs-mot" oninput="upRecScore()" style="width:100%;">
       </div>
-      <div style="flex:1;min-width:120px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:6px;"><span>Energy</span><span id="rv-en" style="font-family:var(--mono);color:var(--a);">7/10</span></div>
+      <div style="flex:1;min-width:110px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Energy</span><span id="rv-en" style="font-family:var(--mono);color:var(--a);">7/10</span></div>
         <input type="range" min="1" max="10" value="7" id="rs-en" oninput="upRecScore()" style="width:100%;">
       </div>
     </div>
@@ -680,40 +585,35 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:4px;"><span>Recovery score</span><span id="rec-score-lbl">—</span></div>
       <div class="bbar"><div class="bfill" id="rec-fill" style="width:70%;background:var(--a3);"></div></div>
     </div>
-    <div class="ig"><label>Notes (residency stress, illness, poor sleep run, etc.)</label><textarea id="rec-notes" placeholder="What's driving recovery debt this week?"></textarea></div>
-    <div class="brow"><button class="btn bp btn-inline" onclick="logRecovery()">Save recovery log</button></div>
+    <div class="ig"><label>Notes</label><textarea id="rec-notes" placeholder="What's driving recovery debt? Residency stress, poor sleep run, illness?"></textarea></div>
+    <button class="save-btn" id="rec-save-btn" onclick="saveRecovery()">💾 Save recovery log to GitHub</button>
+    <div id="rec-save-status" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:6px;min-height:16px;"></div>
   </div>
 
-  <!-- Recovery rules -->
-  <div class="card">
-    <div class="lbl">auto-regulation rules</div>
-    <div class="g2">
-      <div>
-        <div style="font-size:12px;color:var(--a);font-family:var(--mono);margin-bottom:8px;">REDUCE IF:</div>
-        <div style="font-size:13px;color:var(--t2);line-height:2.0;">
-          <div>• Fatigue score &gt; 70</div>
-          <div>• Sleep average &lt; 6 hours</div>
-          <div>• Performance declining 2+ weeks</div>
-          <div>• Persistent joint soreness</div>
-          <div>• Cardio metrics regressing</div>
-          <div>• Elevated resting HR</div>
-          <div>• Severe residency stress (ICU, nights)</div>
-        </div>
+  <div class="g2">
+    <div class="card">
+      <div class="lbl" style="color:var(--a);">reduce if:</div>
+      <div style="font-size:12px;color:var(--t2);line-height:2.0;">
+        <div>• Fatigue score &gt; 70</div>
+        <div>• Sleep average &lt; 6 hours</div>
+        <div>• Performance declining 2+ weeks</div>
+        <div>• Persistent joint soreness</div>
+        <div>• Cardio metrics regressing</div>
+        <div>• Severe residency stress</div>
       </div>
-      <div>
-        <div style="font-size:12px;color:var(--a3);font-family:var(--mono);margin-bottom:8px;">REDUCTION ORDER:</div>
-        <div style="font-size:13px;color:var(--t2);line-height:2.0;">
-          <div>1. Reduce volume first</div>
-          <div>2. Reduce intensity second</div>
-          <div>3. Reduce frequency third</div>
-          <div>4. Switch to minimum viable</div>
-          <div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:var(--r);font-size:12px;color:var(--a);">Reduced training is always preferred over missed training. Consistency during residency IS success.</div>
-        </div>
+    </div>
+    <div class="card">
+      <div class="lbl" style="color:var(--a3);">reduction order:</div>
+      <div style="font-size:12px;color:var(--t2);line-height:2.0;">
+        <div>1. Reduce volume first</div>
+        <div>2. Reduce intensity second</div>
+        <div>3. Reduce frequency third</div>
+        <div>4. Switch to minimum viable</div>
       </div>
+      <div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:var(--r);font-size:12px;color:var(--a);line-height:1.6;">Reduced training is always preferred over missed training. Consistency during residency IS success.</div>
     </div>
   </div>
 
-  <!-- Recovery history -->
   <div class="card">
     <div class="lbl">recovery log history</div>
     <div id="rec-hist"><div style="font-size:12px;color:var(--t3);font-style:italic;">No recovery logs yet.</div></div>
@@ -723,194 +623,192 @@ code { font-family: var(--mono); font-size: 11px; background: var(--s3); padding
 <!-- ===== MILESTONES ===== -->
 <div id="panel-milestones" class="panel">
   <div class="stitle">Goals &amp; <span>milestones</span></div>
-
   <div class="g2">
     <div class="card">
-      <div class="lbl">strength goals</div>
+      <div class="lbl">strength timeline</div>
       <div class="tl">
-        <div class="tli now"><div class="tli-date">CURRENT</div><div class="tli-title">Bench 190x5x5 / OHP 90x3x5</div><div class="tli-detail">Squat 160x5x5 / Deadlift 160x3x5</div></div>
+        <div class="tli now"><div class="tli-date">CURRENT</div><div class="tli-title">Bench 190×5×5 / OHP 90×3×5</div><div class="tli-detail">Squat 160×5×5 / Deadlift 160×3×5</div></div>
         <div class="tli"><div class="tli-date">SHORT TERM</div><div class="tli-title">Bench e1RM 275 / OHP e1RM 135</div><div class="tli-detail">Squat e1RM 245 / Deadlift e1RM 245</div></div>
-        <div class="tli"><div class="tli-date">MEDIUM TERM</div><div class="tli-title">Bench 225x5x5 / Pullups 8 clean reps</div><div class="tli-detail">Consistent progressive overload through intern year</div></div>
-        <div class="tli"><div class="tli-date">LONG TERM</div><div class="tli-title">Bench 300 / Squat 315 / Deadlift 315</div><div class="tli-detail">Post-residency strength targets</div></div>
+        <div class="tli"><div class="tli-date">MEDIUM TERM</div><div class="tli-title">Bench 225×5×5 / 8 clean pullups</div></div>
+        <div class="tli"><div class="tli-date">LONG TERM</div><div class="tli-title">Bench 300 / Squat 315 / DL 315</div></div>
       </div>
     </div>
     <div class="card">
-      <div class="lbl">cardio goals</div>
+      <div class="lbl">cardio timeline</div>
       <div class="tl">
-        <div class="tli now"><div class="tli-date">CURRENT</div><div class="tli-title">4 miles @ 10:30 pace / 165 HR</div><div class="tli-detail">Zone 2 baseline established</div></div>
-        <div class="tli"><div class="tli-date">SHORT TERM</div><div class="tli-title">4 miles @ 10:00 pace / same HR</div><div class="tli-detail">Aerobic efficiency improvement</div></div>
-        <div class="tli"><div class="tli-date">MEDIUM TERM</div><div class="tli-title">6 miles @ sub-10:00 / &lt;160 HR</div><div class="tli-detail">Zone 2 foundation well established</div></div>
-        <div class="tli"><div class="tli-date">LONG TERM</div><div class="tli-title">Half marathon capable</div><div class="tli-detail">Hybrid athlete aerobic base</div></div>
+        <div class="tli now"><div class="tli-date">CURRENT</div><div class="tli-title">4 mi @ 10:30 / 165 HR</div><div class="tli-detail">Zone 2 baseline established</div></div>
+        <div class="tli"><div class="tli-date">SHORT TERM</div><div class="tli-title">4 mi @ 10:00 / same HR</div></div>
+        <div class="tli"><div class="tli-date">MEDIUM TERM</div><div class="tli-title">6 mi @ sub-10:00 / &lt;160 HR</div></div>
+        <div class="tli"><div class="tli-date">LONG TERM</div><div class="tli-title">Half marathon capable</div></div>
       </div>
     </div>
   </div>
-
   <div class="card">
     <div class="lbl">open tasks</div>
-    <div class="ci" id="mhw1"><input type="checkbox" id="mhwcb1" onchange="chk('mhw1')"><label for="mhwcb1">Establish consistent 5-day training week during pre-residency</label></div>
-    <div class="ci" id="mhw2"><input type="checkbox" id="mhwcb2" onchange="chk('mhw2')"><label for="mhwcb2">Find gym near Kaiser SF Medical Center</label></div>
-    <div class="ci" id="mhw3"><input type="checkbox" id="mhwcb3" onchange="chk('mhw3')"><label for="mhwcb3">Log first session in new city</label></div>
-    <div class="ci" id="mhw4"><input type="checkbox" id="mhwcb4" onchange="chk('mhw4')"><label for="mhwcb4">Establish Zone 2 running route near hospital</label></div>
-    <div class="ci" id="mhw5"><input type="checkbox" id="mhwcb5" onchange="chk('mhw5')"><label for="mhwcb5">Deload week 4 — reduce volume 30-50%</label></div>
-    <div class="ci" id="mhw6"><input type="checkbox" id="mhwcb6" onchange="chk('mhw6')"><label for="mhwcb6">First heavy single attempt (90-95% effort) — weeks 3-6</label></div>
-    <div class="ci" id="mhw7"><input type="checkbox" id="mhwcb7" onchange="chk('mhw7')"><label for="mhwcb7">Bench 225x5x5 milestone</label></div>
-    <div class="ci" id="mhw8"><input type="checkbox" id="mhwcb8" onchange="chk('mhw8')"><label for="mhwcb8">10 clean pullups milestone</label></div>
-  </div>
-
-  <div class="card">
-    <div class="lbl">weekly snapshot</div>
-    <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;">
-        <thead>
-          <tr style="border-bottom:1px solid var(--b2);">
-            <th style="text-align:left;padding:8px 10px;color:var(--t3);">Week</th>
-            <th style="text-align:left;padding:8px 10px;color:var(--t3);">BW</th>
-            <th style="text-align:left;padding:8px 10px;color:var(--t3);">Bench</th>
-            <th style="text-align:left;padding:8px 10px;color:var(--t3);">Squat</th>
-            <th style="text-align:left;padding:8px 10px;color:var(--t3);">DL</th>
-            <th style="text-align:left;padding:8px 10px;color:var(--t3);">Run</th>
-            <th style="text-align:left;padding:8px 10px;color:var(--t3);">HR</th>
-          </tr>
-        </thead>
-        <tbody id="snapshot-table">
-          <tr style="border-bottom:1px solid var(--b);">
-            <td style="padding:8px 10px;color:var(--a);">W01</td>
-            <td style="padding:8px 10px;color:var(--t2);">225</td>
-            <td style="padding:8px 10px;color:var(--t2);">190x5x5</td>
-            <td style="padding:8px 10px;color:var(--t2);">160x5x5</td>
-            <td style="padding:8px 10px;color:var(--t2);">160x3x5</td>
-            <td style="padding:8px 10px;color:var(--t2);">10:30</td>
-            <td style="padding:8px 10px;color:var(--t2);">165</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="ci" id="mhw1"><input type="checkbox" id="mhwcb1" onchange="chk('mhw1')"><label for="mhwcb1">Find gym near Kaiser SF Medical Center</label></div>
+    <div class="ci" id="mhw2"><input type="checkbox" id="mhwcb2" onchange="chk('mhw2')"><label for="mhwcb2">Establish Zone 2 running route near hospital</label></div>
+    <div class="ci" id="mhw3"><input type="checkbox" id="mhwcb3" onchange="chk('mhw3')"><label for="mhwcb3">Log first session in San Francisco</label></div>
+    <div class="ci" id="mhw4"><input type="checkbox" id="mhwcb4" onchange="chk('mhw4')"><label for="mhwcb4">Complete first full deload week (week 4)</label></div>
+    <div class="ci" id="mhw5"><input type="checkbox" id="mhwcb5" onchange="chk('mhw5')"><label for="mhwcb5">First heavy single — weeks 3-6 (90-95% effort)</label></div>
+    <div class="ci" id="mhw6"><input type="checkbox" id="mhwcb6" onchange="chk('mhw6')"><label for="mhwcb6">Bench 225×5×5 milestone</label></div>
+    <div class="ci" id="mhw7"><input type="checkbox" id="mhwcb7" onchange="chk('mhw7')"><label for="mhwcb7">10 clean pullups milestone</label></div>
   </div>
 </div>
 
 <!-- ===== SETTINGS ===== -->
 <div id="panel-settings" class="panel">
-  <div class="stitle">Settings &amp; <span>sync</span></div>
+  <div class="stitle">Settings &amp; <span>GitHub sync</span></div>
   <div class="g2">
     <div class="card">
-      <div class="api-box">
-        <div class="lbl" style="color:var(--a);">anthropic api key</div>
-        <p><strong>Step 1:</strong> Go to <a href="https://console.anthropic.com" style="color:var(--a2);" target="_blank">console.anthropic.com</a> → sign in.</p>
-        <p><strong>Step 2:</strong> API Keys → Create Key → name it "Javier Workout".</p>
-        <p><strong>Step 3:</strong> Copy it (starts with <code>sk-ant-</code>). Do NOT paste in chat.</p>
-        <p><strong>Step 4:</strong> Paste below → Save. All AI buttons activate.</p>
-        <p style="color:var(--a);"><strong>Cost:</strong> ~$0.003–0.01 per button press. ~$1–3/month for daily use.</p>
+      <div class="api-info">
+        <div class="lbl" style="color:var(--a);">github personal access token</div>
+        <p>This token lets every Save button push directly to GitHub. Stored only in your browser — never sent anywhere except GitHub's API directly.</p>
+        <p><strong>To get a token:</strong> github.com → Profile → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → check <strong>repo</strong> → no expiration → copy it (starts with ghp_).</p>
+        <p style="color:var(--a);">Once set, every Save button updates GitHub automatically. No Claude needed for logging.</p>
+      </div>
+      <div class="ig"><label>GitHub Personal Access Token</label><input type="password" id="gh-token" placeholder="ghp_..."></div>
+      <div class="ig"><label>GitHub Username</label><input type="text" id="gh-user" value="javiermontelongo-md" placeholder="javiermontelongo-md"></div>
+      <div class="ig"><label>Repository Name</label><input type="text" id="gh-repo" value="workout-OS" placeholder="workout-OS"></div>
+      <div class="brow">
+        <button class="btn bp btn-i" onclick="saveGHSettings()">Save GitHub settings</button>
+        <button class="btn bs btn-i" onclick="testGHConnection()">Test connection</button>
+      </div>
+      <div id="gh-status" style="margin-top:8px;font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
+    </div>
+    <div class="card">
+      <div class="api-info">
+        <div class="lbl" style="color:var(--a2);">anthropic api key (ai coaching)</div>
+        <p>Powers the AI coaching buttons — daily plans, progression recommendations, week guidance. Optional.</p>
+        <p><strong>To get a key:</strong> console.anthropic.com → API Keys → Create Key → copy it. ~$0.003 per button press.</p>
       </div>
       <div class="ig"><label>Anthropic API Key</label><input type="password" id="api-input" placeholder="sk-ant-api03-..."></div>
       <div class="brow">
-        <button class="btn bp btn-inline" onclick="saveKey()">Save key</button>
-        <button class="btn bd btn-inline" onclick="clearKey()">Clear key</button>
+        <button class="btn bp btn-i" onclick="saveApiKey()">Save API key</button>
+        <button class="btn bd btn-i" onclick="clearApiKey()">Clear</button>
       </div>
-      <div id="key-status" style="margin-top:8px;font-size:11px;color:var(--t3);font-family:var(--mono);"></div>
-    </div>
-    <div class="card">
-      <div class="lbl">program mode</div>
-      <div style="font-size:13px;color:var(--t2);line-height:2.0;margin-bottom:12px;">
-        <div><strong style="color:var(--a);">NORMAL</strong> — standard volume + progression</div>
-        <div><strong style="color:var(--a2);">HIGH STRESS</strong> — reduce volume 20-30%</div>
-        <div><strong style="color:var(--t);">MAINTENANCE</strong> — preserve, minimize fatigue</div>
-        <div><strong style="color:var(--a5);">DELOAD</strong> — reduce 30-50%, active recovery</div>
-        <div><strong style="color:var(--a4);">RECOVERY</strong> — cardio + mobility only</div>
-        <div><strong style="color:var(--a4);">MINIMUM VIABLE</strong> — main lift or cardio only</div>
-      </div>
+      <div id="api-status" style="margin-top:8px;font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
       <div class="dvdr"></div>
       <div class="lbl">data</div>
       <div class="brow">
-        <button class="btn bs btn-inline" onclick="exportData()">Export data (JSON)</button>
-        <button class="btn bd btn-inline" onclick="clearData()">Clear all data</button>
+        <button class="btn bs btn-i" onclick="exportData()">Export JSON</button>
+        <button class="btn bd btn-i" onclick="clearData()">Clear local settings</button>
       </div>
     </div>
-  </div>
-
-  <!-- Cross-device sync -->
-  <div class="card" style="margin-top:4px;">
-    <div class="lbl" style="color:var(--a2);">cross-device sync</div>
-    <div style="background:rgba(79,195,247,.05);border:1px solid rgba(79,195,247,.15);border-radius:var(--r);padding:16px;margin-bottom:14px;">
-      <div style="font-size:13px;color:var(--t2);line-height:1.85;">
-        <p style="margin-bottom:10px;">Syncs sessions, recovery logs, and checkboxes between your Mac and iPhone automatically using <strong style="color:var(--t);">JSONBin</strong> — free, no account needed beyond a free API key.</p>
-        <p><strong style="color:var(--t);">First time (Mac):</strong> Go to <a href="https://jsonbin.io" target="_blank" style="color:var(--a2);">jsonbin.io</a> → Sign up free → API Keys → copy your Master Key → paste below → click <strong style="color:var(--t);">Create Sync Bin</strong>.</p>
-        <p style="margin-top:6px;"><strong style="color:var(--t);">On iPhone:</strong> Paste same Master Key + Sync ID → Save Settings → Pull from cloud.</p>
-        <p style="margin-top:6px;color:var(--a);">After setup: every save auto-pushes to cloud. On other device, tap Pull to sync.</p>
-      </div>
-    </div>
-    <div class="g2 keep2" style="margin-bottom:12px;">
-      <div class="ig"><label>JSONBin Master Key</label><input type="password" id="sync-key-input" placeholder="$2a$10$..."></div>
-      <div class="ig">
-        <label>Sync ID (auto-filled after creating)</label>
-        <div style="display:flex;gap:8px;">
-          <input type="text" id="sync-id-input" placeholder="Auto-fills after creation" style="flex:1;">
-          <button class="btn bs btn-inline" onclick="copySyncId()" style="white-space:nowrap;">Copy</button>
-        </div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn bp btn-inline" onclick="createBin()">Create Sync Bin (first time)</button>
-      <button class="btn bs btn-inline" onclick="saveSyncSettings()">Save Settings (existing ID)</button>
-      <button class="btn bs btn-inline" onclick="cloudPull()">↓ Pull from cloud</button>
-      <button class="btn bs btn-inline" onclick="cloudPush()">↑ Push to cloud</button>
-    </div>
-    <div id="sync-status" style="margin-top:10px;font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
   </div>
 </div>
 
 </div><!-- end main -->
 
-<!-- BOTTOM NAV (mobile only) -->
 <nav class="bottom-nav">
   <button class="nav-item active" onclick="goMobile('today',this)"><span class="nav-icon">🏋️</span><span class="nav-label">TODAY</span></button>
-  <button class="nav-item" onclick="goMobile('week',this)"><span class="nav-icon">📅</span><span class="nav-label">WEEK</span></button>
   <button class="nav-item" onclick="goMobile('log',this)"><span class="nav-icon">📝</span><span class="nav-label">LOG</span></button>
+  <button class="nav-item" onclick="goMobile('week',this)"><span class="nav-icon">📅</span><span class="nav-label">WEEK</span></button>
   <button class="nav-item" onclick="goMobile('progress',this)"><span class="nav-icon">📈</span><span class="nav-label">PROGRESS</span></button>
   <button class="nav-item" onclick="goMobile('program',this)"><span class="nav-icon">📋</span><span class="nav-label">PROGRAM</span></button>
   <button class="nav-item" onclick="goMobile('recovery',this)"><span class="nav-icon">🛌</span><span class="nav-label">RECOVERY</span></button>
   <button class="nav-item" onclick="goMobile('milestones',this)"><span class="nav-icon">🎯</span><span class="nav-label">GOALS</span></button>
   <button class="nav-item" onclick="goMobile('settings',this)"><span class="nav-icon">⚙️</span><span class="nav-label">SETTINGS</span></button>
 </nav>
-
-</div><!-- end app -->
+</div>
 
 <script>
-/* ============================================================ STATE ============================================================ */
-let S = { sessions:[], recovery:[], checks:{}, apiKey:'', syncBinId:'', syncApiKey:'', restDays:['Sat'] };
-function load(){ try{ const d=localStorage.getItem('j_workout_v1'); if(d) Object.assign(S,JSON.parse(d)); }catch(e){} }
-function save(){
-  try{
-    localStorage.setItem('j_workout_v1',JSON.stringify(S));
-    if(S.syncBinId&&S.syncApiKey) cloudPush().catch(()=>{});
-  }catch(e){}
-}
-load();
+// ============================================================
+// CANONICAL DATA STORE
+// ============================================================
+const CANONICAL = {
+  lastUpdated: "2026-05-16",
+  sessions: [],
+  recoveryLogs: [],
+  checks: {},
+  restDays: ["Sat"],
+  profile: { bodyweight: 225, phase: "Fat loss + strength base", blockWeek: 1, mode: "NORMAL" },
+  currentLifts: { benchE1RM: 255, squatE1RM: 215, deadliftE1RM: 215, ohpE1RM: 120, pullups: 5 },
+  cardioBaseline: { pace: "10:30", distance: 4.0, avgHR: 165 },
+  volumeBests: { bench: "190x5x5", ohp: "90x3x5", squat: "160x5x5", deadlift: "160x3x5" },
+  adherence: { planned: 5, completed: 0, missed: 0 }
+};
+// ============================================================
+// END CANONICAL DATA STORE
+// ============================================================
 
-/* ============================================================ INIT ============================================================ */
-const now = new Date();
-const ds = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-const dsm = now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-if(document.getElementById('d-date')) document.getElementById('d-date').textContent = ds;
-if(document.getElementById('m-date')) document.getElementById('m-date').textContent = dsm;
+let SETTINGS = { ghToken:'', ghUser:'javiermontelongo-md', ghRepo:'workout-OS', apiKey:'' };
+function loadSettings(){ try{ const d=localStorage.getItem('workout_os_settings'); if(d) Object.assign(SETTINGS,JSON.parse(d)); }catch(e){} }
+function saveSettings(){ try{ localStorage.setItem('workout_os_settings',JSON.stringify(SETTINGS)); }catch(e){} }
+loadSettings();
+
+// ============================================================
+// GITHUB API
+// ============================================================
+async function pushToGitHub(triggerEl, statusEl){
+  if(!SETTINGS.ghToken){ setSaveStatus(statusEl,'⚠ Add GitHub token in Settings first'); return false; }
+  if(triggerEl){ triggerEl.classList.add('saving'); triggerEl.textContent='Saving…'; }
+  setSyncIndicator('saving','Saving…');
+  try{
+    const infoRes=await fetch(`https://api.github.com/repos/${SETTINGS.ghUser}/${SETTINGS.ghRepo}/contents/index.html`,{headers:{Authorization:`token ${SETTINGS.ghToken}`,Accept:'application/vnd.github.v3+json'}});
+    if(!infoRes.ok) throw new Error('Could not read file. Check token and repo name.');
+    const info=await infoRes.json();
+    const sha=info.sha;
+    const currentContent=atob(info.content.replace(/\n/g,''));
+    CANONICAL.lastUpdated=new Date().toISOString().split('T')[0];
+    const canonicalStr=JSON.stringify(CANONICAL,null,2);
+    const updated=currentContent.replace(
+      /const CANONICAL = \{[\s\S]*?\};\n\/\/ ={10,}\n\/\/ END CANONICAL DATA STORE/,
+      `const CANONICAL = ${canonicalStr};\n// ============================================================\n// END CANONICAL DATA STORE`
+    );
+    const pushRes=await fetch(`https://api.github.com/repos/${SETTINGS.ghUser}/${SETTINGS.ghRepo}/contents/index.html`,{
+      method:'PUT',
+      headers:{Authorization:`token ${SETTINGS.ghToken}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({message:`Update data — ${new Date().toLocaleDateString()}`,content:btoa(unescape(encodeURIComponent(updated))),sha})
+    });
+    if(!pushRes.ok) throw new Error('GitHub push failed. Check token permissions.');
+    setSaveStatus(statusEl,'✓ Saved to GitHub — '+new Date().toLocaleTimeString());
+    setSyncIndicator('ok','Synced');
+    if(triggerEl){ triggerEl.classList.remove('saving'); triggerEl.textContent='💾 Save session to GitHub'; }
+    return true;
+  }catch(e){
+    setSaveStatus(statusEl,'⚠ '+e.message);
+    setSyncIndicator('error','Sync error');
+    if(triggerEl){ triggerEl.classList.remove('saving'); triggerEl.textContent='💾 Save session to GitHub'; }
+    return false;
+  }
+}
+function setSaveStatus(id,msg){ const el=document.getElementById(id); if(el) el.textContent=msg; }
+function setSyncIndicator(state,label){
+  const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label'),mtag=document.getElementById('m-sync-tag');
+  if(dot) dot.className='sync-dot '+state;
+  if(lbl) lbl.textContent=label;
+  if(mtag) mtag.textContent=label.toUpperCase();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+const now=new Date();
+if(document.getElementById('d-date')) document.getElementById('d-date').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+if(document.getElementById('m-date')) document.getElementById('m-date').textContent=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 const di=document.getElementById('log-date'); if(di) di.value=now.toISOString().split('T')[0];
 const di2=document.getElementById('rec-date'); if(di2) di2.value=now.toISOString().split('T')[0];
-if(S.apiKey){ document.getElementById('api-input').value=S.apiKey; document.getElementById('key-status').textContent='✓ Key loaded'; }
-if(S.syncBinId) { const el=document.getElementById('sync-id-input'); if(el) el.value=S.syncBinId; }
-if(S.syncApiKey){ const el=document.getElementById('sync-key-input'); if(el) el.value=S.syncApiKey; }
-if(S.syncBinId&&S.syncApiKey) setSyncStatus('✓ Sync configured');
+if(SETTINGS.ghToken){ document.getElementById('gh-token').value=SETTINGS.ghToken; document.getElementById('gh-status').textContent='✓ Token loaded'; }
+if(SETTINGS.ghUser) document.getElementById('gh-user').value=SETTINGS.ghUser;
+if(SETTINGS.ghRepo) document.getElementById('gh-repo').value=SETTINGS.ghRepo;
+if(SETTINGS.apiKey){ document.getElementById('api-input').value=SETTINGS.apiKey; document.getElementById('api-status').textContent='✓ Key loaded'; }
 try{ restoreChecks(); }catch(e){}
-try{ renderHistory(); }catch(e){}
+try{ renderSessionHistory(); }catch(e){}
+try{ renderRecoveryHistory(); }catch(e){}
 try{ buildWeekGrid(); }catch(e){}
 try{ loadDayPreview(); }catch(e){}
 try{ upRecScore(); }catch(e){}
+try{ initSets(); }catch(e){}
+try{ updateProgressStats(); }catch(e){}
 
-/* ============================================================ NAVIGATION ============================================================ */
+// ============================================================
+// NAVIGATION
+// ============================================================
 function goTab(name,el){
   try{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    const panel=document.getElementById('panel-'+name);
-    if(panel) panel.classList.add('active');
+    const p=document.getElementById('panel-'+name); if(p) p.classList.add('active');
     if(el) el.classList.add('active');
   }catch(e){}
 }
@@ -918,191 +816,211 @@ function goMobile(name,el){
   try{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    const panel=document.getElementById('panel-'+name);
-    if(panel){ panel.classList.add('active'); panel.scrollTop=0; }
+    const p=document.getElementById('panel-'+name); if(p){ p.classList.add('active'); p.scrollTop=0; }
     if(el) el.classList.add('active');
   }catch(e){}
 }
 
-/* ============================================================ FATIGUE METER ============================================================ */
-function upFatigue(){
-  const e=+document.getElementById('sl-e').value;
-  const s=+document.getElementById('sl-s').value;
-  const sr=+document.getElementById('sl-sr').value;
-  const m=+document.getElementById('sl-m').value;
-  document.getElementById('v-e').textContent=e+'/10';
-  document.getElementById('v-s').textContent=s+'h';
-  document.getElementById('v-sr').textContent=sr+'/10';
-  document.getElementById('v-m').textContent=m+'/10';
-  // Fatigue = high soreness + low sleep + low energy
-  const fatigue=Math.max(0,Math.min(100,Math.round(((10-e)+(10-s/9*10)+(sr)+(10-m))/4*10)));
-  document.getElementById('f-fill').style.width=fatigue+'%';
-  const c=fatigue<25?'var(--a3)':fatigue<50?'var(--a)':fatigue<75?'var(--a4)':'var(--red)';
-  const l=fatigue<25?'LOW':fatigue<50?'MODERATE':fatigue<75?'HIGH':'CRITICAL';
-  document.getElementById('f-fill').style.background=c;
-  document.getElementById('f-lbl').textContent=l;
-  document.getElementById('f-lbl').style.color=c;
+// ============================================================
+// FATIGUE METER
+// ============================================================
+function upFat(){
+  const e=+document.getElementById('sl-e').value,s=+document.getElementById('sl-s').value,sr=+document.getElementById('sl-sr').value,m=+document.getElementById('sl-m').value;
+  document.getElementById('v-e').textContent=e+'/10';document.getElementById('v-s').textContent=s+'h';document.getElementById('v-sr').textContent=sr+'/10';document.getElementById('v-m').textContent=m+'/10';
+  const fat=Math.max(0,Math.min(100,Math.round(((10-e)+(10-s/9*10)+sr+(10-m))/4*10)));
+  document.getElementById('f-fill').style.width=fat+'%';
+  const c=fat<25?'var(--a3)':fat<50?'var(--a)':fat<75?'var(--a4)':'var(--red)';
+  const l=fat<25?'LOW':fat<50?'MODERATE':fat<75?'HIGH':'CRITICAL';
+  document.getElementById('f-fill').style.background=c;document.getElementById('f-lbl').textContent=l;document.getElementById('f-lbl').style.color=c;
 }
 
-/* ============================================================ RECOVERY SCORE ============================================================ */
+// ============================================================
+// RECOVERY SCORE
+// ============================================================
 function upRecScore(){
-  const sl=+document.getElementById('rs-sleep').value;
-  const so=+document.getElementById('rs-sor').value;
-  const mo=+document.getElementById('rs-mot').value;
-  const en=+document.getElementById('rs-en').value;
-  document.getElementById('rv-sleep').textContent=sl+'/10';
-  document.getElementById('rv-sor').textContent=so+'/10';
-  document.getElementById('rv-mot').textContent=mo+'/10';
-  document.getElementById('rv-en').textContent=en+'/10';
+  const sl=+document.getElementById('rs-sleep').value,so=+document.getElementById('rs-sor').value,mo=+document.getElementById('rs-mot').value,en=+document.getElementById('rs-en').value;
+  document.getElementById('rv-sleep').textContent=sl+'/10';document.getElementById('rv-sor').textContent=so+'/10';document.getElementById('rv-mot').textContent=mo+'/10';document.getElementById('rv-en').textContent=en+'/10';
   const score=Math.round((sl+(10-so)+mo+en)/4*10)/10;
   const pct=score*10;
   document.getElementById('rec-fill').style.width=pct+'%';
   const c=pct>70?'var(--a3)':pct>50?'var(--a)':pct>30?'var(--a4)':'var(--red)';
-  document.getElementById('rec-fill').style.background=c;
-  document.getElementById('rec-score-lbl').textContent=score.toFixed(1)+'/10';
+  document.getElementById('rec-fill').style.background=c;document.getElementById('rec-score-lbl').textContent=score.toFixed(1)+'/10';
 }
 
-/* ============================================================ MODE ============================================================ */
+// ============================================================
+// MODE
+// ============================================================
 function modeChange(){
   const m=document.getElementById('mode-sel').value;
   const msgs={
-    normal:'<p><strong>Normal mode:</strong> Follow prescribed volume and loading. Hit your compound sets first, accessories second.</p>',
-    stress:'<p><strong>High stress mode:</strong> Reduce volume 20-30%. Keep compound lifts at same weight but cut sets. Drop accessories if needed. Protect recovery.</p>',
-    maintenance:'<p><strong>Maintenance mode:</strong> Preserve strength and conditioning. Minimize fatigue accumulation. One heavy set per lift, then done.</p>',
-    deload:'<p><strong>Deload mode:</strong> Reduce load 30-50%. Maintain movement patterns. Prioritize sleep and food. No grinders. This is productive rest.</p>',
-    recovery:'<p><strong>Recovery mode:</strong> Cardio and mobility only. No heavy loading. Zone 2 runs, stretching, foam rolling. Let the body rebuild.</p>',
-    minimum:'<p><strong>Minimum viable:</strong> Main lift only OR cardio only. Getting to the gym and doing one thing is a win. Consistency preservation is the goal.</p>'
+    normal:'<p><strong>Normal:</strong> Follow prescribed volume. Compound lifts first, accessories second.</p>',
+    stress:'<p><strong>High stress:</strong> Reduce volume 20-30%. Keep compound weight, cut sets. Drop accessories.</p>',
+    maintenance:'<p><strong>Maintenance:</strong> One heavy set per lift. Preserve, don\'t accumulate fatigue.</p>',
+    deload:'<p><strong>Deload:</strong> Reduce load 30-50%. Maintain movement patterns. Sleep and eat. No grinders.</p>',
+    recovery:'<p><strong>Recovery:</strong> Zone 2 cardio and mobility only. No heavy loading.</p>',
+    minimum:'<p><strong>Minimum viable:</strong> Main lift only OR cardio only. Getting there is the win.</p>'
   };
-  document.getElementById('today-out').innerHTML='<div class="air"><div class="albl">◆ MODE OVERRIDE</div>'+msgs[m]+'</div>';
+  document.getElementById('today-out').innerHTML='<div class="air"><div class="albl">◆ MODE</div>'+msgs[m]+'</div>';
 }
 
-/* ============================================================ CHECKBOXES ============================================================ */
+// ============================================================
+// CHECKBOXES
+// ============================================================
 function chk(id){
   const el=document.getElementById(id); if(!el) return;
   const cb=el.querySelector('input[type=checkbox]');
   if(cb.checked) el.classList.add('checked'); else el.classList.remove('checked');
-  S.checks[id]=cb.checked; save();
+  CANONICAL.checks[id]=cb.checked;
 }
 function restoreChecks(){
-  for(const [id,val] of Object.entries(S.checks)){
+  for(const [id,val] of Object.entries(CANONICAL.checks)){
     const el=document.getElementById(id); if(!el) continue;
     const cb=el.querySelector('input[type=checkbox]'); if(!cb) continue;
     cb.checked=val; if(val) el.classList.add('checked'); else el.classList.remove('checked');
   }
 }
 
-/* ============================================================ DAY PREVIEW ============================================================ */
-const dayPreviews = {
-  '1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a);">■</span> Bench Press — 5x5 @ 190</div><div><span style="color:var(--a);">■</span> Barbell Row — 4x6-8</div><div><span style="color:var(--a);">■</span> Overhead Press — 3x5 @ 90</div><div><span style="color:var(--a);">■</span> Pullups — 5×3 clean reps</div><div><span style="color:var(--a);">■</span> Incline DB Press — 3x8-10</div><div><span style="color:var(--a);">■</span> Lateral Raises — 4x15-20</div><div><span style="color:var(--a2);">■</span> Zone 2 cardio — 20-30 min</div></div>',
-  '2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a);">■</span> Back Squat — 5x5 @ 160</div><div><span style="color:var(--a);">■</span> Deadlift — 3x5 @ 160</div><div><span style="color:var(--a);">■</span> Romanian Deadlift — 3x8</div><div><span style="color:var(--a);">■</span> Split Squats — 3x10 each leg</div><div><span style="color:var(--a);">■</span> Core — 2-3 exercises</div><div><span style="color:var(--a2);">■</span> Zone 2 cardio — 20-40 min</div></div>',
-  '3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a2);">■</span> Easy run — 20-45 min @ 140-155 HR</div><div><span style="color:var(--a2);">■</span> Target: conversational pace</div><div><span style="color:var(--a2);">■</span> Baseline: 10:30 pace @ 165 HR</div><div style="margin-top:8px;font-size:11px;color:var(--t3);">Full recovery day — no lifting</div></div>',
-  '4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a5);">■</span> Incline Machine Press — 4x8-12</div><div><span style="color:var(--a5);">■</span> Lat Pulldown — 4x8-12</div><div><span style="color:var(--a5);">■</span> DB Shoulder Press — 3x8-10</div><div><span style="color:var(--a5);">■</span> Lateral Raises — 5x15-20</div><div><span style="color:var(--a5);">■</span> Rear Delt Fly — 4x15-20</div><div><span style="color:var(--a5);">■</span> Biceps + Triceps — 3x10-15 each</div><div><span style="color:var(--a2);">■</span> Easy cardio — 20-30 min</div></div>',
-  '5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a5);">■</span> Leg Press / Front Squat — 3x8-10</div><div><span style="color:var(--a5);">■</span> RDL — 3x8-10 @ 115-155</div><div><span style="color:var(--a5);">■</span> Walking Lunges — 3x12 each leg</div><div><span style="color:var(--a5);">■</span> Hamstring Curl — 3x12-15</div><div><span style="color:var(--a2);">■</span> Intervals — 1 min hard / 2 min easy × 6-10</div></div>',
-  'rest':'<div style="font-size:13px;color:var(--t3);padding:10px 0;">Rest day — sleep, eat well, recover. This is part of the program.</div>'
-};
-function loadDayPreview(){
-  const day=document.getElementById('today-day').value;
-  const el=document.getElementById('day-preview');
-  if(el) el.innerHTML=dayPreviews[day]||'';
+// ============================================================
+// SET-BY-SET LOGGING
+// ============================================================
+const setData = { bench:[], ohp:[], squat:[], dl:[] };
+function initSets(){
+  ['bench','ohp','squat','dl'].forEach(lift=>{
+    setData[lift]=[];
+    addSet(lift); // start with one empty set
+  });
+}
+function addSet(lift){
+  const idx=setData[lift].length;
+  setData[lift].push({weight:'',reps:'',rpe:''});
+  renderSets(lift);
+}
+function removeSet(lift,idx){
+  setData[lift].splice(idx,1);
+  renderSets(lift);
+}
+function renderSets(lift){
+  const container=document.getElementById(lift+'-sets'); if(!container) return;
+  const defaults={bench:190,ohp:90,squat:160,dl:160};
+  container.innerHTML=setData[lift].map((s,i)=>`
+    <div class="set-row">
+      <input type="number" placeholder="${defaults[lift]}" value="${s.weight}" oninput="setData['${lift}'][${i}].weight=this.value" style="font-size:16px;text-align:center;">
+      <input type="number" placeholder="5" value="${s.reps}" oninput="setData['${lift}'][${i}].reps=this.value" style="font-size:16px;text-align:center;">
+      <input type="number" placeholder="7" min="1" max="10" value="${s.rpe}" oninput="setData['${lift}'][${i}].rpe=this.value" style="font-size:16px;text-align:center;">
+      <button class="remove-set" onclick="removeSet('${lift}',${i})">×</button>
+    </div>`).join('');
 }
 
-/* ============================================================ WEEK GRID ============================================================ */
-const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-function buildWeekGrid(){
-  const today=new Date(),dow=today.getDay();
-  const grid=document.getElementById('wk-grid'); grid.innerHTML='';
-  const dayTypes=['rest','Upper Str','Lower Str','Recovery','Upper Hyp','Lower+Cond','rest'];
-  const dayClasses=['rt','st','st','cd','hy','hy','rt'];
-  for(let i=0;i<7;i++){
-    const d=new Date(today); d.setDate(today.getDate()-dow+i);
-    const dn=DAYS[i],isToday=i===dow,isRest=S.restDays.includes(dn);
-    const col=document.createElement('div');
-    col.className='dc'+(isToday?' today':'')+(isRest?' rest':'');
-    let inner=`<div class="dn">${dn.toUpperCase()}</div><div class="dd">${d.getDate()}</div>`;
-    if(isRest){inner+=`<div class="dtask rt">REST</div>`;}
-    else{inner+=`<div class="dtask ${dayClasses[i]}">${dayTypes[i]}</div>`;}
-    col.innerHTML=inner; grid.appendChild(col);
-  }
-}
-function toggleRest(el,day){
-  el.classList.toggle('sel');
-  if(S.restDays.includes(day)) S.restDays=S.restDays.filter(d=>d!==day);
-  else S.restDays.push(day);
-  save(); buildWeekGrid();
-}
-function upWeekBars(){
-  const s=+document.getElementById('inp-sess').value||0;
-  const c=+document.getElementById('inp-card').value||0;
-  document.getElementById('wk-sess-v').textContent=s+' / 5';
-  document.getElementById('wk-sess-b').style.width=Math.min(100,Math.round(s/5*100))+'%';
-  document.getElementById('wk-card-v').textContent=c+' / 3';
-  document.getElementById('wk-card-b').style.width=Math.min(100,Math.round(c/3*100))+'%';
-}
-
-/* ============================================================ LOG SESSION ============================================================ */
-function logSession(){
+// ============================================================
+// SAVE SESSION
+// ============================================================
+async function saveSession(){
   const date=document.getElementById('log-date').value;
   const day=document.getElementById('log-day').value;
-  const rpe=+document.getElementById('log-rpe').value||null;
-  const dur=+document.getElementById('log-dur').value||null;
-  const energy=+document.getElementById('log-energy').value||null;
-  const bw=+document.getElementById('log-bw').value||null;
-  const sleep=+document.getElementById('log-sleep').value||null;
-  const notes=document.getElementById('log-notes').value;
-  if(!date||!day){alert('Fill in date and day type.');return;}
-  const lifts={
-    bench:{w:+document.getElementById('bench-w').value||null,sets:+document.getElementById('bench-sets').value||null,reps:+document.getElementById('bench-reps').value||null,rpe:+document.getElementById('bench-rpe').value||null,notes:document.getElementById('bench-notes').value},
-    ohp:{w:+document.getElementById('ohp-w').value||null,sets:+document.getElementById('ohp-sets').value||null,reps:+document.getElementById('ohp-reps').value||null,rpe:+document.getElementById('ohp-rpe').value||null,notes:document.getElementById('ohp-notes').value},
-    squat:{w:+document.getElementById('sq-w').value||null,sets:+document.getElementById('sq-sets').value||null,reps:+document.getElementById('sq-reps').value||null,rpe:+document.getElementById('sq-rpe').value||null,notes:document.getElementById('sq-notes').value},
-    dl:{w:+document.getElementById('dl-w').value||null,sets:+document.getElementById('dl-sets').value||null,reps:+document.getElementById('dl-reps').value||null,rpe:+document.getElementById('dl-rpe').value||null,notes:document.getElementById('dl-notes').value},
-    pullups:{sets:+document.getElementById('pu-sets').value||null,reps:+document.getElementById('pu-reps').value||null}
+  if(!date||!day){ setSaveStatus('log-save-status','⚠ Fill in date and day type'); return; }
+
+  const getLift=(lift)=>({
+    sets: setData[lift].filter(s=>s.weight||s.reps).map(s=>({weight:+s.weight||null,reps:+s.reps||null,rpe:+s.rpe||null})),
+    notes: document.getElementById(lift+'-notes')?.value||''
+  });
+
+  const session={
+    date, day,
+    rpe: +document.getElementById('log-rpe').value||null,
+    duration: +document.getElementById('log-dur').value||null,
+    energy: +document.getElementById('log-energy').value||null,
+    bodyweight: +document.getElementById('log-bw').value||null,
+    sleep: +document.getElementById('log-sleep').value||null,
+    notes: document.getElementById('log-notes').value,
+    bench: getLift('bench'),
+    ohp: getLift('ohp'),
+    squat: getLift('squat'),
+    dl: getLift('dl'),
+    pullups: { sets:+document.getElementById('pu-sets').value||null, reps:+document.getElementById('pu-reps').value||null },
+    cardio: {
+      type: document.getElementById('card-type').value,
+      duration: +document.getElementById('card-dur').value||null,
+      distance: +document.getElementById('card-dist').value||null,
+      avgHR: +document.getElementById('card-hr').value||null,
+      pace: document.getElementById('card-pace').value,
+      notes: document.getElementById('card-notes').value
+    },
+    ts: Date.now()
   };
-  const cardio={
-    type:document.getElementById('card-type').value,
-    dur:+document.getElementById('card-dur').value||null,
-    dist:+document.getElementById('card-dist').value||null,
-    hr:+document.getElementById('card-hr').value||null,
-    pace:document.getElementById('card-pace').value,
-    notes:document.getElementById('card-notes').value
+
+  CANONICAL.sessions.push(session);
+  CANONICAL.adherence.completed++;
+
+  // Update e1RM using Epley formula
+  const updateE1RM=(sets,current,key)=>{
+    sets.filter(s=>s.weight&&s.reps).forEach(s=>{
+      const e=Math.round(s.weight*(1+s.reps/30));
+      if(e>current){ CANONICAL.currentLifts[key]=e; }
+    });
   };
-  S.sessions.push({date,day,rpe,dur,energy,bw,sleep,notes,lifts,cardio,ts:Date.now()});
-  save(); renderHistory();
-  // Update e1RM estimates
-  if(lifts.bench.w && lifts.bench.reps) updateE1RM('bench',lifts.bench.w,lifts.bench.reps);
-  if(lifts.ohp.w && lifts.ohp.reps) updateE1RM('ohp',lifts.ohp.w,lifts.ohp.reps);
-  if(lifts.squat.w && lifts.squat.reps) updateE1RM('squat',lifts.squat.w,lifts.squat.reps);
-  if(lifts.dl.w && lifts.dl.reps) updateE1RM('dl',lifts.dl.w,lifts.dl.reps);
-  alert('Session saved ✓');
-}
-function updateE1RM(lift,w,r){
-  // Epley formula: e1RM = w * (1 + r/30)
-  const e1rm=Math.round(w*(1+r/30));
-  const map={bench:'pr-bench',ohp:'pr-ohp',squat:'pr-squat',dl:'pr-dl'};
-  const el=document.getElementById(map[lift]);
-  if(el){const cur=+el.textContent; if(e1rm>cur) el.textContent=e1rm;}
-}
-function renderHistory(){
-  const el=document.getElementById('session-hist');
-  const el2=document.getElementById('all-sessions');
-  const ss=[...S.sessions].reverse().slice(0,20);
-  if(!ss.length){
-    const msg='<div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div>';
-    if(el) el.innerHTML=msg; if(el2) el2.innerHTML=msg; return;
+  if(session.bench.sets.length) updateE1RM(session.bench.sets,CANONICAL.currentLifts.benchE1RM,'benchE1RM');
+  if(session.ohp.sets.length) updateE1RM(session.ohp.sets,CANONICAL.currentLifts.ohpE1RM,'ohpE1RM');
+  if(session.squat.sets.length) updateE1RM(session.squat.sets,CANONICAL.currentLifts.squatE1RM,'squatE1RM');
+  if(session.dl.sets.length) updateE1RM(session.dl.sets,CANONICAL.currentLifts.deadliftE1RM,'deadliftE1RM');
+  if(session.pullups.reps && session.pullups.reps>CANONICAL.currentLifts.pullups) CANONICAL.currentLifts.pullups=session.pullups.reps;
+
+  const btn=document.getElementById('log-save-btn');
+  const ok=await pushToGitHub(btn,'log-save-status');
+  if(ok){
+    renderSessionHistory();
+    updateProgressStats();
+    // Reset form
+    document.getElementById('log-rpe').value='';
+    document.getElementById('log-dur').value='';
+    document.getElementById('log-energy').value='';
+    document.getElementById('log-bw').value='';
+    document.getElementById('log-sleep').value='';
+    document.getElementById('log-notes').value='';
+    document.getElementById('card-dur').value='';
+    document.getElementById('card-dist').value='';
+    document.getElementById('card-hr').value='';
+    document.getElementById('card-pace').value='';
+    document.getElementById('card-notes').value='';
+    initSets();
+  } else {
+    CANONICAL.sessions.pop();
+    CANONICAL.adherence.completed--;
   }
+}
+function renderSessionHistory(){
   const dayNames={'1':'Upper Strength','2':'Lower Strength','3':'Recovery/Cardio','4':'Upper Hypertrophy','5':'Lower+Conditioning'};
-  const html=ss.map(s=>{
-    const liftsStr=[];
-    if(s.lifts?.bench?.w) liftsStr.push(`Bench ${s.lifts.bench.w}x${s.lifts.bench.sets}x${s.lifts.bench.reps}`);
-    if(s.lifts?.squat?.w) liftsStr.push(`Squat ${s.lifts.squat.w}x${s.lifts.squat.sets}x${s.lifts.squat.reps}`);
-    if(s.lifts?.dl?.w) liftsStr.push(`DL ${s.lifts.dl.w}x${s.lifts.dl.sets}x${s.lifts.dl.reps}`);
-    if(s.cardio?.pace) liftsStr.push(`Run ${s.cardio.pace}/mi`);
-    return`<div class="le"><div class="ld">${s.date}</div><div class="lc"><div class="lt">${dayNames[s.day]||'Session'}${s.rpe?' · RPE '+s.rpe:''}</div><div class="ldt">${liftsStr.join(' · ')||'No lift data logged'}${s.notes?' — '+s.notes.substring(0,80):''}</div></div></div>`;
-  }).join('');
-  if(el) el.innerHTML=html; if(el2) el2.innerHTML=html;
+  const render=(id,limit)=>{
+    const el=document.getElementById(id); if(!el) return;
+    const ss=[...CANONICAL.sessions].reverse().slice(0,limit);
+    if(!ss.length){ el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions yet.</div>'; return; }
+    el.innerHTML=ss.map(s=>{
+      const parts=[];
+      if(s.bench?.sets?.length){ const best=s.bench.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`Bench ${best.weight}×${best.reps}`); }
+      if(s.squat?.sets?.length){ const best=s.squat.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`Squat ${best.weight}×${best.reps}`); }
+      if(s.dl?.sets?.length){ const best=s.dl.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`DL ${best.weight}×${best.reps}`); }
+      if(s.cardio?.pace) parts.push(`Run ${s.cardio.pace}/mi`);
+      return`<div class="le"><div class="ld">${s.date}</div><div class="lc"><div class="lt">${dayNames[s.day]||'Session'}${s.rpe?' · RPE '+s.rpe:''}</div><div class="ldt">${parts.join(' · ')||'No lift data'}${s.notes?' — '+s.notes.substring(0,60):''}</div></div></div>`;
+    }).join('');
+  };
+  render('session-hist',10);
+  render('all-sessions',20);
+}
+function updateProgressStats(){
+  const el=id=>document.getElementById(id);
+  if(el('pr-bench')) el('pr-bench').textContent=CANONICAL.currentLifts.benchE1RM;
+  if(el('pr-squat')) el('pr-squat').textContent=CANONICAL.currentLifts.squatE1RM;
+  if(el('pr-dl')) el('pr-dl').textContent=CANONICAL.currentLifts.deadliftE1RM;
+  if(el('pr-ohp')) el('pr-ohp').textContent=CANONICAL.currentLifts.ohpE1RM;
+  if(el('pr-pullups')) el('pr-pullups').textContent=CANONICAL.currentLifts.pullups;
+  if(el('pr-pace')) el('pr-pace').textContent=CANONICAL.cardioBaseline.pace;
+  if(el('pr-hr')) el('pr-hr').textContent=CANONICAL.cardioBaseline.avgHR;
+  if(el('pr-bw')) el('pr-bw').textContent=CANONICAL.profile.bodyweight;
 }
 
-/* ============================================================ RECOVERY LOG ============================================================ */
-function logRecovery(){
+// ============================================================
+// SAVE RECOVERY
+// ============================================================
+async function saveRecovery(){
   const date=document.getElementById('rec-date').value;
   const bw=+document.getElementById('rec-bw').value||null;
   const sleep=+document.getElementById('rs-sleep').value;
@@ -1110,130 +1028,127 @@ function logRecovery(){
   const mot=+document.getElementById('rs-mot').value;
   const en=+document.getElementById('rs-en').value;
   const notes=document.getElementById('rec-notes').value;
-  const score=((sleep+(10-sor)+mot+en)/4).toFixed(1);
-  S.recovery.push({date,bw,sleep,sor,mot,en,score,notes,ts:Date.now()});
-  save();
-  // Update stats
-  const avgSleep=(S.recovery.slice(-7).reduce((a,r)=>a+r.sleep,0)/Math.min(S.recovery.length,7)).toFixed(1);
-  const el=document.getElementById('rec-sleep'); if(el) el.textContent=avgSleep+'h';
-  const elr=document.getElementById('rec-score'); if(elr) elr.textContent=score;
-  // Render history
-  const hist=document.getElementById('rec-hist');
-  if(hist) hist.innerHTML=[...S.recovery].reverse().slice(0,10).map(r=>`<div class="le"><div class="ld">${r.date}</div><div class="lc"><div class="lt">Recovery ${r.score}/10${r.bw?' · '+r.bw+'lb':''}</div><div class="ldt">Sleep ${r.sleep}/10 · Soreness ${r.sor}/10 · Motivation ${r.mot}/10${r.notes?' — '+r.notes.substring(0,80):''}</div></div></div>`).join('');
-  alert('Recovery log saved ✓');
+  const score=+((sleep+(10-sor)+mot+en)/4).toFixed(1);
+  CANONICAL.recoveryLogs.push({date,bw,sleep,sor,mot,en,score,notes,ts:Date.now()});
+  if(bw) CANONICAL.profile.bodyweight=bw;
+  const btn=document.getElementById('rec-save-btn');
+  const ok=await pushToGitHub(btn,'rec-save-status');
+  if(ok){
+    renderRecoveryHistory();
+    updateRecoveryStats();
+    document.getElementById('rec-notes').value='';
+  } else { CANONICAL.recoveryLogs.pop(); }
+}
+function renderRecoveryHistory(){
+  const el=document.getElementById('rec-hist'); if(!el) return;
+  const logs=[...CANONICAL.recoveryLogs].reverse().slice(0,10);
+  if(!logs.length){ el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">No recovery logs yet.</div>'; return; }
+  el.innerHTML=logs.map(r=>`<div class="le"><div class="ld">${r.date}</div><div class="lc"><div class="lt">Recovery ${r.score}/10${r.bw?' · '+r.bw+'lb':''}</div><div class="ldt">Sleep ${r.sleep}/10 · Soreness ${r.sor}/10 · Motivation ${r.mot}/10</div></div></div>`).join('');
+}
+function updateRecoveryStats(){
+  const recent=CANONICAL.recoveryLogs.slice(-7);
+  if(!recent.length) return;
+  const avgSleep=(recent.reduce((a,r)=>a+r.sleep,0)/recent.length).toFixed(1);
+  const avgScore=(recent.reduce((a,r)=>a+r.score,0)/recent.length).toFixed(1);
+  const el=id=>document.getElementById(id);
+  if(el('rec-sleep-avg')) el('rec-sleep-avg').textContent=avgSleep;
+  if(el('rec-score')) el('rec-score').textContent=avgScore;
+  if(el('rec-count')) el('rec-count').textContent=recent.length;
 }
 
-/* ============================================================ CLOUD SYNC ============================================================ */
-const JBIN='https://api.jsonbin.io/v3/b';
-async function cloudPush(){
-  if(!S.syncBinId||!S.syncApiKey) return;
-  try{
-    const p={...S}; delete p.apiKey;
-    const r=await fetch(`${JBIN}/${S.syncBinId}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':S.syncApiKey},body:JSON.stringify(p)});
-    if(r.ok) setSyncStatus('✓ Synced '+new Date().toLocaleTimeString());
-    else setSyncStatus('⚠ Sync push failed');
-  }catch(e){ setSyncStatus('⚠ Sync error — local data safe'); }
+// ============================================================
+// WEEK GRID
+// ============================================================
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const dayTypes={0:'rest',1:'Upper Str',2:'Lower Str',3:'Recovery',4:'Upper Hyp',5:'Lower+Cond',6:'rest'};
+const dayClasses={0:'rt',1:'st',2:'st',3:'cd',4:'hy',5:'hy',6:'rt'};
+function buildWeekGrid(){
+  const today=new Date(),dow=today.getDay();
+  const grid=document.getElementById('wk-grid'); if(!grid) return;
+  grid.innerHTML='';
+  for(let i=0;i<7;i++){
+    const d=new Date(today); d.setDate(today.getDate()-dow+i);
+    const dn=DAYS[i],isToday=i===dow,isRest=CANONICAL.restDays.includes(dn);
+    const col=document.createElement('div');
+    col.className='dc'+(isToday?' today':'')+(isRest?' rest':'');
+    let html=`<div class="dn">${dn.toUpperCase()}</div><div class="dd">${d.getDate()}</div>`;
+    if(isRest){ html+=`<div class="dtask rt">REST</div>`; }
+    else{ html+=`<div class="dtask ${dayClasses[i]}">${dayTypes[i]}</div>`; }
+    col.innerHTML=html; grid.appendChild(col);
+  }
 }
-async function cloudPull(){
-  if(!S.syncBinId||!S.syncApiKey){setSyncStatus('⚠ Enter Sync ID and Key first, then Save Settings');return;}
-  setSyncStatus('Pulling from cloud…');
-  try{
-    const r=await fetch(`${JBIN}/${S.syncBinId}/latest`,{headers:{'X-Master-Key':S.syncApiKey}});
-    if(!r.ok) throw new Error();
-    const cloud=(await r.json()).record;
-    if(cloud.sessions&&cloud.sessions.length>S.sessions.length) S.sessions=cloud.sessions;
-    if(cloud.recovery&&cloud.recovery.length>S.recovery.length) S.recovery=cloud.recovery;
-    if(cloud.checks) Object.assign(S.checks,cloud.checks);
-    if(cloud.restDays) S.restDays=cloud.restDays;
-    const localKey=S.apiKey;
-    Object.assign(S,cloud); S.apiKey=localKey;
-    localStorage.setItem('j_workout_v1',JSON.stringify(S));
-    setSyncStatus('✓ Pulled! Reloading…');
-    setTimeout(()=>location.reload(),800);
-  }catch(e){ setSyncStatus('⚠ Pull failed — check Sync ID and Key'); }
+function toggleRest(el,day){
+  el.classList.toggle('sel');
+  if(CANONICAL.restDays.includes(day)) CANONICAL.restDays=CANONICAL.restDays.filter(d=>d!==day);
+  else CANONICAL.restDays.push(day);
+  buildWeekGrid();
 }
-async function createBin(){
-  const key=document.getElementById('sync-key-input').value.trim();
-  if(!key){setSyncStatus('⚠ Paste your JSONBin Master Key first');return;}
-  setSyncStatus('Creating sync bin…');
-  try{
-    const p={...S}; delete p.apiKey;
-    const r=await fetch(JBIN,{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Name':'javier-workout','X-Bin-Private':'true'},body:JSON.stringify(p)});
-    if(!r.ok) throw new Error();
-    const id=(await r.json()).metadata.id;
-    S.syncBinId=id; S.syncApiKey=key;
-    document.getElementById('sync-id-input').value=id;
-    document.getElementById('sync-key-input').value=key;
-    localStorage.setItem('j_workout_v1',JSON.stringify(S));
-    setSyncStatus('✓ Sync bin created! Copy your Sync ID above and use it on your other device.');
-  }catch(e){ setSyncStatus('⚠ Failed — check your JSONBin Master Key'); }
+function upWeekBars(){
+  const s=+document.getElementById('inp-sess').value||0,c=+document.getElementById('inp-card').value||0;
+  document.getElementById('wk-sess-v').textContent=s+' / 5';document.getElementById('wk-sess-b').style.width=Math.min(100,Math.round(s/5*100))+'%';
+  document.getElementById('wk-card-v').textContent=c+' / 3';document.getElementById('wk-card-b').style.width=Math.min(100,Math.round(c/3*100))+'%';
 }
-function saveSyncSettings(){
-  S.syncBinId=document.getElementById('sync-id-input').value.trim();
-  S.syncApiKey=document.getElementById('sync-key-input').value.trim();
-  localStorage.setItem('j_workout_v1',JSON.stringify(S));
-  setSyncStatus('✓ Saved — tap Pull to sync now');
-}
-function copySyncId(){
-  const id=document.getElementById('sync-id-input').value.trim();
-  if(!id){setSyncStatus('⚠ No Sync ID yet — create one first');return;}
-  navigator.clipboard.writeText(id).then(()=>setSyncStatus('✓ Sync ID copied to clipboard'));
-}
-function setSyncStatus(msg){ const el=document.getElementById('sync-status'); if(el) el.textContent=msg; }
 
-/* ============================================================ API / AI ============================================================ */
-function saveKey(){ S.apiKey=document.getElementById('api-input').value.trim(); save(); document.getElementById('key-status').textContent=S.apiKey?'✓ Key saved — AI buttons active':'No key entered'; }
-function clearKey(){ S.apiKey=''; document.getElementById('api-input').value=''; document.getElementById('key-status').textContent='Key cleared'; save(); }
+// ============================================================
+// DAY PREVIEW
+// ============================================================
+const dayPreviews={
+  '1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a);">■</span> Bench Press — 5×5 @ 190</div><div><span style="color:var(--a);">■</span> Barbell Row — 4×6-8</div><div><span style="color:var(--a);">■</span> Overhead Press — 3×5 @ 90</div><div><span style="color:var(--a);">■</span> Pullups — 5×3 clean</div><div><span style="color:var(--a);">■</span> Incline DB Press — 3×8-10</div><div><span style="color:var(--a2);">■</span> Zone 2 cardio — 20-30 min</div></div>',
+  '2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a);">■</span> Back Squat — 5×5 @ 160</div><div><span style="color:var(--a);">■</span> Deadlift — 3×5 @ 160</div><div><span style="color:var(--a);">■</span> Romanian DL — 3×8</div><div><span style="color:var(--a);">■</span> Split Squats — 3×10 each</div><div><span style="color:var(--a2);">■</span> Zone 2 cardio — 20-40 min</div></div>',
+  '3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a2);">■</span> Easy run — 20-45 min @ 140-155 HR</div><div><span style="color:var(--a2);">■</span> Baseline: 10:30 @ 165 HR</div><div style="margin-top:6px;font-size:11px;color:var(--t3);">Recovery day — no heavy lifting</div></div>',
+  '4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a5);">■</span> Incline Machine — 4×8-12</div><div><span style="color:var(--a5);">■</span> Lat Pulldown — 4×8-12</div><div><span style="color:var(--a5);">■</span> DB Shoulder Press — 3×8-10</div><div><span style="color:var(--a5);">■</span> Lateral Raises — 5×15-20</div><div><span style="color:var(--a5);">■</span> Biceps + Triceps — 3×10-15</div></div>',
+  '5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a5);">■</span> Leg Press — 3×8-10</div><div><span style="color:var(--a5);">■</span> RDL — 3×8-10</div><div><span style="color:var(--a5);">■</span> Walking Lunges — 3×12 each</div><div><span style="color:var(--a2);">■</span> Intervals — 1 min hard / 2 min easy × 6-10</div></div>',
+  'rest':'<div style="font-size:13px;color:var(--t3);padding:8px 0;">Rest day — sleep, eat, recover. This is part of the program.</div>'
+};
+function loadDayPreview(){ const el=document.getElementById('day-preview'); if(el) el.innerHTML=dayPreviews[document.getElementById('today-day').value]||''; }
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function saveGHSettings(){
+  SETTINGS.ghToken=document.getElementById('gh-token').value.trim();
+  SETTINGS.ghUser=document.getElementById('gh-user').value.trim();
+  SETTINGS.ghRepo=document.getElementById('gh-repo').value.trim();
+  saveSettings(); document.getElementById('gh-status').textContent='✓ Settings saved';
+}
+async function testGHConnection(){
+  if(!SETTINGS.ghToken){ document.getElementById('gh-status').textContent='⚠ Enter token first'; return; }
+  document.getElementById('gh-status').textContent='Testing…';
+  try{
+    const r=await fetch(`https://api.github.com/repos/${SETTINGS.ghUser}/${SETTINGS.ghRepo}/contents/index.html`,{headers:{Authorization:`token ${SETTINGS.ghToken}`}});
+    document.getElementById('gh-status').textContent=r.ok?'✓ Connected — ready to save':'⚠ Failed — check token and repo name';
+  }catch(e){ document.getElementById('gh-status').textContent='⚠ Network error'; }
+}
+function saveApiKey(){ SETTINGS.apiKey=document.getElementById('api-input').value.trim(); saveSettings(); document.getElementById('api-status').textContent=SETTINGS.apiKey?'✓ Key saved':'No key entered'; }
+function clearApiKey(){ SETTINGS.apiKey=''; document.getElementById('api-input').value=''; document.getElementById('api-status').textContent='Cleared'; saveSettings(); }
+function exportData(){ const b=new Blob([JSON.stringify(CANONICAL,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='workout_os_data.json'; a.click(); }
+function clearData(){ if(confirm('Clear local settings? GitHub data is safe.')){ localStorage.removeItem('workout_os_settings'); location.reload(); } }
+
+// ============================================================
+// AI
+// ============================================================
 function loading(id){ document.getElementById(id).innerHTML='<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Generating…</span></div>'; }
 async function claude(prompt){
-  if(!S.apiKey) return null;
+  if(!SETTINGS.apiKey) return null;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:800,
-        system:`You are Javier Montelongo's hybrid training coach. He is a PGY-1 Internal Medicine resident at Kaiser SF. Program: fat loss + strength base. Current lifts: Bench e1RM 255, Squat e1RM 215, Deadlift e1RM 215, OHP e1RM 120, Pullups 5 reps. Running baseline: 10:30 pace @ 165 HR for 4 miles. Recovery is frequently constrained by residency stress. Philosophy: sustainable > optimal, consistency during high stress is success. Recovery overrides progression. Be specific, practical, and brief. 150 words max.`,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const d=await r.json();
-    return d.content?.[0]?.text||null;
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:`You are Javier Montelongo's hybrid training coach. PGY-1 IM resident at Kaiser SF. Program: fat loss + strength base. Current lifts: Bench e1RM ${CANONICAL.currentLifts.benchE1RM}, Squat e1RM ${CANONICAL.currentLifts.squatE1RM}, DL e1RM ${CANONICAL.currentLifts.deadliftE1RM}, OHP e1RM ${CANONICAL.currentLifts.ohpE1RM}, Pullups ${CANONICAL.currentLifts.pullups} reps. Running: ${CANONICAL.cardioBaseline.pace} @ ${CANONICAL.cardioBaseline.avgHR} HR. Philosophy: sustainable > optimal, recovery overrides progression. Be specific, 150 words max.`,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json(); return d.content?.[0]?.text||null;
   }catch(e){ return null; }
 }
-function fmt(t,id){
-  document.getElementById(id).innerHTML=t
-    ?`<div class="air"><div class="albl">◆ TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`
-    :`<div class="air"><div class="albl">◆ ERROR</div><p>Could not reach API. Check your key in Settings.</p></div>`;
-}
+function fmt(t,id){ document.getElementById(id).innerHTML=t?`<div class="air"><div class="albl">◆ TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="albl">◆ NOTE</div><p>Add API key in Settings to enable AI coaching.</p></div>`; }
 async function genToday(){
-  const mode=document.getElementById('mode-sel').value;
-  const e=document.getElementById('sl-e').value;
-  const s=document.getElementById('sl-s').value;
-  const sr=document.getElementById('sl-sr').value;
-  const day=document.getElementById('today-day').value;
-  if(!S.apiKey){document.getElementById('today-out').innerHTML='<div class="air"><div class="albl">◆ NOTE</div><p>Add your Anthropic API key in Settings to enable AI coaching.</p></div>';return;}
+  const mode=document.getElementById('mode-sel').value,e=document.getElementById('sl-e').value,s=document.getElementById('sl-s').value,sr=document.getElementById('sl-sr').value,day=document.getElementById('today-day').value;
+  if(!SETTINGS.apiKey){fmt(null,'today-out');return;}
   loading('today-out');
-  fmt(await claude(`Today's training plan. Mode: ${mode}. Day: ${day}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Give specific loading recommendations, auto-regulation guidance for today, and one recovery priority. Be direct and practical.`),'today-out');
+  const recent=CANONICAL.sessions.slice(-3).map(s=>`${s.date} Day${s.day} RPE${s.rpe||'?'}`).join(', ')||'No recent sessions';
+  fmt(await claude(`Today's plan. Mode: ${mode}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent: ${recent}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');
 }
 async function genWeekGuidance(){
-  if(!S.apiKey) return;
-  loading('wk-guid');
-  const t=await claude('Give a specific weekly training guidance update. Include: this week\'s compound loading targets, cardio focus, recovery priorities given residency stress, and one autoregulation rule to apply this week.');
-  document.getElementById('wk-guid').innerHTML=t?`<div class="albl">◆ WEEK COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`:'<p>Could not generate.</p>';
+  if(!SETTINGS.apiKey) return; loading('wk-guid');
+  const recent=CANONICAL.sessions.slice(-5).map(s=>`Day${s.day} ${s.date} RPE${s.rpe||'?'}`).join(', ')||'No sessions';
+  const t=await claude(`Weekly guidance. Recent sessions: ${recent}. Current lifts: Bench ${CANONICAL.currentLifts.benchE1RM}, Squat ${CANONICAL.currentLifts.squatE1RM}, DL ${CANONICAL.currentLifts.deadliftE1RM}, OHP ${CANONICAL.currentLifts.ohpE1RM}. Give compound loading targets, cardio focus, recovery priority, one auto-regulation rule.`);
+  document.getElementById('wk-guid').innerHTML=t?`<div class="albl">◆ AI COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`:'<p>Add API key in Settings.</p>';
 }
-async function getProgRec(){
-  const recent=S.sessions.slice(-5);
-  if(!S.apiKey){document.getElementById('prog-rec').innerHTML='<div class="air" style="margin-top:12px;"><div class="albl">◆ NOTE</div><p>Add API key in Settings.</p></div>';return;}
-  loading('prog-rec');
-  const summary=recent.map(s=>`${s.date}: Bench ${s.lifts?.bench?.w||'—'}x${s.lifts?.bench?.sets||'—'}x${s.lifts?.bench?.reps||'—'}, Squat ${s.lifts?.squat?.w||'—'}, DL ${s.lifts?.dl?.w||'—'}, RPE ${s.rpe||'—'}`).join('; ')||'No recent sessions';
-  fmt(await claude(`Based on recent sessions: ${summary}. Give specific progression recommendations for next session: should Javier increase, maintain, or reduce load on each compound lift? Why? Be specific with numbers.`),'prog-rec');
-}
-
-/* ============================================================ DATA ============================================================ */
-function exportData(){ const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='javier_workout_data.json'; a.click(); }
-function clearData(){ if(confirm('Clear all workout data? Cannot be undone.')){ localStorage.removeItem('j_workout_v1'); location.reload(); } }
 </script>
 </body>
 </html>
