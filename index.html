@@ -195,7 +195,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div>
       <div class="lbl">program state</div>
       <div style="font-family:var(--serif);font-size:19px;font-weight:300;color:var(--a);">Fat loss + strength base</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Block 1/4 Â· Volume accumulation</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Block 1/4 &middot; Volume accumulation</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <select id="mode-sel" style="width:190px;" onchange="modeChange()">
@@ -206,7 +206,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <option value="recovery">RECOVERY mode</option>
         <option value="minimum">MINIMUM VIABLE</option>
       </select>
-      <button class="btn bp btn-i" onclick="genToday()">â» AI plan</button>
+      <button class="btn bp btn-i" onclick="genToday()">AI AI plan</button>
     </div>
   </div>
 
@@ -242,38 +242,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="ig">
         <label>Select day</label>
         <select id="today-day" onchange="loadDayPreview()">
-          <option value="1">Day 1 â Upper Strength</option>
-          <option value="2">Day 2 â Lower Strength</option>
-          <option value="3">Day 3 â Recovery / Cardio</option>
-          <option value="4">Day 4 â Upper Hypertrophy</option>
-          <option value="5">Day 5 â Lower + Conditioning</option>
+          <option value="1">Day 1 &#8212; Upper Strength</option>
+          <option value="2">Day 2 &#8212; Lower Strength</option>
+          <option value="3">Day 3 &#8212; Recovery / Cardio</option>
+          <option value="4">Day 4 &#8212; Upper Hypertrophy</option>
+          <option value="5">Day 5 &#8212; Lower + Conditioning</option>
           <option value="rest">Rest Day</option>
         </select>
       </div>
       <div id="day-preview"></div>
-      <button class="btn bp" style="width:100%;margin-top:10px;" onclick="goTab('log',document.querySelector('.tab:nth-child(2)'))">Start logging this session â</button>
+      <button class="btn bp" style="width:100%;margin-top:10px;" onclick="goTab('log',document.querySelector('.tab:nth-child(2)'))">Start logging this session -&gt;</button>
     </div>
     <div class="card">
       <div class="lbl">session checklist</div>
-      <div class="ci" id="ci-warmup"><input type="checkbox" id="cb-warmup" onchange="chk('ci-warmup')"><label for="cb-warmup">ð¥ Warm-up â 5â10 min mobility</label></div>
-      <div class="ci" id="ci-main"><input type="checkbox" id="cb-main" onchange="chk('ci-main')"><label for="cb-main">ðª Compound lifts completed</label></div>
-      <div class="ci" id="ci-acc"><input type="checkbox" id="cb-acc" onchange="chk('ci-acc')"><label for="cb-acc">ð¯ Accessory work completed</label></div>
-      <div class="ci" id="ci-cardio"><input type="checkbox" id="cb-cardio" onchange="chk('ci-cardio')"><label for="cb-cardio">ð Cardio / conditioning done</label></div>
-      <div class="ci" id="ci-logged"><input type="checkbox" id="cb-logged" onchange="chk('ci-logged')"><label for="cb-logged">ð¾ Session saved to GitHub</label></div>
-      <div class="ci" id="ci-protein"><input type="checkbox" id="cb-protein" onchange="chk('ci-protein')"><label for="cb-protein">ð¥ Post-workout protein within 1 hour</label></div>
-      <div class="ci" id="ci-sleep7"><input type="checkbox" id="cb-sleep7" onchange="chk('ci-sleep7')"><label for="cb-sleep7">ð´ Sleep target â 7+ hours tonight</label></div>
+      <div class="ci" id="ci-warmup"><input type="checkbox" id="cb-warmup" onchange="chk('ci-warmup')"><label for="cb-warmup"> Warm-up &#8212; 5&#8211;10 min mobility</label></div>
+      <div class="ci" id="ci-main"><input type="checkbox" id="cb-main" onchange="chk('ci-main')"><label for="cb-main"> Compound lifts completed</label></div>
+      <div class="ci" id="ci-acc"><input type="checkbox" id="cb-acc" onchange="chk('ci-acc')"><label for="cb-acc">GOALS Accessory work completed</label></div>
+      <div class="ci" id="ci-cardio"><input type="checkbox" id="cb-cardio" onchange="chk('ci-cardio')"><label for="cb-cardio"> Cardio / conditioning done</label></div>
+      <div class="ci" id="ci-logged"><input type="checkbox" id="cb-logged" onchange="chk('ci-logged')"><label for="cb-logged"> Session saved to GitHub</label></div>
+      <div class="ci" id="ci-protein"><input type="checkbox" id="cb-protein" onchange="chk('ci-protein')"><label for="cb-protein">[WL] Post-workout protein within 1 hour</label></div>
+      <div class="ci" id="ci-sleep7"><input type="checkbox" id="cb-sleep7" onchange="chk('ci-sleep7')"><label for="cb-sleep7"> Sleep target &#8212; 7+ hours tonight</label></div>
     </div>
   </div>
 
   <div class="card">
     <div class="lbl">ai coach</div>
     <div id="today-out">
-      <div class="air"><div class="albl">â TRAINING COACH</div>
-        <p>Check your fatigue score above first. If it's moderate or higher, auto-regulate before you start â reduce working weight by 5-10% and protect bar speed over ego.</p>
+      <div class="air"><div class="albl">* TRAINING COACH</div>
+        <p>Check your fatigue score above first. If it's moderate or higher, auto-regulate before you start &#8212; reduce working weight by 5-10% and protect bar speed over ego.</p>
         <p><strong>Recovery rules the program.</strong> Sustainable training during residency beats optimal training every time. A 70% effort session that happens is worth more than a 100% session that doesn't.</p>
       </div>
     </div>
-    <div class="brow"><button class="btn bs btn-i" onclick="genToday()">â» Regenerate</button></div>
+    <div class="brow"><button class="btn bs btn-i" onclick="genToday()">AI Regenerate</button></div>
   </div>
 </div>
 
@@ -287,18 +287,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="ig"><label>Date</label><input type="date" id="log-date"></div>
       <div class="ig"><label>Day type</label>
         <select id="log-day">
-          <option value="1">Day 1 â Upper Strength</option>
-          <option value="2">Day 2 â Lower Strength</option>
-          <option value="3">Day 3 â Recovery / Cardio</option>
-          <option value="4">Day 4 â Upper Hypertrophy</option>
-          <option value="5">Day 5 â Lower + Conditioning</option>
+          <option value="1">Day 1 &#8212; Upper Strength</option>
+          <option value="2">Day 2 &#8212; Lower Strength</option>
+          <option value="3">Day 3 &#8212; Recovery / Cardio</option>
+          <option value="4">Day 4 &#8212; Upper Hypertrophy</option>
+          <option value="5">Day 5 &#8212; Lower + Conditioning</option>
         </select>
       </div>
-      <div class="ig"><label>Session RPE (1â10)</label><input type="number" id="log-rpe" min="1" max="10" placeholder="e.g. 7"></div>
+      <div class="ig"><label>Session RPE (1&#8211;10)</label><input type="number" id="log-rpe" min="1" max="10" placeholder="e.g. 7"></div>
     </div>
     <div class="g2 k2" style="margin-bottom:10px;">
       <div class="ig"><label>Duration (min)</label><input type="number" id="log-dur" placeholder="e.g. 65"></div>
-      <div class="ig"><label>Energy (1â10)</label><input type="number" id="log-energy" min="1" max="10" placeholder="e.g. 7"></div>
+      <div class="ig"><label>Energy (1&#8211;10)</label><input type="number" id="log-energy" min="1" max="10" placeholder="e.g. 7"></div>
     </div>
     <div class="g2 k2" style="margin-bottom:10px;">
       <div class="ig"><label>Bodyweight (lb)</label><input type="number" id="log-bw" placeholder="225"></div>
@@ -306,11 +306,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
 
-  <!-- BENCH PRESS â set-by-set logging -->
+  <!-- BENCH PRESS &#8212; set-by-set logging -->
   <div class="card" id="bench-card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
       <span class="badge ba">BENCH PRESS</span>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5Ã5 @ 190</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 190</span>
     </div>
     <div class="set-row-header"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="bench-sets"></div>
@@ -322,7 +322,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card" id="ohp-card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
       <span class="badge ba">OVERHEAD PRESS</span>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3Ã5 @ 90</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 90</span>
     </div>
     <div class="set-row-header"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="ohp-sets"></div>
@@ -334,7 +334,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card" id="squat-card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
       <span class="badge ba">BACK SQUAT</span>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5Ã5 @ 160</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 160</span>
     </div>
     <div class="set-row-header"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="squat-sets"></div>
@@ -346,7 +346,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card" id="dl-card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
       <span class="badge ba">DEADLIFT</span>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3Ã5 @ 160</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 160</span>
     </div>
     <div class="set-row-header"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="dl-sets"></div>
@@ -358,7 +358,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <span class="badge ba">PULLUPS</span>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5 sets Ã 3 clean reps</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5 sets x 3 clean reps</span>
     </div>
     <div class="g2 k2" style="gap:8px;">
       <div class="ig"><label>Sets completed</label><input type="number" id="pu-sets" placeholder="5"></div>
@@ -394,7 +394,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 
   <!-- SAVE -->
-  <button class="save-btn" id="log-save-btn" onclick="saveSession()">ð¾ Save session to GitHub</button>
+  <button class="save-btn" id="log-save-btn" onclick="saveSession()"> Save session to GitHub</button>
   <div id="log-save-status" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;margin-bottom:16px;min-height:16px;"></div>
 
   <div class="card">
@@ -410,11 +410,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="csm" style="margin-bottom:12px;">
       <div class="lbl">weekly split</div>
       <div style="font-size:12px;color:var(--t2);line-height:1.9;margin-bottom:12px;">
-        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 1</strong> â Upper Strength</span><span class="badge ba">STRENGTH</span></div>
-        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 2</strong> â Lower Strength</span><span class="badge ba">STRENGTH</span></div>
-        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a2);">Day 3</strong> â Recovery / Cardio</span><span class="badge bb">CARDIO</span></div>
-        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 4</strong> â Upper Hypertrophy</span><span class="badge bp2">HYPERTROPHY</span></div>
-        <div style="padding:5px 0;display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 5</strong> â Lower + Conditioning</span><span class="badge bp2">HYBRID</span></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 1</strong> &#8212; Upper Strength</span><span class="badge ba">STRENGTH</span></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 2</strong> &#8212; Lower Strength</span><span class="badge ba">STRENGTH</span></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a2);">Day 3</strong> &#8212; Recovery / Cardio</span><span class="badge bb">CARDIO</span></div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 4</strong> &#8212; Upper Hypertrophy</span><span class="badge bp2">HYPERTROPHY</span></div>
+        <div style="padding:5px 0;display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 5</strong> &#8212; Lower + Conditioning</span><span class="badge bp2">HYBRID</span></div>
       </div>
       <div class="lbl">rest days</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;">
@@ -443,12 +443,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card">
     <div class="lbl">week guidance</div>
     <div id="wk-guid" class="air">
-      <div class="albl">â WEEK COACH</div>
-      <p><strong>Volume accumulation week.</strong> Consistency and technique quality are the goals â not maximal loading.</p>
-      <p><strong>Bench:</strong> 5Ã5 @ 190. All sets complete at RPE &lt;8 â add 5 lbs next week. <strong>OHP:</strong> 3Ã5 @ 90. <strong>Squat:</strong> 5Ã5 @ 160. <strong>Deadlift:</strong> 3Ã5 @ 160.</p>
-      <p><strong>Cardio:</strong> Zone 2 at 140â155 HR. If HR elevated above normal, slow down â don't chase pace.</p>
+      <div class="albl">* WEEK COACH</div>
+      <p><strong>Volume accumulation week.</strong> Consistency and technique quality are the goals &#8212; not maximal loading.</p>
+      <p><strong>Bench:</strong> 5x5 @ 190. All sets complete at RPE &lt;8 -&gt; add 5 lbs next week. <strong>OHP:</strong> 3x5 @ 90. <strong>Squat:</strong> 5x5 @ 160. <strong>Deadlift:</strong> 3x5 @ 160.</p>
+      <p><strong>Cardio:</strong> Zone 2 at 140&#8211;155 HR. If HR elevated above normal, slow down &#8212; don't chase pace.</p>
     </div>
-    <div class="brow"><button class="btn bs btn-i" onclick="genWeekGuidance()">â» AI guidance</button></div>
+    <div class="brow"><button class="btn bs btn-i" onclick="genWeekGuidance()">AI AI guidance</button></div>
   </div>
 </div>
 
@@ -471,12 +471,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="lbl">best recent volume</div>
     <div class="g2">
       <div>
-        <div class="pbw"><div class="pbl"><span>Bench</span><span id="vol-bench">190Ã5Ã5</span></div><div class="pbb"><div class="pbf" style="width:75%;"></div></div></div>
-        <div class="pbw"><div class="pbl"><span>OHP</span><span id="vol-ohp">90Ã3Ã5</span></div><div class="pbb"><div class="pbf" style="width:45%;"></div></div></div>
+        <div class="pbw"><div class="pbl"><span>Bench</span><span id="vol-bench">190x5x5</span></div><div class="pbb"><div class="pbf" style="width:75%;"></div></div></div>
+        <div class="pbw"><div class="pbl"><span>OHP</span><span id="vol-ohp">90x3x5</span></div><div class="pbb"><div class="pbf" style="width:45%;"></div></div></div>
       </div>
       <div>
-        <div class="pbw"><div class="pbl"><span>Squat</span><span id="vol-squat">160Ã5Ã5</span></div><div class="pbb"><div class="pbf" style="width:60%;"></div></div></div>
-        <div class="pbw"><div class="pbl"><span>Deadlift</span><span id="vol-dl">160Ã3Ã5</span></div><div class="pbb"><div class="pbf" style="width:60%;"></div></div></div>
+        <div class="pbw"><div class="pbl"><span>Squat</span><span id="vol-squat">160x5x5</span></div><div class="pbb"><div class="pbf" style="width:60%;"></div></div></div>
+        <div class="pbw"><div class="pbl"><span>Deadlift</span><span id="vol-dl">160x3x5</span></div><div class="pbb"><div class="pbf" style="width:60%;"></div></div></div>
       </div>
     </div>
   </div>
@@ -490,51 +490,51 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <div id="panel-program" class="panel">
   <div class="stitle">Program <span>structure</span></div>
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ba">STRENGTH</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 1 â Upper Strength</div></div>
-    <div class="ex-row"><div class="ex-name">ðï¸ Bench Press</div><div class="ex-plan">5Ã5 @ 190 Â· Primary compound â protect this first</div></div>
-    <div class="ex-row"><div class="ex-name">ðï¸ Barbell Row</div><div class="ex-plan">4Ã6-8 Â· 115â145 lb</div></div>
-    <div class="ex-row"><div class="ex-name">ðï¸ Overhead Press</div><div class="ex-plan">3Ã5 @ 90 Â· Second key compound</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Pullups</div><div class="ex-plan">5 sets Ã 3 clean reps Â· No kipping</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Incline DB Press</div><div class="ex-plan">3Ã8-10 Â· 65â80 lb DBs</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Lateral Raises</div><div class="ex-plan">4Ã15-20</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Face Pulls</div><div class="ex-plan">3Ã15-20 Â· Shoulder health</div></div>
-    <div class="ex-row"><div class="ex-name">ð Cardio</div><div class="ex-plan">20-30 min Zone 2 Â· Target HR 140-155</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ba">STRENGTH</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 1 &#8212; Upper Strength</div></div>
+    <div class="ex-row"><div class="ex-name"> Bench Press</div><div class="ex-plan">5x5 @ 190 &middot; Primary compound &#8212; protect this first</div></div>
+    <div class="ex-row"><div class="ex-name"> Barbell Row</div><div class="ex-plan">4x6-8 &middot; 115&#8211;145 lb</div></div>
+    <div class="ex-row"><div class="ex-name"> Overhead Press</div><div class="ex-plan">3x5 @ 90 &middot; Second key compound</div></div>
+    <div class="ex-row"><div class="ex-name"> Pullups</div><div class="ex-plan">5 sets x 3 clean reps &middot; No kipping</div></div>
+    <div class="ex-row"><div class="ex-name"> Incline DB Press</div><div class="ex-plan">3x8-10 &middot; 65&#8211;80 lb DBs</div></div>
+    <div class="ex-row"><div class="ex-name"> Lateral Raises</div><div class="ex-plan">4x15-20</div></div>
+    <div class="ex-row"><div class="ex-name"> Face Pulls</div><div class="ex-plan">3x15-20 &middot; Shoulder health</div></div>
+    <div class="ex-row"><div class="ex-name"> Cardio</div><div class="ex-plan">20-30 min Zone 2 &middot; Target HR 140-155</div></div>
   </div>
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ba">STRENGTH</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 2 â Lower Strength</div></div>
-    <div class="ex-row"><div class="ex-name">ðï¸ Back Squat</div><div class="ex-plan">5Ã5 @ 160</div></div>
-    <div class="ex-row"><div class="ex-name">ðï¸ Deadlift</div><div class="ex-plan">3Ã5 @ 160</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Romanian Deadlift</div><div class="ex-plan">3Ã8 Â· 95â135 lb</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Split Squats / Lunges</div><div class="ex-plan">3Ã10 each leg</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Calf Raises</div><div class="ex-plan">3Ã12-15</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Core</div><div class="ex-plan">2-3 exercises: Planks, hanging knee raises, cable crunches</div></div>
-    <div class="ex-row"><div class="ex-name">ð Cardio</div><div class="ex-plan">20-40 min Zone 2</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge ba">STRENGTH</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 2 &#8212; Lower Strength</div></div>
+    <div class="ex-row"><div class="ex-name"> Back Squat</div><div class="ex-plan">5x5 @ 160</div></div>
+    <div class="ex-row"><div class="ex-name"> Deadlift</div><div class="ex-plan">3x5 @ 160</div></div>
+    <div class="ex-row"><div class="ex-name"> Romanian Deadlift</div><div class="ex-plan">3x8 &middot; 95&#8211;135 lb</div></div>
+    <div class="ex-row"><div class="ex-name"> Split Squats / Lunges</div><div class="ex-plan">3x10 each leg</div></div>
+    <div class="ex-row"><div class="ex-name"> Calf Raises</div><div class="ex-plan">3x12-15</div></div>
+    <div class="ex-row"><div class="ex-name"> Core</div><div class="ex-plan">2-3 exercises: Planks, hanging knee raises, cable crunches</div></div>
+    <div class="ex-row"><div class="ex-name"> Cardio</div><div class="ex-plan">20-40 min Zone 2</div></div>
   </div>
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bb">CARDIO</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 3 â Recovery / Cardio</div></div>
-    <div class="ex-row"><div class="ex-name">ð Run</div><div class="ex-plan">20-45 min easy Â· Target HR 140-155 Â· Baseline: 10:30 pace @ 165 HR</div></div>
-    <div class="ex-row"><div class="ex-name">ð´ Cycling (alternative)</div><div class="ex-plan">Same duration and HR targets</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bb">CARDIO</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 3 &#8212; Recovery / Cardio</div></div>
+    <div class="ex-row"><div class="ex-name"> Run</div><div class="ex-plan">20-45 min easy &middot; Target HR 140-155 &middot; Baseline: 10:30 pace @ 165 HR</div></div>
+    <div class="ex-row"><div class="ex-name"> Cycling (alternative)</div><div class="ex-plan">Same duration and HR targets</div></div>
     <div style="background:rgba(79,195,247,.06);border:1px solid rgba(79,195,247,.15);border-radius:var(--r);padding:11px;margin-top:6px;font-size:12px;color:var(--t2);line-height:1.6;"><strong style="color:var(--a2);">Zone 2 rule:</strong> You should be able to hold a conversation. Log pace, HR, and RPE every session.</div>
   </div>
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bp2">HYPERTROPHY</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 4 â Upper Hypertrophy</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Incline Machine Press</div><div class="ex-plan">4Ã8-12</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Lat Pulldown</div><div class="ex-plan">4Ã8-12</div></div>
-    <div class="ex-row"><div class="ex-name">ðª DB Shoulder Press</div><div class="ex-plan">3Ã8-10 Â· 45â60 lb DBs Â· Shoulder priority</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Cable Fly</div><div class="ex-plan">3Ã12-15</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Lateral Raises</div><div class="ex-plan">5Ã15-20 Â· High volume</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Rear Delt Fly</div><div class="ex-plan">4Ã15-20</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Biceps + Triceps</div><div class="ex-plan">3Ã10-15 each</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Dead Hangs</div><div class="ex-plan">3 sets Â· Grip + shoulder decompression</div></div>
-    <div class="ex-row"><div class="ex-name">ð Cardio</div><div class="ex-plan">20-30 min easy</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bp2">HYPERTROPHY</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 4 &#8212; Upper Hypertrophy</div></div>
+    <div class="ex-row"><div class="ex-name"> Incline Machine Press</div><div class="ex-plan">4x8-12</div></div>
+    <div class="ex-row"><div class="ex-name"> Lat Pulldown</div><div class="ex-plan">4x8-12</div></div>
+    <div class="ex-row"><div class="ex-name"> DB Shoulder Press</div><div class="ex-plan">3x8-10 &middot; 45&#8211;60 lb DBs &middot; Shoulder priority</div></div>
+    <div class="ex-row"><div class="ex-name"> Cable Fly</div><div class="ex-plan">3x12-15</div></div>
+    <div class="ex-row"><div class="ex-name"> Lateral Raises</div><div class="ex-plan">5x15-20 &middot; High volume</div></div>
+    <div class="ex-row"><div class="ex-name"> Rear Delt Fly</div><div class="ex-plan">4x15-20</div></div>
+    <div class="ex-row"><div class="ex-name"> Biceps + Triceps</div><div class="ex-plan">3x10-15 each</div></div>
+    <div class="ex-row"><div class="ex-name"> Dead Hangs</div><div class="ex-plan">3 sets &middot; Grip + shoulder decompression</div></div>
+    <div class="ex-row"><div class="ex-name"> Cardio</div><div class="ex-plan">20-30 min easy</div></div>
   </div>
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bp2">HYBRID</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 5 â Lower + Conditioning</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Leg Press / Front Squat</div><div class="ex-plan">3Ã8-10</div></div>
-    <div class="ex-row"><div class="ex-name">ðª RDL</div><div class="ex-plan">3Ã8-10 Â· 115â155 lb</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Walking Lunges</div><div class="ex-plan">3Ã12 each leg</div></div>
-    <div class="ex-row"><div class="ex-name">ðª Hamstring Curl</div><div class="ex-plan">3Ã12-15</div></div>
-    <div class="ex-row"><div class="ex-name">ð Intervals</div><div class="ex-plan">1 min hard / 2 min easy Ã 6-10 rounds</div></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="badge bp2">HYBRID</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 5 &#8212; Lower + Conditioning</div></div>
+    <div class="ex-row"><div class="ex-name"> Leg Press / Front Squat</div><div class="ex-plan">3x8-10</div></div>
+    <div class="ex-row"><div class="ex-name"> RDL</div><div class="ex-plan">3x8-10 &middot; 115&#8211;155 lb</div></div>
+    <div class="ex-row"><div class="ex-name"> Walking Lunges</div><div class="ex-plan">3x12 each leg</div></div>
+    <div class="ex-row"><div class="ex-name"> Hamstring Curl</div><div class="ex-plan">3x12-15</div></div>
+    <div class="ex-row"><div class="ex-name"> Intervals</div><div class="ex-plan">1 min hard / 2 min easy x 6-10 rounds</div></div>
   </div>
   <div class="card">
     <div class="lbl">4-week progression model</div>
@@ -542,7 +542,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="badge ba" style="margin-right:8px;">WEEK 1</span><strong style="color:var(--t);">Volume accumulation</strong></div>
       <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="badge bb" style="margin-right:8px;">WEEK 2</span><strong style="color:var(--t);">Strength emphasis</strong></div>
       <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="badge bg" style="margin-right:8px;">WEEK 3</span><strong style="color:var(--t);">Heavy exposure</strong></div>
-      <div style="padding:8px 0;"><span class="badge bp2" style="margin-right:8px;">WEEK 4</span><strong style="color:var(--t);">Deload / recovery â reduce 30-50%</strong></div>
+      <div style="padding:8px 0;"><span class="badge bp2" style="margin-right:8px;">WEEK 4</span><strong style="color:var(--t);">Deload / recovery &#8212; reduce 30-50%</strong></div>
     </div>
   </div>
 </div>
@@ -551,14 +551,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <div id="panel-recovery" class="panel">
   <div class="stitle">Recovery &amp; <span>fatigue</span></div>
   <div class="g4 k2" style="margin-bottom:14px;">
-    <div class="stat"><div class="sv g" id="rec-score">â</div><div class="sl">Recovery score</div></div>
-    <div class="stat"><div class="sv r" id="fat-score">â</div><div class="sl">Fatigue score</div></div>
-    <div class="stat"><div class="sv b" id="rec-sleep-avg">â</div><div class="sl">Sleep avg (7d)</div></div>
+    <div class="stat"><div class="sv g" id="rec-score">&#8212;</div><div class="sl">Recovery score</div></div>
+    <div class="stat"><div class="sv r" id="fat-score">&#8212;</div><div class="sl">Fatigue score</div></div>
+    <div class="stat"><div class="sv b" id="rec-sleep-avg">&#8212;</div><div class="sl">Sleep avg (7d)</div></div>
     <div class="stat"><div class="sv a" id="rec-count">0</div><div class="sl">Logs this week</div></div>
   </div>
 
   <div class="card" style="border:1px solid rgba(255,183,77,.25);">
-    <div class="lbl" style="color:var(--a);">log daily recovery â saves to github</div>
+    <div class="lbl" style="color:var(--a);">log daily recovery &#8212; saves to github</div>
     <div class="g2 k2" style="margin-bottom:12px;">
       <div class="ig"><label>Date</label><input type="date" id="rec-date"></div>
       <div class="ig"><label>Bodyweight (lb)</label><input type="number" id="rec-bw" placeholder="225"></div>
@@ -582,11 +582,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       </div>
     </div>
     <div style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:4px;"><span>Recovery score</span><span id="rec-score-lbl">â</span></div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:4px;"><span>Recovery score</span><span id="rec-score-lbl">&#8212;</span></div>
       <div class="bbar"><div class="bfill" id="rec-fill" style="width:70%;background:var(--a3);"></div></div>
     </div>
     <div class="ig"><label>Notes</label><textarea id="rec-notes" placeholder="What's driving recovery debt? Residency stress, poor sleep run, illness?"></textarea></div>
-    <button class="save-btn" id="rec-save-btn" onclick="saveRecovery()">ð¾ Save recovery log to GitHub</button>
+    <button class="save-btn" id="rec-save-btn" onclick="saveRecovery()"> Save recovery log to GitHub</button>
     <div id="rec-save-status" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:6px;min-height:16px;"></div>
   </div>
 
@@ -594,12 +594,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="card">
       <div class="lbl" style="color:var(--a);">reduce if:</div>
       <div style="font-size:12px;color:var(--t2);line-height:2.0;">
-        <div>â¢ Fatigue score &gt; 70</div>
-        <div>â¢ Sleep average &lt; 6 hours</div>
-        <div>â¢ Performance declining 2+ weeks</div>
-        <div>â¢ Persistent joint soreness</div>
-        <div>â¢ Cardio metrics regressing</div>
-        <div>â¢ Severe residency stress</div>
+        <div>&#8226; Fatigue score &gt; 70</div>
+        <div>&#8226; Sleep average &lt; 6 hours</div>
+        <div>&#8226; Performance declining 2+ weeks</div>
+        <div>&#8226; Persistent joint soreness</div>
+        <div>&#8226; Cardio metrics regressing</div>
+        <div>&#8226; Severe residency stress</div>
       </div>
     </div>
     <div class="card">
@@ -627,9 +627,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="card">
       <div class="lbl">strength timeline</div>
       <div class="tl">
-        <div class="tli now"><div class="tli-date">CURRENT</div><div class="tli-title">Bench 190Ã5Ã5 / OHP 90Ã3Ã5</div><div class="tli-detail">Squat 160Ã5Ã5 / Deadlift 160Ã3Ã5</div></div>
+        <div class="tli now"><div class="tli-date">CURRENT</div><div class="tli-title">Bench 190x5x5 / OHP 90x3x5</div><div class="tli-detail">Squat 160x5x5 / Deadlift 160x3x5</div></div>
         <div class="tli"><div class="tli-date">SHORT TERM</div><div class="tli-title">Bench e1RM 275 / OHP e1RM 135</div><div class="tli-detail">Squat e1RM 245 / Deadlift e1RM 245</div></div>
-        <div class="tli"><div class="tli-date">MEDIUM TERM</div><div class="tli-title">Bench 225Ã5Ã5 / 8 clean pullups</div></div>
+        <div class="tli"><div class="tli-date">MEDIUM TERM</div><div class="tli-title">Bench 225x5x5 / 8 clean pullups</div></div>
         <div class="tli"><div class="tli-date">LONG TERM</div><div class="tli-title">Bench 300 / Squat 315 / DL 315</div></div>
       </div>
     </div>
@@ -649,8 +649,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="ci" id="mhw2"><input type="checkbox" id="mhwcb2" onchange="chk('mhw2')"><label for="mhwcb2">Establish Zone 2 running route near hospital</label></div>
     <div class="ci" id="mhw3"><input type="checkbox" id="mhwcb3" onchange="chk('mhw3')"><label for="mhwcb3">Log first session in San Francisco</label></div>
     <div class="ci" id="mhw4"><input type="checkbox" id="mhwcb4" onchange="chk('mhw4')"><label for="mhwcb4">Complete first full deload week (week 4)</label></div>
-    <div class="ci" id="mhw5"><input type="checkbox" id="mhwcb5" onchange="chk('mhw5')"><label for="mhwcb5">First heavy single â weeks 3-6 (90-95% effort)</label></div>
-    <div class="ci" id="mhw6"><input type="checkbox" id="mhwcb6" onchange="chk('mhw6')"><label for="mhwcb6">Bench 225Ã5Ã5 milestone</label></div>
+    <div class="ci" id="mhw5"><input type="checkbox" id="mhwcb5" onchange="chk('mhw5')"><label for="mhwcb5">First heavy single &#8212; weeks 3-6 (90-95% effort)</label></div>
+    <div class="ci" id="mhw6"><input type="checkbox" id="mhwcb6" onchange="chk('mhw6')"><label for="mhwcb6">Bench 225x5x5 milestone</label></div>
     <div class="ci" id="mhw7"><input type="checkbox" id="mhwcb7" onchange="chk('mhw7')"><label for="mhwcb7">10 clean pullups milestone</label></div>
   </div>
 </div>
@@ -662,8 +662,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="card">
       <div class="api-info">
         <div class="lbl" style="color:var(--a);">github personal access token</div>
-        <p>This token lets every Save button push directly to GitHub. Stored only in your browser â never sent anywhere except GitHub's API directly.</p>
-        <p><strong>To get a token:</strong> github.com â Profile â Settings â Developer settings â Personal access tokens â Tokens (classic) â Generate new token â check <strong>repo</strong> â no expiration â copy it (starts with ghp_).</p>
+        <p>This token lets every Save button push directly to GitHub. Stored only in your browser &#8212; never sent anywhere except GitHub's API directly.</p>
+        <p><strong>To get a token:</strong> github.com -&gt; Profile -&gt; Settings -&gt; Developer settings -&gt; Personal access tokens -&gt; Tokens (classic) -&gt; Generate new token -&gt; check <strong>repo</strong> -&gt; no expiration -&gt; copy it (starts with ghp_).</p>
         <p style="color:var(--a);">Once set, every Save button updates GitHub automatically. No Claude needed for logging.</p>
       </div>
       <div class="ig"><label>GitHub Personal Access Token</label><input type="password" id="gh-token" placeholder="ghp_..."></div>
@@ -678,8 +678,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="card">
       <div class="api-info">
         <div class="lbl" style="color:var(--a2);">anthropic api key (ai coaching)</div>
-        <p>Powers the AI coaching buttons â daily plans, progression recommendations, week guidance. Optional.</p>
-        <p><strong>To get a key:</strong> console.anthropic.com â API Keys â Create Key â copy it. ~$0.003 per button press.</p>
+        <p>Powers the AI coaching buttons &#8212; daily plans, progression recommendations, week guidance. Optional.</p>
+        <p><strong>To get a key:</strong> console.anthropic.com -&gt; API Keys -&gt; Create Key -&gt; copy it. ~$0.003 per button press.</p>
       </div>
       <div class="ig"><label>Anthropic API Key</label><input type="password" id="api-input" placeholder="sk-ant-api03-..."></div>
       <div class="brow">
@@ -700,14 +700,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 </div><!-- end main -->
 
 <nav class="bottom-nav">
-  <button class="nav-item active" onclick="goMobile('today',this)"><span class="nav-icon">ðï¸</span><span class="nav-label">TODAY</span></button>
-  <button class="nav-item" onclick="goMobile('log',this)"><span class="nav-icon">ð</span><span class="nav-label">LOG</span></button>
-  <button class="nav-item" onclick="goMobile('week',this)"><span class="nav-icon">ð</span><span class="nav-label">WEEK</span></button>
-  <button class="nav-item" onclick="goMobile('progress',this)"><span class="nav-icon">ð</span><span class="nav-label">PROGRESS</span></button>
-  <button class="nav-item" onclick="goMobile('program',this)"><span class="nav-icon">ð</span><span class="nav-label">PROGRAM</span></button>
-  <button class="nav-item" onclick="goMobile('recovery',this)"><span class="nav-icon">ð</span><span class="nav-label">RECOVERY</span></button>
-  <button class="nav-item" onclick="goMobile('milestones',this)"><span class="nav-icon">ð¯</span><span class="nav-label">GOALS</span></button>
-  <button class="nav-item" onclick="goMobile('settings',this)"><span class="nav-icon">âï¸</span><span class="nav-label">SETTINGS</span></button>
+  <button class="nav-item active" onclick="goMobile('today',this)"><span class="nav-icon"></span><span class="nav-label">TODAY</span></button>
+  <button class="nav-item" onclick="goMobile('log',this)"><span class="nav-icon">LOG</span><span class="nav-label">LOG</span></button>
+  <button class="nav-item" onclick="goMobile('week',this)"><span class="nav-icon">WEEK</span><span class="nav-label">WEEK</span></button>
+  <button class="nav-item" onclick="goMobile('progress',this)"><span class="nav-icon">PROG</span><span class="nav-label">PROGRESS</span></button>
+  <button class="nav-item" onclick="goMobile('program',this)"><span class="nav-icon">PROG</span><span class="nav-label">PROGRAM</span></button>
+  <button class="nav-item" onclick="goMobile('recovery',this)"><span class="nav-icon">REC</span><span class="nav-label">RECOVERY</span></button>
+  <button class="nav-item" onclick="goMobile('milestones',this)"><span class="nav-icon">GOALS</span><span class="nav-label">GOALS</span></button>
+  <button class="nav-item" onclick="goMobile('settings',this)"><span class="nav-icon">SET</span><span class="nav-label">SETTINGS</span></button>
 </nav>
 </div>
 
@@ -716,88 +716,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 // CANONICAL DATA STORE
 // ============================================================
 const CANONICAL = {
-  "lastUpdated": "2026-05-16",
-  "sessions": [
-    {
-      "date": "2026-05-16",
-      "day": "1",
-      "rpe": 1,
-      "duration": null,
-      "energy": null,
-      "bodyweight": null,
-      "sleep": null,
-      "notes": "",
-      "bench": {
-        "sets": [
-          {
-            "weight": 192,
-            "reps": 6,
-            "rpe": 6
-          }
-        ],
-        "notes": ""
-      },
-      "ohp": {
-        "sets": [],
-        "notes": ""
-      },
-      "squat": {
-        "sets": [],
-        "notes": ""
-      },
-      "dl": {
-        "sets": [],
-        "notes": ""
-      },
-      "pullups": {
-        "sets": null,
-        "reps": null
-      },
-      "cardio": {
-        "type": "Zone 2 Run",
-        "duration": null,
-        "distance": null,
-        "avgHR": null,
-        "pace": "",
-        "notes": ""
-      },
-      "ts": 1778968379783
-    }
-  ],
-  "recoveryLogs": [],
-  "checks": {},
-  "restDays": [
-    "Sat"
-  ],
-  "profile": {
-    "bodyweight": 225,
-    "phase": "Fat loss + strength base",
-    "blockWeek": 1,
-    "mode": "NORMAL"
-  },
-  "currentLifts": {
-    "benchE1RM": 255,
-    "squatE1RM": 215,
-    "deadliftE1RM": 215,
-    "ohpE1RM": 120,
-    "pullups": 5
-  },
-  "cardioBaseline": {
-    "pace": "10:30",
-    "distance": 4,
-    "avgHR": 165
-  },
-  "volumeBests": {
-    "bench": "190x5x5",
-    "ohp": "90x3x5",
-    "squat": "160x5x5",
-    "deadlift": "160x3x5"
-  },
-  "adherence": {
-    "planned": 5,
-    "completed": 1,
-    "missed": 0
-  }
+  lastUpdated: "2026-05-16",
+  sessions: [],
+  recoveryLogs: [],
+  checks: {},
+  restDays: ["Sat"],
+  profile: { bodyweight: 225, phase: "Fat loss + strength base", blockWeek: 1, mode: "NORMAL" },
+  currentLifts: { benchE1RM: 255, squatE1RM: 215, deadliftE1RM: 215, ohpE1RM: 120, pullups: 5 },
+  cardioBaseline: { pace: "10:30", distance: 4.0, avgHR: 165 },
+  volumeBests: { bench: "190x5x5", ohp: "90x3x5", squat: "160x5x5", deadlift: "160x3x5" },
+  adherence: { planned: 5, completed: 0, missed: 0 }
 };
 // ============================================================
 // END CANONICAL DATA STORE
@@ -812,16 +740,16 @@ loadSettings();
 // GITHUB API
 // ============================================================
 async function pushToGitHub(triggerEl, statusEl){
-  if(!SETTINGS.ghToken){ setSaveStatus(statusEl,'â  Add GitHub token in Settings first'); return false; }
-  if(triggerEl){ triggerEl.classList.add('saving'); triggerEl.textContent='Savingâ¦'; }
-  setSyncIndicator('saving','Savingâ¦');
+  if(!SETTINGS.ghToken){ setSaveStatus(statusEl,'&#9888; Add GitHub token in Settings first'); return false; }
+  if(triggerEl){ triggerEl.classList.add('saving'); triggerEl.textContent='Saving&#8230;'; }
+  setSyncIndicator('saving','Saving&#8230;');
   try{
     const infoRes=await fetch(`https://api.github.com/repos/${SETTINGS.ghUser}/${SETTINGS.ghRepo}/contents/index.html`,{headers:{Authorization:`token ${SETTINGS.ghToken}`,Accept:'application/vnd.github.v3+json'}});
     if(!infoRes.ok) throw new Error('Could not read file. Check token and repo name.');
     const info=await infoRes.json();
     const sha=info.sha;
-    const rawContent=info.content.replace(/\n/g,'');
-    const currentContent=decodeURIComponent(escape(atob(rawContent)));
+    const rawBytes=Uint8Array.from(atob(info.content.replace(/\n/g,'')),c=>c.charCodeAt(0));
+    const currentContent=new TextDecoder('utf-8').decode(rawBytes);
     CANONICAL.lastUpdated=new Date().toISOString().split('T')[0];
     const canonicalStr=JSON.stringify(CANONICAL,null,2);
     const updated=currentContent.replace(
@@ -831,17 +759,17 @@ async function pushToGitHub(triggerEl, statusEl){
     const pushRes=await fetch(`https://api.github.com/repos/${SETTINGS.ghUser}/${SETTINGS.ghRepo}/contents/index.html`,{
       method:'PUT',
       headers:{Authorization:`token ${SETTINGS.ghToken}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
-      body:JSON.stringify({message:`Update data â ${new Date().toLocaleDateString()}`,content:btoa(unescape(encodeURIComponent(updated))),sha})
+      body:JSON.stringify({message:`Update data &#8212; ${new Date().toLocaleDateString()}`,content:btoa(String.fromCharCode(...new TextEncoder().encode(updated))),sha})
     });
     if(!pushRes.ok) throw new Error('GitHub push failed. Check token permissions.');
-    setSaveStatus(statusEl,'â Saved to GitHub â '+new Date().toLocaleTimeString());
+    setSaveStatus(statusEl,'&check; Saved to GitHub &#8212; '+new Date().toLocaleTimeString());
     setSyncIndicator('ok','Synced');
-    if(triggerEl){ triggerEl.classList.remove('saving'); triggerEl.textContent='ð¾ Save session to GitHub'; }
+    if(triggerEl){ triggerEl.classList.remove('saving'); triggerEl.textContent=' Save session to GitHub'; }
     return true;
   }catch(e){
-    setSaveStatus(statusEl,'â  '+e.message);
+    setSaveStatus(statusEl,'&#9888; '+e.message);
     setSyncIndicator('error','Sync error');
-    if(triggerEl){ triggerEl.classList.remove('saving'); triggerEl.textContent='ð¾ Save session to GitHub'; }
+    if(triggerEl){ triggerEl.classList.remove('saving'); triggerEl.textContent=' Save session to GitHub'; }
     return false;
   }
 }
@@ -861,10 +789,10 @@ if(document.getElementById('d-date')) document.getElementById('d-date').textCont
 if(document.getElementById('m-date')) document.getElementById('m-date').textContent=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 const di=document.getElementById('log-date'); if(di) di.value=now.toISOString().split('T')[0];
 const di2=document.getElementById('rec-date'); if(di2) di2.value=now.toISOString().split('T')[0];
-if(SETTINGS.ghToken){ document.getElementById('gh-token').value=SETTINGS.ghToken; document.getElementById('gh-status').textContent='â Token loaded'; }
+if(SETTINGS.ghToken){ document.getElementById('gh-token').value=SETTINGS.ghToken; document.getElementById('gh-status').textContent='&check; Token loaded'; }
 if(SETTINGS.ghUser) document.getElementById('gh-user').value=SETTINGS.ghUser;
 if(SETTINGS.ghRepo) document.getElementById('gh-repo').value=SETTINGS.ghRepo;
-if(SETTINGS.apiKey){ document.getElementById('api-input').value=SETTINGS.apiKey; document.getElementById('api-status').textContent='â Key loaded'; }
+if(SETTINGS.apiKey){ document.getElementById('api-input').value=SETTINGS.apiKey; document.getElementById('api-status').textContent='&check; Key loaded'; }
 try{ restoreChecks(); }catch(e){}
 try{ renderSessionHistory(); }catch(e){}
 try{ renderRecoveryHistory(); }catch(e){}
@@ -933,7 +861,7 @@ function modeChange(){
     recovery:'<p><strong>Recovery:</strong> Zone 2 cardio and mobility only. No heavy loading.</p>',
     minimum:'<p><strong>Minimum viable:</strong> Main lift only OR cardio only. Getting there is the win.</p>'
   };
-  document.getElementById('today-out').innerHTML='<div class="air"><div class="albl">â MODE</div>'+msgs[m]+'</div>';
+  document.getElementById('today-out').innerHTML='<div class="air"><div class="albl">* MODE</div>'+msgs[m]+'</div>';
 }
 
 // ============================================================
@@ -980,7 +908,7 @@ function renderSets(lift){
       <input type="number" placeholder="${defaults[lift]}" value="${s.weight}" oninput="setData['${lift}'][${i}].weight=this.value" style="font-size:16px;text-align:center;">
       <input type="number" placeholder="5" value="${s.reps}" oninput="setData['${lift}'][${i}].reps=this.value" style="font-size:16px;text-align:center;">
       <input type="number" placeholder="7" min="1" max="10" value="${s.rpe}" oninput="setData['${lift}'][${i}].rpe=this.value" style="font-size:16px;text-align:center;">
-      <button class="remove-set" onclick="removeSet('${lift}',${i})">Ã</button>
+      <button class="remove-set" onclick="removeSet('${lift}',${i})">x</button>
     </div>`).join('');
 }
 
@@ -990,7 +918,7 @@ function renderSets(lift){
 async function saveSession(){
   const date=document.getElementById('log-date').value;
   const day=document.getElementById('log-day').value;
-  if(!date||!day){ setSaveStatus('log-save-status','â  Fill in date and day type'); return; }
+  if(!date||!day){ setSaveStatus('log-save-status','&#9888; Fill in date and day type'); return; }
 
   const getLift=(lift)=>({
     sets: setData[lift].filter(s=>s.weight||s.reps).map(s=>({weight:+s.weight||null,reps:+s.reps||null,rpe:+s.rpe||null})),
@@ -1068,11 +996,11 @@ function renderSessionHistory(){
     if(!ss.length){ el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions yet.</div>'; return; }
     el.innerHTML=ss.map(s=>{
       const parts=[];
-      if(s.bench?.sets?.length){ const best=s.bench.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`Bench ${best.weight}Ã${best.reps}`); }
-      if(s.squat?.sets?.length){ const best=s.squat.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`Squat ${best.weight}Ã${best.reps}`); }
-      if(s.dl?.sets?.length){ const best=s.dl.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`DL ${best.weight}Ã${best.reps}`); }
+      if(s.bench?.sets?.length){ const best=s.bench.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`Bench ${best.weight}x${best.reps}`); }
+      if(s.squat?.sets?.length){ const best=s.squat.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`Squat ${best.weight}x${best.reps}`); }
+      if(s.dl?.sets?.length){ const best=s.dl.sets.filter(x=>x.weight).sort((a,b)=>b.weight-a.weight)[0]; if(best) parts.push(`DL ${best.weight}x${best.reps}`); }
       if(s.cardio?.pace) parts.push(`Run ${s.cardio.pace}/mi`);
-      return`<div class="le"><div class="ld">${s.date}</div><div class="lc"><div class="lt">${dayNames[s.day]||'Session'}${s.rpe?' Â· RPE '+s.rpe:''}</div><div class="ldt">${parts.join(' Â· ')||'No lift data'}${s.notes?' â '+s.notes.substring(0,60):''}</div></div></div>`;
+      return`<div class="le"><div class="ld">${s.date}</div><div class="lc"><div class="lt">${dayNames[s.day]||'Session'}${s.rpe?' &middot; RPE '+s.rpe:''}</div><div class="ldt">${parts.join(' &middot; ')||'No lift data'}${s.notes?' &#8212; '+s.notes.substring(0,60):''}</div></div></div>`;
     }).join('');
   };
   render('session-hist',10);
@@ -1116,7 +1044,7 @@ function renderRecoveryHistory(){
   const el=document.getElementById('rec-hist'); if(!el) return;
   const logs=[...CANONICAL.recoveryLogs].reverse().slice(0,10);
   if(!logs.length){ el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">No recovery logs yet.</div>'; return; }
-  el.innerHTML=logs.map(r=>`<div class="le"><div class="ld">${r.date}</div><div class="lc"><div class="lt">Recovery ${r.score}/10${r.bw?' Â· '+r.bw+'lb':''}</div><div class="ldt">Sleep ${r.sleep}/10 Â· Soreness ${r.sor}/10 Â· Motivation ${r.mot}/10</div></div></div>`).join('');
+  el.innerHTML=logs.map(r=>`<div class="le"><div class="ld">${r.date}</div><div class="lc"><div class="lt">Recovery ${r.score}/10${r.bw?' &middot; '+r.bw+'lb':''}</div><div class="ldt">Sleep ${r.sleep}/10 &middot; Soreness ${r.sor}/10 &middot; Motivation ${r.mot}/10</div></div></div>`).join('');
 }
 function updateRecoveryStats(){
   const recent=CANONICAL.recoveryLogs.slice(-7);
@@ -1166,12 +1094,12 @@ function upWeekBars(){
 // DAY PREVIEW
 // ============================================================
 const dayPreviews={
-  '1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a);">â </span> Bench Press â 5Ã5 @ 190</div><div><span style="color:var(--a);">â </span> Barbell Row â 4Ã6-8</div><div><span style="color:var(--a);">â </span> Overhead Press â 3Ã5 @ 90</div><div><span style="color:var(--a);">â </span> Pullups â 5Ã3 clean</div><div><span style="color:var(--a);">â </span> Incline DB Press â 3Ã8-10</div><div><span style="color:var(--a2);">â </span> Zone 2 cardio â 20-30 min</div></div>',
-  '2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a);">â </span> Back Squat â 5Ã5 @ 160</div><div><span style="color:var(--a);">â </span> Deadlift â 3Ã5 @ 160</div><div><span style="color:var(--a);">â </span> Romanian DL â 3Ã8</div><div><span style="color:var(--a);">â </span> Split Squats â 3Ã10 each</div><div><span style="color:var(--a2);">â </span> Zone 2 cardio â 20-40 min</div></div>',
-  '3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a2);">â </span> Easy run â 20-45 min @ 140-155 HR</div><div><span style="color:var(--a2);">â </span> Baseline: 10:30 @ 165 HR</div><div style="margin-top:6px;font-size:11px;color:var(--t3);">Recovery day â no heavy lifting</div></div>',
-  '4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a5);">â </span> Incline Machine â 4Ã8-12</div><div><span style="color:var(--a5);">â </span> Lat Pulldown â 4Ã8-12</div><div><span style="color:var(--a5);">â </span> DB Shoulder Press â 3Ã8-10</div><div><span style="color:var(--a5);">â </span> Lateral Raises â 5Ã15-20</div><div><span style="color:var(--a5);">â </span> Biceps + Triceps â 3Ã10-15</div></div>',
-  '5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a5);">â </span> Leg Press â 3Ã8-10</div><div><span style="color:var(--a5);">â </span> RDL â 3Ã8-10</div><div><span style="color:var(--a5);">â </span> Walking Lunges â 3Ã12 each</div><div><span style="color:var(--a2);">â </span> Intervals â 1 min hard / 2 min easy Ã 6-10</div></div>',
-  'rest':'<div style="font-size:13px;color:var(--t3);padding:8px 0;">Rest day â sleep, eat, recover. This is part of the program.</div>'
+  '1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a);">-</span> Bench Press &#8212; 5x5 @ 190</div><div><span style="color:var(--a);">-</span> Barbell Row &#8212; 4x6-8</div><div><span style="color:var(--a);">-</span> Overhead Press &#8212; 3x5 @ 90</div><div><span style="color:var(--a);">-</span> Pullups &#8212; 5x3 clean</div><div><span style="color:var(--a);">-</span> Incline DB Press &#8212; 3x8-10</div><div><span style="color:var(--a2);">-</span> Zone 2 cardio &#8212; 20-30 min</div></div>',
+  '2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a);">-</span> Back Squat &#8212; 5x5 @ 160</div><div><span style="color:var(--a);">-</span> Deadlift &#8212; 3x5 @ 160</div><div><span style="color:var(--a);">-</span> Romanian DL &#8212; 3x8</div><div><span style="color:var(--a);">-</span> Split Squats &#8212; 3x10 each</div><div><span style="color:var(--a2);">-</span> Zone 2 cardio &#8212; 20-40 min</div></div>',
+  '3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a2);">-</span> Easy run &#8212; 20-45 min @ 140-155 HR</div><div><span style="color:var(--a2);">-</span> Baseline: 10:30 @ 165 HR</div><div style="margin-top:6px;font-size:11px;color:var(--t3);">Recovery day &#8212; no heavy lifting</div></div>',
+  '4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a5);">-</span> Incline Machine &#8212; 4x8-12</div><div><span style="color:var(--a5);">-</span> Lat Pulldown &#8212; 4x8-12</div><div><span style="color:var(--a5);">-</span> DB Shoulder Press &#8212; 3x8-10</div><div><span style="color:var(--a5);">-</span> Lateral Raises &#8212; 5x15-20</div><div><span style="color:var(--a5);">-</span> Biceps + Triceps &#8212; 3x10-15</div></div>',
+  '5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div><span style="color:var(--a5);">-</span> Leg Press &#8212; 3x8-10</div><div><span style="color:var(--a5);">-</span> RDL &#8212; 3x8-10</div><div><span style="color:var(--a5);">-</span> Walking Lunges &#8212; 3x12 each</div><div><span style="color:var(--a2);">-</span> Intervals &#8212; 1 min hard / 2 min easy x 6-10</div></div>',
+  'rest':'<div style="font-size:13px;color:var(--t3);padding:8px 0;">Rest day &#8212; sleep, eat, recover. This is part of the program.</div>'
 };
 function loadDayPreview(){ const el=document.getElementById('day-preview'); if(el) el.innerHTML=dayPreviews[document.getElementById('today-day').value]||''; }
 
@@ -1182,17 +1110,17 @@ function saveGHSettings(){
   SETTINGS.ghToken=document.getElementById('gh-token').value.trim();
   SETTINGS.ghUser=document.getElementById('gh-user').value.trim();
   SETTINGS.ghRepo=document.getElementById('gh-repo').value.trim();
-  saveSettings(); document.getElementById('gh-status').textContent='â Settings saved';
+  saveSettings(); document.getElementById('gh-status').textContent='&check; Settings saved';
 }
 async function testGHConnection(){
-  if(!SETTINGS.ghToken){ document.getElementById('gh-status').textContent='â  Enter token first'; return; }
-  document.getElementById('gh-status').textContent='Testingâ¦';
+  if(!SETTINGS.ghToken){ document.getElementById('gh-status').textContent='&#9888; Enter token first'; return; }
+  document.getElementById('gh-status').textContent='Testing&#8230;';
   try{
     const r=await fetch(`https://api.github.com/repos/${SETTINGS.ghUser}/${SETTINGS.ghRepo}/contents/index.html`,{headers:{Authorization:`token ${SETTINGS.ghToken}`}});
-    document.getElementById('gh-status').textContent=r.ok?'â Connected â ready to save':'â  Failed â check token and repo name';
-  }catch(e){ document.getElementById('gh-status').textContent='â  Network error'; }
+    document.getElementById('gh-status').textContent=r.ok?'&check; Connected &#8212; ready to save':'&#9888; Failed &#8212; check token and repo name';
+  }catch(e){ document.getElementById('gh-status').textContent='&#9888; Network error'; }
 }
-function saveApiKey(){ SETTINGS.apiKey=document.getElementById('api-input').value.trim(); saveSettings(); document.getElementById('api-status').textContent=SETTINGS.apiKey?'â Key saved':'No key entered'; }
+function saveApiKey(){ SETTINGS.apiKey=document.getElementById('api-input').value.trim(); saveSettings(); document.getElementById('api-status').textContent=SETTINGS.apiKey?'&check; Key saved':'No key entered'; }
 function clearApiKey(){ SETTINGS.apiKey=''; document.getElementById('api-input').value=''; document.getElementById('api-status').textContent='Cleared'; saveSettings(); }
 function exportData(){ const b=new Blob([JSON.stringify(CANONICAL,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='workout_os_data.json'; a.click(); }
 function clearData(){ if(confirm('Clear local settings? GitHub data is safe.')){ localStorage.removeItem('workout_os_settings'); location.reload(); } }
@@ -1200,7 +1128,7 @@ function clearData(){ if(confirm('Clear local settings? GitHub data is safe.')){
 // ============================================================
 // AI
 // ============================================================
-function loading(id){ document.getElementById(id).innerHTML='<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Generatingâ¦</span></div>'; }
+function loading(id){ document.getElementById(id).innerHTML='<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Generating&#8230;</span></div>'; }
 async function claude(prompt){
   if(!SETTINGS.apiKey) return null;
   try{
@@ -1208,7 +1136,7 @@ async function claude(prompt){
     const d=await r.json(); return d.content?.[0]?.text||null;
   }catch(e){ return null; }
 }
-function fmt(t,id){ document.getElementById(id).innerHTML=t?`<div class="air"><div class="albl">â TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="albl">â NOTE</div><p>Add API key in Settings to enable AI coaching.</p></div>`; }
+function fmt(t,id){ document.getElementById(id).innerHTML=t?`<div class="air"><div class="albl">* TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="albl">* NOTE</div><p>Add API key in Settings to enable AI coaching.</p></div>`; }
 async function genToday(){
   const mode=document.getElementById('mode-sel').value,e=document.getElementById('sl-e').value,s=document.getElementById('sl-s').value,sr=document.getElementById('sl-sr').value,day=document.getElementById('today-day').value;
   if(!SETTINGS.apiKey){fmt(null,'today-out');return;}
@@ -1220,7 +1148,7 @@ async function genWeekGuidance(){
   if(!SETTINGS.apiKey) return; loading('wk-guid');
   const recent=CANONICAL.sessions.slice(-5).map(s=>`Day${s.day} ${s.date} RPE${s.rpe||'?'}`).join(', ')||'No sessions';
   const t=await claude(`Weekly guidance. Recent sessions: ${recent}. Current lifts: Bench ${CANONICAL.currentLifts.benchE1RM}, Squat ${CANONICAL.currentLifts.squatE1RM}, DL ${CANONICAL.currentLifts.deadliftE1RM}, OHP ${CANONICAL.currentLifts.ohpE1RM}. Give compound loading targets, cardio focus, recovery priority, one auto-regulation rule.`);
-  document.getElementById('wk-guid').innerHTML=t?`<div class="albl">â AI COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`:'<p>Add API key in Settings.</p>';
+  document.getElementById('wk-guid').innerHTML=t?`<div class="albl">* AI COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`:'<p>Add API key in Settings.</p>';
 }
 </script>
 </body>
