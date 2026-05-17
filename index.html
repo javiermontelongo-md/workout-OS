@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- workout-OS v4 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -595,10 +596,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 </div><!-- end app -->
 
 <script>
-const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const DT={0:'rest',1:'Upper Str',2:'Lower Str',3:'Recovery',4:'Upper Hyp',5:'Lower+Cond',6:'rest'};
-const DC={0:'rt',1:'st',2:'st',3:'cd',4:'hy',5:'hy',6:'rt'};
-const DP={'1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Bench Press -- 5x5 @ 190</div><div>Barbell Row -- 4x6-8</div><div>Overhead Press -- 3x5 @ 90</div><div>Pullups -- 5x3 clean</div><div>Incline DB Press -- 3x8-10</div><div>Zone 2 cardio -- 20-30 min</div></div>','2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Back Squat -- 5x5 @ 160</div><div>Deadlift -- 3x5 @ 160</div><div>Romanian DL -- 3x8</div><div>Split Squats -- 3x10 each</div><div>Zone 2 cardio -- 20-40 min</div></div>','3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Easy run -- 20-45 min @ 140-155 HR</div><div>Baseline: 10:30 @ 165 HR</div><div style="margin-top:6px;font-size:11px;color:var(--t3);">Recovery day -- no heavy lifting</div></div>','4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Incline Machine -- 4x8-12</div><div>Lat Pulldown -- 4x8-12</div><div>DB Shoulder Press -- 3x8-10</div><div>Lateral Raises -- 5x15-20</div><div>Biceps + Triceps -- 3x10-15</div></div>','5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Leg Press -- 3x8-10</div><div>RDL -- 3x8-10</div><div>Walking Lunges -- 3x12 each</div><div>Intervals -- 1 min hard / 2 min easy x 6-10</div></div>','rest':'<div style="font-size:13px;color:var(--t3);padding:8px 0;">Rest day -- sleep, eat, recover.</div>'};
+var SD={bench:[],ohp:[],squat:[],dl:[]};
+var DEF={bench:190,ohp:90,squat:160,dl:160};
+var DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var DT={0:'rest',1:'Upper Str',2:'Lower Str',3:'Recovery',4:'Upper Hyp',5:'Lower+Cond',6:'rest'};
+var DC={0:'rt',1:'st',2:'st',3:'cd',4:'hy',5:'hy',6:'rt'};
+var DP={'1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Bench Press -- 5x5 @ 190</div><div>Barbell Row -- 4x6-8</div><div>Overhead Press -- 3x5 @ 90</div><div>Pullups -- 5x3 clean</div><div>Incline DB Press -- 3x8-10</div><div>Zone 2 cardio -- 20-30 min</div></div>','2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Back Squat -- 5x5 @ 160</div><div>Deadlift -- 3x5 @ 160</div><div>Romanian DL -- 3x8</div><div>Split Squats -- 3x10 each</div><div>Zone 2 cardio -- 20-40 min</div></div>','3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Easy run -- 20-45 min @ 140-155 HR</div><div>Baseline: 10:30 @ 165 HR</div><div style="margin-top:6px;font-size:11px;color:var(--t3);">Recovery day -- no heavy lifting</div></div>','4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Incline Machine -- 4x8-12</div><div>Lat Pulldown -- 4x8-12</div><div>DB Shoulder Press -- 3x8-10</div><div>Lateral Raises -- 5x15-20</div><div>Biceps + Triceps -- 3x10-15</div></div>','5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Leg Press -- 3x8-10</div><div>RDL -- 3x8-10</div><div>Walking Lunges -- 3x12 each</div><div>Intervals -- 1 min hard / 2 min easy x 6-10</div></div>','rest':'<div style="font-size:13px;color:var(--t3);padding:8px 0;">Rest day -- sleep, eat, recover.</div>'};
 
 // ============================================================
 // STATE -- no data here. All data in data.json on GitHub.
@@ -770,8 +773,6 @@ function restChk(){
 // ============================================================
 // SET-BY-SET LOGGING
 // ============================================================
-const SD={bench:[],ohp:[],squat:[],dl:[]};
-const DEF={bench:190,ohp:90,squat:160,dl:160};
 function initSets(){ ['bench','ohp','squat','dl'].forEach(l=>{SD[l]=[];addSet(l);}); }
 function addSet(lift){
   const i=SD[lift].length; SD[lift].push({w:'',r:'',rpe:''});
