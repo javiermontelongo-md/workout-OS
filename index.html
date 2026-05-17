@@ -595,6 +595,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 </div><!-- end app -->
 
 <script>
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DT={0:'rest',1:'Upper Str',2:'Lower Str',3:'Recovery',4:'Upper Hyp',5:'Lower+Cond',6:'rest'};
+const DC={0:'rt',1:'st',2:'st',3:'cd',4:'hy',5:'hy',6:'rt'};
+const DP={'1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Bench Press -- 5x5 @ 190</div><div>Barbell Row -- 4x6-8</div><div>Overhead Press -- 3x5 @ 90</div><div>Pullups -- 5x3 clean</div><div>Incline DB Press -- 3x8-10</div><div>Zone 2 cardio -- 20-30 min</div></div>','2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Back Squat -- 5x5 @ 160</div><div>Deadlift -- 3x5 @ 160</div><div>Romanian DL -- 3x8</div><div>Split Squats -- 3x10 each</div><div>Zone 2 cardio -- 20-40 min</div></div>','3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Easy run -- 20-45 min @ 140-155 HR</div><div>Baseline: 10:30 @ 165 HR</div><div style="margin-top:6px;font-size:11px;color:var(--t3);">Recovery day -- no heavy lifting</div></div>','4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Incline Machine -- 4x8-12</div><div>Lat Pulldown -- 4x8-12</div><div>DB Shoulder Press -- 3x8-10</div><div>Lateral Raises -- 5x15-20</div><div>Biceps + Triceps -- 3x10-15</div></div>','5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Leg Press -- 3x8-10</div><div>RDL -- 3x8-10</div><div>Walking Lunges -- 3x12 each</div><div>Intervals -- 1 min hard / 2 min easy x 6-10</div></div>','rest':'<div style="font-size:13px;color:var(--t3);padding:8px 0;">Rest day -- sleep, eat, recover.</div>'};
+
 // ============================================================
 // STATE -- no data here. All data in data.json on GitHub.
 // ============================================================
@@ -609,7 +614,15 @@ lCFG();
 // GITHUB -- reads/writes data.json ONLY
 // ============================================================
 async function fetchData(){
-  if(!CFG.tok){ hOv(); sync('err','No token -- go to Settings'); return; }
+  if(!CFG.tok){
+    hOv();
+    sync('err','No token');
+    D=defD();
+    onLoad();
+    const wo=document.getElementById('today-out');
+    if(wo) wo.innerHTML='<div class="air"><div class="al">ACTION REQUIRED</div><p>No GitHub token found. Go to <strong>Settings tab</strong>, paste your token, click <strong>Save settings</strong>, then click <strong>Reload data</strong>.</p></div>';
+    return;
+  }
   sync('saving','Loading...');
   try{
     const r=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
@@ -619,8 +632,13 @@ async function fetchData(){
     D=JSON.parse(new TextDecoder('utf-8').decode(bytes));
     sync('ok','Synced'); hOv(); onLoad();
   }catch(e){
-    sync('err',e.message); hOv();
-    D=defD(); onLoad();
+    sync('err','Load failed -- check token in Settings');
+    hOv();
+    D=defD();
+    onLoad();
+    // Show settings warning on today tab
+    const wo=document.getElementById('today-out');
+    if(wo) wo.innerHTML='<div class="air"><div class="al">ACTION REQUIRED</div><p>Could not load your data from GitHub. Go to <strong>Settings tab</strong> -- make sure your GitHub token is entered and click <strong>Test connection</strong>. Then click <strong>Reload data</strong>.</p></div>';
   }
 }
 
@@ -769,7 +787,8 @@ function renderSets(lift){
 // SAVE SESSION
 // ============================================================
 async function saveSession(){
-  if(!D){ msg('log-smsg','Data not loaded yet'); return; }
+  try{
+  if(!D){ msg('log-smsg','Data not loaded -- go to Settings, check your token, then tap Reload data'); return; }
   const date=document.getElementById('log-date').value,day=document.getElementById('log-day').value;
   if(!date||!day){ msg('log-smsg','Fill in date and day type'); return; }
   const getLift=l=>({sets:SD[l].filter(s=>s.w||s.r).map(s=>({w:+s.w||null,r:+s.r||null,rpe:+s.rpe||null})),notes:document.getElementById(l+'-notes')?.value||''});
@@ -788,6 +807,7 @@ async function saveSession(){
   const ok=await push('log-sbtn','log-smsg');
   if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); }
   else { D.sessions.pop(); D.adherence.completed--; }
+  }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
 function resetLogForm(){
   ['log-rpe','log-dur','log-energy','log-bw','log-sleep','log-notes','card-dur','card-dist','card-hr','card-pace','card-notes','pu-sets','pu-reps'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -870,9 +890,6 @@ function updRecStats(){
 // ============================================================
 // WEEK GRID
 // ============================================================
-const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const DT={0:'rest',1:'Upper Str',2:'Lower Str',3:'Recovery',4:'Upper Hyp',5:'Lower+Cond',6:'rest'};
-const DC={0:'rt',1:'st',2:'st',3:'cd',4:'hy',5:'hy',6:'rt'};
 function buildWkGrid(){
   const today=new Date(),dow=today.getDay(),grid=document.getElementById('wk-grid'),restDays=D?D.restDays:['Sat'];
   if(!grid) return; grid.innerHTML='';
@@ -900,7 +917,6 @@ function upWkB(){
 // ============================================================
 // DAY PREVIEW
 // ============================================================
-const DP={'1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Bench Press -- 5x5 @ 190</div><div>Barbell Row -- 4x6-8</div><div>Overhead Press -- 3x5 @ 90</div><div>Pullups -- 5x3 clean</div><div>Incline DB Press -- 3x8-10</div><div>Zone 2 cardio -- 20-30 min</div></div>','2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Back Squat -- 5x5 @ 160</div><div>Deadlift -- 3x5 @ 160</div><div>Romanian DL -- 3x8</div><div>Split Squats -- 3x10 each</div><div>Zone 2 cardio -- 20-40 min</div></div>','3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Easy run -- 20-45 min @ 140-155 HR</div><div>Baseline: 10:30 @ 165 HR</div><div style="margin-top:6px;font-size:11px;color:var(--t3);">Recovery day -- no heavy lifting</div></div>','4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Incline Machine -- 4x8-12</div><div>Lat Pulldown -- 4x8-12</div><div>DB Shoulder Press -- 3x8-10</div><div>Lateral Raises -- 5x15-20</div><div>Biceps + Triceps -- 3x10-15</div></div>','5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Leg Press -- 3x8-10</div><div>RDL -- 3x8-10</div><div>Walking Lunges -- 3x12 each</div><div>Intervals -- 1 min hard / 2 min easy x 6-10</div></div>','rest':'<div style="font-size:13px;color:var(--t3);padding:8px 0;">Rest day -- sleep, eat, recover.</div>'};
 function ldPrev(){ const el=document.getElementById('day-prev');if(el) el.innerHTML=DP[document.getElementById('today-day')?.value||'1']||''; }
 
 // ============================================================
