@@ -1,10 +1,58 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-16",
-  "sessions": [],
+  "lastUpdated": "2026-05-17",
+  "sessions": [
+    {
+      "date": "2026-05-10",
+      "day": "1",
+      "rpe": null,
+      "duration": null,
+      "energy": null,
+      "bw": null,
+      "sleep": null,
+      "notes": "",
+      "bench": {
+        "sets": [
+          {
+            "w": 190,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullups": {
+        "sets": null,
+        "reps": null
+      },
+      "cardio": {
+        "type": "Other",
+        "dur": 30,
+        "dist": 3,
+        "hr": 170,
+        "pace": "10:06",
+        "notes": ""
+      },
+      "ts": 1779026884276
+    }
+  ],
   "recoveryLogs": [],
   "checks": {},
-  "restDays": ["Sat"],
+  "restDays": [
+    "Sat"
+  ],
   "profile": {
     "bodyweight": 225,
     "phase": "Fat loss + strength base",
@@ -20,7 +68,7 @@
   },
   "cardioBaseline": {
     "pace": "10:30",
-    "distance": 4.0,
+    "distance": 4,
     "avgHR": 165
   },
   "volumeBests": {
@@ -31,7 +79,7 @@
   },
   "adherence": {
     "planned": 5,
-    "completed": 0,
+    "completed": 1,
     "missed": 0
   }
 }
