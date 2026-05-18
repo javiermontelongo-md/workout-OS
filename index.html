@@ -192,6 +192,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .spark-bar.stress{background:var(--a4);opacity:.7;}
 .spark-bar.stress:last-child{opacity:1;}
 .spark-bar.neutral{background:var(--a);opacity:.6;}
+/* Activity calendar */
+.cal-nav-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-nav-btn{background:var(--s3);border:none;color:var(--t2);font-family:var(--mono);font-size:16px;cursor:pointer;border-radius:6px;padding:4px 10px;line-height:1;}
+.cal-nav-btn:active{color:var(--a);}
+.cal-week-label{font-family:var(--mono);font-size:11px;color:var(--t2);text-align:center;}
+.cal-week-sub{font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;margin-top:1px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+.cal-hdr{font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;padding:3px 0;letter-spacing:.05em;}
+.cal-cell{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:7px 4px 5px;min-height:64px;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.cal-cell.today{border-color:var(--a);background:rgba(255,183,77,.06);}
+.cal-date{font-family:var(--mono);font-size:12px;color:var(--t2);line-height:1;}
+.cal-cell.today .cal-date{color:var(--a);font-weight:500;}
+.cal-badge{font-family:var(--mono);font-size:8px;padding:2px 5px;border-radius:3px;text-align:center;line-height:1.3;width:100%;word-break:break-word;}
+@supports(color:color-mix(in srgb,red 50%,blue)){
+  .cal-badge.strength{background:color-mix(in srgb,var(--a) 15%,transparent);color:var(--a);}
+  .cal-badge.cardio{background:color-mix(in srgb,var(--a2) 15%,transparent);color:var(--a2);}
+  .cal-badge.rest{background:color-mix(in srgb,var(--a4) 10%,transparent);color:var(--a4);}
+  .cal-badge.planned{background:color-mix(in srgb,var(--a5) 12%,transparent);color:var(--a5);border:1px dashed color-mix(in srgb,var(--a5) 40%,transparent);}
+}
+@supports not(color:color-mix(in srgb,red 50%,blue)){
+  .cal-badge.strength{background:rgba(255,183,77,.15);color:var(--a);}
+  .cal-badge.cardio{background:rgba(79,195,247,.15);color:var(--a2);}
+  .cal-badge.rest{background:rgba(239,83,80,.1);color:var(--a4);}
+  .cal-badge.planned{background:rgba(206,147,216,.12);color:var(--a5);border:1px dashed rgba(206,147,216,.4);}
+}
+.cal-week-summary{font-family:var(--mono);font-size:10px;color:var(--t3);text-align:center;padding:5px 0 2px;}
 </style>
 </head>
 <body>
@@ -392,34 +418,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <!-- v2026-05-17 19:25:02 -->
 <div id="panel-week" class="panel">
   <div class="h1">This <span>week</span></div>
-  <div class="g2">
-    <div style="background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:13px 15px;margin-bottom:12px;">
-      <div class="lbl">weekly split</div>
-      <div style="font-size:12px;color:var(--t2);line-height:1.9;margin-bottom:12px;">
-        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 1</strong> -- Upper Strength</span><span class="bdg a">STRENGTH</span></div>
-        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a);">Day 2</strong> -- Lower Strength</span><span class="bdg a">STRENGTH</span></div>
-        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a2);">Day 3</strong> -- Recovery / Cardio</span><span class="bdg b">CARDIO</span></div>
-        <div style="padding:5px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 4</strong> -- Upper Hypertrophy</span><span class="bdg p">HYPERTROPHY</span></div>
-        <div style="padding:5px 0;display:flex;justify-content:space-between;"><span><strong style="color:var(--a5);">Day 5</strong> -- Lower + Conditioning</span><span class="bdg p">HYBRID</span></div>
+  <div class="card" id="activity-calendar-card">
+    <div class="cal-nav-row">
+      <button class="cal-nav-btn" onclick="calNav(-1)">&#8592;</button>
+      <div>
+        <div class="cal-week-label" id="cal-week-label"></div>
+        <div class="cal-week-sub" id="cal-week-sub"></div>
       </div>
-      <div class="lbl">rest days</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;" id="rchips">
-        <span class="chip" onclick="togRest(this,'Sun')">SUN</span><span class="chip on" onclick="togRest(this,'Sat')">SAT</span><span class="chip" onclick="togRest(this,'Mon')">MON</span><span class="chip" onclick="togRest(this,'Tue')">TUE</span><span class="chip" onclick="togRest(this,'Wed')">WED</span><span class="chip" onclick="togRest(this,'Thu')">THU</span><span class="chip" onclick="togRest(this,'Fri')">FRI</span>
-      </div>
+      <button class="cal-nav-btn" onclick="calNav(1)">&#8594;</button>
     </div>
-    <div style="background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:13px 15px;margin-bottom:12px;">
-      <div class="lbl">weekly adherence</div>
-      <div class="pbw"><div class="pbl"><span>Sessions done</span><span id="wkv-s">0 / 5</span></div><div class="pbb"><div class="pbf" id="wkb-s" style="width:0%;"></div></div></div>
-      <div class="pbw"><div class="pbl"><span>Cardio done</span><span id="wkv-c">0 / 3</span></div><div class="pbb"><div class="pbf" id="wkb-c" style="width:0%;background:var(--a2);"></div></div></div>
-      <div class="dvdr" style="margin:10px 0;"></div>
-      <div class="lbl">update</div>
-      <div class="g2 k2" style="gap:8px;">
-        <input type="number" id="iws" placeholder="Sessions" min="0" max="5" oninput="upWkB()">
-        <input type="number" id="iwc" placeholder="Cardio" min="0" max="5" oninput="upWkB()">
-      </div>
-    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-week-summary" id="cal-week-summary"></div>
   </div>
-  <div class="wkg" id="wk-grid"></div>
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div class="lbl" style="margin:0;">adaptive plan</div>
@@ -831,22 +841,16 @@ if(CFG.api){ document.getElementById('api-key').value=CFG.api; document.getEleme
 fetchData();
 initSets();
 ldPrev();
-buildWkGrid();
 
 function hOv(){ const e=document.getElementById('ov'); if(e){ e.style.opacity='0'; e.style.transition='opacity .4s'; setTimeout(()=>e.remove(),400); } }
 
 function onLoad(){
   if(D.checks) restChk();
-  if(D.restDays){
-    document.querySelectorAll('#rchips .chip').forEach(c=>{
-      if(D.restDays.includes(c.textContent)) c.classList.add('on'); else c.classList.remove('on');
-    });
-  }
   updProgressStats();
   renderSessHist();
   renderRecHist();
   updRecStats();
-  buildWkGrid();
+  renderCalendar();
   buildLocalPlan();
   renderAdaptivePlan();
   renderPredictionChart();
@@ -1044,28 +1048,70 @@ function updRecStats(){
 // ============================================================
 // WEEK GRID
 // ============================================================
-function buildWkGrid(){
-  const today=new Date(),dow=today.getDay(),grid=document.getElementById('wk-grid'),restDays=D?D.restDays:['Sat'];
-  if(!grid) return; grid.innerHTML='';
+// ============================================================
+// ACTIVITY CALENDAR
+// ============================================================
+var calOffset=0;
+function getWeekStart(offset){
+  const d=new Date(),dow=d.getDay();
+  d.setDate(d.getDate()-dow+(offset*7));
+  d.setHours(0,0,0,0);
+  return d;
+}
+function getSessionsForDate(dateStr){
+  if(!D||!D.sessions) return [];
+  return D.sessions.filter(s=>s.date===dateStr);
+}
+function getActivityBadges(sessions){
+  return sessions.map(s=>{
+    const t=(s.type||'').toLowerCase();
+    const cls=t.includes('cardio')?'cardio':'strength';
+    const lbl=t.includes('cardio')?'CARDIO':'LIFT';
+    return `<span class="cal-badge ${cls}">${lbl}</span>`;
+  }).join('');
+}
+function getPlannedBadge(dateStr){
+  if(!window._adaptivePlan||!window._adaptivePlan.schedule) return '';
+  const day=window._adaptivePlan.schedule.find(d=>d.date===dateStr);
+  if(!day||day.isRest) return '';
+  return `<span class="cal-badge planned">PLAN</span>`;
+}
+function calNav(dir){
+  calOffset=Math.max(-3,Math.min(3,calOffset+dir));
+  renderCalendar();
+}
+function renderCalendar(){
+  const grid=document.getElementById('cal-grid');
+  const lbl=document.getElementById('cal-week-label');
+  const sub=document.getElementById('cal-week-sub');
+  const sumEl=document.getElementById('cal-week-summary');
+  if(!grid) return;
+  const ws=getWeekStart(calOffset);
+  const we=new Date(ws); we.setDate(ws.getDate()+6);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const todayStr=today.toISOString().split('T')[0];
+  const fmt=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  lbl.textContent=fmt(ws)+' – '+fmt(we);
+  const relMap={'-3':'3 weeks ago','-2':'2 weeks ago','-1':'last week','0':'this week','1':'next week','2':'in 2 weeks','3':'in 3 weeks'};
+  sub.textContent=relMap[String(calOffset)]||'';
+  const DAY_HDRS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  let html=DAY_HDRS.map(h=>`<div class="cal-hdr">${h}</div>`).join('');
+  let liftCount=0,cardioCount=0;
   for(let i=0;i<7;i++){
-    const d=new Date(today);d.setDate(today.getDate()-dow+i);
-    const dn=DAYS[i],isT=i===dow,isR=restDays.includes(dn);
-    const col=document.createElement('div');col.className='dc'+(isT?' today':'')+(isR?' rest':'');
-    let h=`<div class="dn">${dn.toUpperCase()}</div><div class="dd">${d.getDate()}</div>`;
-    if(isR) h+=`<div class="dt rt">REST</div>`;
-    else h+=`<div class="dt ${DC[i]}">${DT[i]}</div>`;
-    col.innerHTML=h; grid.appendChild(col);
+    const d=new Date(ws); d.setDate(ws.getDate()+i);
+    const ds=d.toISOString().split('T')[0];
+    const isToday=ds===todayStr;
+    const sessions=getSessionsForDate(ds);
+    sessions.forEach(s=>{ if((s.type||'').toLowerCase().includes('cardio')) cardioCount++; else liftCount++; });
+    const badges=getActivityBadges(sessions);
+    const planned=!sessions.length?getPlannedBadge(ds):'';
+    html+=`<div class="cal-cell${isToday?' today':''}"><div class="cal-date">${d.getDate()}</div>${badges}${planned}</div>`;
   }
-}
-function togRest(el,day){
-  el.classList.toggle('on');if(!D)return;if(!D.restDays)D.restDays=[];
-  if(D.restDays.includes(day))D.restDays=D.restDays.filter(d=>d!==day);else D.restDays.push(day);
-  buildWkGrid();
-}
-function upWkB(){
-  const s=+document.getElementById('iws').value||0,c=+document.getElementById('iwc').value||0;
-  document.getElementById('wkv-s').textContent=s+' / 5';document.getElementById('wkb-s').style.width=Math.min(100,Math.round(s/5*100))+'%';
-  document.getElementById('wkv-c').textContent=c+' / 3';document.getElementById('wkb-c').style.width=Math.min(100,Math.round(c/3*100))+'%';
+  grid.innerHTML=html;
+  const parts=[];
+  if(liftCount) parts.push(liftCount+' lift'+(liftCount!==1?'s':''));
+  if(cardioCount) parts.push(cardioCount+' cardio');
+  sumEl.textContent=parts.length?parts.join(' · '):'no sessions logged';
 }
 
 // ============================================================
