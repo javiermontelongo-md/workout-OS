@@ -1034,18 +1034,23 @@ function getSessionsForDate(dateStr){
   return D.sessions.filter(s=>s.date===dateStr);
 }
 function getActivityBadges(sessions){
-  return sessions.map(s=>{
-    const t=(s.type||'').toLowerCase();
-    const cls=t.includes('cardio')?'cardio':'strength';
-    const lbl=t.includes('cardio')?'CARDIO':'LIFT';
-    return `<span class="cal-badge ${cls}">${lbl}</span>`;
-  }).join('');
+  const DAY_BADGE={1:{label:'Upper Str',cls:'strength'},2:{label:'Lower Str',cls:'strength'},3:{label:'Recovery',cls:'cardio'},4:{label:'Upper Hyp',cls:'strength'},5:{label:'Lower+Cond',cls:'strength'}};
+  let html='';
+  sessions.forEach(s=>{
+    const dt=parseInt(s.day);
+    const badge=DAY_BADGE[dt];
+    if(badge) html+=`<span class="cal-badge ${badge.cls}">${badge.label}</span>`;
+    if(s.cardio&&s.cardio.dur>0) html+=`<span class="cal-badge cardio">Cardio</span>`;
+  });
+  return html;
 }
 function getPlannedBadge(dateStr){
   if(!window._adaptivePlan||!window._adaptivePlan.schedule) return '';
-  const day=window._adaptivePlan.schedule.find(d=>d.date===dateStr);
-  if(!day||day.isRest) return '';
-  return `<span class="cal-badge planned">PLAN</span>`;
+  const entry=window._adaptivePlan.schedule.find(d=>d.date===dateStr);
+  if(!entry||entry.isRest) return '';
+  const DAY_LABEL={1:'Upper Str',2:'Lower Str',3:'Recovery',4:'Upper Hyp',5:'Lower+Cond'};
+  const lbl=DAY_LABEL[entry.dayType]||'Training';
+  return `<span class="cal-badge planned">${lbl}</span>`;
 }
 function calNav(dir){
   calOffset=Math.max(-3,Math.min(3,calOffset+dir));
@@ -1067,22 +1072,21 @@ function renderCalendar(){
   sub.textContent=relMap[String(calOffset)]||'';
   const DAY_HDRS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
   let html=DAY_HDRS.map(h=>`<div class="cal-hdr">${h}</div>`).join('');
-  let liftCount=0,cardioCount=0;
+  let trainedCount=0,cardioCount=0;
   for(let i=0;i<7;i++){
     const d=new Date(ws); d.setDate(ws.getDate()+i);
     const ds=d.toISOString().split('T')[0];
     const isToday=ds===todayStr;
     const sessions=getSessionsForDate(ds);
-    sessions.forEach(s=>{ if((s.type||'').toLowerCase().includes('cardio')) cardioCount++; else liftCount++; });
+    if(sessions.length) trainedCount++;
+    sessions.forEach(s=>{ if(s.cardio&&s.cardio.dur>0) cardioCount++; });
     const badges=getActivityBadges(sessions);
     const planned=!sessions.length?getPlannedBadge(ds):'';
     html+=`<div class="cal-cell${isToday?' today':''}"><div class="cal-date">${d.getDate()}</div>${badges}${planned}</div>`;
   }
   grid.innerHTML=html;
-  const parts=[];
-  if(liftCount) parts.push(liftCount+' lift'+(liftCount!==1?'s':''));
-  if(cardioCount) parts.push(cardioCount+' cardio');
-  sumEl.textContent=parts.length?parts.join(' · '):'no sessions logged';
+  sumEl.textContent=`${trainedCount}/5 sessions · ${cardioCount} cardio`;
+  sumEl.style.color=trainedCount>=4?'var(--a3)':trainedCount>=2?'var(--a)':'var(--t3)';
 }
 
 // ============================================================
