@@ -179,6 +179,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .ap-confidence-badge.high{background:rgba(127,255,110,.1);color:var(--a3);}
 .ap-confidence-badge.medium{background:rgba(255,183,77,.1);color:var(--a);}
 .ap-confidence-badge.low{background:var(--s3);color:var(--t3);}
+/* Check-in sparklines */
+.spark-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b);}
+.spark-row:last-child{border-bottom:none;}
+.spark-label{font-family:var(--mono);font-size:10px;color:var(--t3);width:80px;flex-shrink:0;text-transform:uppercase;}
+.spark-avg{font-family:var(--mono);font-size:11px;color:var(--t2);width:44px;flex-shrink:0;text-align:right;}
+.spark-bars{display:flex;align-items:flex-end;gap:2px;height:28px;flex:1;}
+.spark-bar{flex:1;border-radius:2px 2px 0 0;min-height:3px;transition:height .3s;}
+.spark-bar.empty{background:var(--s3);opacity:.4;}
+.spark-bar.good{background:var(--a3);opacity:.7;}
+.spark-bar.good:last-child{opacity:1;}
+.spark-bar.stress{background:var(--a4);opacity:.7;}
+.spark-bar.stress:last-child{opacity:1;}
+.spark-bar.neutral{background:var(--a);opacity:.6;}
 </style>
 </head>
 <body>
@@ -238,15 +251,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <button class="btn bp bi" onclick="genToday()">AI plan</button>
     </div>
   </div>
-  <div class="card">
-    <div class="lbl">daily check-in</div>
-    <div style="display:flex;gap:18px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:110px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Energy</span><span id="ve" style="font-family:var(--mono);color:var(--a);">7/10</span></div><input type="range" min="1" max="10" value="7" id="sle" oninput="upF()" style="width:100%;"></div>
-      <div style="flex:1;min-width:110px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Sleep</span><span id="vs" style="font-family:var(--mono);color:var(--a2);">7h</span></div><input type="range" min="0" max="9" value="7" id="sls" oninput="upF()" style="width:100%;"></div>
-      <div style="flex:1;min-width:110px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Soreness</span><span id="vsr" style="font-family:var(--mono);color:var(--a4);">3/10</span></div><input type="range" min="1" max="10" value="3" id="slsr" oninput="upF()" style="width:100%;"></div>
-      <div style="flex:1;min-width:110px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Motivation</span><span id="vm" style="font-family:var(--mono);">7/10</span></div><input type="range" min="1" max="10" value="7" id="slm" oninput="upF()" style="width:100%;"></div>
-    </div>
-    <div style="margin-top:12px;"><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:4px;"><span>Fatigue score</span><span id="flbl">LOW</span></div><div class="bbar"><div class="bfill" id="bfill" style="width:20%;background:var(--a3);"></div></div></div>
+  <div class="card" id="today-checkin-snapshot">
+    <div class="lbl">recovery snapshot · 30 days</div>
+    <div id="snapshot-charts"></div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px;">Log check-ins in the Recovery tab</div>
   </div>
   <div class="g2">
     <div class="card">
@@ -552,6 +560,55 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <!-- v2026-05-17 19:25:02 -->
 <div id="panel-recovery" class="panel">
   <div class="h1">Recovery &amp; <span>fatigue</span></div>
+
+  <!-- Daily Check-in Input -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div class="lbl" style="margin:0;">daily check-in</div>
+      <div id="checkin-date-label" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">ENERGY</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-energy-val">7</div>
+      </div>
+      <input type="range" id="ci-energy" min="1" max="10" value="7" oninput="document.getElementById('ci-energy-val').textContent=this.value;updateFatiguePreview()">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SLEEP</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-sleep-val">7h</div>
+      </div>
+      <input type="range" id="ci-sleep" min="3" max="12" step="0.5" value="7" oninput="document.getElementById('ci-sleep-val').textContent=this.value+'h';updateFatiguePreview()">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SORENESS</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--a4);" id="ci-soreness-val">3</div>
+      </div>
+      <input type="range" id="ci-soreness" min="1" max="10" value="3" oninput="document.getElementById('ci-soreness-val').textContent=this.value;updateFatiguePreview()">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">MOTIVATION</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-motivation-val">7</div>
+      </div>
+      <input type="range" id="ci-motivation" min="1" max="10" value="7" oninput="document.getElementById('ci-motivation-val').textContent=this.value;updateFatiguePreview()">
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px;">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">FATIGUE SCORE</div>
+      <div style="font-family:var(--mono);font-size:15px;font-weight:500;" id="ci-fatigue-preview">--</div>
+    </div>
+    <button class="btn bp" style="width:100%;" onclick="saveCheckin()">Save Check-in to GitHub</button>
+    <div id="checkin-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
+  </div>
+
+  <!-- 30-day history charts -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="lbl">30-day history</div>
+    <div id="recovery-history-charts"></div>
+  </div>
+
   <div class="g4 k2" style="margin-bottom:14px;">
     <div class="stat"><div class="sv g" id="rec-score">--</div><div class="sl">Recovery score</div></div>
     <div class="stat"><div class="sv r" id="fat-score">--</div><div class="sl">Fatigue score</div></div>
@@ -756,7 +813,7 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:1,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sat'],profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,rpeConfirmations:[]}; }
+function defD(){ return{schemaVersion:1,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sat'],profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,rpeConfirmations:[],checkins:[]}; }
 
 // ============================================================
 // INIT
@@ -795,6 +852,9 @@ function onLoad(){
   renderPredictionChart();
   updateLogTabPlanned();
   updateTodayPreview();
+  initCheckinTab();
+  renderSnapshotCharts();
+  renderRecoveryHistoryCharts();
 }
 
 // ============================================================
@@ -1082,7 +1142,7 @@ async function ai(prompt){
 }
 function fai(t,id){document.getElementById(id).innerHTML=t?`<div class="air"><div class="al">TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="al">NOTE</div><p>Add your Anthropic API key in Settings -- paste key and click Save key. Or check browser console (F12) for error details.</p></div>`;}
 
-async function genToday(){if(!(document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key'))){fai(null,'today-out');return;}const e=document.getElementById('sle').value,s=document.getElementById('sls').value,sr=document.getElementById('slsr').value,day=document.getElementById('today-day').value;const recent=D?D.sessions.slice(-3).map(x=>x.date+' Day'+x.day+' RPE'+(x.rpe||'?')).join(', '):'No recent sessions';spin('today-out');fai(await ai(`Today's training plan. Mode: ${document.getElementById('mode-sel').value}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent sessions: ${recent}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');}
+async function genToday(){if(!(document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key'))){fai(null,'today-out');return;}const last=D?.checkins?.slice(-1)[0];const e=last?.energy??7,s=last?.sleep??7,sr=last?.soreness??3;const day=document.getElementById('today-day').value;const recent=D?D.sessions.slice(-3).map(x=>x.date+' Day'+x.day+' RPE'+(x.rpe||'?')).join(', '):'No recent sessions';spin('today-out');fai(await ai(`Today's training plan. Mode: ${document.getElementById('mode-sel').value}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent sessions: ${recent}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');}
 // ============================================================
 // ADAPTIVE PROGRAMMING ENGINE
 // ============================================================
@@ -1208,12 +1268,13 @@ async function generateAdaptivePlan(){
   const plan=buildLocalPlan();
   const {blockWeek,lifts:{bench,ohp,squat,dl}}=plan;
   const last3=(D.sessions||[]).slice(-3).map(s=>`${s.date} Day${s.day} RPE${s.rpe||'?'}`).join('; ')||'No recent sessions';
-  const r7=(D.recoveryLogs||[]).slice(-7);
-  const avgSleep=r7.length?(r7.reduce((a,r)=>a+r.sleep,0)/r7.length).toFixed(1):'N/A';
-  const avgRec=r7.length?(r7.reduce((a,r)=>a+r.score,0)/r7.length).toFixed(1):'N/A';
+  const recentCheckins=(D.checkins||[]).slice(-7).filter(c=>c);
+  const avgSleep=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.sleep,0)/recentCheckins.length).toFixed(1):'no data';
+  const avgEnergy=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.energy,0)/recentCheckins.length).toFixed(1):'no data';
+  const avgFatigue=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.fatigueScore,0)/recentCheckins.length).toFixed(1):'no data';
   const shifted=plan.schedule.filter(d=>d.wasShifted).length;
   const schedNote=shifted?`${shifted} day(s) shifted due to missed sessions`:'Schedule on track';
-  const prompt=`You are Javier's strength coach. PGY-1 IM resident — recovery and consistency beat optimization.\n\nCURRENT BLOCK: Week ${blockWeek.weekNum}/4 — ${blockWeek.label}\n\nLIFT PREDICTIONS FOR NEXT WEEK:\n- Bench: ${bench.sets}x${bench.reps} @ ${bench.weight}lb (trend: ${bench.trend}, confidence: ${bench.confidence})\n- OHP: ${ohp.sets}x${ohp.reps} @ ${ohp.weight}lb (trend: ${ohp.trend})\n- Squat: ${squat.sets}x${squat.reps} @ ${squat.weight}lb (trend: ${squat.trend})\n- Deadlift: ${dl.sets}x${dl.reps} @ ${dl.weight}lb (trend: ${dl.trend})\n\nLAST 3 SESSIONS: ${last3}\n\nRECOVERY (last 7 days): avg sleep ${avgSleep}/10, avg recovery score ${avgRec}\n\nSCHEDULE NOTE: ${schedNote}\n\nWrite:\n1. One paragraph (3-4 sentences) on this week's training focus and what success looks like\n2. One auto-regulation rule to apply this week based on the data above\n3. One recovery priority\n\nKeep it under 150 words. Be specific to the numbers above, not generic.`;
+  const prompt=`You are Javier's strength coach. PGY-1 IM resident — recovery and consistency beat optimization.\n\nCURRENT BLOCK: Week ${blockWeek.weekNum}/4 — ${blockWeek.label}\n\nLIFT PREDICTIONS FOR NEXT WEEK:\n- Bench: ${bench.sets}x${bench.reps} @ ${bench.weight}lb (trend: ${bench.trend}, confidence: ${bench.confidence})\n- OHP: ${ohp.sets}x${ohp.reps} @ ${ohp.weight}lb (trend: ${ohp.trend})\n- Squat: ${squat.sets}x${squat.reps} @ ${squat.weight}lb (trend: ${squat.trend})\n- Deadlift: ${dl.sets}x${dl.reps} @ ${dl.weight}lb (trend: ${dl.trend})\n\nLAST 3 SESSIONS: ${last3}\n\nRECOVERY (last 7 days): avg sleep ${avgSleep}h, avg energy ${avgEnergy}/10, avg fatigue ${avgFatigue}/10\n\nSCHEDULE NOTE: ${schedNote}\n\nWrite:\n1. One paragraph (3-4 sentences) on this week's training focus and what success looks like\n2. One auto-regulation rule to apply this week based on the data above\n3. One recovery priority\n\nKeep it under 150 words. Be specific to the numbers above, not generic.`;
   const narrative=await ai(prompt);
   plan.narrative=narrative;
   D.adaptivePlanCache=plan;
@@ -1334,6 +1395,116 @@ function showRPEConfirm(lift){
   const targetRPE=window._adaptivePlan?.lifts[lift]?.targetRPE;
   if(predEl)predEl.textContent=targetRPE?`(predicted: RPE ${targetRPE})`:'';
   pillsEl.innerHTML=[5,6,7,8,9,10].map(r=>`<span class="rpe-pill${r===targetRPE?' predicted':''}" data-rpe="${r}" onclick="confirmRPE('${lift}',${r})">${r}</span>`).join('');
+}
+
+// ============================================================
+// DAILY CHECK-IN SYSTEM
+// ============================================================
+
+function calcFatigue(energy,sleep,soreness,motivation){
+  return Math.round(((10-energy)+(10-motivation)+soreness+Math.max(0,8-sleep))/4*10)/10;
+}
+
+function updateFatiguePreview(){
+  const el=document.getElementById('ci-fatigue-preview');if(!el)return;
+  const e=+document.getElementById('ci-energy').value;
+  const s=+document.getElementById('ci-sleep').value;
+  const so=+document.getElementById('ci-soreness').value;
+  const m=+document.getElementById('ci-motivation').value;
+  const f=calcFatigue(e,s,so,m);
+  el.textContent=f.toFixed(1);
+  el.style.color=f<4?'var(--a3)':f<6?'var(--a)':'var(--a4)';
+}
+
+async function saveCheckin(){
+  if(!D)return;
+  const today=new Date().toISOString().split('T')[0];
+  const energy=+document.getElementById('ci-energy').value;
+  const sleep=+document.getElementById('ci-sleep').value;
+  const soreness=+document.getElementById('ci-soreness').value;
+  const motivation=+document.getElementById('ci-motivation').value;
+  const fatigueScore=calcFatigue(energy,sleep,soreness,motivation);
+  if(!D.checkins)D.checkins=[];
+  const existing=D.checkins.findIndex(c=>c.date===today);
+  const entry={date:today,energy,sleep,soreness,motivation,fatigueScore};
+  if(existing>=0)D.checkins[existing]=entry;else D.checkins.push(entry);
+  const ok=await push(null,null);
+  const msgEl=document.getElementById('checkin-save-msg');
+  if(ok){
+    msgEl.textContent=existing>=0?'updated ✓':'saved ✓';
+    msgEl.style.color='var(--a3)';
+    renderSnapshotCharts();
+    renderRecoveryHistoryCharts();
+  }else{
+    if(existing>=0)D.checkins[existing]={...entry};else D.checkins.pop();
+    msgEl.textContent='save failed — check token';
+    msgEl.style.color='var(--a4)';
+  }
+  setTimeout(()=>{msgEl.textContent='';},3000);
+}
+
+function _buildSparkRows(checkins30,larger){
+  const barH=larger?40:28;
+  const today=new Date();
+  const days=[];
+  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+  const byDate={};
+  checkins30.forEach(c=>{byDate[c.date]=c;});
+  const metrics=[
+    {key:'energy',label:'ENERGY',invert:false,unit:'',max:10},
+    {key:'sleep',label:'SLEEP',invert:false,unit:'h',max:12},
+    {key:'soreness',label:'SORENESS',invert:true,unit:'',max:10},
+    {key:'motivation',label:'MOTIVATION',invert:false,unit:'',max:10},
+    {key:'fatigueScore',label:'FATIGUE',invert:true,unit:'',max:10}
+  ];
+  return metrics.map(m=>{
+    const vals=checkins30.map(c=>c[m.key]).filter(v=>v!=null);
+    const avg=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length):null;
+    const avgStr=avg!=null?(m.key==='sleep'?avg.toFixed(1)+'h':avg.toFixed(1)):'-';
+    const titleAttr=larger?' title="'+m.label+'"':'';
+    const bars=days.map(d=>{
+      const c=byDate[d];
+      if(!c||c[m.key]==null){
+        return `<div class="spark-bar empty" style="height:${larger?8:4}px;"${titleAttr}></div>`;
+      }
+      const v=c[m.key];
+      const pct=Math.max(0.05,Math.min(1,v/m.max));
+      const h=Math.round(pct*(larger?barH:28));
+      const cls=m.invert?(v>6?'stress':v>3?'neutral':'good'):(v>=7?'good':v>=4?'neutral':'stress');
+      const tip=larger?` title="${m.label}: ${v} (${d})"`:' title="'+d+'"';
+      return `<div class="spark-bar ${cls}" style="height:${h}px;"${tip}></div>`;
+    }).join('');
+    return `<div class="spark-row"><div class="spark-label">${m.label}</div><div class="spark-avg">${avgStr}</div><div class="spark-bars">${bars}</div></div>`;
+  }).join('');
+}
+
+function renderSnapshotCharts(){
+  const el=document.getElementById('snapshot-charts');if(!el)return;
+  const checkins=(D.checkins||[]).slice(-30);
+  if(checkins.length<3){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;padding:8px 0;">No check-in data yet — log in Recovery tab</div>';return;}
+  el.innerHTML=_buildSparkRows(checkins,false);
+}
+
+function renderRecoveryHistoryCharts(){
+  const el=document.getElementById('recovery-history-charts');if(!el)return;
+  const checkins=(D.checkins||[]).slice(-30);
+  if(checkins.length<3){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;padding:8px 0;">No check-in data yet — save your first check-in above</div>';return;}
+  el.innerHTML=_buildSparkRows(checkins,true)+'<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:10px;display:flex;gap:12px;"><span style="color:var(--a3);">■</span> good &nbsp;<span style="color:var(--a4);">■</span> high stress &nbsp;<span style="color:var(--a);">■</span> mid</div>';
+}
+
+function initCheckinTab(){
+  const lbl=document.getElementById('checkin-date-label');
+  if(lbl){const d=new Date();lbl.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();}
+  const today=new Date().toISOString().split('T')[0];
+  const existing=(D.checkins||[]).find(c=>c.date===today);
+  if(existing){
+    const se=id=>document.getElementById(id);
+    if(se('ci-energy')){se('ci-energy').value=existing.energy;se('ci-energy-val').textContent=existing.energy;}
+    if(se('ci-sleep')){se('ci-sleep').value=existing.sleep;se('ci-sleep-val').textContent=existing.sleep+'h';}
+    if(se('ci-soreness')){se('ci-soreness').value=existing.soreness;se('ci-soreness-val').textContent=existing.soreness;}
+    if(se('ci-motivation')){se('ci-motivation').value=existing.motivation;se('ci-motivation-val').textContent=existing.motivation;}
+  }
+  updateFatiguePreview();
 }
 
 function updateTodayPreview(){
