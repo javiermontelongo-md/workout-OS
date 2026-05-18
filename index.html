@@ -218,6 +218,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   .cal-badge.planned{background:rgba(206,147,216,.12);color:var(--a5);border:1px dashed rgba(206,147,216,.4);}
 }
 .cal-week-summary{font-family:var(--mono);font-size:10px;color:var(--t3);text-align:center;padding:5px 0 2px;}
+/* Program tab */
+.prog-day-card{background:var(--s1);border:1px solid var(--b);border-radius:10px;overflow:hidden;}
+.prog-today{border-color:var(--a);}
+.prog-collapsed{cursor:pointer;padding:14px 16px;transition:border-color .2s;}
+.prog-collapsed:hover{border-color:var(--b2);}
+.prog-day-header{padding:14px 16px 10px;border-bottom:1px solid var(--b);background:var(--s2);}
+.prog-day-tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+.prog-day-title{font-size:15px;font-weight:500;color:var(--t);}
+.prog-day-sub{font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:3px;}
+.prog-exercises{padding:12px 16px;display:flex;flex-direction:column;gap:0;}
+.prog-exercise{padding:11px 0;border-bottom:1px solid var(--b);}
+.prog-exercise:last-child{border-bottom:none;}
+.prog-exercise.primary .prog-ex-name{font-size:13px;font-weight:500;color:var(--t);}
+.prog-exercise.accessory .prog-ex-name{font-size:12px;color:var(--t2);}
+.prog-ex-presc{font-family:var(--mono);font-size:12px;color:var(--a);margin-top:3px;}
+.prog-exercise.accessory .prog-ex-presc{color:var(--t2);font-size:11px;}
+.prog-ex-note{font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:3px;font-style:italic;}
+.prog-chevron{font-size:18px;color:var(--t3);transition:transform .2s;}
+.prog-chevron.open{transform:rotate(90deg);}
+.prog-collapsed-body{margin-top:12px;padding-top:12px;border-top:1px solid var(--b);}
 </style>
 </head>
 <body>
@@ -502,68 +522,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <!-- v2026-05-17 19:25:02 -->
 <div id="panel-program" class="panel">
   <div class="h1">Program <span>structure</span></div>
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="bdg a">STRENGTH</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 1 -- Upper Strength</div></div>
-    <div class="ex-row"><div class="ex-name">Bench Press</div><div class="ex-plan">5x5 @ 190 -- Primary compound -- protect this first</div></div>
-    <div class="ex-row"><div class="ex-name">Barbell Row</div><div class="ex-plan">4x6-8 -- 115-145 lb</div></div>
-    <div class="ex-row"><div class="ex-name">Overhead Press</div><div class="ex-plan">3x5 @ 90 -- Second key compound</div></div>
-    <div class="ex-row"><div class="ex-name">Pullups</div><div class="ex-plan">5 sets x 3 clean reps -- No kipping</div></div>
-    <div class="ex-row"><div class="ex-name">Incline DB Press</div><div class="ex-plan">3x8-10 -- 65-80 lb DBs</div></div>
-    <div class="ex-row"><div class="ex-name">Lateral Raises</div><div class="ex-plan">4x15-20</div></div>
-    <div class="ex-row"><div class="ex-name">Face Pulls</div><div class="ex-plan">3x15-20 -- Shoulder health priority</div></div>
-    <div class="ex-row"><div class="ex-name">Cardio</div><div class="ex-plan">20-30 min Zone 2 -- Target HR 140-155</div></div>
-  </div>
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="bdg a">STRENGTH</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 2 -- Lower Strength</div></div>
-    <div class="ex-row"><div class="ex-name">Back Squat</div><div class="ex-plan">5x5 @ 160</div></div>
-    <div class="ex-row"><div class="ex-name">Deadlift</div><div class="ex-plan">3x5 @ 160</div></div>
-    <div class="ex-row"><div class="ex-name">Romanian Deadlift</div><div class="ex-plan">3x8 -- 95-135 lb</div></div>
-    <div class="ex-row"><div class="ex-name">Split Squats / Lunges</div><div class="ex-plan">3x10 each leg</div></div>
-    <div class="ex-row"><div class="ex-name">Calf Raises</div><div class="ex-plan">3x12-15</div></div>
-    <div class="ex-row"><div class="ex-name">Core</div><div class="ex-plan">2-3 exercises: Planks, hanging knee raises, cable crunches</div></div>
-    <div class="ex-row"><div class="ex-name">Cardio</div><div class="ex-plan">20-40 min Zone 2</div></div>
-  </div>
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="bdg b">CARDIO</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 3 -- Recovery / Cardio</div></div>
-    <div class="ex-row"><div class="ex-name">Run</div><div class="ex-plan">20-45 min easy -- Target HR 140-155 -- Baseline: 10:30 pace @ 165 HR</div></div>
-    <div class="ex-row"><div class="ex-name">Cycling (alternative)</div><div class="ex-plan">Same duration and HR targets</div></div>
-    <div style="background:rgba(79,195,247,.06);border:1px solid rgba(79,195,247,.15);border-radius:var(--r);padding:11px;margin-top:6px;font-size:12px;color:var(--t2);line-height:1.6;"><strong style="color:var(--a2);">Zone 2 rule:</strong> You should be able to hold a conversation. Log pace, HR, and RPE every session to track aerobic adaptation over time.</div>
-  </div>
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="bdg p">HYPERTROPHY</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 4 -- Upper Hypertrophy</div></div>
-    <div class="ex-row"><div class="ex-name">Incline Machine Press</div><div class="ex-plan">4x8-12</div></div>
-    <div class="ex-row"><div class="ex-name">Lat Pulldown</div><div class="ex-plan">4x8-12</div></div>
-    <div class="ex-row"><div class="ex-name">DB Shoulder Press</div><div class="ex-plan">3x8-10 -- 45-60 lb DBs -- Shoulder priority</div></div>
-    <div class="ex-row"><div class="ex-name">Cable Fly</div><div class="ex-plan">3x12-15</div></div>
-    <div class="ex-row"><div class="ex-name">Lateral Raises</div><div class="ex-plan">5x15-20 -- High volume</div></div>
-    <div class="ex-row"><div class="ex-name">Rear Delt Fly</div><div class="ex-plan">4x15-20</div></div>
-    <div class="ex-row"><div class="ex-name">Biceps + Triceps</div><div class="ex-plan">3x10-15 each</div></div>
-    <div class="ex-row"><div class="ex-name">Dead Hangs</div><div class="ex-plan">3 sets -- Grip + shoulder decompression</div></div>
-    <div class="ex-row"><div class="ex-name">Cardio</div><div class="ex-plan">20-30 min easy</div></div>
-  </div>
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="bdg p">HYBRID</span><div style="font-size:15px;font-weight:500;color:var(--t);">Day 5 -- Lower + Conditioning</div></div>
-    <div class="ex-row"><div class="ex-name">Leg Press / Front Squat</div><div class="ex-plan">3x8-10</div></div>
-    <div class="ex-row"><div class="ex-name">RDL</div><div class="ex-plan">3x8-10 -- 115-155 lb</div></div>
-    <div class="ex-row"><div class="ex-name">Walking Lunges</div><div class="ex-plan">3x12 each leg</div></div>
-    <div class="ex-row"><div class="ex-name">Hamstring Curl</div><div class="ex-plan">3x12-15</div></div>
-    <div class="ex-row"><div class="ex-name">Intervals</div><div class="ex-plan">1 min hard / 2 min easy x 6-10 rounds -- Run or bike</div></div>
-  </div>
-  <div class="card">
-    <div class="lbl">4-week progression model</div>
-    <div style="font-size:13px;color:var(--t2);line-height:1.8;">
-      <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="bdg a" style="margin-right:8px;">WEEK 1</span><strong style="color:var(--t);">Volume accumulation</strong> -- build work capacity, technique focus</div>
-      <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="bdg b" style="margin-right:8px;">WEEK 2</span><strong style="color:var(--t);">Strength emphasis</strong> -- increase intensity, maintain volume</div>
-      <div style="padding:8px 0;border-bottom:1px solid var(--b);"><span class="bdg g" style="margin-right:8px;">WEEK 3</span><strong style="color:var(--t);">Heavy exposure</strong> -- peak intensity week</div>
-      <div style="padding:8px 0;"><span class="bdg p" style="margin-right:8px;">WEEK 4</span><strong style="color:var(--t);">Deload / recovery</strong> -- reduce 30-50%, consolidate adaptations</div>
+  <div style="margin-bottom:20px;">
+    <div id="prog-date-header" style="font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;"></div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div id="prog-block-badge"></div>
+      <div id="prog-block-desc" style="font-family:var(--mono);font-size:11px;color:var(--t3);"></div>
     </div>
   </div>
-  <div class="card">
-    <div class="lbl">exercise substitution matrix</div>
-    <div class="g2" style="font-size:13px;color:var(--t2);line-height:2.0;">
-      <div><div><strong style="color:var(--t);">Bench</strong> -- DB Bench / Machine Press</div><div><strong style="color:var(--t);">OHP</strong> -- DB Shoulder Press / Machine</div><div><strong style="color:var(--t);">Squat</strong> -- Hack Squat / Leg Press</div></div>
-      <div><div><strong style="color:var(--t);">Deadlift</strong> -- RDL / Trap Bar DL</div><div><strong style="color:var(--t);">Lat Pulldown</strong> -- Assisted Pullups / Cable</div><div><strong style="color:var(--t);">Running</strong> -- Bike / Incline Walk</div></div>
-    </div>
+  <div id="prog-today-card" class="prog-day-card prog-today" style="margin-bottom:12px;"></div>
+  <div id="prog-other-days" style="display:flex;flex-direction:column;gap:8px;"></div>
+  <div id="prog-no-plan" style="display:none;padding:20px;text-align:center;">
+    <div style="font-family:var(--mono);font-size:12px;color:var(--t3);margin-bottom:12px;">No adaptive plan generated yet.</div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Go to This Week tab and tap "Generate AI Plan" to build your personalized program.</div>
   </div>
 </div>
 
@@ -859,6 +829,7 @@ function onLoad(){
   initCheckinTab();
   renderSnapshotCharts();
   renderRecoveryHistoryCharts();
+  renderProgramTab();
 }
 
 // ============================================================
@@ -1335,6 +1306,7 @@ async function generateAdaptivePlan(){
   if(msgEl) msgEl.textContent=narrative?'Plan generated — '+new Date().toLocaleTimeString():'Add API key in Settings for narrative';
   renderAdaptivePlan();
   renderPredictionChart();
+  renderProgramTab();
 }
 
 async function confirmRPE(lift,actualRPE){
@@ -1566,6 +1538,151 @@ function updateTodayPreview(){
   const cur=el.innerHTML;
   if(cur.startsWith('<div style="background:rgba(255,183,77')){el.innerHTML=banner+cur.replace(/^<div style="background:rgba\(255,183,77[^>]*>[^<]*<\/div>/,'');}
   else{el.innerHTML=banner+cur;}
+}
+
+// ============================================================
+// PROGRAM TAB
+// ============================================================
+function getTodayDayType(){
+  const today=new Date().toISOString().split('T')[0];
+  const plan=window._adaptivePlan;
+  if(plan?.schedule){
+    const entry=plan.schedule.find(d=>d.date===today);
+    if(entry) return {dayType:entry.isRest?null:entry.dayType,isRest:!!entry.isRest};
+  }
+  const dow=new Date().getDay();
+  const dowMap={1:1,2:2,3:3,4:4,5:5,0:null,6:null};
+  const dt=dowMap[dow];
+  return {dayType:dt,isRest:dt===null};
+}
+function buildPrescriptionString(lift){
+  if(!lift) return '—';
+  return `${lift.sets}×${lift.reps} @ ${lift.weight} lb · RPE ~${lift.targetRPE} target`;
+}
+function getDayProgram(dayType){
+  const plan=window._adaptivePlan;
+  const exs=[];
+  if(dayType===null){
+    return [{name:'Rest & Recovery',prescription:'No training today',note:'Sleep, eat, and recover',isPrimary:false,trend:null,confidence:null}];
+  }
+  if(dayType===1){
+    const b=plan?.lifts?.bench;
+    exs.push({name:'Bench Press',prescription:b?buildPrescriptionString(b):'See This Week tab for targets',note:b?.variation||null,isPrimary:true,trend:b?.trend||null,confidence:b?.confidence||null});
+    const o=plan?.lifts?.ohp;
+    exs.push({name:'Overhead Press',prescription:o?buildPrescriptionString(o):'See This Week tab for targets',note:o?.variation||null,isPrimary:true,trend:o?.trend||null,confidence:o?.confidence||null});
+    exs.push({name:'Pullups',prescription:'5 sets × 3 clean reps — no kipping',note:null,isPrimary:false,trend:null,confidence:null});
+    (plan?.accessories?.day1||[]).forEach(a=>exs.push({name:a.name||a,prescription:a.prescription||'3×10-12',note:'suggested — swap if equipment unavailable',isPrimary:false,trend:null,confidence:null}));
+  } else if(dayType===2){
+    const s=plan?.lifts?.squat;
+    exs.push({name:'Back Squat',prescription:s?buildPrescriptionString(s):'See This Week tab for targets',note:s?.variation||null,isPrimary:true,trend:s?.trend||null,confidence:s?.confidence||null});
+    const d=plan?.lifts?.dl;
+    exs.push({name:'Deadlift',prescription:d?buildPrescriptionString(d):'See This Week tab for targets',note:d?.variation||null,isPrimary:true,trend:d?.trend||null,confidence:d?.confidence||null});
+    (plan?.accessories?.day2||[]).forEach(a=>exs.push({name:a.name||a,prescription:a.prescription||'3×10-12',note:'suggested — swap if equipment unavailable',isPrimary:false,trend:null,confidence:null}));
+  } else if(dayType===3){
+    exs.push({name:'Zone 2 Cardio',prescription:'30-45 min · HR 130-150',note:'Run, bike, or row — pace should be conversational',isPrimary:true,trend:null,confidence:null});
+    exs.push({name:'Mobility Work',prescription:'15-20 min',note:'Hip flexors, thoracic spine, shoulder capsule',isPrimary:false,trend:null,confidence:null});
+    exs.push({name:'Optional Accessories',prescription:'Light pullups or band work only',note:'Skip if fatigued',isPrimary:false,trend:null,confidence:null});
+  } else if(dayType===4){
+    exs.push({name:'Incline DB Press',prescription:'3×8-10',note:'3s eccentric — controlled tempo',isPrimary:true,trend:null,confidence:null});
+    exs.push({name:'Cable Rows',prescription:'3×10-12',note:'Full stretch at top, squeeze at bottom',isPrimary:true,trend:null,confidence:null});
+    exs.push({name:'DB Shoulder Press',prescription:'3×10-12',note:'Moderate load — shoulder priority',isPrimary:false,trend:null,confidence:null});
+    exs.push({name:'Face Pulls',prescription:'3×15',note:'Shoulder health — never skip',isPrimary:false,trend:null,confidence:null});
+    exs.push({name:'Lateral Raises',prescription:'4×15-20',note:'Light weight, high reps — no momentum',isPrimary:false,trend:null,confidence:null});
+  } else if(dayType===5){
+    const sq=plan?.lifts?.squat;
+    const sqW=sq?Math.round(sq.weight*0.75/2.5)*2.5:null;
+    exs.push({name:'Squat Variation',prescription:sqW?`3×8-10 @ ${sqW} lb`:'3×8-10 @ ~75% of Day 2 weight',note:'Front squat or hack squat — lighter than Day 2',isPrimary:true,trend:null,confidence:null});
+    exs.push({name:'Romanian Deadlift',prescription:'3×8-10',note:"Hip hinge focus — don't round lower back",isPrimary:true,trend:null,confidence:null});
+    exs.push({name:'Leg Press',prescription:'3×10-12',note:'Full range of motion, controlled descent',isPrimary:false,trend:null,confidence:null});
+    exs.push({name:'Conditioning',prescription:'3-4 rounds: 200m row + 10 goblet squats + 10 KB swings',note:'Rest 90s between rounds',isPrimary:false,trend:null,confidence:null});
+  }
+  return exs;
+}
+function renderDayCard(dayType,isToday,isExpanded){
+  const DAY_NAMES={1:'Upper Strength',2:'Lower Strength',3:'Recovery / Cardio',4:'Upper Hypertrophy',5:'Lower + Conditioning'};
+  const DAY_TYPE_LABELS={1:'STRENGTH',2:'STRENGTH',3:'CARDIO',4:'HYPERTROPHY',5:'CONDITIONING'};
+  const DAY_COLORS={1:'var(--a)',2:'var(--a)',3:'var(--a2)',4:'#a855f7',5:'#a855f7'};
+  const DOW_NAMES={1:'Monday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday'};
+  const TREND_ICON={up:'↑',flat:'→',down:'↓'};
+  const TREND_TEXT={up:'progressing',flat:'holding',down:'regressing'};
+
+  const exs=getDayProgram(dayType);
+  const exHtml=exs.map(ex=>{
+    const cls='prog-exercise '+(ex.isPrimary?'primary':'accessory');
+    let h=`<div class="${cls}"><div class="prog-ex-name">${ex.name}</div><div class="prog-ex-presc">${ex.prescription}</div>`;
+    if(ex.note) h+=`<div class="prog-ex-note">${ex.note}</div>`;
+    if(ex.trend&&ex.trend!=='flat') h+=`<div class="ap-trend ${ex.trend}">${TREND_ICON[ex.trend]||''} ${TREND_TEXT[ex.trend]||''}</div>`;
+    return h+'</div>';
+  }).join('');
+
+  if(dayType===null){
+    return `<div class="prog-day-card prog-today"><div class="prog-day-header"><div class="prog-day-tag" style="color:var(--t3);">REST</div><div class="prog-day-title">Rest &amp; Recovery</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div></div><div class="prog-exercises">${exHtml}</div></div>`;
+  }
+
+  const name=DAY_NAMES[dayType]||'Training Day';
+  const typeLabel=DAY_TYPE_LABELS[dayType]||'TRAINING';
+  const color=DAY_COLORS[dayType]||'var(--a)';
+
+  if(isToday){
+    const todayStr=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return `<div class="prog-day-card prog-today"><div class="prog-day-header"><div class="prog-day-tag" style="color:${color};">${typeLabel}</div><div class="prog-day-title">Day ${dayType} — ${name}</div><div class="prog-day-sub">Today · ${todayStr}</div></div><div class="prog-exercises">${exHtml}</div></div>`;
+  }
+
+  const dowStr=DOW_NAMES[dayType]||'';
+  const bdgStyle=`font-family:var(--mono);font-size:8px;padding:2px 8px;border-radius:3px;background:transparent;color:${color};border:1px solid ${color};`;
+  return `<div class="prog-day-card prog-collapsed" onclick="toggleProgDay(this,${dayType})"><div style="display:flex;align-items:center;justify-content:space-between;"><div><div class="prog-day-title" style="font-size:12px;">Day ${dayType} — ${name}</div><div class="prog-day-sub">${dowStr}</div></div><div style="display:flex;align-items:center;gap:8px;"><span style="${bdgStyle}">${typeLabel}</span><div class="prog-chevron">›</div></div></div><div class="prog-collapsed-body" style="display:none;"><div class="prog-exercises" style="padding:0;">${exHtml}</div></div></div>`;
+}
+function toggleProgDay(el,dayType){
+  const body=el.querySelector('.prog-collapsed-body');
+  const chevron=el.querySelector('.prog-chevron');
+  if(!body) return;
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  if(chevron) chevron.classList.toggle('open',!isOpen);
+}
+function renderProgramTab(){
+  const plan=window._adaptivePlan;
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const hdr=document.getElementById('prog-date-header');
+  if(hdr) hdr.textContent=dateStr;
+  if(!plan){
+    const noPlan=document.getElementById('prog-no-plan');
+    const todayCard=document.getElementById('prog-today-card');
+    const otherDays=document.getElementById('prog-other-days');
+    if(noPlan) noPlan.style.display='block';
+    if(todayCard) todayCard.style.display='none';
+    if(otherDays) otherDays.style.display='none';
+    return;
+  }
+  const noPlan=document.getElementById('prog-no-plan');
+  if(noPlan) noPlan.style.display='none';
+  const blockColors={1:'var(--a2)',2:'var(--a)',3:'var(--a4)',4:'var(--a3)'};
+  const blockLabels={1:'W1 · Volume',2:'W2 · Strength',3:'W3 · Peak',4:'W4 · Deload'};
+  const bw=plan.blockWeek;
+  const bbEl=document.getElementById('prog-block-badge');
+  const bdEl=document.getElementById('prog-block-desc');
+  if(bbEl) bbEl.innerHTML=`<span style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(255,183,77,.1);color:${blockColors[bw.weekNum]};border:1px solid ${blockColors[bw.weekNum]}40;">${blockLabels[bw.weekNum]}</span>`;
+  if(bdEl) bdEl.textContent=bw.label+' — 4-week block periodization';
+  const todayInfo=getTodayDayType();
+  const todayCard=document.getElementById('prog-today-card');
+  if(todayCard){
+    todayCard.style.display='';
+    const tmp=document.createElement('div');
+    tmp.innerHTML=renderDayCard(todayInfo.dayType,true,true);
+    const rendered=tmp.firstChild;
+    if(rendered){ todayCard.className=rendered.className; todayCard.innerHTML=rendered.innerHTML; }
+  }
+  const otherDays=document.getElementById('prog-other-days');
+  if(otherDays){
+    otherDays.style.display='';
+    otherDays.innerHTML='';
+    [1,2,3,4,5].filter(d=>d!==todayInfo.dayType).forEach(d=>{
+      const tmp=document.createElement('div');
+      tmp.innerHTML=renderDayCard(d,false,false);
+      if(tmp.firstChild) otherDays.appendChild(tmp.firstChild);
+    });
+  }
 }
 </script>
 </body>
