@@ -218,6 +218,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   .cal-badge.planned{background:rgba(206,147,216,.12);color:var(--a5);border:1px dashed rgba(206,147,216,.4);}
 }
 .cal-week-summary{font-family:var(--mono);font-size:10px;color:var(--t3);text-align:center;padding:5px 0 2px;}
+.cal-rest{font-family:var(--mono);font-size:8px;color:var(--t3);opacity:.45;}
 /* Program tab */
 .prog-day-card{background:var(--s1);border:1px solid var(--b);border-radius:10px;overflow:hidden;}
 .prog-today{border-color:var(--a);}
@@ -840,12 +841,14 @@ function gT(n,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   const p=document.getElementById('panel-'+n); if(p) p.classList.add('on');
   if(el) el.classList.add('on');
+  if(n==='week') renderCalendar();
 }
 function gM(n,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
   const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); p.scrollTop=0; }
   if(el) el.classList.add('on');
+  if(n==='week') renderCalendar();
 }
 
 // ============================================================
@@ -1080,9 +1083,12 @@ function renderCalendar(){
     const sessions=getSessionsForDate(ds);
     if(sessions.length) trainedCount++;
     sessions.forEach(s=>{ if(s.cardio&&s.cardio.dur>0) cardioCount++; });
-    const badges=getActivityBadges(sessions);
-    const planned=!sessions.length?getPlannedBadge(ds):'';
-    html+=`<div class="cal-cell${isToday?' today':''}"><div class="cal-date">${d.getDate()}</div>${badges}${planned}</div>`;
+    const isFuture=ds>todayStr;
+    let cellContent='';
+    if(sessions.length){ cellContent=getActivityBadges(sessions); }
+    else if(isFuture){ cellContent=getPlannedBadge(ds); }
+    else{ cellContent='<div class="cal-rest">rest</div>'; }
+    html+=`<div class="cal-cell${isToday?' today':''}"><div class="cal-date">${d.getDate()}</div>${cellContent}</div>`;
   }
   grid.innerHTML=html;
   sumEl.textContent=`${trainedCount}/5 sessions · ${cardioCount} cardio`;
@@ -1254,20 +1260,13 @@ function getAccessoryVariation(liftKey){
 function buildSchedule(){
   const today=new Date(); today.setHours(0,0,0,0);
   const schedule=[];
-  let nextDayType=1;
-  if(D.sessions&&D.sessions.length){
-    const last=[...D.sessions].sort((a,b)=>a.date.localeCompare(b.date)).slice(-1)[0];
-    nextDayType=(parseInt(last.day)%5)+1;
-  }
-  let dtq=nextDayType;
-  const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayTypeMap={0:null,1:1,2:2,3:3,4:4,5:5,6:null};
   for(let i=0;i<28;i++){
     const d=new Date(today); d.setDate(today.getDate()+i);
     const dateStr=d.toISOString().split('T')[0];
-    const dn=dayNames[d.getDay()];
-    const isRest=(D.restDays||['Sat']).includes(dn);
-    if(isRest){schedule.push({date:dateStr,dayType:'rest',isRest:true,wasShifted:false});}
-    else{schedule.push({date:dateStr,dayType:dtq,isRest:false,wasShifted:false});dtq=(dtq%5)+1;}
+    const dt=dayTypeMap[d.getDay()];
+    if(dt===null){schedule.push({date:dateStr,dayType:'rest',isRest:true,wasShifted:false});}
+    else{schedule.push({date:dateStr,dayType:dt,isRest:false,wasShifted:false});}
   }
   return schedule;
 }
