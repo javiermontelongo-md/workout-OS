@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Workout OS">
 <title>Workout OS</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,400;0,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{--bg:#0a0c12;--s1:#111420;--s2:#171b2a;--s3:#1e2235;--b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);--a:#ffb74d;--a2:#4fc3f7;--a3:#7fff6e;--a4:#ef9a9a;--a5:#ce93d8;--t:#e8eaf0;--t2:#8a90a8;--t3:#4a5068;--red:#ef5350;--mono:'DM Mono',monospace;--serif:'Fraunces',serif;--sans:'DM Sans',sans-serif;--r:10px;--rl:16px;--nav:62px;--safe:env(safe-area-inset-bottom,0px);}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -146,6 +147,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   .srow{grid-template-columns:1fr 1fr 1fr auto;}
   .wkg{flex-wrap:nowrap;}.dc{min-width:78px;flex:0 0 78px;}
 }
+/* Adaptive plan */
+.ap-week-cell{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:9px 6px;text-align:center;transition:border-color .2s;}
+.ap-week-cell.current{border-color:var(--a);background:rgba(255,183,77,.06);}
+.ap-week-num{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--t3);}
+.ap-week-cell.current .ap-week-num{color:var(--a);}
+.ap-week-lbl{font-size:9px;color:var(--t3);margin-top:3px;letter-spacing:.05em;text-transform:uppercase;}
+
+.ap-lift-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--b);}
+.ap-lift-row:last-child{border-bottom:none;}
+.ap-lift-name{font-size:13px;font-weight:500;color:var(--t);margin-bottom:2px;}
+.ap-lift-var{font-family:var(--mono);font-size:10px;color:var(--t3);}
+.ap-lift-right{text-align:right;flex-shrink:0;margin-left:12px;}
+.ap-lift-weight{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--a);}
+.ap-lift-detail{font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:2px;}
+.ap-trend{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;margin-top:4px;}
+.ap-trend.up{background:rgba(127,255,110,.1);color:var(--a3);}
+.ap-trend.down{background:rgba(239,83,80,.1);color:var(--a4);}
+.ap-trend.flat{background:var(--s3);color:var(--t3);}
+
+.rpe-pill{display:inline-block;font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:20px;border:1px solid var(--b2);color:var(--t2);cursor:pointer;transition:all .15s;user-select:none;}
+.rpe-pill:hover{border-color:var(--a);color:var(--a);}
+.rpe-pill.predicted{border-color:rgba(255,183,77,.5);background:rgba(255,183,77,.08);color:var(--a);}
+.rpe-pill.confirmed{background:var(--a);color:#0a0c12;border-color:var(--a);}
+
+.chart-lift-btn.active{background:rgba(255,183,77,.12);color:var(--a);border-color:rgba(255,183,77,.3);}
+
+.ap-shift-badge{font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,183,77,.15);color:var(--a);border:1px solid rgba(255,183,77,.3);margin-left:4px;}
+
+.ap-confidence-badge{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:3px;}
+.ap-confidence-badge.high{background:rgba(127,255,110,.1);color:var(--a3);}
+.ap-confidence-badge.medium{background:rgba(255,183,77,.1);color:var(--a);}
+.ap-confidence-badge.low{background:var(--s3);color:var(--t3);}
 </style>
 </head>
 <body>
@@ -266,38 +299,54 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 
   <!-- v2026-05-17 19:25:02 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BENCH PRESS</span><span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 190</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BENCH PRESS</span><span id="planned-bench" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 190</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="bench-sets"></div>
     <button class="addbtn" onclick="addSet('bench')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="bench-notes" placeholder="Bar speed, form, anything to flag..."></div>
+    <div id="rpe-confirm-bench" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID BENCH ACTUALLY FEEL? <span id="rpe-pred-bench" style="color:var(--a);"></span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-bench"></div>
+    </div>
   </div>
 
   <!-- v2026-05-17 19:25:02 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">OVERHEAD PRESS</span><span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 90</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">OVERHEAD PRESS</span><span id="planned-ohp" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 90</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="ohp-sets"></div>
     <button class="addbtn" onclick="addSet('ohp')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="ohp-notes" placeholder="Notes..."></div>
+    <div id="rpe-confirm-ohp" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID OHP ACTUALLY FEEL? <span id="rpe-pred-ohp" style="color:var(--a);"></span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-ohp"></div>
+    </div>
   </div>
 
   <!-- v2026-05-17 19:25:02 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BACK SQUAT</span><span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 160</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BACK SQUAT</span><span id="planned-squat" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="squat-sets"></div>
     <button class="addbtn" onclick="addSet('squat')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="squat-notes" placeholder="Notes..."></div>
+    <div id="rpe-confirm-squat" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID SQUAT ACTUALLY FEEL? <span id="rpe-pred-squat" style="color:var(--a);"></span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-squat"></div>
+    </div>
   </div>
 
   <!-- v2026-05-17 19:25:02 -->
   <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">DEADLIFT</span><span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 160</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">DEADLIFT</span><span id="planned-dl" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="dl-sets"></div>
     <button class="addbtn" onclick="addSet('dl')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="dl-notes" placeholder="Notes..."></div>
+    <div id="rpe-confirm-dl" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID DEADLIFT ACTUALLY FEEL? <span id="rpe-pred-dl" style="color:var(--a);"></span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-dl"></div>
+    </div>
   </div>
 
   <!-- v2026-05-17 19:25:02 -->
@@ -363,7 +412,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
   <div class="wkg" id="wk-grid"></div>
-  <div class="card"><div class="lbl">week guidance</div><div id="wk-guid" class="air"><div class="al">WEEK COACH</div><p><strong>Volume accumulation week.</strong> Consistency and technique quality are the goals -- not maximal loading.</p><p><strong>Bench:</strong> 5x5 @ 190. All sets at RPE below 8, add 5 lbs next week. <strong>OHP:</strong> 3x5 @ 90. <strong>Squat:</strong> 5x5 @ 160. <strong>Deadlift:</strong> 3x5 @ 160.</p><p><strong>Cardio:</strong> Zone 2 at 140-155 HR. If HR is elevated above normal, slow down -- don't chase pace.</p></div><div class="brow"><button class="btn bs bi" onclick="genWeekG()">AI guidance</button></div></div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div class="lbl" style="margin:0;">adaptive plan</div>
+      <span id="ap-confidence"></span>
+    </div>
+    <div id="ap-block-week" style="margin-bottom:16px;"></div>
+    <div id="ap-lifts" style="margin-bottom:16px;"></div>
+    <div id="ap-accessories" style="margin-bottom:16px;"></div>
+    <div id="ap-schedule" style="margin-bottom:16px;"></div>
+    <div id="wk-guid" class="air" style="margin-bottom:12px;">
+      <div class="al">WEEK COACH</div>
+      <div id="wk-guid-text" style="font-size:13px;color:var(--t3);font-style:italic;">Tap "Generate AI Plan" to get your personalized weekly narrative and store your plan.</div>
+    </div>
+    <button class="btn bp" style="width:100%;" id="ap-gen-btn" onclick="generateAdaptivePlan()">Generate AI Plan</button>
+    <div id="ap-gen-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:6px;min-height:16px;"></div>
+  </div>
 </div>
 
 <!-- v2026-05-17 19:25:02 -->
@@ -392,6 +456,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="pbw"><div class="pbl"><span>Squat</span><span id="vol-squat">160x5x5</span></div><div class="pbb"><div class="pbf" id="vb-squat" style="width:60%;"></div></div></div>
         <div class="pbw"><div class="pbl"><span>Deadlift</span><span id="vol-dl">160x3x5</span></div><div class="pbb"><div class="pbf" id="vb-dl" style="width:60%;"></div></div></div>
       </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="lbl" style="margin:0;">strength trajectory</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn bs bi chart-lift-btn" id="chart-bench" onclick="setChartLift('bench')" style="font-size:10px;padding:5px 10px;">BENCH</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-squat" onclick="setChartLift('squat')" style="font-size:10px;padding:5px 10px;">SQUAT</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-dl" onclick="setChartLift('dl')" style="font-size:10px;padding:5px 10px;">DL</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-ohp" onclick="setChartLift('ohp')" style="font-size:10px;padding:5px 10px;">OHP</button>
+      </div>
+    </div>
+    <div style="position:relative;height:220px;">
+      <canvas id="e1rm-chart"></canvas>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--t3);">
+      <span>── Actual e1RM</span>
+      <span style="color:rgba(255,183,77,.6);">── Optimistic</span>
+      <span style="color:rgba(79,195,247,.6);">── Conservative</span>
+      <span style="border-left:2px dashed var(--t3);padding-left:6px;">│ Today</span>
     </div>
   </div>
   <div class="card"><div class="lbl">session history</div><div id="all-sessions"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div></div>
@@ -672,7 +756,7 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:1,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sat'],profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0}}; }
+function defD(){ return{schemaVersion:1,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sat'],profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,rpeConfirmations:[]}; }
 
 // ============================================================
 // INIT
@@ -706,6 +790,11 @@ function onLoad(){
   renderRecHist();
   updRecStats();
   buildWkGrid();
+  buildLocalPlan();
+  renderAdaptivePlan();
+  renderPredictionChart();
+  updateLogTabPlanned();
+  updateTodayPreview();
 }
 
 // ============================================================
@@ -780,6 +869,7 @@ function initSets(){ ['bench','ohp','squat','dl'].forEach(l=>{SD[l]=[];addSet(l)
 function addSet(lift){
   const i=SD[lift].length; SD[lift].push({w:'',r:'',rpe:''});
   renderSets(lift);
+  if(i>0) showRPEConfirm(lift);
 }
 function removeSet(lift,i){ SD[lift].splice(i,1); renderSets(lift); }
 function renderSets(lift){
@@ -809,7 +899,7 @@ async function saveSession(){
   if(session.pullups.reps&&session.pullups.reps>(D.currentLifts.pullups||0)) D.currentLifts.pullups=session.pullups.reps;
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
-  if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); }
+  if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); D.adaptivePlanCache=null; buildLocalPlan(); renderAdaptivePlan(); renderPredictionChart(); updateLogTabPlanned(); }
   else { D.sessions.pop(); D.adherence.completed--; }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
@@ -921,7 +1011,7 @@ function upWkB(){
 // ============================================================
 // DAY PREVIEW
 // ============================================================
-function ldPrev(){ const el=document.getElementById('day-prev');if(el) el.innerHTML=DP[document.getElementById('today-day')?.value||'1']||''; }
+function ldPrev(){ const el=document.getElementById('day-prev');if(el) el.innerHTML=DP[document.getElementById('today-day')?.value||'1']||''; updateTodayPreview(); }
 
 // ============================================================
 // SETTINGS
@@ -993,7 +1083,273 @@ async function ai(prompt){
 function fai(t,id){document.getElementById(id).innerHTML=t?`<div class="air"><div class="al">TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="al">NOTE</div><p>Add your Anthropic API key in Settings -- paste key and click Save key. Or check browser console (F12) for error details.</p></div>`;}
 
 async function genToday(){if(!(document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key'))){fai(null,'today-out');return;}const e=document.getElementById('sle').value,s=document.getElementById('sls').value,sr=document.getElementById('slsr').value,day=document.getElementById('today-day').value;const recent=D?D.sessions.slice(-3).map(x=>x.date+' Day'+x.day+' RPE'+(x.rpe||'?')).join(', '):'No recent sessions';spin('today-out');fai(await ai(`Today's training plan. Mode: ${document.getElementById('mode-sel').value}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent sessions: ${recent}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');}
-async function genWeekG(){if(!CFG.api)return;spin('wk-guid');const recent=D?D.sessions.slice(-5).map(s=>'Day'+s.day+' '+s.date+' RPE'+(s.rpe||'?')).join(', '):'No sessions';const t=await ai(`Weekly training guidance. Recent sessions: ${recent}. Give compound loading targets for this week, cardio focus, recovery priority, one auto-regulation rule to apply.`);document.getElementById('wk-guid').innerHTML=t?`<div class="al">AI COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`:'<p>Add API key in Settings.</p>';}
+// ============================================================
+// ADAPTIVE PROGRAMMING ENGINE
+// ============================================================
+
+function calcE1RM(weight,reps){return Math.round((weight*(1+reps/30))/2.5)*2.5;}
+
+function getLiftHistory(liftKey,daysBack=60){
+  if(!D||!D.sessions) return [];
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-daysBack);
+  const cutoffStr=cutoff.toISOString().split('T')[0];
+  const results=[];
+  D.sessions.filter(s=>s.date>=cutoffStr&&s[liftKey]&&s[liftKey].sets&&s[liftKey].sets.length).forEach(s=>{
+    const valid=s[liftKey].sets.filter(x=>x.w&&x.r);
+    if(!valid.length) return;
+    const best=valid.reduce((b,x)=>calcE1RM(x.w,x.r)>calcE1RM(b.w,b.r)?x:b);
+    const e1RM=calcE1RM(best.w,best.r);
+    const daysAgo=Math.floor((new Date()-new Date(s.date))/86400000);
+    const rw=daysAgo<=14?1.0:daysAgo<=30?0.7:0.4;
+    results.push({date:s.date,e1RM,sessionRPE:s.rpe,weight:best.w,reps:best.r,recencyWeight:rw});
+  });
+  return results.sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function detectBlockWeek(){
+  if(!D||!D.sessions||!D.sessions.length) return {weekNum:1,label:'Volume Accumulation'};
+  const labels=['Volume Accumulation','Strength Emphasis','Peak Intensity','Deload'];
+  const wkSet=new Set();
+  D.sessions.forEach(s=>{
+    const d=new Date(s.date+'T12:00:00');
+    const mon=new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7));
+    wkSet.add(mon.toISOString().split('T')[0]);
+  });
+  const idx=wkSet.size%4;
+  return {weekNum:idx+1,label:labels[idx]};
+}
+
+function getBlockParams(blockWeek){
+  const p={1:{sets:5,reps:5,targetRPE:7},2:{sets:4,reps:4,targetRPE:8},3:{sets:3,reps:3,targetRPE:9},4:{sets:3,reps:5,targetRPE:6}};
+  return p[blockWeek.weekNum]||p[1];
+}
+
+function buildPredictions(currentE1RM,slope){
+  const today=new Date();
+  return [1,2,3,4].map(w=>{
+    const d=new Date(today); d.setDate(d.getDate()+w*7);
+    const date=d.toISOString().split('T')[0];
+    const opt=Math.max(Math.round((currentE1RM+slope*w)/2.5)*2.5,Math.round(currentE1RM*0.9/2.5)*2.5);
+    const con=Math.max(Math.round((currentE1RM+slope*0.5*w)/2.5)*2.5,Math.round(currentE1RM*0.85/2.5)*2.5);
+    return {date,optimistic:opt,conservative:con};
+  });
+}
+
+function predictLift(liftKey,blockWeek){
+  const baselines={bench:{e1RM:255,weight:190},ohp:{e1RM:120,weight:90},squat:{e1RM:215,weight:160},dl:{e1RM:215,weight:160}};
+  const bl=baselines[liftKey];
+  const history=getLiftHistory(liftKey);
+  const {sets,reps,targetRPE}=getBlockParams(blockWeek);
+  if(!history.length) return {weight:bl.weight,sets,reps,targetRPE,trend:'flat',confidence:'low',predictedE1RMs:buildPredictions(bl.e1RM,0)};
+  const totalW=history.reduce((s,h)=>s+h.recencyWeight,0);
+  const wAvgE1RM=history.reduce((s,h)=>s+h.e1RM*h.recencyWeight,0)/totalW;
+  const last6=history.slice(-6);
+  let slope=0;
+  if(last6.length>=2){
+    const n=last6.length,xs=last6.map((_,i)=>i),ys=last6.map(h=>h.e1RM);
+    const xm=xs.reduce((a,b)=>a+b,0)/n,ym=ys.reduce((a,b)=>a+b,0)/n;
+    const num=xs.reduce((s,x,i)=>s+(x-xm)*(ys[i]-ym),0);
+    const den=xs.reduce((s,x)=>s+(x-xm)**2,0);
+    slope=den?num/den:0;
+  }
+  const last=history[history.length-1];
+  const lastRPE=last.sessionRPE||7;
+  let nextW=last.weight;
+  if(lastRPE<7) nextW+=7.5; else if(lastRPE<=8) nextW+=2.5; else nextW=Math.max(nextW-5,bl.weight*0.7);
+  nextW=Math.round(nextW/2.5)*2.5;
+  const trend=slope>1?'up':slope<-1?'down':'flat';
+  const confidence=history.length<3?'low':history.length<7?'medium':'high';
+  return {weight:nextW,sets,reps,targetRPE,trend,confidence,predictedE1RMs:buildPredictions(wAvgE1RM,slope)};
+}
+
+function getAccessoryVariation(liftKey){
+  const idx=Math.floor((D.sessions?.length||0)/3)%3;
+  const rot={bench:['Barbell Bench Press 5x5','DB Bench Press 4x8-10','Machine Chest Press 4x10-12'],ohp:['Barbell OHP 3x5','DB Shoulder Press 3x8-10','Machine Shoulder Press 3x10-12'],squat:['Back Squat 5x5','Hack Squat 4x8-10','Leg Press 4x10-12'],dl:['Conventional Deadlift 3x5','Romanian DL 3x8-10','Trap Bar DL 3x6-8']};
+  const full=rot[liftKey][idx];
+  const m=full.match(/^(.+?)\s+(\d+x[\d\-]+)$/);
+  return m?{name:m[1],setsReps:m[2]}:{name:full,setsReps:''};
+}
+
+function buildSchedule(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const schedule=[];
+  let nextDayType=1;
+  if(D.sessions&&D.sessions.length){
+    const last=[...D.sessions].sort((a,b)=>a.date.localeCompare(b.date)).slice(-1)[0];
+    nextDayType=(parseInt(last.day)%5)+1;
+  }
+  let dtq=nextDayType;
+  const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  for(let i=0;i<28;i++){
+    const d=new Date(today); d.setDate(today.getDate()+i);
+    const dateStr=d.toISOString().split('T')[0];
+    const dn=dayNames[d.getDay()];
+    const isRest=(D.restDays||['Sat']).includes(dn);
+    if(isRest){schedule.push({date:dateStr,dayType:'rest',isRest:true,wasShifted:false});}
+    else{schedule.push({date:dateStr,dayType:dtq,isRest:false,wasShifted:false});dtq=(dtq%5)+1;}
+  }
+  return schedule;
+}
+
+function buildLocalPlan(){
+  const blockWeek=detectBlockWeek();
+  const bench=predictLift('bench',blockWeek),ohp=predictLift('ohp',blockWeek),squat=predictLift('squat',blockWeek),dl=predictLift('dl',blockWeek);
+  const accessories={day1:[getAccessoryVariation('bench'),getAccessoryVariation('ohp')],day2:[getAccessoryVariation('squat'),getAccessoryVariation('dl')]};
+  const schedule=buildSchedule();
+  const plan={generatedDate:new Date().toISOString().split('T')[0],blockWeek,schedule,lifts:{bench,ohp,squat,dl},accessories,narrative:D.adaptivePlanCache?.narrative||null};
+  window._adaptivePlan=plan;
+  return plan;
+}
+
+async function generateAdaptivePlan(){
+  const btn=document.getElementById('ap-gen-btn'),msgEl=document.getElementById('ap-gen-msg'),guidText=document.getElementById('wk-guid-text');
+  if(btn){btn.disabled=true;btn.textContent='Generating...';}
+  if(guidText) guidText.innerHTML='<div class="spin"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Generating...</span></div>';
+  const plan=buildLocalPlan();
+  const {blockWeek,lifts:{bench,ohp,squat,dl}}=plan;
+  const last3=(D.sessions||[]).slice(-3).map(s=>`${s.date} Day${s.day} RPE${s.rpe||'?'}`).join('; ')||'No recent sessions';
+  const r7=(D.recoveryLogs||[]).slice(-7);
+  const avgSleep=r7.length?(r7.reduce((a,r)=>a+r.sleep,0)/r7.length).toFixed(1):'N/A';
+  const avgRec=r7.length?(r7.reduce((a,r)=>a+r.score,0)/r7.length).toFixed(1):'N/A';
+  const shifted=plan.schedule.filter(d=>d.wasShifted).length;
+  const schedNote=shifted?`${shifted} day(s) shifted due to missed sessions`:'Schedule on track';
+  const prompt=`You are Javier's strength coach. PGY-1 IM resident — recovery and consistency beat optimization.\n\nCURRENT BLOCK: Week ${blockWeek.weekNum}/4 — ${blockWeek.label}\n\nLIFT PREDICTIONS FOR NEXT WEEK:\n- Bench: ${bench.sets}x${bench.reps} @ ${bench.weight}lb (trend: ${bench.trend}, confidence: ${bench.confidence})\n- OHP: ${ohp.sets}x${ohp.reps} @ ${ohp.weight}lb (trend: ${ohp.trend})\n- Squat: ${squat.sets}x${squat.reps} @ ${squat.weight}lb (trend: ${squat.trend})\n- Deadlift: ${dl.sets}x${dl.reps} @ ${dl.weight}lb (trend: ${dl.trend})\n\nLAST 3 SESSIONS: ${last3}\n\nRECOVERY (last 7 days): avg sleep ${avgSleep}/10, avg recovery score ${avgRec}\n\nSCHEDULE NOTE: ${schedNote}\n\nWrite:\n1. One paragraph (3-4 sentences) on this week's training focus and what success looks like\n2. One auto-regulation rule to apply this week based on the data above\n3. One recovery priority\n\nKeep it under 150 words. Be specific to the numbers above, not generic.`;
+  const narrative=await ai(prompt);
+  plan.narrative=narrative;
+  D.adaptivePlanCache=plan;
+  window._adaptivePlan=plan;
+  if(CFG.tok){
+    try{
+      const ir=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
+      if(ir.ok){const info=await ir.json();D.lastUpdated=new Date().toISOString().split('T')[0];const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'Adaptive plan cache update',content:enc,sha:info.sha})});}
+    }catch(e){console.warn('Silent push failed:',e.message);}
+  }
+  if(btn){btn.disabled=false;btn.textContent='Generate AI Plan';}
+  if(msgEl) msgEl.textContent=narrative?'Plan generated — '+new Date().toLocaleTimeString():'Add API key in Settings for narrative';
+  renderAdaptivePlan();
+  renderPredictionChart();
+}
+
+async function confirmRPE(lift,actualRPE){
+  const plan=window._adaptivePlan;
+  const ld=plan?.lifts[lift];
+  if(!D.rpeConfirmations) D.rpeConfirmations=[];
+  D.rpeConfirmations.push({date:new Date().toISOString().split('T')[0],lift,predictedRPE:ld?.targetRPE||null,actualRPE,weight:ld?.weight||null,sets:ld?.sets||null,reps:ld?.reps||null});
+  const pills=document.getElementById('rpe-pills-'+lift);
+  if(pills) pills.querySelectorAll('.rpe-pill').forEach(p=>{if(+p.dataset.rpe===actualRPE)p.classList.add('confirmed');else p.classList.remove('predicted');});
+  const row=document.getElementById('rpe-confirm-'+lift);
+  if(row) setTimeout(()=>{row.style.display='none';},800);
+  if(CFG.tok){
+    try{
+      const ir=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
+      if(ir.ok){const info=await ir.json();D.lastUpdated=new Date().toISOString().split('T')[0];const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'RPE confirmation',content:enc,sha:info.sha})});}
+    }catch(e){}
+  }
+}
+
+function renderAdaptivePlan(){
+  const plan=window._adaptivePlan;
+  if(!plan) return;
+  const {blockWeek,lifts,accessories,schedule}=plan;
+  const bwEl=document.getElementById('ap-block-week');
+  if(bwEl){const wl=['VOLUME','STRENGTH','PEAK','DELOAD'];bwEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">${[1,2,3,4].map(w=>`<div class="ap-week-cell${w===blockWeek.weekNum?' current':''}"><div class="ap-week-num">W${w}</div><div class="ap-week-lbl">${wl[w-1]}</div></div>`).join('')}</div>`;}
+  const confEl=document.getElementById('ap-confidence');
+  if(confEl){const c=lifts.bench.confidence;confEl.innerHTML=`<span class="ap-confidence-badge ${c}">${c.toUpperCase()}</span>`;}
+  const liftsEl=document.getElementById('ap-lifts');
+  if(liftsEl){
+    const lds=[{key:'bench',name:'BENCH PRESS'},{key:'ohp',name:'OVERHEAD PRESS'},{key:'squat',name:'BACK SQUAT'},{key:'dl',name:'DEADLIFT'}];
+    liftsEl.innerHTML=lds.map(ld=>{
+      const l=lifts[ld.key],acc=getAccessoryVariation(ld.key);
+      const ta=l.trend==='up'?'↑ progressing':l.trend==='down'?'↓ declining':'→ steady';
+      return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">${acc.name} · suggested</div></div><div class="ap-lift-right"><div class="ap-lift-weight">${l.weight} lb</div><div class="ap-lift-detail">${l.sets}×${l.reps} · RPE ~${l.targetRPE} target</div><div class="ap-trend ${l.trend}">${ta}</div></div></div>`;
+    }).join('');
+  }
+  const accEl=document.getElementById('ap-accessories');
+  if(accEl){
+    const d1=accessories.day1.map(a=>`<div style="font-size:12px;color:var(--t2);padding:3px 0;">${a.name} ${a.setsReps}</div>`).join('');
+    const d2=accessories.day2.map(a=>`<div style="font-size:12px;color:var(--t2);padding:3px 0;">${a.name} ${a.setsReps}</div>`).join('');
+    accEl.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:6px;">ACCESSORIES — suggested, swap if equipment unavailable</div><div class="g2"><div><div style="font-size:10px;color:var(--a);font-family:var(--mono);margin-bottom:4px;">DAY 1</div>${d1}</div><div><div style="font-size:10px;color:var(--a);font-family:var(--mono);margin-bottom:4px;">DAY 2</div>${d2}</div></div>`;
+  }
+  const schedEl=document.getElementById('ap-schedule');
+  if(schedEl){
+    const n14=schedule.slice(0,14),today=new Date().toISOString().split('T')[0],da=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    schedEl.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">NEXT 14 DAYS</div><div class="wkg">${n14.map(d=>{const dt=new Date(d.date+'T12:00:00');const cls='dc'+(d.date===today?' today':'')+(d.isRest?' rest':'');const badge=d.wasShifted?'<span class="ap-shift-badge">shifted</span>':'';const lbl=d.isRest?`<div class="dt rt">REST</div>`:`<div class="dt st">Day ${d.dayType}${badge}</div>`;return `<div class="${cls}" style="min-width:70px;flex:0 0 70px;"><div class="dn">${da[dt.getDay()]}</div><div class="dd">${dt.getDate()}</div>${lbl}</div>`;}).join('')}</div>`;
+  }
+  const guidText=document.getElementById('wk-guid-text');
+  if(guidText){
+    const narrative=plan.narrative||D.adaptivePlanCache?.narrative;
+    if(narrative){guidText.innerHTML=narrative.replace(/\n\n/g,'</p><p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:8px;">').replace(/\n/g,'<br>');guidText.style.fontStyle='normal';guidText.style.color='var(--t2)';}
+    else{guidText.textContent='Tap "Generate AI Plan" to get your personalized weekly narrative and store your plan.';guidText.style.fontStyle='italic';guidText.style.color='var(--t3)';}
+  }
+}
+
+function renderPredictionChart(lift='bench'){
+  const canvas=document.getElementById('e1rm-chart');
+  if(!canvas||typeof Chart==='undefined') return;
+  if(window._e1rmChart){window._e1rmChart.destroy();window._e1rmChart=null;}
+  document.querySelectorAll('.chart-lift-btn').forEach(b=>b.classList.remove('active'));
+  const ab=document.getElementById('chart-'+lift);if(ab)ab.classList.add('active');
+  const history=getLiftHistory(lift,120);
+  const planData=(window._adaptivePlan||D.adaptivePlanCache)?.lifts?.[lift];
+  const labels=history.map(h=>h.date);
+  const actualPts=history.map(h=>h.e1RM);
+  let predLabels=[],optVals=[],conVals=[];
+  if(planData?.predictedE1RMs){
+    predLabels=planData.predictedE1RMs.map(p=>p.date);
+    optVals=planData.predictedE1RMs.map(p=>p.optimistic);
+    conVals=planData.predictedE1RMs.map(p=>p.conservative);
+    predLabels.filter(l=>!labels.includes(l)).forEach(l=>labels.push(l));
+  }
+  const actualPadded=labels.map(l=>{const i=history.findIndex(h=>h.date===l);return i>=0?actualPts[i]:null;});
+  const optPadded=labels.map(l=>{const i=predLabels.indexOf(l);return i>=0?optVals[i]:null;});
+  const conPadded=labels.map(l=>{const i=predLabels.indexOf(l);return i>=0?conVals[i]:null;});
+  if(planData&&history.length&&predLabels.length){
+    const bi=labels.indexOf(history[history.length-1].date);
+    if(bi>=0){if(optPadded[bi]===null)optPadded[bi]=actualPadded[bi];if(conPadded[bi]===null)conPadded[bi]=actualPadded[bi];}
+  }
+  const datasets=[{label:'Actual e1RM',data:actualPadded,borderColor:'#ffb74d',backgroundColor:'rgba(255,183,77,0.08)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#ffb74d',tension:0.3,spanGaps:false}];
+  if(planData?.predictedE1RMs){
+    datasets.push({label:'Optimistic',data:optPadded,borderColor:'rgba(255,183,77,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:'+1',backgroundColor:'rgba(255,183,77,0.08)',tension:0.3,spanGaps:false},{label:'Conservative',data:conPadded,borderColor:'rgba(79,195,247,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:false});
+  }
+  window._e1rmChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+}
+
+function setChartLift(lift){
+  document.querySelectorAll('.chart-lift-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('chart-'+lift);if(btn)btn.classList.add('active');
+  renderPredictionChart(lift);
+}
+
+function updateLogTabPlanned(){
+  const plan=window._adaptivePlan;if(!plan)return;
+  const {bench,ohp,squat,dl}=plan.lifts;
+  const upd=(id,l)=>{const el=document.getElementById(id);if(el)el.textContent=`Planned: ${l.sets}x${l.reps} @ ${l.weight}`;};
+  upd('planned-bench',bench);upd('planned-ohp',ohp);upd('planned-squat',squat);upd('planned-dl',dl);
+}
+
+function showRPEConfirm(lift){
+  const row=document.getElementById('rpe-confirm-'+lift),pillsEl=document.getElementById('rpe-pills-'+lift),predEl=document.getElementById('rpe-pred-'+lift);
+  if(!row||!pillsEl)return;
+  row.style.display='block';
+  const targetRPE=window._adaptivePlan?.lifts[lift]?.targetRPE;
+  if(predEl)predEl.textContent=targetRPE?`(predicted: RPE ${targetRPE})`:'';
+  pillsEl.innerHTML=[5,6,7,8,9,10].map(r=>`<span class="rpe-pill${r===targetRPE?' predicted':''}" data-rpe="${r}" onclick="confirmRPE('${lift}',${r})">${r}</span>`).join('');
+}
+
+function updateTodayPreview(){
+  const plan=window._adaptivePlan;if(!plan)return;
+  const day=document.getElementById('today-day')?.value;
+  if(day!=='1'&&day!=='2')return;
+  const el=document.getElementById('day-prev');if(!el)return;
+  const {bench,ohp,squat,dl}=plan.lifts;
+  let targets='';
+  if(day==='1'){targets=`Bench ${bench.weight}lb · ${bench.sets}x${bench.reps} · RPE ~${bench.targetRPE}`;if(ohp)targets+=` &nbsp;|&nbsp; OHP ${ohp.weight}lb · ${ohp.sets}x${ohp.reps}`;}
+  else{targets=`Squat ${squat.weight}lb · ${squat.sets}x${squat.reps} · RPE ~${squat.targetRPE}`;if(dl)targets+=` &nbsp;|&nbsp; DL ${dl.weight}lb · ${dl.sets}x${dl.reps}`;}
+  const banner=`<div style="background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.2);border-radius:8px;padding:9px 12px;margin-bottom:10px;font-family:var(--mono);font-size:11px;color:var(--a);">Adaptive targets: ${targets}</div>`;
+  const cur=el.innerHTML;
+  if(cur.startsWith('<div style="background:rgba(255,183,77')){el.innerHTML=banner+cur.replace(/^<div style="background:rgba\(255,183,77[^>]*>[^<]*<\/div>/,'');}
+  else{el.innerHTML=banner+cur;}
+}
 </script>
 </body>
 </html>
