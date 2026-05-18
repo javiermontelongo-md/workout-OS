@@ -1068,7 +1068,7 @@ function renderCalendar(){
   const ws=getWeekStart(calOffset);
   const we=new Date(ws); we.setDate(ws.getDate()+6);
   const today=new Date(); today.setHours(0,0,0,0);
-  const todayStr=today.toISOString().split('T')[0];
+  const todayStr=localDS(today);
   const fmt=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
   lbl.textContent=fmt(ws)+' – '+fmt(we);
   const relMap={'-3':'3 weeks ago','-2':'2 weeks ago','-1':'last week','0':'this week','1':'next week','2':'in 2 weeks','3':'in 3 weeks'};
@@ -1078,7 +1078,7 @@ function renderCalendar(){
   let trainedCount=0,cardioCount=0;
   for(let i=0;i<7;i++){
     const d=new Date(ws); d.setDate(ws.getDate()+i);
-    const ds=d.toISOString().split('T')[0];
+    const ds=localDS(d);
     const isToday=ds===todayStr;
     const sessions=getSessionsForDate(ds);
     if(sessions.length) trainedCount++;
@@ -1257,13 +1257,14 @@ function getAccessoryVariation(liftKey){
   return m?{name:m[1],setsReps:m[2]}:{name:full,setsReps:''};
 }
 
+function localDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function buildSchedule(){
   const today=new Date(); today.setHours(0,0,0,0);
   const schedule=[];
   const dayTypeMap={0:null,1:1,2:2,3:3,4:4,5:5,6:null};
   for(let i=0;i<28;i++){
     const d=new Date(today); d.setDate(today.getDate()+i);
-    const dateStr=d.toISOString().split('T')[0];
+    const dateStr=localDS(d);
     const dt=dayTypeMap[d.getDay()];
     if(dt===null){schedule.push({date:dateStr,dayType:'rest',isRest:true,wasShifted:false});}
     else{schedule.push({date:dateStr,dayType:dt,isRest:false,wasShifted:false});}
@@ -1547,7 +1548,7 @@ function updateTodayPreview(){
 // PROGRAM TAB
 // ============================================================
 function getTodayDayType(){
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDS(new Date());
   const plan=window._adaptivePlan;
   if(plan?.schedule){
     const entry=plan.schedule.find(d=>d.date===today);
