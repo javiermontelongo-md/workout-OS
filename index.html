@@ -239,6 +239,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .prog-chevron{font-size:18px;color:var(--t3);transition:transform .2s;}
 .prog-chevron.open{transform:rotate(90deg);}
 .prog-collapsed-body{margin-top:12px;padding-top:12px;border-top:1px solid var(--b);}
+/* Week navigator */
+.wn-dot{border-radius:3px;transition:all .2s;}
 </style>
 </head>
 <body>
@@ -456,10 +458,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="lbl" style="margin:0;">adaptive plan</div>
       <span id="ap-confidence"></span>
     </div>
-    <div id="ap-block-week" style="margin-bottom:16px;"></div>
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <button class="btn bs" id="wn-prev" onclick="weekNavNav(-1)" style="padding:5px 12px;font-size:15px;line-height:1;">←</button>
+        <div style="text-align:center;">
+          <div id="wn-label" style="font-family:var(--mono);font-size:12px;font-weight:500;color:var(--t);"></div>
+          <div id="wn-sublabel" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;"></div>
+        </div>
+        <button class="btn bs" id="wn-next" onclick="weekNavNav(1)" style="padding:5px 12px;font-size:15px;line-height:1;">→</button>
+      </div>
+      <div id="wn-dots" style="display:flex;justify-content:center;gap:6px;margin-bottom:12px;"></div>
+      <div id="wn-block-badge" style="text-align:center;margin-bottom:14px;"></div>
+    </div>
+    <div id="wn-context-label" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:10px;text-align:center;min-height:14px;"></div>
     <div id="ap-lifts" style="margin-bottom:16px;"></div>
-    <div id="ap-accessories" style="margin-bottom:16px;"></div>
-    <div id="ap-schedule" style="margin-bottom:16px;"></div>
     <div id="wk-guid" class="air" style="margin-bottom:12px;">
       <div class="al">WEEK COACH</div>
       <div id="wk-guid-text" style="font-size:13px;color:var(--t3);font-style:italic;">Tap "Generate AI Plan" to get your personalized weekly narrative and store your plan.</div>
@@ -824,6 +836,7 @@ function onLoad(){
   renderCalendar();
   buildLocalPlan();
   renderAdaptivePlan();
+  renderWeekNav();
   renderPredictionChart();
   updateLogTabPlanned();
   updateTodayPreview();
@@ -1026,6 +1039,7 @@ function updRecStats(){
 // ACTIVITY CALENDAR
 // ============================================================
 var calOffset=0;
+var weekNavOffset=0;
 function getWeekStart(offset){
   const d=new Date(),dow=d.getDay();
   d.setDate(d.getDate()-dow+(offset*7));
@@ -1309,6 +1323,7 @@ async function generateAdaptivePlan(){
   if(btn){btn.disabled=false;btn.textContent='Generate AI Plan';}
   if(msgEl) msgEl.textContent=narrative?'Plan generated — '+new Date().toLocaleTimeString():'Add API key in Settings for narrative';
   renderAdaptivePlan();
+  renderWeekNav();
   renderPredictionChart();
   renderProgramTab();
 }
@@ -1687,6 +1702,148 @@ function renderProgramTab(){
       if(tmp.firstChild) otherDays.appendChild(tmp.firstChild);
     });
   }
+}
+
+// ============================================================
+// WEEK NAVIGATOR
+// ============================================================
+function weekNavNav(dir){
+  const next=weekNavOffset+dir;
+  if(next<-4||next>3) return;
+  weekNavOffset=next;
+  renderWeekNav();
+}
+function getWeekLabel(offset){
+  const m={'-4':'4 Weeks Ago','-3':'3 Weeks Ago','-2':'2 Weeks Ago','-1':'Last Week','0':'This Week','1':'Next Week','2':'In 2 Weeks','3':'In 3 Weeks'};
+  return m[String(offset)]||'';
+}
+function getWeekDateRange(offset){
+  const ws=getWeekStart(offset);
+  const we=new Date(ws); we.setDate(ws.getDate()+6);
+  const fmt=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  return fmt(ws)+' – '+fmt(we);
+}
+function getBlockPhaseForOffset(offset){
+  const shortLabels=['Volume','Strength','Peak','Deload'];
+  const blockColors={1:'var(--a2)',2:'var(--a)',3:'var(--a4)',4:'var(--a3)'};
+  let weekNum;
+  if(offset>=0){
+    const currentWN=(window._adaptivePlan?.blockWeek?.weekNum)||1;
+    weekNum=((currentWN+offset-1+400)%4)+1;
+  } else {
+    const ws=getWeekStart(offset);
+    const we=new Date(ws); we.setDate(ws.getDate()+6);
+    const weStr=localDS(we);
+    const wkSet=new Set();
+    (D?.sessions||[]).forEach(s=>{
+      if(s.date<=weStr){
+        const d=new Date(s.date+'T12:00:00');
+        const mon=new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7));
+        wkSet.add(localDS(mon));
+      }
+    });
+    weekNum=wkSet.size?((wkSet.size-1)%4)+1:1;
+  }
+  return {weekNum,label:shortLabels[weekNum-1],color:blockColors[weekNum]};
+}
+function getActualLiftsForWeek(offset){
+  const ws=getWeekStart(offset);
+  const we=new Date(ws); we.setDate(ws.getDate()+6);
+  const wsStr=localDS(ws),weStr=localDS(we);
+  const weekSessions=(D?.sessions||[]).filter(s=>s.date>=wsStr&&s.date<=weStr);
+  if(!weekSessions.length) return {isActual:true,empty:true};
+  const result={isActual:true};
+  ['bench','ohp','squat','dl'].forEach(lift=>{
+    const allSets=[];
+    weekSessions.forEach(s=>{ const ld=s[lift]; if(ld?.sets) allSets.push(...ld.sets.filter(x=>x.w&&x.r)); });
+    if(allSets.length){
+      const best=allSets.reduce((b,x)=>calcE1RM(x.w,x.r)>calcE1RM(b.w,b.r)?x:b);
+      const sessWithLift=weekSessions.find(s=>s[lift]?.sets?.some(x=>x.w&&x.r));
+      result[lift]={weight:best.w,reps:best.r,rpe:best.rpe||null,e1rm:calcE1RM(best.w,best.r),sets:sessWithLift?sessWithLift[lift].sets.filter(x=>x.w).length:null};
+    } else { result[lift]=null; }
+  });
+  return result;
+}
+function getPlannedLiftsForWeek(offset){
+  const plan=window._adaptivePlan;
+  if(!plan) return {isActual:false};
+  const currentWN=plan.blockWeek.weekNum;
+  const targetWN=((currentWN+offset-1+400)%4)+1;
+  const mods={1:{setsAdj:+1,wMult:.95,rpe:7},2:{setsAdj:0,wMult:1,rpe:8},3:{setsAdj:-1,wMult:1.05,rpe:9},4:{setsAdj:-2,wMult:.65,rpe:5}};
+  const mod=mods[targetWN];
+  const result={isActual:false};
+  ['bench','ohp','squat','dl'].forEach(lift=>{
+    const base=plan.lifts[lift];
+    if(base) result[lift]={weight:Math.round(base.weight*mod.wMult/2.5)*2.5,sets:Math.max(1,base.sets+mod.setsAdj),reps:base.reps,targetRPE:mod.rpe};
+  });
+  return result;
+}
+function renderWeekNavLifts(offset){
+  const liftsEl=document.getElementById('ap-lifts');
+  const ctxEl=document.getElementById('wn-context-label');
+  if(!liftsEl) return;
+  const plan=window._adaptivePlan;
+  if(!plan){
+    liftsEl.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--t3);text-align:center;padding:16px 0;">Generate AI Plan to see prescriptions</div>';
+    if(ctxEl) ctxEl.textContent='';
+    return;
+  }
+  const lds=[{key:'bench',name:'BENCH PRESS'},{key:'ohp',name:'OVERHEAD PRESS'},{key:'squat',name:'BACK SQUAT'},{key:'dl',name:'DEADLIFT'}];
+  if(ctxEl){
+    if(offset===0){ctxEl.textContent='';ctxEl.style.color='var(--t3)';}
+    else if(offset<0){ctxEl.textContent='Actual logged data for this week';ctxEl.style.color='var(--a3)';}
+    else{ctxEl.textContent='AI prescription — predicted, not logged';ctxEl.style.color='var(--t3)';}
+  }
+  if(offset<0){
+    const actual=getActualLiftsForWeek(offset);
+    if(actual.empty){
+      liftsEl.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--t3);text-align:center;padding:16px 0;">No sessions logged this week</div>';
+      return;
+    }
+    liftsEl.innerHTML=lds.map(ld=>{
+      const l=actual[ld.key];
+      if(!l) return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div></div><div class="ap-lift-right"><div style="font-family:var(--mono);font-size:12px;color:var(--t3);">not logged</div></div></div>`;
+      return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">e1RM ${l.e1rm} lb</div></div><div class="ap-lift-right"><div class="ap-lift-weight" style="color:var(--t);">${l.weight} lb</div><div class="ap-lift-detail">${l.sets||'?'}×${l.reps} · RPE ${l.rpe||'?'}</div><div class="ap-trend up">✓ logged</div></div></div>`;
+    }).join('');
+  } else if(offset===0){
+    const {lifts}=plan;
+    liftsEl.innerHTML=lds.map(ld=>{
+      const l=lifts[ld.key],acc=getAccessoryVariation(ld.key);
+      const ta=l.trend==='up'?'↑ progressing':l.trend==='down'?'↓ declining':'→ steady';
+      return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">${acc.name} · suggested</div></div><div class="ap-lift-right"><div class="ap-lift-weight">${l.weight} lb</div><div class="ap-lift-detail">${l.sets}×${l.reps} · RPE ~${l.targetRPE} target</div><div class="ap-trend ${l.trend}">${ta}</div></div></div>`;
+    }).join('');
+  } else {
+    const proj=getPlannedLiftsForWeek(offset);
+    liftsEl.innerHTML=lds.map(ld=>{
+      const l=proj[ld.key];
+      if(!l) return '';
+      return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var" style="color:var(--t3);">projected</div></div><div class="ap-lift-right"><div class="ap-lift-weight">${l.weight} lb</div><div class="ap-lift-detail">${l.sets}×${l.reps} · RPE ~${l.targetRPE} target</div></div></div>`;
+    }).join('');
+  }
+}
+function renderWeekNav(){
+  const offset=weekNavOffset;
+  const prevBtn=document.getElementById('wn-prev');
+  const nextBtn=document.getElementById('wn-next');
+  if(!prevBtn) return;
+  prevBtn.style.opacity=offset<=-4?'0.3':'1';
+  nextBtn.style.opacity=offset>=3?'0.3':'1';
+  document.getElementById('wn-label').textContent=getWeekLabel(offset);
+  document.getElementById('wn-sublabel').textContent=getWeekDateRange(offset);
+  const dotsEl=document.getElementById('wn-dots');
+  if(dotsEl){
+    dotsEl.innerHTML='';
+    for(let i=-4;i<=3;i++){
+      const dot=document.createElement('div');
+      dot.className='wn-dot';
+      dot.style.cssText=`width:${i===offset?'20px':'6px'};height:6px;background:${i===offset?'var(--a)':i===0?'var(--b2)':'var(--b)'};`;
+      dotsEl.appendChild(dot);
+    }
+  }
+  const phase=getBlockPhaseForOffset(offset);
+  const bbEl=document.getElementById('wn-block-badge');
+  if(bbEl) bbEl.innerHTML=`<span style="font-family:var(--mono);font-size:10px;padding:3px 12px;border-radius:4px;background:${phase.color}18;color:${phase.color};border:1px solid ${phase.color}40;">W${phase.weekNum} · ${phase.label}</span>`;
+  renderWeekNavLifts(offset);
 }
 </script>
 </body>
