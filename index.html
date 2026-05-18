@@ -1555,9 +1555,9 @@ function getTodayDayType(){
     if(entry) return {dayType:entry.isRest?null:entry.dayType,isRest:!!entry.isRest};
   }
   const dow=new Date().getDay();
-  const dowMap={1:1,2:2,3:3,4:4,5:5,0:null,6:null};
-  const dt=dowMap[dow];
-  return {dayType:dt,isRest:dt===null};
+  const dowMap={0:null,1:1,2:2,3:3,4:4,5:5,6:null};
+  const dayType=dowMap[dow];
+  return {dayType,isRest:dayType===null};
 }
 function buildPrescriptionString(lift){
   if(!lift) return '—';
