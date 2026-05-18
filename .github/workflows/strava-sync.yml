@@ -1,0 +1,36 @@
+name: Strava Nightly Sync
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # 2am EST (7am UTC) every day
+  workflow_dispatch:       # Manual trigger from GitHub Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # needed to push data.json
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Strava sync
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+        run: node .github/scripts/strava-sync.js
+
+      - name: Commit and push if data changed
+        run: |
+          git config user.name "workout-OS bot"
+          git config user.email "bot@workout-os"
+          git add data.json
+          git diff --staged --quiet || git commit -m "strava sync $(date -u +%Y-%m-%d)"
+          git push
