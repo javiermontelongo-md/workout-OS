@@ -1086,7 +1086,7 @@ function renderCalendar(){
     const isFuture=ds>todayStr;
     let cellContent='';
     if(sessions.length){ cellContent=getActivityBadges(sessions); }
-    else if(isFuture){ cellContent=getPlannedBadge(ds); }
+    else if(isFuture||isToday){ cellContent=getPlannedBadge(ds); }
     else{ cellContent='<div class="cal-rest">rest</div>'; }
     html+=`<div class="cal-cell${isToday?' today':''}"><div class="cal-date">${d.getDate()}</div>${cellContent}</div>`;
   }
