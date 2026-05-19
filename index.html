@@ -310,7 +310,67 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card" id="today-checkin-snapshot">
     <div class="lbl">recovery snapshot · 30 days</div>
     <div id="snapshot-charts"></div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px;">Log check-ins in the Recovery tab</div>
+  </div>
+  <!-- Daily Check-in Input -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div class="lbl" style="margin:0;">daily check-in</div>
+      <div id="checkin-date-label" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">ENERGY</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-energy-val">7</div>
+      </div>
+      <input type="range" id="ci-energy" min="1" max="10" value="7" oninput="document.getElementById('ci-energy-val').textContent=this.value;updateFatiguePreview()">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SORENESS</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--a4);" id="ci-soreness-val">3</div>
+      </div>
+      <input type="range" id="ci-soreness" min="1" max="10" value="3" oninput="document.getElementById('ci-soreness-val').textContent=this.value;updateFatiguePreview()">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">MOTIVATION</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-motivation-val">7</div>
+      </div>
+      <input type="range" id="ci-motivation" min="1" max="10" value="7" oninput="document.getElementById('ci-motivation-val').textContent=this.value;updateFatiguePreview()">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SLEEP</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">HH:MM format</div>
+      </div>
+      <input type="text" id="ci-sleep-input" placeholder="7:30" style="font-family:var(--mono);font-size:14px;text-align:center;letter-spacing:2px;" maxlength="5" oninput="formatSleepInput(this)">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">WEIGHT</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">lbs</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="number" id="ci-weight" placeholder="225" step="0.5" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;">BMI: <span id="ci-bmi-display" style="color:var(--t2);">--</span></div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">WAIST</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">inches</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="number" id="ci-waist" placeholder="34.0" step="0.25" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;">W/H: <span id="ci-whr-display" style="color:var(--t2);">--</span></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px;">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">FATIGUE SCORE</div>
+      <div style="font-family:var(--mono);font-size:15px;font-weight:500;" id="ci-fatigue-preview">--</div>
+    </div>
+    <button class="btn bp" style="width:100%;" onclick="saveCheckin()">Save Check-in to GitHub</button>
+    <div id="checkin-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
   </div>
   <div class="g2">
     <div class="card">
@@ -610,75 +670,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div id="health-sync-time" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
     </div>
     <div id="health-log-content"></div>
-  </div>
-
-  <!-- Daily Check-in Input -->
-  <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div class="lbl" style="margin:0;">daily check-in</div>
-      <div id="checkin-date-label" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">ENERGY</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-energy-val">7</div>
-      </div>
-      <input type="range" id="ci-energy" min="1" max="10" value="7" oninput="document.getElementById('ci-energy-val').textContent=this.value;updateFatiguePreview()">
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SLEEP</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-sleep-val">7h</div>
-      </div>
-      <input type="range" id="ci-sleep" min="3" max="12" step="0.5" value="7" oninput="document.getElementById('ci-sleep-val').textContent=this.value+'h';updateFatiguePreview()">
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SORENESS</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--a4);" id="ci-soreness-val">3</div>
-      </div>
-      <input type="range" id="ci-soreness" min="1" max="10" value="3" oninput="document.getElementById('ci-soreness-val').textContent=this.value;updateFatiguePreview()">
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">MOTIVATION</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-motivation-val">7</div>
-      </div>
-      <input type="range" id="ci-motivation" min="1" max="10" value="7" oninput="document.getElementById('ci-motivation-val').textContent=this.value;updateFatiguePreview()">
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SLEEP</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">HH:MM format</div>
-      </div>
-      <input type="text" id="ci-sleep-input" placeholder="7:30" style="font-family:var(--mono);font-size:14px;text-align:center;letter-spacing:2px;" maxlength="5" oninput="formatSleepInput(this)">
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">WEIGHT</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">lbs</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <input type="number" id="ci-weight" placeholder="225" step="0.5" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;">BMI: <span id="ci-bmi-display" style="color:var(--t2);">--</span></div>
-      </div>
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">WAIST</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">inches</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <input type="number" id="ci-waist" placeholder="34.0" step="0.25" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;">W/H: <span id="ci-whr-display" style="color:var(--t2);">--</span></div>
-      </div>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px;">
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">FATIGUE SCORE</div>
-      <div style="font-family:var(--mono);font-size:15px;font-weight:500;" id="ci-fatigue-preview">--</div>
-    </div>
-    <button class="btn bp" style="width:100%;" onclick="saveCheckin()">Save Check-in to GitHub</button>
-    <div id="checkin-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
   </div>
 
   <!-- 30-day history charts -->
@@ -1778,10 +1769,10 @@ function calcFatigue(energy,sleep,soreness,motivation){
 function updateFatiguePreview(){
   const el=document.getElementById('ci-fatigue-preview');if(!el)return;
   const e=+document.getElementById('ci-energy').value;
-  const s=+document.getElementById('ci-sleep').value;
+  const sleepHrs=parseSleepHHMM(document.getElementById('ci-sleep-input')?.value)||7;
   const so=+document.getElementById('ci-soreness').value;
   const m=+document.getElementById('ci-motivation').value;
-  const f=calcFatigue(e,s,so,m);
+  const f=calcFatigue(e,sleepHrs,so,m);
   el.textContent=f.toFixed(1);
   el.style.color=f<4?'var(--a3)':f<6?'var(--a)':'var(--a4)';
 }
@@ -1790,12 +1781,12 @@ async function saveCheckin(){
   if(!D)return;
   const today=new Date().toISOString().split('T')[0];
   const energy=+document.getElementById('ci-energy').value;
-  const sleep=+document.getElementById('ci-sleep').value;
   const soreness=+document.getElementById('ci-soreness').value;
   const motivation=+document.getElementById('ci-motivation').value;
-  const fatigueScore=calcFatigue(energy,sleep,soreness,motivation);
   const sleepInput=document.getElementById('ci-sleep-input')?.value;
   const sleepHours=parseSleepHHMM(sleepInput);
+  const sleep=sleepHours||7;
+  const fatigueScore=calcFatigue(energy,sleep,soreness,motivation);
   const weightLbs=parseFloat(document.getElementById('ci-weight')?.value)||null;
   const waistInches=parseFloat(document.getElementById('ci-waist')?.value)||null;
   if(!D.checkins)D.checkins=[];
@@ -1866,8 +1857,9 @@ function _buildSparkRows(checkins30,larger){
 function renderSnapshotCharts(){
   const el=document.getElementById('snapshot-charts');if(!el)return;
   const checkins=(D.checkins||[]).slice(-30);
-  if(checkins.length<3){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;padding:8px 0;">No check-in data yet — log in Recovery tab</div>';return;}
-  let html=_buildSparkRows(checkins,false);
+  const hasHealthLogs=(D.healthLogs||[]).length>0;
+  if(checkins.length<3&&!hasHealthLogs){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;padding:8px 0;">No check-in data yet</div>';return;}
+  let html=checkins.length>=3?_buildSparkRows(checkins,false):'';
   // Steps sparkline
   const today=new Date();
   const days30=[];
@@ -1939,7 +1931,6 @@ function initCheckinTab(){
   if(existing){
     const se=id=>document.getElementById(id);
     if(se('ci-energy')){se('ci-energy').value=existing.energy;se('ci-energy-val').textContent=existing.energy;}
-    if(se('ci-sleep')){se('ci-sleep').value=existing.sleep;se('ci-sleep-val').textContent=existing.sleep+'h';}
     if(se('ci-soreness')){se('ci-soreness').value=existing.soreness;se('ci-soreness-val').textContent=existing.soreness;}
     if(se('ci-motivation')){se('ci-motivation').value=existing.motivation;se('ci-motivation-val').textContent=existing.motivation;}
   }
