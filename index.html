@@ -340,6 +340,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">STRESS</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--a4);" id="ci-stress-val">5</div>
+      </div>
+      <input type="range" id="ci-stress" min="1" max="10" value="5"
+        oninput="document.getElementById('ci-stress-val').textContent=this.value;updateFatiguePreview()">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SLEEP</div>
         <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">HH:MM format</div>
       </div>
@@ -1762,8 +1770,9 @@ function showRPEConfirm(lift){
 // DAILY CHECK-IN SYSTEM
 // ============================================================
 
-function calcFatigue(energy,sleep,soreness,motivation){
-  return Math.round(((10-energy)+(10-motivation)+soreness+Math.max(0,8-sleep))/4*10)/10;
+function calcFatigue(energy,sleep,soreness,motivation,stress){
+  const st=stress||5;
+  return Math.round(((10-energy)+(10-motivation)+soreness+st+Math.max(0,8-sleep))/5*10)/10;
 }
 
 function updateFatiguePreview(){
@@ -1772,7 +1781,8 @@ function updateFatiguePreview(){
   const sleepHrs=parseSleepHHMM(document.getElementById('ci-sleep-input')?.value)||7;
   const so=+document.getElementById('ci-soreness').value;
   const m=+document.getElementById('ci-motivation').value;
-  const f=calcFatigue(e,sleepHrs,so,m);
+  const stress=+document.getElementById('ci-stress').value;
+  const f=calcFatigue(e,sleepHrs,so,m,stress);
   el.textContent=f.toFixed(1);
   el.style.color=f<4?'var(--a3)':f<6?'var(--a)':'var(--a4)';
 }
@@ -1783,15 +1793,16 @@ async function saveCheckin(){
   const energy=+document.getElementById('ci-energy').value;
   const soreness=+document.getElementById('ci-soreness').value;
   const motivation=+document.getElementById('ci-motivation').value;
+  const stress=+document.getElementById('ci-stress').value;
   const sleepInput=document.getElementById('ci-sleep-input')?.value;
   const sleepHours=parseSleepHHMM(sleepInput);
   const sleep=sleepHours||7;
-  const fatigueScore=calcFatigue(energy,sleep,soreness,motivation);
+  const fatigueScore=calcFatigue(energy,sleep,soreness,motivation,stress);
   const weightLbs=parseFloat(document.getElementById('ci-weight')?.value)||null;
   const waistInches=parseFloat(document.getElementById('ci-waist')?.value)||null;
   if(!D.checkins)D.checkins=[];
   const existing=D.checkins.findIndex(c=>c.date===today);
-  const entry={date:today,energy,sleep,soreness,motivation,fatigueScore};
+  const entry={date:today,energy,sleep,soreness,motivation,stress,fatigueScore};
   if(sleepHours)entry.sleepHours=sleepHours;
   if(existing>=0)D.checkins[existing]=entry;else D.checkins.push(entry);
   if(weightLbs||waistInches){
@@ -1855,65 +1866,124 @@ function _buildSparkRows(checkins30,larger){
 }
 
 function renderSnapshotCharts(){
-  const el=document.getElementById('snapshot-charts');if(!el)return;
-  const checkins=(D.checkins||[]).slice(-30);
-  const hasHealthLogs=(D.healthLogs||[]).length>0;
-  if(checkins.length<3&&!hasHealthLogs){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;padding:8px 0;">No check-in data yet</div>';return;}
-  let html=checkins.length>=3?_buildSparkRows(checkins,false):'';
-  // Steps sparkline
-  const today=new Date();
-  const days30=[];
-  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);days30.push(d.toISOString().split('T')[0]);}
-  const hlByDate={};(D.healthLogs||[]).forEach(h=>{hlByDate[h.date]=h;});
-  const ciByDate={};(D.checkins||[]).forEach(c=>{ciByDate[c.date]=c;});
-  // Steps
-  const stepsVals=days30.map(d=>hlByDate[d]?.steps||null);
-  const stepsFiltered=stepsVals.filter(v=>v!=null);
-  const stepsAvg=stepsFiltered.length?Math.round(stepsFiltered.reduce((a,b)=>a+b,0)/stepsFiltered.length):null;
-  const stepsAvgStr=stepsAvg!=null?stepsAvg.toLocaleString()+' avg':'-';
-  const stepsMax=stepsFiltered.length?Math.max(...stepsFiltered):10000;
-  const stepsBars=days30.map(d=>{
-    const v=hlByDate[d]?.steps;
-    if(v==null)return `<div class="spark-bar empty" style="height:4px;"></div>`;
-    const pct=Math.max(0.05,Math.min(1,v/Math.max(stepsMax,1)));
-    const h=Math.round(pct*28);
-    return `<div class="spark-bar good" style="height:${h}px;background:var(--a2);" title="${d}: ${v.toLocaleString()} steps"></div>`;
-  }).join('');
-  html+=`<div class="spark-row"><div class="spark-label">STEPS</div><div class="spark-avg">${stepsAvgStr}</div><div class="spark-bars">${stepsBars}</div></div>`;
-  // Sleep (merged checkins sleepHours + healthLogs sleepHours)
-  const sleepVals=days30.map(d=>{
-    const ci=ciByDate[d];if(ci?.sleepHours!=null)return ci.sleepHours;
-    const hl=hlByDate[d];if(hl?.sleepHours!=null)return hl.sleepHours;
-    return null;
+  const container=document.getElementById('snapshot-charts');
+  if(!container)return;
+
+  const logs=(D.healthLogs||[]).slice(-30);
+  const checkins=D.checkins||[];
+
+  if(logs.length<3){
+    container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px 0;">No health data yet — sync via Shortcut or export</div>';
+    return;
+  }
+
+  container.innerHTML=`
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;">Sleep · 30 days</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);" id="snap-sleep-avg"></div>
+      </div>
+      <div style="position:relative;height:120px;"><canvas id="snap-sleep-chart"></canvas></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
+        <span style="color:rgba(34,197,94,0.8);">── Actual sleep</span>
+        <span style="margin-left:10px;">- - Optimal 7h – 7h30m</span>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;">Steps + Exercise · 30 days</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);" id="snap-activity-avg"></div>
+      </div>
+      <div style="position:relative;height:140px;"><canvas id="snap-activity-chart"></canvas></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
+        <span style="color:rgba(0,212,255,0.8);">── Steps (L)</span>
+        <span style="margin-left:8px;color:rgba(168,85,247,0.8);">── Exercise min (R)</span>
+        <span style="margin-left:8px;">- - Avg</span>
+      </div>
+    </div>
+  `;
+
+  const dates=logs.map(l=>l.date);
+
+  // ── SLEEP CHART ──
+  const sleepData=dates.map(date=>{
+    const ci=checkins.find(c=>c.date===date);
+    const hl=logs.find(l=>l.date===date);
+    return ci?.sleepHours||hl?.sleepHours||null;
   });
-  const sleepFiltered=sleepVals.filter(v=>v!=null);
-  const sleepAvg=sleepFiltered.length?sleepFiltered.reduce((a,b)=>a+b,0)/sleepFiltered.length:null;
-  const sleepAvgStr=sleepAvg!=null?sleepAvg.toFixed(1)+'h avg':'-';
-  const sleepMax=12;
-  const sleepBars=days30.map((d,i)=>{
-    const v=sleepVals[i];
-    if(v==null)return `<div class="spark-bar empty" style="height:4px;"></div>`;
-    const pct=Math.max(0.05,Math.min(1,v/sleepMax));
-    const h=Math.round(pct*28);
-    const color=v>=7?'var(--a3)':v>=6?'var(--a)':'var(--red)';
-    return `<div class="spark-bar" style="height:${h}px;background:${color};" title="${d}: ${v}h sleep"></div>`;
-  }).join('');
-  html+=`<div class="spark-row"><div class="spark-label">SLEEP</div><div class="spark-avg">${sleepAvgStr}</div><div class="spark-bars">${sleepBars}</div></div>`;
-  // Exercise minutes
-  const exVals=days30.map(d=>hlByDate[d]?.exerciseMinutes||null);
-  const exFiltered=exVals.filter(v=>v!=null);
-  const exAvg=exFiltered.length?Math.round(exFiltered.reduce((a,b)=>a+b,0)/exFiltered.length):null;
-  const exAvgStr=exAvg!=null?exAvg+' min avg':'-';
-  const exMax=exFiltered.length?Math.max(...exFiltered,1):60;
-  const exBars=days30.map((d,i)=>{
-    const v=exVals[i];
-    if(v==null)return `<div class="spark-bar empty" style="height:4px;"></div>`;
-    const pct=Math.max(0.05,Math.min(1,v/Math.max(exMax,1)));
-    const h=Math.round(pct*28);
-    return `<div class="spark-bar" style="height:${h}px;background:#a855f7;" title="${d}: ${v} min exercise"></div>`;
-  }).join('');
-  html+=`<div class="spark-row"><div class="spark-label">EXERCISE</div><div class="spark-avg">${exAvgStr}</div><div class="spark-bars">${exBars}</div></div>`;
-  el.innerHTML=html;
+  const validSleep=sleepData.filter(v=>v!==null);
+  const avgSleep=validSleep.length?(validSleep.reduce((s,v)=>s+v,0)/validSleep.length).toFixed(1):null;
+  const sleepAvgEl=document.getElementById('snap-sleep-avg');
+  if(sleepAvgEl&&avgSleep)sleepAvgEl.textContent=avgSleep+'h avg';
+
+  const sleepCtx=document.getElementById('snap-sleep-chart')?.getContext('2d');
+  if(sleepCtx){
+    new Chart(sleepCtx,{
+      type:'line',
+      data:{
+        labels:dates,
+        datasets:[
+          {label:'Sleep',data:sleepData,borderColor:'rgba(34,197,94,0.8)',backgroundColor:'rgba(34,197,94,0.1)',pointRadius:2,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
+          {label:'Optimal min',data:dates.map(()=>7),borderColor:'rgba(34,197,94,0.35)',borderDash:[4,4],pointRadius:0,fill:false,tension:0},
+          {label:'Optimal max',data:dates.map(()=>7.5),borderColor:'rgba(34,197,94,0.35)',borderDash:[4,4],pointRadius:0,fill:'-1',backgroundColor:'rgba(34,197,94,0.06)',tension:0}
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:ctx=>{if(ctx.dataset.label==='Sleep'){const v=ctx.parsed.y;const h=Math.floor(v);const m=Math.round((v-h)*60);return h+'h '+m+'m';}return null;}}}
+        },
+        scales:{
+          x:{ticks:{color:'#4a5068',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'}},
+          y:{min:4,max:10,ticks:{color:'#4a5068',font:{size:9},callback:function(v){return v+'h';}},grid:{color:'rgba(255,255,255,0.04)'}}
+        }
+      }
+    });
+  }
+
+  // ── STEPS + EXERCISE CHART ──
+  const stepsData=dates.map(date=>logs.find(x=>x.date===date)?.steps||null);
+  const exerciseData=dates.map(date=>logs.find(x=>x.date===date)?.exerciseMinutes||null);
+  const validSteps=stepsData.filter(v=>v!==null);
+  const validExercise=exerciseData.filter(v=>v!==null);
+  const avgSteps=validSteps.length?Math.round(validSteps.reduce((s,v)=>s+v,0)/validSteps.length):null;
+  const avgExercise=validExercise.length?Math.round(validExercise.reduce((s,v)=>s+v,0)/validExercise.length):null;
+
+  const actAvgEl=document.getElementById('snap-activity-avg');
+  if(actAvgEl){
+    const parts=[];
+    if(avgSteps)parts.push(avgSteps.toLocaleString()+' steps avg');
+    if(avgExercise)parts.push(avgExercise+' min avg');
+    actAvgEl.textContent=parts.join(' · ');
+  }
+
+  const actCtx=document.getElementById('snap-activity-chart')?.getContext('2d');
+  if(actCtx&&(avgSteps!==null||avgExercise!==null)){
+    new Chart(actCtx,{
+      type:'line',
+      data:{
+        labels:dates,
+        datasets:[
+          {label:'Steps',data:stepsData,borderColor:'rgba(0,212,255,0.8)',backgroundColor:'rgba(0,212,255,0.05)',pointRadius:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySteps'},
+          {label:'Steps avg',data:avgSteps?dates.map(()=>avgSteps):[],borderColor:'rgba(0,212,255,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySteps'},
+          {label:'Exercise',data:exerciseData,borderColor:'rgba(168,85,247,0.8)',backgroundColor:'rgba(168,85,247,0.05)',pointRadius:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
+          {label:'Exercise avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'}
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+        scales:{
+          x:{ticks:{color:'#4a5068',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'}},
+          ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.6)',font:{size:9},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.04)'}},
+          yExercise:{type:'linear',position:'right',ticks:{color:'rgba(168,85,247,0.6)',font:{size:9},callback:function(v){return v+'m';}},grid:{display:false}}
+        }
+      }
+    });
+  }
 }
 
 function renderRecoveryHistoryCharts(){
@@ -1933,6 +2003,7 @@ function initCheckinTab(){
     if(se('ci-energy')){se('ci-energy').value=existing.energy;se('ci-energy-val').textContent=existing.energy;}
     if(se('ci-soreness')){se('ci-soreness').value=existing.soreness;se('ci-soreness-val').textContent=existing.soreness;}
     if(se('ci-motivation')){se('ci-motivation').value=existing.motivation;se('ci-motivation-val').textContent=existing.motivation;}
+    if(existing.stress&&se('ci-stress')){se('ci-stress').value=existing.stress;se('ci-stress-val').textContent=existing.stress;}
   }
   updateFatiguePreview();
   const today2=new Date().toISOString().split('T')[0];
@@ -2305,7 +2376,13 @@ function renderWeekNav(){
 }
 function formatSleepInput(input){
   let val=input.value.replace(/[^0-9]/g,'');
-  if(val.length>=3){val=val.substring(0,2)+':'+val.substring(2,4);}
+  if(val.length>4)val=val.substring(0,4);
+  if(val.length>=2){
+    const minsStr=val.substring(val.length-2);
+    const minsNum=parseInt(minsStr);
+    if(minsNum>59){val=val.substring(0,val.length-1);}
+    if(val.length>=2){val=val.substring(0,val.length-2)+':'+val.substring(val.length-2);}
+  }
   input.value=val;
 }
 function parseSleepHHMM(str){
