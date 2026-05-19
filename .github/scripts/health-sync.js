@@ -7,6 +7,55 @@ function localDateStr(date) {
   return `${y}-${m}-${d}`;
 }
 
+function extractDate(raw) {
+  const match = raw.match(/"*date"*\s*:\s*"(\d{4}-\d{2}-\d{2})/);
+  return match ? match[1] : localDateStr(new Date());
+}
+
+function extractSimpleNumber(raw, key) {
+  // Handles keys with extra quotes like ""restingHR"
+  const re = new RegExp(`"+${key}"+\\s*:\\s*([\\d.]+)`, 'i');
+  const match = raw.match(re);
+  if (match) {
+    const val = parseFloat(match[1]);
+    return isNaN(val) ? null : val;
+  }
+  return null;
+}
+
+function extractSleepSeconds(raw) {
+  // Sleep comes as sum of durations in seconds
+  const re = /"*sleepHours"*\s*:\s*([\d.]+)/i;
+  const match = raw.match(re);
+  if (match) {
+    const seconds = parseFloat(match[1]);
+    if (!isNaN(seconds) && seconds > 3600) {
+      return Math.round((seconds / 3600) * 10) / 10;
+    }
+  }
+  return null;
+}
+
+function extractStepsTotal(raw) {
+  // Steps may come as multiple records — find them all and sum
+  const singleMatch = raw.match(/"*steps"*\s*:\s*([\d.]+)(?:[^\d]|$)/i);
+  if (singleMatch) {
+    const val = parseInt(singleMatch[1]);
+    if (val > 500) return val;
+  }
+
+  const stepsSection = raw.match(/"*steps"*\s*:([\s\S]*?)"*exerciseMinutes"*\s*:/i);
+  if (stepsSection) {
+    const nums = stepsSection[1].match(/\b(\d+)\b/g);
+    if (nums && nums.length > 0) {
+      const total = nums.reduce((s, n) => s + parseInt(n), 0);
+      console.log(`Steps: summed ${nums.length} records = ${total}`);
+      return total;
+    }
+  }
+  return null;
+}
+
 async function main() {
   const healthDataRaw = process.env.HEALTH_DATA;
   if (!healthDataRaw) {
@@ -14,101 +63,50 @@ async function main() {
     process.exit(0);
   }
 
-  let healthData;
-  try {
-    healthData = JSON.parse(healthDataRaw);
-  } catch(e) {
-    console.log('Direct parse failed, attempting cleanup:', e.message);
-    try {
-      let cleaned = healthDataRaw
-        .replace(/:\s*\[object Object\]/g, ':null')
-        .replace(/:\s*undefined/g, ':null')
-        .replace(/,\s*}/g, '}')
-        .replace(/,\s*,/g, ',')
-        .trim();
-      healthData = JSON.parse(cleaned);
-      console.log('Cleaned parse succeeded');
-    } catch(e2) {
-      console.error('Failed to parse health data after cleanup:', e2.message);
-      console.error('Raw data received:', healthDataRaw.substring(0, 500));
-      process.exit(1);
-    }
-  }
+  console.log('Raw data preview:', healthDataRaw.substring(0, 300));
 
-  function extractNumber(val) {
-    if (val === null || val === undefined) return null;
-    if (typeof val === 'number') return val;
-    if (typeof val === 'string') {
-      const n = parseFloat(val);
-      return isNaN(n) ? null : n;
-    }
-    if (typeof val === 'object') {
-      return val.value ?? val.Value ?? val.quantity ?? null;
-    }
-    return null;
-  }
+  const date = extractDate(healthDataRaw);
+  const restingHR = extractSimpleNumber(healthDataRaw, 'restingHR');
+  const hrv = extractSimpleNumber(healthDataRaw, 'hrv');
+  const wristTemp = extractSimpleNumber(healthDataRaw, 'wristTemp');
+  const sleepHours = extractSleepSeconds(healthDataRaw);
+  const steps = extractStepsTotal(healthDataRaw);
+  const exerciseMinutes = extractSimpleNumber(healthDataRaw, 'exerciseMinutes');
+  const walkingHR = extractSimpleNumber(healthDataRaw, 'walkingHR');
+  const respiratoryRate = extractSimpleNumber(healthDataRaw, 'respiratoryRate');
+  const vo2max = extractSimpleNumber(healthDataRaw, 'vo2max');
 
-  healthData = {
-    date: healthData.date || new Date().toISOString().split('T')[0],
-    restingHR: extractNumber(healthData.restingHR),
-    hrv: extractNumber(healthData.hrv),
-    wristTemp: extractNumber(healthData.wristTemp),
-    sleepHours: extractNumber(healthData.sleepHours),
-    steps: extractNumber(healthData.steps),
-    exerciseMinutes: extractNumber(healthData.exerciseMinutes),
-    walkingHR: extractNumber(healthData.walkingHR),
-    respiratoryRate: extractNumber(healthData.respiratoryRate),
-    vo2max: extractNumber(healthData.vo2max)
+  const entry = {
+    date,
+    restingHR,
+    hrv,
+    wristTemp,
+    sleepHours,
+    sleepDeep: null,
+    sleepREM: null,
+    sleepLight: null,
+    sleepAwake: null,
+    steps,
+    exerciseMinutes,
+    walkingHR,
+    respiratoryRate,
+    vo2maxApple: vo2max,
+    source: 'apple_health'
   };
 
-  if (healthData.date && healthData.date.length > 10) {
-    healthData.date = healthData.date.substring(0, 10);
-  }
-
-  console.log('Processed health data:', JSON.stringify(healthData));
+  console.log('Extracted entry:', JSON.stringify(entry));
 
   const dataPath = './data.json';
   let data = {};
   try {
     data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
   } catch(e) {
-    console.log('Starting fresh data.json');
+    console.log('Starting fresh');
   }
 
   if (!data.healthLogs) data.healthLogs = [];
 
-  const date = healthData.date || localDateStr(new Date());
   const existingIdx = data.healthLogs.findIndex(h => h.date === date);
-
-  const entry = {
-    date,
-    // Core recovery metrics
-    restingHR: healthData.restingHR || null,           // bpm
-    hrv: healthData.hrv || null,                        // ms SDNN
-    walkingHR: healthData.walkingHR || null,            // bpm — daily stress proxy
-
-    // Sleep
-    sleepHours: healthData.sleepHours || null,          // total hours
-    sleepDeep: healthData.sleepDeep || null,            // hours deep
-    sleepREM: healthData.sleepREM || null,              // hours REM
-    sleepLight: healthData.sleepLight || null,          // hours light
-    sleepAwake: healthData.sleepAwake || null,          // hours awake
-
-    // Series 10 sensors
-    wristTemp: healthData.wristTemp || null,            // °C deviation from baseline
-    respiratoryRate: healthData.respiratoryRate || null, // breaths/min
-
-    // Activity
-    steps: healthData.steps || null,
-    exerciseMinutes: healthData.exerciseMinutes || null,
-    standHours: healthData.standHours || null,
-
-    // Apple fitness estimates
-    vo2maxApple: healthData.vo2max || null,             // ml/kg/min
-
-    source: 'apple_health'
-  };
-
   if (existingIdx >= 0) {
     data.healthLogs[existingIdx] = entry;
     console.log(`Updated health log for ${date}`);
