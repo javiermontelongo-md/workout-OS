@@ -1,0 +1,38 @@
+name: Apple Health Sync
+
+on:
+  repository_dispatch:
+    types: [health-sync]
+  workflow_dispatch:
+    inputs:
+      health_data:
+        description: 'JSON health data from iPhone Shortcut'
+        required: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Process health data
+        env:
+          HEALTH_DATA: ${{ github.event.client_payload.health_data || inputs.health_data }}
+        run: node .github/scripts/health-sync.js
+
+      - name: Commit and push if data changed
+        run: |
+          git config user.name "workout-OS bot"
+          git config user.email "bot@workout-os"
+          git add data.json
+          git diff --staged --quiet || git commit -m "health sync $(date -u +%Y-%m-%d)"
+          git push
