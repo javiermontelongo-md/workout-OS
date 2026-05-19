@@ -566,6 +566,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div id="run-chart-legend"></div>
     <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
   </div>
+<div class="card" id="body-metrics-card" style="display:none;margin-bottom:14px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <div class="lbl" style="margin:0;">body composition</div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn bs bi" onclick="setBodyChart('weight')" id="body-chart-weight" style="font-size:10px;padding:5px 10px;">WEIGHT</button>
+      <button class="btn bs bi" onclick="setBodyChart('waist')" id="body-chart-waist" style="font-size:10px;padding:5px 10px;">WAIST</button>
+      <button class="btn bs bi" onclick="setBodyChart('bmi')" id="body-chart-bmi" style="font-size:10px;padding:5px 10px;">BMI</button>
+    </div>
+  </div>
+  <div style="position:relative;height:180px;"><canvas id="body-chart"></canvas></div>
+  <div id="body-chart-legend" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px;"></div>
+</div>
   <div class="card"><div class="lbl">session history</div><div id="all-sessions"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div></div>
 </div>
 
@@ -633,6 +645,33 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-motivation-val">7</div>
       </div>
       <input type="range" id="ci-motivation" min="1" max="10" value="7" oninput="document.getElementById('ci-motivation-val').textContent=this.value;updateFatiguePreview()">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SLEEP</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">HH:MM format</div>
+      </div>
+      <input type="text" id="ci-sleep-input" placeholder="7:30" style="font-family:var(--mono);font-size:14px;text-align:center;letter-spacing:2px;" maxlength="5" oninput="formatSleepInput(this)">
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">WEIGHT</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">lbs</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="number" id="ci-weight" placeholder="225" step="0.5" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;">BMI: <span id="ci-bmi-display" style="color:var(--t2);">--</span></div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">WAIST</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">inches</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="number" id="ci-waist" placeholder="34.0" step="0.25" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;">W/H: <span id="ci-whr-display" style="color:var(--t2);">--</span></div>
+      </div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px;">
       <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">FATIGUE SCORE</div>
@@ -852,7 +891,7 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[]}; }
 
 // ============================================================
 // INIT
@@ -893,6 +932,7 @@ function onLoad(){
   renderRecoveryHistoryCharts();
   renderProgramTab();
   renderHealthLog();
+  renderBodyChart('weight');
 }
 
 // ============================================================
@@ -1090,6 +1130,8 @@ function updRecStats(){
 // ============================================================
 var calOffset=0;
 var weekNavOffset=0;
+const HEIGHT_INCHES = 69.5; // 5'9.5"
+const HEIGHT_CM = 176.53;
 function getWeekStart(offset){
   const d=new Date(),dow=d.getDay();
   d.setDate(d.getDate()-dow+(offset*7));
@@ -1503,11 +1545,15 @@ function buildPlanContext(){
   const liftBests={bench:0,ohp:0,squat:0,dl:0};
   sessions.forEach(s=>{['bench','ohp','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if(set.w&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
   if(!liftBests.bench)liftBests.bench=255;if(!liftBests.ohp)liftBests.ohp=120;if(!liftBests.squat)liftBests.squat=215;if(!liftBests.dl)liftBests.dl=215;
-  return{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,totalSessions:sessions.length,totalRuns:runs.length,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max};
+  const latestBody=(D.bodyMetrics||[]).slice(-1)[0]||null;
+  const currentWeight=latestBody?.weightLbs||null;
+  const currentWaist=latestBody?.waistInches||null;
+  const currentBMI=latestBody?.bmi||null;
+  return{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,totalSessions:sessions.length,totalRuns:runs.length,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max,currentWeight,currentWaist,currentBMI,latestBody};
 }
 
 function buildPlanPrompt(ctx){
-  const{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max}=ctx;
+  const{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max,currentWeight,currentWaist,currentBMI,latestBody}=ctx;
   const sessLines=recentSessions.map(s=>`${s.date} [${s.dayType}] RPE:${s.rpe||'?'} Energy:${s.energy||'?'} Sleep:${s.sleep||'?'}h\n  Bench:${s.bench||'none'} OHP:${s.ohp||'none'} Squat:${s.squat||'none'} DL:${s.dl||'none'}`).join('\n')||'No sessions yet';
   const runLines=recentRuns.map(r=>`${r.date} [${r.type||'?'}] ${r.distance}mi @ ${r.pace||'?'} · HR avg ${r.hrAvg||'?'} max ${r.hrMax||'?'} (${r.name||''})`).join('\n')||'No runs logged';
   const rpeLines=rpeConfirmations.length?rpeConfirmations.map(r=>`${r.lift}: predicted ${r.predictedRPE} actual ${r.actualRPE} @ ${r.weight}lb`).join('\n'):'No RPE confirmations yet';
@@ -1538,6 +1584,12 @@ RECOVERY & BIOMETRICS (last 7 days, Apple Watch Series 10):
 - Avg exercise minutes/day: ${avgExerciseMins||'?'} min (includes non-logged activity)
 - Apple Watch VO2max: ${appleVO2max||'not available'} ml/kg/min
 - Calculated VO2max: ${vo2max||'?'} ml/kg/min (HR reserve + elevation corrected, resting HR ${avgRestingHR})
+
+BODY COMPOSITION:
+- Weight: ${currentWeight?currentWeight+' lbs':'not logged'}
+- Waist: ${currentWaist?currentWaist+'"':'not logged'}
+- BMI: ${currentBMI||'not calculated'} (height 5'9.5")
+- Waist-to-height ratio: ${latestBody?.waistHeightRatio||'not calculated'}
 
 BIOMETRIC RULES (apply these, not just the checkin data):
 - Wrist temp >+0.5°C → mandatory easy day, flag recovery concern
@@ -1742,10 +1794,24 @@ async function saveCheckin(){
   const soreness=+document.getElementById('ci-soreness').value;
   const motivation=+document.getElementById('ci-motivation').value;
   const fatigueScore=calcFatigue(energy,sleep,soreness,motivation);
+  const sleepInput=document.getElementById('ci-sleep-input')?.value;
+  const sleepHours=parseSleepHHMM(sleepInput);
+  const weightLbs=parseFloat(document.getElementById('ci-weight')?.value)||null;
+  const waistInches=parseFloat(document.getElementById('ci-waist')?.value)||null;
   if(!D.checkins)D.checkins=[];
   const existing=D.checkins.findIndex(c=>c.date===today);
-  const entry={date:today,energy,sleep,soreness,motivation,fatigueScore};
+  const entry={date:today,energy,sleep,soreness,motivation,fatigueScore,sleepHoursLogged:sleepHours};
   if(existing>=0)D.checkins[existing]=entry;else D.checkins.push(entry);
+  if(weightLbs||waistInches){
+    if(!D.bodyMetrics)D.bodyMetrics=[];
+    const bmi=weightLbs?Math.round((weightLbs*703)/(HEIGHT_INCHES*HEIGHT_INCHES)*10)/10:null;
+    const whr=waistInches?Math.round((waistInches/HEIGHT_INCHES)*100)/100:null;
+    const bodyEntry={date:today,weightLbs,waistInches,bmi,waistHeightRatio:whr};
+    const existingBody=D.bodyMetrics.findIndex(b=>b.date===today);
+    if(existingBody>=0){D.bodyMetrics[existingBody]=bodyEntry;}else{D.bodyMetrics.push(bodyEntry);}
+    D.bodyMetrics.sort((a,b)=>a.date.localeCompare(b.date));
+  }
+  renderBodyChart('weight');
   const ok=await push(null,null);
   const msgEl=document.getElementById('checkin-save-msg');
   if(ok){
@@ -1800,7 +1866,61 @@ function renderSnapshotCharts(){
   const el=document.getElementById('snapshot-charts');if(!el)return;
   const checkins=(D.checkins||[]).slice(-30);
   if(checkins.length<3){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;padding:8px 0;">No check-in data yet — log in Recovery tab</div>';return;}
-  el.innerHTML=_buildSparkRows(checkins,false);
+  let html=_buildSparkRows(checkins,false);
+  // Steps sparkline
+  const today=new Date();
+  const days30=[];
+  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);days30.push(d.toISOString().split('T')[0]);}
+  const hlByDate={};(D.healthLogs||[]).forEach(h=>{hlByDate[h.date]=h;});
+  const ciByDate={};(D.checkins||[]).forEach(c=>{ciByDate[c.date]=c;});
+  // Steps
+  const stepsVals=days30.map(d=>hlByDate[d]?.steps||null);
+  const stepsFiltered=stepsVals.filter(v=>v!=null);
+  const stepsAvg=stepsFiltered.length?Math.round(stepsFiltered.reduce((a,b)=>a+b,0)/stepsFiltered.length):null;
+  const stepsAvgStr=stepsAvg!=null?stepsAvg.toLocaleString()+' avg':'-';
+  const stepsMax=stepsFiltered.length?Math.max(...stepsFiltered):10000;
+  const stepsBars=days30.map(d=>{
+    const v=hlByDate[d]?.steps;
+    if(v==null)return `<div class="spark-bar empty" style="height:4px;"></div>`;
+    const pct=Math.max(0.05,Math.min(1,v/Math.max(stepsMax,1)));
+    const h=Math.round(pct*28);
+    return `<div class="spark-bar good" style="height:${h}px;background:var(--a2);" title="${d}: ${v.toLocaleString()} steps"></div>`;
+  }).join('');
+  html+=`<div class="spark-row"><div class="spark-label">STEPS</div><div class="spark-avg">${stepsAvgStr}</div><div class="spark-bars">${stepsBars}</div></div>`;
+  // Sleep (merged checkins sleepHoursLogged + healthLogs sleepHours)
+  const sleepVals=days30.map(d=>{
+    const ci=ciByDate[d];if(ci?.sleepHoursLogged!=null)return ci.sleepHoursLogged;
+    const hl=hlByDate[d];if(hl?.sleepHours!=null)return hl.sleepHours;
+    return null;
+  });
+  const sleepFiltered=sleepVals.filter(v=>v!=null);
+  const sleepAvg=sleepFiltered.length?sleepFiltered.reduce((a,b)=>a+b,0)/sleepFiltered.length:null;
+  const sleepAvgStr=sleepAvg!=null?sleepAvg.toFixed(1)+'h avg':'-';
+  const sleepMax=12;
+  const sleepBars=days30.map((d,i)=>{
+    const v=sleepVals[i];
+    if(v==null)return `<div class="spark-bar empty" style="height:4px;"></div>`;
+    const pct=Math.max(0.05,Math.min(1,v/sleepMax));
+    const h=Math.round(pct*28);
+    const color=v>=7?'var(--a3)':v>=6?'var(--a)':'var(--red)';
+    return `<div class="spark-bar" style="height:${h}px;background:${color};" title="${d}: ${v}h sleep"></div>`;
+  }).join('');
+  html+=`<div class="spark-row"><div class="spark-label">SLEEP</div><div class="spark-avg">${sleepAvgStr}</div><div class="spark-bars">${sleepBars}</div></div>`;
+  // Exercise minutes
+  const exVals=days30.map(d=>hlByDate[d]?.exerciseMinutes||null);
+  const exFiltered=exVals.filter(v=>v!=null);
+  const exAvg=exFiltered.length?Math.round(exFiltered.reduce((a,b)=>a+b,0)/exFiltered.length):null;
+  const exAvgStr=exAvg!=null?exAvg+' min avg':'-';
+  const exMax=exFiltered.length?Math.max(...exFiltered,1):60;
+  const exBars=days30.map((d,i)=>{
+    const v=exVals[i];
+    if(v==null)return `<div class="spark-bar empty" style="height:4px;"></div>`;
+    const pct=Math.max(0.05,Math.min(1,v/Math.max(exMax,1)));
+    const h=Math.round(pct*28);
+    return `<div class="spark-bar" style="height:${h}px;background:#a855f7;" title="${d}: ${v} min exercise"></div>`;
+  }).join('');
+  html+=`<div class="spark-row"><div class="spark-label">EXERCISE</div><div class="spark-avg">${exAvgStr}</div><div class="spark-bars">${exBars}</div></div>`;
+  el.innerHTML=html;
 }
 
 function renderRecoveryHistoryCharts(){
@@ -1823,6 +1943,17 @@ function initCheckinTab(){
     if(se('ci-motivation')){se('ci-motivation').value=existing.motivation;se('ci-motivation-val').textContent=existing.motivation;}
   }
   updateFatiguePreview();
+  const today2=new Date().toISOString().split('T')[0];
+  const todayCheckin=(D.checkins||[]).find(c=>c.date===today2);
+  if(todayCheckin?.sleepHoursLogged){
+    const h=Math.floor(todayCheckin.sleepHoursLogged);
+    const m=Math.round((todayCheckin.sleepHoursLogged-h)*60);
+    const si=document.getElementById('ci-sleep-input');if(si)si.value=`${h}:${String(m).padStart(2,'0')}`;
+  }
+  const todayBody=(D.bodyMetrics||[]).find(b=>b.date===today2);
+  if(todayBody?.weightLbs){const wi=document.getElementById('ci-weight');if(wi)wi.value=todayBody.weightLbs;}
+  if(todayBody?.waistInches){const wai=document.getElementById('ci-waist');if(wai)wai.value=todayBody.waistInches;}
+  if(todayBody)updateBodyCalcs();
 }
 
 function updateTodayPreview(){
@@ -2180,6 +2311,62 @@ function renderWeekNav(){
   if(bbEl) bbEl.innerHTML=`<span style="font-family:var(--mono);font-size:10px;padding:3px 12px;border-radius:4px;background:${phase.color}18;color:${phase.color};border:1px solid ${phase.color}40;">W${phase.weekNum} · ${phase.label}</span>`;
   renderWeekNavLifts(offset);
 }
+function formatSleepInput(input){
+  let val=input.value.replace(/[^0-9]/g,'');
+  if(val.length>=3){val=val.substring(0,2)+':'+val.substring(2,4);}
+  input.value=val;
+}
+function parseSleepHHMM(str){
+  if(!str||!str.includes(':'))return null;
+  const parts=str.split(':');
+  const hours=parseInt(parts[0]);
+  const mins=parseInt(parts[1]||'0');
+  if(isNaN(hours)||isNaN(mins))return null;
+  return Math.round((hours+mins/60)*100)/100;
+}
+function updateBodyCalcs(){
+  const weight=parseFloat(document.getElementById('ci-weight')?.value);
+  const waist=parseFloat(document.getElementById('ci-waist')?.value);
+  if(weight&&!isNaN(weight)){
+    const bmi=Math.round((weight*703)/(HEIGHT_INCHES*HEIGHT_INCHES)*10)/10;
+    const bmiEl=document.getElementById('ci-bmi-display');
+    if(bmiEl){bmiEl.textContent=bmi;bmiEl.style.color=bmi<18.5?'var(--a2)':bmi<25?'var(--a3)':bmi<30?'var(--a)':'var(--a4)';}
+  }
+  if(waist&&!isNaN(waist)){
+    const whr=Math.round((waist/HEIGHT_INCHES)*100)/100;
+    const whrEl=document.getElementById('ci-whr-display');
+    if(whrEl){whrEl.textContent=whr;whrEl.style.color=whr<0.4?'var(--a2)':whr<0.5?'var(--a3)':whr<0.6?'var(--a)':'var(--a4)';}
+  }
+}
+function renderBodyChart(type='weight'){
+  const metrics=D.bodyMetrics||[];
+  const card=document.getElementById('body-metrics-card');
+  if(!card)return;
+  if(!metrics.length){card.style.display='none';return;}
+  card.style.display='block';
+  document.querySelectorAll('[id^="body-chart-"]').forEach(b=>b.classList.remove('active'));
+  const ab=document.getElementById('body-chart-'+type);if(ab)ab.classList.add('active');
+  const canvas=document.getElementById('body-chart');
+  if(!canvas||typeof Chart==='undefined')return;
+  if(window._bodyChart){window._bodyChart.destroy();window._bodyChart=null;}
+  const labels=metrics.map(m=>m.date);
+  const legendEl=document.getElementById('body-chart-legend');
+  if(type==='weight'){
+    const data=metrics.map(m=>m.weightLbs);
+    const latest=data.filter(v=>v).slice(-1)[0];
+    window._bodyChart=new Chart(canvas,{type:'line',data:{labels,datasets:[{label:'Weight (lbs)',data,borderColor:'rgba(255,183,77,0.8)',backgroundColor:'rgba(255,183,77,0.06)',borderWidth:2,pointRadius:4,tension:0.3,spanGaps:true},{label:'Current',data:labels.map(()=>latest),borderColor:'rgba(255,183,77,0.3)',borderDash:[5,5],borderWidth:1,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    if(legendEl)legendEl.textContent=latest?`Current: ${latest} lbs`:'';
+  }else if(type==='waist'){
+    const data=metrics.map(m=>m.waistInches);
+    window._bodyChart=new Chart(canvas,{type:'line',data:{labels,datasets:[{label:'Waist (in)',data,borderColor:'rgba(79,195,247,0.8)',backgroundColor:'rgba(79,195,247,0.06)',borderWidth:2,pointRadius:4,tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    if(legendEl)legendEl.textContent='';
+  }else{
+    const data=metrics.map(m=>m.bmi);
+    window._bodyChart=new Chart(canvas,{type:'line',data:{labels,datasets:[{label:'BMI',data,borderColor:'rgba(127,255,110,0.8)',backgroundColor:'rgba(127,255,110,0.06)',borderWidth:2,pointRadius:4,tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:15,max:40,ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    if(legendEl)legendEl.innerHTML='<span style="color:var(--a3);">18.5–25 healthy</span> · <span style="color:var(--a);">25–30 overweight</span> · <span style="color:var(--a4);">>30 obese</span>';
+  }
+}
+function setBodyChart(type){renderBodyChart(type);}
 function renderHealthLog(){
   const logs=D.healthLogs||[];
   if(logs.length===0) return;
