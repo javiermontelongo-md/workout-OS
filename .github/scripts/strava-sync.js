@@ -57,22 +57,33 @@ function localDateStr(date) {
 
 function classifyRunType(activity) {
   const name = (activity.name || '').toLowerCase();
-  const distance = activity.distance / 1609.34; // meters to miles
-  const duration = activity.moving_time; // seconds
+  const distanceMiles = activity.distance / 1609.34;
+  const durationSeconds = activity.moving_time;
+  const hrAvg = activity.average_heartrate || null;
+
+  if (distanceMiles >= 6) return 'long';
 
   if (name.includes('400m') || name.includes('interval') || name.includes('repeat') ||
-      name.includes('track') || name.includes('speed')) {
+      name.includes('track') || name.includes('speed') || name.includes('fartlek')) {
     return 'intervals';
   }
-
-  if (name.includes('tempo') || name.includes('threshold')) {
+  if (name.includes('tempo') || name.includes('threshold') || name.includes('lactate')) {
     return 'tempo';
   }
+  if (name.includes('easy') || name.includes('recovery') || name.includes('zone 2') ||
+      name.includes('zone2') || name.includes('regeneration')) {
+    return 'easy';
+  }
+  if (name.includes('long') || name.includes('lsd')) return 'long';
 
-  if (distance >= 6 || duration >= 3000) {
-    return 'long';
+  if (hrAvg) {
+    if (hrAvg >= 165) return 'intervals';
+    if (hrAvg >= 155) return 'tempo';
+    if (hrAvg >= 148) return 'moderate';
+    return 'easy';
   }
 
+  if (durationSeconds >= 3000) return 'long';
   return 'easy';
 }
 
@@ -103,9 +114,9 @@ async function main() {
   const accessToken = tokenRes.access_token;
   console.log('Access token obtained.');
 
-  // 2. Fetch activities from last 30 days
-  const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60);
-  const activitiesUrl = `https://www.strava.com/api/v3/athlete/activities?after=${thirtyDaysAgo}&per_page=50`;
+  // 2. Fetch activities from last 60 days
+  const sixtyDaysAgo = Math.floor(Date.now() / 1000) - (60 * 24 * 60 * 60);
+  const activitiesUrl = `https://www.strava.com/api/v3/athlete/activities?after=${sixtyDaysAgo}&per_page=100`;
 
   console.log('Fetching Strava activities...');
   const activities = await httpsGet(activitiesUrl, {
