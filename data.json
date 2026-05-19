@@ -548,111 +548,103 @@
   ],
   "stravaLastSync": "2026-05-19T17:30:46.143Z",
   "adaptivePlanCache": {
-    "narrative": "Week 2 of strength emphasis building on last week's bench work. Your easy runs are being performed at threshold HR (165-175) when they should be conversational Zone 2 (130-145). This is sabotaging both recovery and aerobic base development.",
-    "weeklyFocus": "Run easy runs EASY: HR must stay 130-145 bpm, walk breaks mandatory if drift occurs",
-    "autoRegulationRule": "If easy run average HR exceeds 150 bpm, next run must include 1 min walk breaks every 5 minutes",
+    "narrative": "Your biometrics show significant recovery concerns: resting HR is 12 bpm above baseline (64 vs 52) and wrist temp is massively elevated (+95.7°C is clearly a sensor error, but any deviation flags stress). Recent runs show you're running threshold effort (HR 165-171) when trying to go easy. This week we prioritize genuine aerobic development at true Zone 2 and manage fatigue.",
+    "weeklyFocus": "Establish true easy pace discipline (HR 130-145) and monitor recovery markers daily",
+    "autoRegulationRule": "If resting HR remains >60 bpm tomorrow, convert Thursday intervals to easy run and reduce all lift volumes by 1 set",
     "lifts": {
       "bench": {
-        "weight": 195,
+        "weight": 192.5,
         "sets": 4,
         "reps": 4,
         "targetRPE": 8,
         "variation": "Barbell Bench Press",
         "trend": "up",
         "confidence": "medium",
-        "coachNote": "190×5@7 was solid. Moving to 4×4 at higher intensity. Control eccentric, explode up."
+        "coachNote": "Last session 190×5@7 was strong. Small jump to build on that momentum. Stop set immediately if bar speed slows."
       },
       "ohp": {
         "weight": 90,
-        "sets": 4,
-        "reps": 4,
-        "targetRPE": 7.5,
+        "sets": 3,
+        "reps": 5,
+        "targetRPE": 7,
         "variation": "Barbell OHP",
         "trend": "flat",
         "confidence": "low",
-        "coachNote": "Conservative start. Strict form, no leg drive. Brace hard at bottom."
+        "coachNote": "Conservative start given no recent data. Focus on keeping elbows forward and full lockout overhead."
       },
       "squat": {
-        "weight": 165,
+        "weight": 160,
         "sets": 4,
         "reps": 4,
-        "targetRPE": 8,
+        "targetRPE": 7,
         "variation": "Back Squat",
-        "trend": "up",
+        "trend": "flat",
         "confidence": "low",
-        "coachNote": "Building from estimated e1RM 215. Focus on depth and bracing. Bar speed indicator."
+        "coachNote": "Moderate load to assess movement quality. Hit depth every rep, maintain neutral spine throughout."
       },
       "dl": {
-        "weight": 165,
+        "weight": 160,
         "sets": 3,
         "reps": 4,
-        "targetRPE": 8,
+        "targetRPE": 7,
         "variation": "Conventional Deadlift",
-        "trend": "up",
+        "trend": "flat",
         "confidence": "low",
-        "coachNote": "Match squat progression. Reset each rep. Lat tension throughout pull."
+        "coachNote": "Same as squat weight—this is intentional given fatigue markers. Film a set to check setup and lockout pattern."
       }
     },
     "runs": {
       "tuesday": {
         "type": "easy",
         "targetHR": "130-145",
-        "targetPace": "12:00-13:00/mile",
+        "targetPace": "11:45-13:00/mile",
         "duration": 30,
-        "coachNote": "SLOW DOWN. If HR climbs above 145, take 1 min walk breaks. Goal is aerobic base, not fitness demonstration. Conversational throughout."
+        "coachNote": "This will feel SLOW. Walk if HR climbs above 145. The goal is actual aerobic adaptation, not cardiovascular fatigue. Check HR every 5 minutes."
       },
       "thursday": {
-        "type": "intervals",
-        "workout": "8 × 400m with 90s rest",
-        "targetPace": "7:15-7:30/mile per rep",
-        "warmup": "10 min easy jog + 4 strides",
-        "cooldown": "10 min easy",
-        "coachNote": "Based on current fitness. Hit 1:49-1:53 per 400m. If pace falls off >5s, stop at 6 reps. Recovery jog between."
+        "type": "easy",
+        "targetHR": "130-145",
+        "targetPace": "11:45-13:00/mile",
+        "duration": 35,
+        "coachNote": "Converted from intervals due to elevated resting HR. You need aerobic base work more than speed right now. No intervals until recovery markers normalize."
       },
       "saturday": {
         "type": "long",
         "distance": 5,
         "targetHR": "135-150",
         "targetPace": "11:30-12:30/mile",
-        "coachNote": "Build aerobic capacity. First half HR 135-145, can drift to 150 second half. Walk 1 min at miles 2 and 4 to control drift."
+        "coachNote": "Reduced from typical long run volume. Start at 12:30 pace minimum. If HR drifts above 150 after mile 3, slow down further or walk 1 min every mile."
       }
     },
     "accessories": {
       "dayA": [
         "Face Pulls 3×15",
-        "Barbell Row 3×8 @RPE7",
-        "Pullups 3×AMRAP-2",
-        "Tricep Pushdown 3×12"
+        "Tricep Pushdown 3×12",
+        "Hammer Curls 3×10"
       ],
       "dayB": [
         "Bulgarian Split Squat 3×8 each",
         "Leg Curl 3×10",
-        "Pallof Press 3×10 each side",
-        "Calf Raises 3×20"
+        "Calf Raises 3×15",
+        "Pallof Press 3×10 each"
       ],
       "dayC": [
-        "Romanian DL 3×8 @60% DL weight",
+        "Romanian DL 3×8",
         "Step-ups 3×10 each",
         "Copenhagen Plank 3×20s each",
         "Dead Bug 3×10 each",
-        "90/90 Hip Stretch 2×90s each"
+        "90/90 Hip Stretch 2min each side"
       ]
     },
-    "vo2maxEstimate": 31.7,
-    "estimated5KTime": "31:20",
-    "recoveryFlag": "CRITICAL: Easy runs performed at threshold pace. Must slow down to HR 130-145 or aerobic development and recovery will continue to be compromised.",
+    "vo2maxEstimate": 48.5,
+    "estimated5KTime": "21:45",
+    "recoveryFlag": "ELEVATED RESTING HR (+12 bpm above baseline) — all runs must stay true easy pace with strict HR caps. Monitor daily and report any fatigue, soreness, or motivation drops.",
     "generatedDate": "2026-05-19",
     "blockWeek": {
       "weekNum": 2,
       "label": "Strength Emphasis"
     },
     "schedule": [
-      {
-        "date": "2026-05-18",
-        "dayType": "A",
-        "isRest": false,
-        "wasShifted": false
-      },
       {
         "date": "2026-05-19",
         "dayType": "run_easy",
@@ -813,6 +805,12 @@
         "date": "2026-06-14",
         "dayType": "rest",
         "isRest": true,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-15",
+        "dayType": "A",
+        "isRest": false,
         "wasShifted": false
       }
     ]
