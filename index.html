@@ -478,6 +478,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="lbl" style="margin:0;">adaptive plan</div>
       <span id="ap-confidence"></span>
     </div>
+    <div id="ap-recovery-flag" style="display:none;font-family:var(--mono);font-size:11px;background:rgba(255,183,77,.08);border:1px solid rgba(255,183,77,.25);border-radius:6px;padding:8px 12px;margin-bottom:12px;"></div>
     <div style="margin-bottom:16px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <button class="btn bs" id="wn-prev" onclick="weekNavNav(-1)" style="padding:5px 12px;font-size:15px;line-height:1;">←</button>
@@ -1329,13 +1330,23 @@ function calcRunMetrics(){
 }
 function renderRunMetricsSummary(){
   const el=document.getElementById('run-metrics-summary');if(!el)return;
-  const metrics=calcRunMetrics();
   const syncEl=document.getElementById('run-last-sync');
   if(syncEl)syncEl.textContent=D.stravaLastSync?new Date(D.stravaLastSync).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'never';
-  if(!metrics){el.innerHTML='<div style="grid-column:1/-1;font-family:var(--mono);font-size:11px;color:var(--t3);padding:8px 0;">No run data yet — Strava syncs automatically overnight once configured.</div>';return;}
-  const sec5k=metrics.estimated5KSeconds;
+  const plan=window._adaptivePlan;
+  const localMetrics=calcRunMetrics();
+  const totalRuns=(D.runs||[]).filter(r=>r.type==='run'&&r.distance>=1).length;
+  // Prefer AI plan values if available, fall back to local calculation
+  const estimated5KTime=plan?.estimated5KTime||localMetrics?.estimated5KTime||null;
+  const vo2maxEstimate=plan?.vo2maxEstimate||localMetrics?.vo2maxEstimate||null;
+  if(!estimated5KTime&&!vo2maxEstimate&&!totalRuns){
+    el.innerHTML='<div style="grid-column:1/-1;font-family:var(--mono);font-size:11px;color:var(--t3);padding:8px 0;">No run data yet — Strava syncs automatically overnight once configured.</div>';
+    return;
+  }
+  const parseTime=t=>{if(!t)return Infinity;const p=String(t).split(':');return p.length===2?+p[0]*60+ +p[1]:Infinity;};
+  const sec5k=parseTime(estimated5KTime);
   const tColor=sec5k<1200?'var(--a3)':sec5k<1500?'var(--a)':'var(--t2)';
-  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${metrics.estimated5KTime}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv b" style="font-size:18px;">${metrics.vo2maxEstimate}</div><div class="sl">Est. VO2max</div></div><div class="stat"><div class="sv g" style="font-size:18px;">${metrics.totalRuns}</div><div class="sl">Total runs</div></div>`;
+  const vo2Color=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
+  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div><div class="sl">Est. VO2max</div></div><div class="stat"><div class="sv g" style="font-size:18px;">${totalRuns}</div><div class="sl">Total runs</div></div>`;
 }
 function renderRunChart(type='pace'){
   const canvas=document.getElementById('run-chart');
@@ -1394,50 +1405,149 @@ function buildSchedule(){
 }
 
 function buildLocalPlan(){
+  // AI owns all numbers — restore cached plan if available, else minimal skeleton
+  if(D.adaptivePlanCache&&D.adaptivePlanCache.lifts){
+    const plan=Object.assign({},D.adaptivePlanCache);
+    plan.blockWeek=detectBlockWeek();
+    plan.schedule=buildSchedule();
+    window._adaptivePlan=plan;
+    return plan;
+  }
   const blockWeek=detectBlockWeek();
-  const bench=predictLift('bench',blockWeek),ohp=predictLift('ohp',blockWeek),squat=predictLift('squat',blockWeek),dl=predictLift('dl',blockWeek);
-  const accessories={day1:[getAccessoryVariation('bench'),getAccessoryVariation('ohp')],day2:[getAccessoryVariation('squat'),getAccessoryVariation('dl')]};
-  const schedule=buildSchedule();
-  const plan={generatedDate:new Date().toISOString().split('T')[0],blockWeek,schedule,lifts:{bench,ohp,squat,dl},accessories,narrative:D.adaptivePlanCache?.narrative||null};
+  const plan={generatedDate:null,blockWeek,schedule:buildSchedule(),lifts:null,runs:null,narrative:null};
   window._adaptivePlan=plan;
   return plan;
 }
 
-async function generateAdaptivePlan(){
-  const btn=document.getElementById('ap-gen-btn'),msgEl=document.getElementById('ap-gen-msg'),guidText=document.getElementById('wk-guid-text');
-  if(btn){btn.disabled=true;btn.textContent='Generating...';}
-  if(guidText) guidText.innerHTML='<div class="spin"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Generating...</span></div>';
-  const plan=buildLocalPlan();
-  const {blockWeek,lifts:{bench,ohp,squat,dl}}=plan;
-  const last3=(D.sessions||[]).slice(-3).map(s=>`${s.date} Day${s.day} RPE${s.rpe||'?'}`).join('; ')||'No recent sessions';
-  const recentCheckins=(D.checkins||[]).slice(-7).filter(c=>c);
-  const avgSleep=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.sleep,0)/recentCheckins.length).toFixed(1):'no data';
-  const avgEnergy=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.energy,0)/recentCheckins.length).toFixed(1):'no data';
-  const avgFatigue=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.fatigueScore,0)/recentCheckins.length).toFixed(1):'no data';
-  const shifted=plan.schedule.filter(d=>d.wasShifted).length;
-  const schedNote=shifted?`${shifted} day(s) shifted due to missed sessions`:'Schedule on track';
-  const runMetrics=calcRunMetrics();
-  const recentRuns=(D.runs||[]).slice(-3).map(r=>`${r.date} ${r.runType||'run'} ${r.distance}mi @${Math.floor(r.pace/60)}:${String(r.pace%60).padStart(2,'0')}/mi`).join('; ')||'No recent runs logged';
-  const lastLongRun=(D.runs||[]).filter(r=>r.runType==='long').slice(-1)[0];
-  const lastLongStr=lastLongRun?`${lastLongRun.distance}mi @ ${Math.floor(lastLongRun.pace/60)}:${String(lastLongRun.pace%60).padStart(2,'0')}/mi`:'none yet';
+function buildPlanContext(){
+  const sessions=D.sessions||[],runs=D.runs||[],checkins=D.checkins||[];
+  const blockWeek=detectBlockWeek();
+  const recentSessions=sessions.slice(-8).map(s=>({
+    date:s.date,dayType:s.day||s.dayType,rpe:s.rpe,energy:s.energy,sleep:s.sleep,
+    bench:s.bench?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
+    ohp:s.ohp?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
+    squat:s.squat?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
+    dl:s.dl?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
+    pullups:s.pullups||null
+  }));
+  const recentRuns=runs.slice(-10).map(r=>({
+    date:r.date,type:r.runType,distance:r.distance,
+    pace:r.pace?`${Math.floor(r.pace/60)}:${String(r.pace%60).padStart(2,'0')}/mile`:null,
+    hrAvg:r.heartRateAvg,hrMax:r.heartRateMax,name:r.name
+  }));
+  const longRuns=runs.filter(r=>r.type==='run'&&r.distance>=4&&r.heartRateAvg);
+  let vo2max=null;
+  if(longRuns.length){const best=longRuns[longRuns.length-1];const spd=(best.distance*1609.34)/best.duration;vo2max=Math.round((spd*209.3/best.heartRateAvg)*10)/10;}
+  const recentCheckins=checkins.slice(-7);
+  const avgSleep=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.sleep,0)/recentCheckins.length).toFixed(1):null;
+  const avgEnergy=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.energy,0)/recentCheckins.length).toFixed(1):null;
+  const avgFatigue=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.fatigueScore,0)/recentCheckins.length).toFixed(1):null;
+  const rpeConfirmations=(D.rpeConfirmations||[]).slice(-20);
   const trainingMode=document.getElementById('mode-sel')?.value||'normal';
-  const prompt=`You are Javier's strength and running coach. PGY-1 IM resident targeting sub-20 5K and VO2max improvement while maintaining compound strength.\n\nCURRENT BLOCK: Week ${blockWeek.weekNum}/4 — ${blockWeek.label}\nTRAINING MODE: ${trainingMode}${(trainingMode==='high_stress'||trainingMode==='minimum')?'\nIMPORTANT: Demanding rotation. Protect recovery. Reduce run intensity. Lifting to maintenance only.':''}\n\nLIFT PREDICTIONS:\n- Lift A (Mon): Bench ${bench.sets}x${bench.reps} @ ${bench.weight}lb (trend: ${bench.trend})\n- Lift A (Mon): OHP ${ohp.sets}x${ohp.reps} @ ${ohp.weight}lb\n- Lift B (Wed): Squat ${squat.sets}x${squat.reps} @ ${squat.weight}lb (trend: ${squat.trend})\n- Lift C (Fri): Deadlift ${dl.sets}x${dl.reps} @ ${dl.weight}lb (trend: ${dl.trend})\n\nRUNNING BASELINE:\n- Estimated 5K: ${runMetrics?.estimated5KTime||'not enough data'} (target: sub-20:00)\n- Estimated VO2max: ${runMetrics?.vo2maxEstimate||'--'} (target: 50+)\n- Recent runs: ${recentRuns}\n- Last long run: ${lastLongStr}\n\nLAST 3 SESSIONS: ${last3}\nRECOVERY (last 7 days): avg sleep ${avgSleep}h, avg energy ${avgEnergy}/10, avg fatigue ${avgFatigue}/10\nSCHEDULE NOTE: ${schedNote}\n\nCross-training rules: Heavy squat day creates 24-48h fatigue affecting Thu run. Long runs >8mi need 48h before hard lifting. Sleep <6h reduces all session intensity. ICU rotation — protect sleep above all.\n\nWrite:\n1. One paragraph (3-4 sentences) on this week's training focus across both lifting and running\n2. One auto-regulation rule based on the data\n3. One recovery priority\n\nUnder 160 words. Be specific to the numbers above.`;
-  const narrative=await ai(prompt);
-  plan.narrative=narrative;
-  D.adaptivePlanCache=plan;
-  window._adaptivePlan=plan;
-  if(CFG.tok){
-    try{
-      const ir=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
-      if(ir.ok){const info=await ir.json();D.lastUpdated=new Date().toISOString().split('T')[0];const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'Adaptive plan cache update',content:enc,sha:info.sha})});}
-    }catch(e){console.warn('Silent push failed:',e.message);}
+  const liftBests={bench:0,ohp:0,squat:0,dl:0};
+  sessions.forEach(s=>{['bench','ohp','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if(set.w&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
+  if(!liftBests.bench)liftBests.bench=255;if(!liftBests.ohp)liftBests.ohp=120;if(!liftBests.squat)liftBests.squat=215;if(!liftBests.dl)liftBests.dl=215;
+  return{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,totalSessions:sessions.length,totalRuns:runs.length};
+}
+
+function buildPlanPrompt(ctx){
+  const{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests}=ctx;
+  const sessLines=recentSessions.map(s=>`${s.date} [${s.dayType}] RPE:${s.rpe||'?'} Energy:${s.energy||'?'} Sleep:${s.sleep||'?'}h\n  Bench:${s.bench||'none'} OHP:${s.ohp||'none'} Squat:${s.squat||'none'} DL:${s.dl||'none'}`).join('\n')||'No sessions yet';
+  const runLines=recentRuns.map(r=>`${r.date} [${r.type||'?'}] ${r.distance}mi @ ${r.pace||'?'} · HR avg ${r.hrAvg||'?'} max ${r.hrMax||'?'} (${r.name||''})`).join('\n')||'No runs logged';
+  const rpeLines=rpeConfirmations.length?rpeConfirmations.map(r=>`${r.lift}: predicted ${r.predictedRPE} actual ${r.actualRPE} @ ${r.weight}lb`).join('\n'):'No RPE confirmations yet';
+  return`You are Javier's personal strength and running coach. PGY-1 IM resident in Philadelphia.
+
+GOALS: Maximize bench/OHP/row/pullups/squat/deadlift strength. Sub-20 min 5K. VO2max 50+. Long-term injury prevention.
+
+PROGRAM: Mon=Lift A (Bench+OHP+Row+Pullups), Tue=Easy Run, Wed=Lift B (Squat), Thu=Quality Run, Fri=Lift C (Deadlift+prevention), Sat=Long Run, Sun=Rest.
+
+CURRENT BLOCK: Week ${blockWeek.weekNum}/4 — ${blockWeek.label}
+TRAINING MODE: ${trainingMode}
+
+LIFT BESTS (e1RM): Bench ${liftBests.bench}lb · OHP ${liftBests.ohp}lb · Squat ${liftBests.squat}lb · DL ${liftBests.dl}lb
+
+RECENT SESSIONS (last 8):
+${sessLines}
+
+RECENT RUNS (last 10):
+${runLines}
+
+RECOVERY (last 7 days): Sleep avg ${avgSleep||'?'}h · Energy avg ${avgEnergy||'?'}/10 · Fatigue avg ${avgFatigue||'?'}/10
+
+VO2MAX ESTIMATE: ${vo2max||'unknown'} ml/kg/min (target 50+)
+
+RPE CALIBRATION:
+${rpeLines}
+
+IMPORTANT: Recent easy runs show HR 165-171 bpm — that is threshold, NOT Zone 2. Zone 2 for Javier is HR 130-145. Easy run prescriptions must reflect this.
+
+Output ONLY a valid JSON object. No markdown, no explanation, no text outside the JSON.
+
+Schema (use exact field names):
+{"narrative":"2-3 sentence overview","weeklyFocus":"single most important thing this week","autoRegulationRule":"one concrete rule based on data","lifts":{"bench":{"weight":192.5,"sets":4,"reps":4,"targetRPE":8,"variation":"Barbell Bench Press","trend":"up","confidence":"medium","coachNote":"specific instruction"},"ohp":{"weight":90,"sets":3,"reps":5,"targetRPE":8,"variation":"Barbell OHP","trend":"flat","confidence":"low","coachNote":""},"squat":{"weight":160,"sets":4,"reps":4,"targetRPE":8,"variation":"Back Squat","trend":"flat","confidence":"low","coachNote":""},"dl":{"weight":160,"sets":3,"reps":4,"targetRPE":8,"variation":"Conventional Deadlift","trend":"flat","confidence":"low","coachNote":""}},"runs":{"tuesday":{"type":"easy","targetHR":"130-145","targetPace":"11:30-12:30/mile","duration":35,"coachNote":"specific instruction"},"thursday":{"type":"intervals","workout":"8 × 400m with 90s rest","targetPace":"6:30-7:00/mile per rep","warmup":"10 min easy","cooldown":"10 min easy","coachNote":"specific instruction"},"saturday":{"type":"long","distance":5.5,"targetHR":"140-155","targetPace":"11:00-12:00/mile","coachNote":"specific instruction"}},"accessories":{"dayA":["Face Pulls 3×15","Tricep Pushdown 3×10","Hammer Curls 3×10"],"dayB":["Bulgarian Split Squat 3×8 each","Leg Curl 3×10","Calf Raises 3×15","Pallof Press 3×10 each"],"dayC":["Romanian DL 3×8","Step-ups 3×10 each","Copenhagen Plank 3×20s each","Dead Bug 3×8 each","Hip Flexor Protocol 2min each"]},"vo2maxEstimate":31.7,"estimated5KTime":"31:20","recoveryFlag":null}
+
+Rules: weights in lb rounded to nearest 2.5 · pace strings MM:SS/mile · duration in minutes · trend must be up/flat/down · confidence must be high/medium/low · recoveryFlag null if fine or a warning string · if blockWeek 4 reduce all weights 35-40% and all runs easy · if fewer than 3 sessions use baseline values with confidence low · Thursday type→easy if last squat RPE>8 OR avgFatigue>7 OR mode is high_stress/minimum`;
+}
+
+function parsePlanResponse(response){
+  try{
+    const clean=response.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const start=clean.indexOf('{'),end=clean.lastIndexOf('}');
+    if(start===-1||end===-1)return null;
+    const plan=JSON.parse(clean.slice(start,end+1));
+    if(!plan.lifts||!plan.runs||!plan.narrative)return null;
+    return plan;
+  }catch(e){console.error('Plan parse error:',e.message,response.slice(0,200));return null;}
+}
+
+async function pushSilent(){
+  if(!CFG.tok)return;
+  try{
+    const ir=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
+    if(!ir.ok)return;
+    const info=await ir.json();
+    D.lastUpdated=new Date().toISOString().split('T')[0];
+    const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));
+    await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'AI plan cache update',content:enc,sha:info.sha})});
+  }catch(e){console.warn('Silent push failed:',e.message);}
+}
+
+async function generateAdaptivePlan(){
+  const btn=document.getElementById('ap-gen-btn'),msgEl=document.getElementById('ap-gen-msg');
+  if(btn){btn.disabled=true;btn.textContent='Generating...';}
+  if(msgEl){msgEl.textContent='Analyzing your training data...';msgEl.style.color='var(--t3)';}
+  try{
+    const ctx=buildPlanContext();
+    const prompt=buildPlanPrompt(ctx);
+    if(msgEl)msgEl.textContent='Generating your personalized plan...';
+    // Call API directly with higher token limit for JSON response
+    const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
+    if(!apiKey)throw new Error('No API key — add it in Settings');
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2000,system:'You are a strength and running coach. Output only valid JSON. No prose outside the JSON object.',messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    if(d.error)throw new Error('API error: '+d.error.message);
+    const response=d.content?.[0]?.text||'';
+    const plan=parsePlanResponse(response);
+    if(!plan)throw new Error('Could not parse AI response as JSON. Raw: '+response.slice(0,300));
+    plan.generatedDate=new Date().toISOString().split('T')[0];
+    plan.blockWeek=ctx.blockWeek;
+    plan.schedule=buildSchedule();
+    window._adaptivePlan=plan;
+    D.adaptivePlanCache=plan;
+    await pushSilent();
+    renderAdaptivePlan();
+    renderWeekNav();
+    renderProgramTab();
+    renderCalendar();
+    renderRunMetricsSummary();
+    updateLogTabPlanned();
+    if(msgEl){msgEl.textContent='Plan updated ✓';msgEl.style.color='var(--a3)';setTimeout(()=>{msgEl.textContent='';},3000);}
+  }catch(err){
+    console.error('Plan generation failed:',err);
+    if(msgEl){msgEl.textContent='Failed: '+err.message;msgEl.style.color='var(--a4)';}
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Generate AI Plan';}
   }
-  if(btn){btn.disabled=false;btn.textContent='Generate AI Plan';}
-  if(msgEl) msgEl.textContent=narrative?'Plan generated — '+new Date().toLocaleTimeString():'Add API key in Settings for narrative';
-  renderAdaptivePlan();
-  renderWeekNav();
-  renderPredictionChart();
-  renderProgramTab();
 }
 
 async function confirmRPE(lift,actualRPE){
@@ -1460,14 +1570,26 @@ async function confirmRPE(lift,actualRPE){
 function renderAdaptivePlan(){
   const plan=window._adaptivePlan;
   if(!plan) return;
-  const {blockWeek,lifts}=plan;
+  const{lifts}=plan;
+  // Confidence badge
   const confEl=document.getElementById('ap-confidence');
-  if(confEl){const c=lifts.bench.confidence;confEl.innerHTML=`<span class="ap-confidence-badge ${c}">${c.toUpperCase()}</span>`;}
+  if(confEl&&lifts?.bench){const c=lifts.bench.confidence||'low';confEl.innerHTML=`<span class="ap-confidence-badge ${c}">${c.toUpperCase()}</span>`;}
+  // Recovery flag banner (shown at top of adaptive plan card if AI flagged something)
+  const flagEl=document.getElementById('ap-recovery-flag');
+  if(flagEl){
+    if(plan.recoveryFlag){flagEl.style.display='block';flagEl.innerHTML=`<span style="color:var(--a);">⚠ ${plan.recoveryFlag}</span>`;}
+    else{flagEl.style.display='none';}
+  }
+  // Week Coach narrative — structured output
   const guidText=document.getElementById('wk-guid-text');
   if(guidText){
-    const narrative=plan.narrative||D.adaptivePlanCache?.narrative;
-    if(narrative){guidText.innerHTML=narrative.replace(/\n\n/g,'</p><p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:8px;">').replace(/\n/g,'<br>');guidText.style.fontStyle='normal';guidText.style.color='var(--t2)';}
-    else{guidText.textContent='Tap "Generate AI Plan" to get your personalized weekly narrative and store your plan.';guidText.style.fontStyle='italic';guidText.style.color='var(--t3)';}
+    if(plan.narrative){
+      let html=`<p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">${plan.narrative}</p>`;
+      if(plan.weeklyFocus) html+=`<p style="font-size:12px;color:var(--t2);margin-bottom:6px;"><span style="font-family:var(--mono);font-size:10px;color:var(--a);letter-spacing:.06em;">THIS WEEK:</span> ${plan.weeklyFocus}</p>`;
+      if(plan.autoRegulationRule) html+=`<p style="font-size:12px;color:var(--t2);margin-bottom:6px;"><span style="font-family:var(--mono);font-size:10px;color:var(--a2);letter-spacing:.06em;">AUTO-REGULATION:</span> ${plan.autoRegulationRule}</p>`;
+      if(plan.recoveryFlag) html+=`<p style="font-size:12px;color:var(--a);margin-bottom:0;"><span style="font-family:var(--mono);font-size:10px;letter-spacing:.06em;">⚠ FLAG:</span> ${plan.recoveryFlag}</p>`;
+      guidText.innerHTML=html;guidText.style.fontStyle='normal';guidText.style.color='var(--t2)';
+    }else{guidText.textContent='Tap "Generate AI Plan" to get your personalized weekly plan.';guidText.style.fontStyle='italic';guidText.style.color='var(--t3)';}
   }
 }
 
@@ -1509,9 +1631,9 @@ function setChartLift(lift){
 }
 
 function updateLogTabPlanned(){
-  const plan=window._adaptivePlan;if(!plan)return;
+  const plan=window._adaptivePlan;if(!plan?.lifts)return;
   const {bench,ohp,squat,dl}=plan.lifts;
-  const upd=(id,l)=>{const el=document.getElementById(id);if(el)el.textContent=`Planned: ${l.sets}x${l.reps} @ ${l.weight}`;};
+  const upd=(id,l)=>{if(!l)return;const el=document.getElementById(id);if(el)el.textContent=`Planned: ${l.sets}x${l.reps} @ ${l.weight}`;};
   upd('planned-bench',bench);upd('planned-ohp',ohp);upd('planned-squat',squat);upd('planned-dl',dl);
 }
 
@@ -1635,14 +1757,15 @@ function initCheckinTab(){
 }
 
 function updateTodayPreview(){
-  const plan=window._adaptivePlan;if(!plan)return;
+  const plan=window._adaptivePlan;if(!plan?.lifts)return;
   const day=document.getElementById('today-day')?.value;
-  if(day!=='1'&&day!=='2')return;
+  if(!['A','B','C'].includes(day))return;
   const el=document.getElementById('day-prev');if(!el)return;
   const {bench,ohp,squat,dl}=plan.lifts;
   let targets='';
-  if(day==='1'){targets=`Bench ${bench.weight}lb · ${bench.sets}x${bench.reps} · RPE ~${bench.targetRPE}`;if(ohp)targets+=` &nbsp;|&nbsp; OHP ${ohp.weight}lb · ${ohp.sets}x${ohp.reps}`;}
-  else{targets=`Squat ${squat.weight}lb · ${squat.sets}x${squat.reps} · RPE ~${squat.targetRPE}`;if(dl)targets+=` &nbsp;|&nbsp; DL ${dl.weight}lb · ${dl.sets}x${dl.reps}`;}
+  if(day==='A'){targets=`Bench ${bench?.weight||'?'}lb · ${bench?.sets||'?'}×${bench?.reps||'?'} · RPE ~${bench?.targetRPE||'?'}`;if(ohp)targets+=` &nbsp;|&nbsp; OHP ${ohp.weight}lb · ${ohp.sets}×${ohp.reps}`;}
+  else if(day==='B'){targets=`Squat ${squat?.weight||'?'}lb · ${squat?.sets||'?'}×${squat?.reps||'?'} · RPE ~${squat?.targetRPE||'?'}`;}
+  else{targets=`Deadlift ${dl?.weight||'?'}lb · ${dl?.sets||'?'}×${dl?.reps||'?'} · RPE ~${dl?.targetRPE||'?'}`;}
   const banner=`<div style="background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.2);border-radius:8px;padding:9px 12px;margin-bottom:10px;font-family:var(--mono);font-size:11px;color:var(--a);">Adaptive targets: ${targets}</div>`;
   const cur=el.innerHTML;
   if(cur.startsWith('<div style="background:rgba(255,183,77')){el.innerHTML=banner+cur.replace(/^<div style="background:rgba\(255,183,77[^>]*>[^<]*<\/div>/,'');}
@@ -1702,36 +1825,48 @@ function getDayProgram(dayType){
     exs.push({name:'Dead Bug',prescription:'3×8 each side · slow',note:'Core stability for running posture',isPrimary:false,trend:null,confidence:null,isRun:false});
     exs.push({name:'Hip Flexor Protocol',prescription:'2min each side · hold + contract',note:'Running posture — do this every Friday',isPrimary:false,trend:null,confidence:null,isRun:false});
   } else if(effectiveDT==='run_easy'){
-    exs.push({name:'Warm-up Walk',prescription:'5 min · let HR settle',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-    exs.push({name:'Zone 2 Run',prescription:'30-45 min · HR 130-150 · conversational pace',note:'If HR drifts above 150, slow down or walk',isPrimary:true,trend:null,confidence:null,isRun:true});
-    exs.push({name:'Cool-down',prescription:'5 min walk + calf stretch',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+    const pr=plan?.runs?.tuesday;
+    if(pr){
+      exs.push({name:'Warm-up Walk',prescription:'5 min · let HR settle',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+      exs.push({name:'Zone 2 Run',prescription:`${pr.duration||35} min · HR ${pr.targetHR||'130-145'} · ${pr.targetPace||'conversational pace'}`,note:pr.coachNote||'If HR drifts above target, slow down or walk',isPrimary:true,trend:null,confidence:null,isRun:true});
+      exs.push({name:'Cool-down',prescription:'5 min walk + calf stretch',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+    } else {
+      exs.push({name:'Warm-up Walk',prescription:'5 min · let HR settle',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+      exs.push({name:'Zone 2 Run',prescription:'30-45 min · HR 130-145 · conversational pace',note:'Generate AI Plan for personalized prescription',isPrimary:true,trend:null,confidence:null,isRun:true});
+      exs.push({name:'Cool-down',prescription:'5 min walk + calf stretch',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+    }
   } else if(effectiveDT==='run_quality'){
-    const blockWeek=plan?.blockWeek||detectBlockWeek();
-    const recentCheckin=(D.checkins||[]).slice(-1)[0];
-    const soreness=recentCheckin?.soreness||0;
-    const lastWedSess=(D.sessions||[]).filter(s=>{ const d=new Date(s.date+'T12:00:00'); return d.getDay()===3&&(s.day==='B'||s.day===3); }).slice(-1)[0];
-    const wedRPE=lastWedSess?.rpe||0;
-    const trainingMode=document.getElementById('mode-sel')?.value||'normal';
-    const forceEasy=(wedRPE>8||soreness>6||trainingMode==='minimum'||trainingMode==='high_stress');
-    const wk=blockWeek.weekNum;
-    if(forceEasy||wk===4){
-      exs.push({name:'Zone 2 Easy Run',prescription:'35-45 min · HR under 145 · easy pace',note:forceEasy?'Heavy squat/fatigue — protecting recovery today':'Deload week — easy only',isPrimary:true,trend:null,confidence:null,isRun:true});
-    } else if(wk===1||wk===3){
-      exs.push({name:'Warm-up',prescription:'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-      exs.push({name:'400m Repeats',prescription:'8-12 × 400m · 90s rest between · current fitness pace',note:'Last rep should feel like you could do one more',isPrimary:true,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Cool-down',prescription:'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+    const pr=plan?.runs?.thursday;
+    if(pr){
+      if(pr.type==='easy'){
+        exs.push({name:'Easy Zone 2 Run',prescription:`${pr.workout||'30-40 min Zone 2 only'} · HR ${pr.targetHR||'130-145'}`,note:pr.coachNote||'Recovery day — protect Thursday',isPrimary:true,trend:null,confidence:null,isRun:true});
+      } else if(pr.type==='intervals'){
+        exs.push({name:'Warm-up',prescription:pr.warmup||'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+        exs.push({name:'Intervals',prescription:`${pr.workout||'8 × 400m · 90s rest'} · ${pr.targetPace||'current pace'}`,note:pr.coachNote||null,isPrimary:true,trend:null,confidence:null,isRun:true});
+        exs.push({name:'Cool-down',prescription:pr.cooldown||'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+      } else {
+        exs.push({name:'Warm-up',prescription:pr.warmup||'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+        exs.push({name:'Tempo Run',prescription:`${pr.workout||'20-25 min threshold'} · ${pr.targetPace||'comfortably hard'}`,note:pr.coachNote||null,isPrimary:true,trend:null,confidence:null,isRun:true});
+        exs.push({name:'Cool-down',prescription:pr.cooldown||'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+      }
     } else {
       exs.push({name:'Warm-up',prescription:'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Tempo Run',prescription:'20-25 min · comfortably hard · ~7:30-8:00/mile target',note:'Should be able to say 3-4 words but not hold conversation',isPrimary:true,trend:null,confidence:null,isRun:true});
+      exs.push({name:'Quality Run',prescription:'Generate AI Plan for this week\'s prescription',note:null,isPrimary:true,trend:null,confidence:null,isRun:true});
       exs.push({name:'Cool-down',prescription:'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
     }
   } else if(effectiveDT==='run_long'){
-    const recentLongRuns=(D.runs||[]).filter(r=>r.runType==='long').slice(-4);
-    const lastLongDistance=recentLongRuns.length?recentLongRuns[recentLongRuns.length-1].distance:4;
-    const blockWeek=plan?.blockWeek||detectBlockWeek();
-    const targetDistance=blockWeek.weekNum===4?Math.round(lastLongDistance*0.5*2)/2:Math.round((lastLongDistance+0.5)*2)/2;
-    exs.push({name:'Long Run',prescription:`${targetDistance} miles · easy pace · HR under 155`,note:'No watch pressure — run by feel and HR',isPrimary:true,trend:null,confidence:null,isRun:true});
-    exs.push({name:'Post-run',prescription:'5 min walk + full stretch protocol',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+    const pr=plan?.runs?.saturday;
+    if(pr){
+      exs.push({name:'Long Run',prescription:`${pr.distance||5} miles · HR ${pr.targetHR||'140-155'} · ${pr.targetPace||'easy pace'}`,note:pr.coachNote||'Run by feel and HR — no ego pacing',isPrimary:true,trend:null,confidence:null,isRun:true});
+      exs.push({name:'Post-run',prescription:'5 min walk + full stretch protocol',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+    } else {
+      const recentLongRuns=(D.runs||[]).filter(r=>r.runType==='long').slice(-4);
+      const lastLongDistance=recentLongRuns.length?recentLongRuns[recentLongRuns.length-1].distance:4;
+      const bw=plan?.blockWeek||detectBlockWeek();
+      const targetDistance=bw.weekNum===4?Math.round(lastLongDistance*0.5*2)/2:Math.round((lastLongDistance+0.5)*2)/2;
+      exs.push({name:'Long Run',prescription:`${targetDistance} miles · easy pace · HR under 155`,note:'Generate AI Plan for personalized prescription',isPrimary:true,trend:null,confidence:null,isRun:true});
+      exs.push({name:'Post-run',prescription:'5 min walk + full stretch protocol',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+    }
   }
   return exs;
 }
@@ -1927,13 +2062,23 @@ function renderWeekNavLifts(offset){
       return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">e1RM ${l.e1rm} lb</div></div><div class="ap-lift-right"><div class="ap-lift-weight" style="color:var(--t);">${l.weight} lb</div><div class="ap-lift-detail">${l.sets||'?'}×${l.reps} · RPE ${l.rpe||'?'}</div><div class="ap-trend up">✓ logged</div></div></div>`;
     }).join('');
   } else if(offset===0){
-    const {lifts}=plan;
+    if(!plan.lifts){
+      liftsEl.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--t3);text-align:center;padding:16px 0;">Generate AI Plan to see this week\'s prescriptions</div>';
+      return;
+    }
+    const{lifts}=plan;
     liftsEl.innerHTML=lds.map(ld=>{
-      const l=lifts[ld.key],acc=getAccessoryVariation(ld.key);
+      const l=lifts[ld.key];
+      if(!l) return '';
       const ta=l.trend==='up'?'↑ progressing':l.trend==='down'?'↓ declining':'→ steady';
-      return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">${acc.name} · suggested</div></div><div class="ap-lift-right"><div class="ap-lift-weight">${l.weight} lb</div><div class="ap-lift-detail">${l.sets}×${l.reps} · RPE ~${l.targetRPE} target</div><div class="ap-trend ${l.trend}">${ta}</div></div></div>`;
+      const note=l.coachNote?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:4px;font-style:italic;">${l.coachNote}</div>`:'';
+      return `<div class="ap-lift-row"><div style="flex:1;"><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">${l.variation||ld.name}</div>${note}</div><div class="ap-lift-right"><div class="ap-lift-weight">${l.weight} lb</div><div class="ap-lift-detail">${l.sets}×${l.reps} · RPE ~${l.targetRPE}</div><div class="ap-trend ${l.trend}">${ta}</div></div></div>`;
     }).join('');
   } else {
+    if(!plan.lifts){
+      liftsEl.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--t3);text-align:center;padding:16px 0;">Generate AI Plan to see projections</div>';
+      return;
+    }
     const proj=getPlannedLiftsForWeek(offset);
     liftsEl.innerHTML=lds.map(ld=>{
       const l=proj[ld.key];
