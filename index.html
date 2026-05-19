@@ -563,6 +563,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
     <div id="run-metrics-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
     <div style="position:relative;height:200px;"><canvas id="run-chart"></canvas></div>
+    <div id="run-chart-legend"></div>
     <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
   </div>
   <div class="card"><div class="lbl">session history</div><div id="all-sessions"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div></div>
@@ -1385,7 +1386,8 @@ function renderRunMetricsSummary(){
   const vo2Color=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
   const vo2Pct=vo2maxEstimate?Math.min(100,Math.round((vo2maxEstimate/55)*100)):0;
   const vo2BarColor=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
-  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div><div class="sl">Est. VO2max</div><div class="pbw" style="margin-top:8px;"><div class="pbl"><span>Target 55</span><span>${vo2Pct}%</span></div><div class="pbb"><div class="pbf" style="width:${vo2Pct}%;background:${vo2BarColor};"></div></div></div></div><div class="stat"><div class="sv g" style="font-size:18px;">${totalRuns}</div><div class="sl">Total runs</div></div>`;
+  const appleVO2=(D.healthLogs||[]).filter(h=>h.vo2maxApple).slice(-1)[0]?.vo2maxApple;
+  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div><div class="sl">Est. VO2max (HR reserve)</div>${appleVO2?`<div style="font-family:var(--mono);font-size:10px;color:rgba(200,255,0,0.9);margin-top:4px;">Apple Watch: ${appleVO2} ml/kg/min</div>`:''}<div class="pbw" style="margin-top:8px;"><div class="pbl"><span>Target 55</span><span>${vo2Pct}%</span></div><div class="pbb"><div class="pbf" style="width:${vo2Pct}%;background:${vo2BarColor};"></div></div></div></div><div class="stat"><div class="sv g" style="font-size:18px;">${totalRuns}</div><div class="sl">Total runs</div></div>`;
 }
 function renderRunChart(type='pace'){
   const canvas=document.getElementById('run-chart');
@@ -1409,17 +1411,22 @@ function renderRunChart(type='pace'){
     const bgColors=runs.map(r=>typeColors[r.runType]||'rgba(255,183,77,0.6)');
     window._runChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'Distance (mi)',data:runs.map(r=>r.distance),backgroundColor:bgColors,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
   } else {
-    const weeklyVO2=[];const weeklyLabels=[];
-    const byWeek={};
-    runs.forEach(r=>{
-      const d=new Date(r.date+'T12:00:00');const dow=d.getDay();
-      const mon=new Date(d);mon.setDate(d.getDate()-((dow+6)%7));
-      const wk=localDS(mon);
-      if(!byWeek[wk])byWeek[wk]=[];
-      const v=estimateVO2max(r);if(v)byWeek[wk].push(v);else{const pm=r.pace/60;if(pm>0)byWeek[wk].push(Math.round(483/pm));}
+    const vo2RunMap={};
+    (D.runs||[]).filter(r=>r.type==='run'&&r.heartRateAvg&&r.distance>=1).forEach(r=>{
+      const v=estimateVO2max(r);if(v){if(!vo2RunMap[r.date])vo2RunMap[r.date]=[];vo2RunMap[r.date].push(v);}
     });
-    Object.keys(byWeek).sort().forEach(wk=>{const arr=byWeek[wk];if(!arr.length)return;arr.sort((a,b)=>a-b);const med=arr[Math.floor(arr.length/2)];weeklyLabels.push(wk);weeklyVO2.push(med);});
-    window._runChart=new Chart(canvas,{type:'line',data:{labels:weeklyLabels,datasets:[{label:'Est. VO2max',data:weeklyVO2,borderColor:'rgba(79,195,247,0.8)',backgroundColor:'rgba(79,195,247,0.08)',borderWidth:2,pointRadius:4,tension:0.3},{label:'Target VO2max 55',data:weeklyLabels.map(()=>55),borderColor:'rgba(127,255,110,0.4)',borderDash:[5,5],borderWidth:1.5,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    const appleMap={};
+    (D.healthLogs||[]).filter(h=>h.vo2maxApple).forEach(h=>{appleMap[h.date]=h.vo2maxApple;});
+    const allDates=[...new Set([...Object.keys(vo2RunMap),...Object.keys(appleMap)])].sort();
+    const calcData=allDates.map(d=>vo2RunMap[d]?Math.round(vo2RunMap[d].reduce((a,b)=>a+b,0)/vo2RunMap[d].length*10)/10:null);
+    const appleData=allDates.map(d=>appleMap[d]||null);
+    const legendEl=document.getElementById('run-chart-legend');
+    if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--t3);"><span style="color:rgba(0,212,255,0.8);">── Calculated (runs)</span><span style="color:rgba(200,255,0,0.8);">- - Apple Watch</span><span style="border-left:2px dashed var(--t3);padding-left:6px;">│ Target 55</span></div>';
+    window._runChart=new Chart(canvas,{type:'line',data:{labels:allDates,datasets:[
+      {label:'Calculated (HR reserve)',data:calcData,borderColor:'rgba(0,212,255,0.8)',backgroundColor:'rgba(0,212,255,0.06)',borderWidth:2,pointRadius:4,spanGaps:false,tension:0.3},
+      {label:'Apple Watch',data:appleData,borderColor:'rgba(200,255,0,0.8)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,5],pointRadius:3,spanGaps:true,tension:0.3},
+      {label:'Target 55',data:allDates.map(()=>55),borderColor:'rgba(127,255,110,0.3)',borderDash:[3,6],borderWidth:1,pointRadius:0}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,filter:i=>i.raw!==null}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:10},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:30,ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
   }
 }
 function setRunChart(type){renderRunChart(type);}
