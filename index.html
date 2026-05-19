@@ -283,7 +283,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <button class="tab" onclick="gT('week',this)">THIS WEEK</button>
     <button class="tab" onclick="gT('progress',this)">PROGRESS</button>
     <button class="tab" onclick="gT('program',this)">PROGRAM</button>
-    <button class="tab" onclick="gT('recovery',this)">RECOVERY</button>
+    <button class="tab" onclick="gT('recovery',this)" style="display:none">RECOVERY</button>
     <button class="tab" onclick="gT('milestones',this)">MILESTONES</button>
     <button class="tab" onclick="gT('settings',this)">SETTINGS</button>
   </div>
@@ -403,6 +403,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
   <div class="card"><div class="lbl">ai coach</div><div id="today-out"><div class="air"><div class="al">TRAINING COACH</div><p>Check your fatigue score above first. If moderate or higher, reduce working weight 5-10% and protect bar speed over ego.</p><p><strong>Recovery rules the program.</strong> Sustainable training during residency beats optimal training every time. A 70% effort session that happens is worth more than a perfect session that doesn't.</p></div></div><div class="brow"><button class="btn bs bi" onclick="genToday()">Regenerate</button></div></div>
+  <div class="g2">
+    <div class="card"><div class="lbl" style="color:var(--a);">reduce if:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>Fatigue score above 70</div><div>Sleep average below 6 hours</div><div>Performance declining 2+ weeks</div><div>Persistent joint soreness</div><div>Cardio metrics regressing</div><div>Severe residency stress (ICU, nights)</div></div></div>
+    <div class="card"><div class="lbl" style="color:var(--a3);">reduction order:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>1. Reduce volume first</div><div>2. Reduce intensity second</div><div>3. Reduce frequency third</div><div>4. Switch to minimum viable</div></div><div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:var(--r);font-size:12px;color:var(--a);line-height:1.6;">Reduced training is always preferred over missed training. Consistency during residency IS success.</div></div>
+  </div>
 </div>
 
 <!-- v2026-05-17 19:25:02 -->
@@ -708,10 +712,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="ig"><label>Notes</label><textarea id="rec-notes" placeholder="What is driving recovery debt? Residency stress, poor sleep run, illness?"></textarea></div>
     <button class="sbtn" id="rec-sbtn" onclick="saveRecovery()">Save recovery log to GitHub</button>
     <div class="smsg" id="rec-smsg"></div>
-  </div>
-  <div class="g2">
-    <div class="card"><div class="lbl" style="color:var(--a);">reduce if:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>Fatigue score above 70</div><div>Sleep average below 6 hours</div><div>Performance declining 2+ weeks</div><div>Persistent joint soreness</div><div>Cardio metrics regressing</div><div>Severe residency stress (ICU, nights)</div></div></div>
-    <div class="card"><div class="lbl" style="color:var(--a3);">reduction order:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>1. Reduce volume first</div><div>2. Reduce intensity second</div><div>3. Reduce frequency third</div><div>4. Switch to minimum viable</div></div><div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:var(--r);font-size:12px;color:var(--a);line-height:1.6;">Reduced training is always preferred over missed training. Consistency during residency IS success.</div></div>
   </div>
   <div class="card"><div class="lbl">recovery log history</div><div id="rec-hist"><div style="font-size:12px;color:var(--t3);font-style:italic;">No recovery logs yet.</div></div></div>
 </div>
@@ -1869,10 +1869,24 @@ function renderSnapshotCharts(){
   const container=document.getElementById('snapshot-charts');
   if(!container)return;
 
-  const logs=(D.healthLogs||[]).slice(-30);
-  const checkins=D.checkins||[];
+  const hlMap={};
+  (D.healthLogs||[]).forEach(h=>{hlMap[h.date]=h;});
+  const ciMap={};
+  (D.checkins||[]).forEach(c=>{ciMap[c.date]=c;});
 
-  if(logs.length<3){
+  // Build last 30 calendar days
+  const dates=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date();
+    d.setDate(d.getDate()-i);
+    const y=d.getFullYear();
+    const mo=String(d.getMonth()+1).padStart(2,'0');
+    const dd=String(d.getDate()).padStart(2,'0');
+    dates.push(`${y}-${mo}-${dd}`);
+  }
+
+  const hasData=Object.keys(hlMap).length>0||Object.keys(ciMap).length>0;
+  if(!hasData){
     container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px 0;">No health data yet — sync via Shortcut or export</div>';
     return;
   }
@@ -1887,6 +1901,7 @@ function renderSnapshotCharts(){
       <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
         <span style="color:rgba(34,197,94,0.8);">── Actual sleep</span>
         <span style="margin-left:10px;">- - Optimal 7h – 7h30m</span>
+        <span style="margin-left:10px;color:rgba(255,183,77,0.6);">- - 30d avg</span>
       </div>
     </div>
     <div style="margin-bottom:12px;">
@@ -1901,14 +1916,24 @@ function renderSnapshotCharts(){
         <span style="margin-left:8px;">- - Avg</span>
       </div>
     </div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;">Heart Rate · 30 days</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);" id="snap-hr-avg"></div>
+      </div>
+      <div style="position:relative;height:140px;"><canvas id="snap-hr-chart"></canvas></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
+        <span style="color:rgba(255,99,71,0.8);">── Resting HR (L, bpm)</span>
+        <span style="margin-left:8px;color:rgba(255,183,77,0.8);">── Walking HR (R, bpm)</span>
+        <span style="margin-left:8px;">- - Avg</span>
+      </div>
+    </div>
   `;
-
-  const dates=logs.map(l=>l.date);
 
   // ── SLEEP CHART ──
   const sleepData=dates.map(date=>{
-    const ci=checkins.find(c=>c.date===date);
-    const hl=logs.find(l=>l.date===date);
+    const ci=ciMap[date];
+    const hl=hlMap[date];
     return ci?.sleepHours||hl?.sleepHours||null;
   });
   const validSleep=sleepData.filter(v=>v!==null);
@@ -1925,7 +1950,8 @@ function renderSnapshotCharts(){
         datasets:[
           {label:'Sleep',data:sleepData,borderColor:'rgba(34,197,94,0.8)',backgroundColor:'rgba(34,197,94,0.1)',pointRadius:2,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
           {label:'Optimal min',data:dates.map(()=>7),borderColor:'rgba(34,197,94,0.35)',borderDash:[4,4],pointRadius:0,fill:false,tension:0},
-          {label:'Optimal max',data:dates.map(()=>7.5),borderColor:'rgba(34,197,94,0.35)',borderDash:[4,4],pointRadius:0,fill:'-1',backgroundColor:'rgba(34,197,94,0.06)',tension:0}
+          {label:'Optimal max',data:dates.map(()=>7.5),borderColor:'rgba(34,197,94,0.35)',borderDash:[4,4],pointRadius:0,fill:'-1',backgroundColor:'rgba(34,197,94,0.06)',tension:0},
+          {label:'30d avg',data:dates.map(()=>avgSleep?parseFloat(avgSleep):null),borderColor:'rgba(255,183,77,0.6)',borderDash:[6,3],pointRadius:0,fill:false,tension:0,spanGaps:true}
         ]
       },
       options:{
@@ -1944,8 +1970,8 @@ function renderSnapshotCharts(){
   }
 
   // ── STEPS + EXERCISE CHART ──
-  const stepsData=dates.map(date=>logs.find(x=>x.date===date)?.steps||null);
-  const exerciseData=dates.map(date=>logs.find(x=>x.date===date)?.exerciseMinutes||null);
+  const stepsData=dates.map(date=>hlMap[date]?.steps||null);
+  const exerciseData=dates.map(date=>hlMap[date]?.exerciseMinutes||null);
   const validSteps=stepsData.filter(v=>v!==null);
   const validExercise=exerciseData.filter(v=>v!==null);
   const avgSteps=validSteps.length?Math.round(validSteps.reduce((s,v)=>s+v,0)/validSteps.length):null;
@@ -1980,6 +2006,48 @@ function renderSnapshotCharts(){
           x:{ticks:{color:'#4a5068',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'}},
           ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.6)',font:{size:9},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.04)'}},
           yExercise:{type:'linear',position:'right',ticks:{color:'rgba(168,85,247,0.6)',font:{size:9},callback:function(v){return v+'m';}},grid:{display:false}}
+        }
+      }
+    });
+  }
+
+  // ── HEART RATE CHART ──
+  const restingHRData=dates.map(date=>hlMap[date]?.restingHR||null);
+  const walkingHRData=dates.map(date=>hlMap[date]?.walkingHR||null);
+  const validResting=restingHRData.filter(v=>v!==null);
+  const validWalking=walkingHRData.filter(v=>v!==null);
+  const avgResting=validResting.length?Math.round(validResting.reduce((s,v)=>s+v,0)/validResting.length):null;
+  const avgWalking=validWalking.length?Math.round(validWalking.reduce((s,v)=>s+v,0)/validWalking.length):null;
+
+  const hrAvgEl=document.getElementById('snap-hr-avg');
+  if(hrAvgEl){
+    const parts=[];
+    if(avgResting)parts.push('RHR '+avgResting+' bpm');
+    if(avgWalking)parts.push('WHR '+avgWalking+' bpm');
+    hrAvgEl.textContent=parts.join(' · ');
+  }
+
+  const hrCtx=document.getElementById('snap-hr-chart')?.getContext('2d');
+  if(hrCtx&&(validResting.length>0||validWalking.length>0)){
+    new Chart(hrCtx,{
+      type:'line',
+      data:{
+        labels:dates,
+        datasets:[
+          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,99,71,0.8)',backgroundColor:'rgba(255,99,71,0.05)',pointRadius:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
+          {label:'Resting avg',data:avgResting?dates.map(()=>avgResting):[],borderColor:'rgba(255,99,71,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResting'},
+          {label:'Walking HR',data:walkingHRData,borderColor:'rgba(255,183,77,0.8)',backgroundColor:'rgba(255,183,77,0.05)',pointRadius:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yWalking'},
+          {label:'Walking avg',data:avgWalking?dates.map(()=>avgWalking):[],borderColor:'rgba(255,183,77,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0,yAxisID:'yWalking'}
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+        scales:{
+          x:{ticks:{color:'#4a5068',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'}},
+          yResting:{type:'linear',position:'left',min:40,max:80,ticks:{color:'rgba(255,99,71,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.04)'}},
+          yWalking:{type:'linear',position:'right',min:80,max:140,ticks:{color:'rgba(255,183,77,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{display:false}}
         }
       }
     });
