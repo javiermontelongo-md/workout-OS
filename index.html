@@ -1400,9 +1400,10 @@ function renderRunChart(type='pace'){
     const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
     return;
   }
-  const typeColors={easy:'rgba(127,255,110,0.8)',long:'rgba(79,195,247,0.8)',intervals:'rgba(255,183,77,0.8)',tempo:'rgba(255,183,77,0.8)'};
+  const typeColors={easy:'rgba(127,255,110,0.8)',long:'rgba(79,195,247,0.8)',intervals:'rgba(255,183,77,0.8)',tempo:'rgba(255,183,77,0.8)',moderate:'rgba(206,147,216,0.8)'};
   const labels=runs.map(r=>r.date);
   if(type==='pace'){
+    const legendEl=document.getElementById('run-chart-legend');if(legendEl)legendEl.innerHTML='';
     const data=runs.map(r=>+(r.pace/60).toFixed(2));
     const pointColors=runs.map(r=>typeColors[r.runType]||'rgba(255,183,77,0.8)');
     const targetPace=6.43;
@@ -1410,6 +1411,8 @@ function renderRunChart(type='pace'){
   } else if(type==='distance'){
     const bgColors=runs.map(r=>typeColors[r.runType]||'rgba(255,183,77,0.6)');
     window._runChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'Distance (mi)',data:runs.map(r=>r.distance),backgroundColor:bgColors,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    const legendEl=document.getElementById('run-chart-legend');
+    if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--t3);"><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(127,255,110,0.8);margin-right:4px;"></span>Easy — Zone 2</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(79,195,247,0.8);margin-right:4px;"></span>Long — weekly long run</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,183,77,0.8);margin-right:4px;"></span>Intervals / Tempo</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(206,147,216,0.8);margin-right:4px;"></span>Moderate</span></div>';
   } else {
     const vo2RunMap={};
     (D.runs||[]).filter(r=>r.type==='run'&&r.heartRateAvg&&r.distance>=1).forEach(r=>{
