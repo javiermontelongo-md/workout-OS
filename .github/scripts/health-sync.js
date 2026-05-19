@@ -18,9 +18,54 @@ async function main() {
   try {
     healthData = JSON.parse(healthDataRaw);
   } catch(e) {
-    console.error('Failed to parse health data:', e);
-    process.exit(1);
+    console.log('Direct parse failed, attempting cleanup:', e.message);
+    try {
+      let cleaned = healthDataRaw
+        .replace(/:\s*\[object Object\]/g, ':null')
+        .replace(/:\s*undefined/g, ':null')
+        .replace(/,\s*}/g, '}')
+        .replace(/,\s*,/g, ',')
+        .trim();
+      healthData = JSON.parse(cleaned);
+      console.log('Cleaned parse succeeded');
+    } catch(e2) {
+      console.error('Failed to parse health data after cleanup:', e2.message);
+      console.error('Raw data received:', healthDataRaw.substring(0, 500));
+      process.exit(1);
+    }
   }
+
+  function extractNumber(val) {
+    if (val === null || val === undefined) return null;
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+      const n = parseFloat(val);
+      return isNaN(n) ? null : n;
+    }
+    if (typeof val === 'object') {
+      return val.value ?? val.Value ?? val.quantity ?? null;
+    }
+    return null;
+  }
+
+  healthData = {
+    date: healthData.date || new Date().toISOString().split('T')[0],
+    restingHR: extractNumber(healthData.restingHR),
+    hrv: extractNumber(healthData.hrv),
+    wristTemp: extractNumber(healthData.wristTemp),
+    sleepHours: extractNumber(healthData.sleepHours),
+    steps: extractNumber(healthData.steps),
+    exerciseMinutes: extractNumber(healthData.exerciseMinutes),
+    walkingHR: extractNumber(healthData.walkingHR),
+    respiratoryRate: extractNumber(healthData.respiratoryRate),
+    vo2max: extractNumber(healthData.vo2max)
+  };
+
+  if (healthData.date && healthData.date.length > 10) {
+    healthData.date = healthData.date.substring(0, 10);
+  }
+
+  console.log('Processed health data:', JSON.stringify(healthData));
 
   const dataPath = './data.json';
   let data = {};
