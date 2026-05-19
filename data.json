@@ -816,5 +816,25 @@
         "wasShifted": false
       }
     ]
-  }
+  },
+  "healthLogs": [
+    {
+      "date": "2026-05-19",
+      "restingHR": 64,
+      "hrv": 51.58468058676428,
+      "wristTemp": 95.7130538940429,
+      "sleepHours": null,
+      "sleepDeep": null,
+      "sleepREM": null,
+      "sleepLight": null,
+      "sleepAwake": null,
+      "steps": 25374,
+      "exerciseMinutes": 86,
+      "walkingHR": 109,
+      "respiratoryRate": 15.5,
+      "vo2maxApple": null,
+      "source": "apple_health"
+    }
+  ],
+  "healthLastSync": "2026-05-19T18:05:32.732Z"
 }
