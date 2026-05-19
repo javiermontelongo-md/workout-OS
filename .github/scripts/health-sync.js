@@ -63,7 +63,7 @@ async function main() {
     process.exit(0);
   }
 
-  console.log('Raw data preview:', healthDataRaw.substring(0, 300));
+  console.log('Raw data preview:', healthDataRaw.substring(0, 2000));
 
   const date = extractDate(healthDataRaw);
   const restingHR = extractSimpleNumber(healthDataRaw, 'restingHR');
