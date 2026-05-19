@@ -1460,31 +1460,9 @@ async function confirmRPE(lift,actualRPE){
 function renderAdaptivePlan(){
   const plan=window._adaptivePlan;
   if(!plan) return;
-  const {blockWeek,lifts,accessories,schedule}=plan;
-  const bwEl=document.getElementById('ap-block-week');
-  if(bwEl){const wl=['VOLUME','STRENGTH','PEAK','DELOAD'];bwEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">${[1,2,3,4].map(w=>`<div class="ap-week-cell${w===blockWeek.weekNum?' current':''}"><div class="ap-week-num">W${w}</div><div class="ap-week-lbl">${wl[w-1]}</div></div>`).join('')}</div>`;}
+  const {blockWeek,lifts}=plan;
   const confEl=document.getElementById('ap-confidence');
   if(confEl){const c=lifts.bench.confidence;confEl.innerHTML=`<span class="ap-confidence-badge ${c}">${c.toUpperCase()}</span>`;}
-  const liftsEl=document.getElementById('ap-lifts');
-  if(liftsEl){
-    const lds=[{key:'bench',name:'BENCH PRESS'},{key:'ohp',name:'OVERHEAD PRESS'},{key:'squat',name:'BACK SQUAT'},{key:'dl',name:'DEADLIFT'}];
-    liftsEl.innerHTML=lds.map(ld=>{
-      const l=lifts[ld.key],acc=getAccessoryVariation(ld.key);
-      const ta=l.trend==='up'?'↑ progressing':l.trend==='down'?'↓ declining':'→ steady';
-      return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">${acc.name} · suggested</div></div><div class="ap-lift-right"><div class="ap-lift-weight">${l.weight} lb</div><div class="ap-lift-detail">${l.sets}×${l.reps} · RPE ~${l.targetRPE} target</div><div class="ap-trend ${l.trend}">${ta}</div></div></div>`;
-    }).join('');
-  }
-  const accEl=document.getElementById('ap-accessories');
-  if(accEl){
-    const d1=accessories.day1.map(a=>`<div style="font-size:12px;color:var(--t2);padding:3px 0;">${a.name} ${a.setsReps}</div>`).join('');
-    const d2=accessories.day2.map(a=>`<div style="font-size:12px;color:var(--t2);padding:3px 0;">${a.name} ${a.setsReps}</div>`).join('');
-    accEl.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:6px;">ACCESSORIES — suggested, swap if equipment unavailable</div><div class="g2"><div><div style="font-size:10px;color:var(--a);font-family:var(--mono);margin-bottom:4px;">DAY 1</div>${d1}</div><div><div style="font-size:10px;color:var(--a);font-family:var(--mono);margin-bottom:4px;">DAY 2</div>${d2}</div></div>`;
-  }
-  const schedEl=document.getElementById('ap-schedule');
-  if(schedEl){
-    const n14=schedule.slice(0,14),today=new Date().toISOString().split('T')[0],da=['SUN','MON','TUE','WED','THU','FRI','SAT'];
-    schedEl.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">NEXT 14 DAYS</div><div class="wkg">${n14.map(d=>{const dt=new Date(d.date+'T12:00:00');const cls='dc'+(d.date===today?' today':'')+(d.isRest?' rest':'');const badge=d.wasShifted?'<span class="ap-shift-badge">shifted</span>':'';const lbl=d.isRest?`<div class="dt rt">REST</div>`:`<div class="dt st">Day ${d.dayType}${badge}</div>`;return `<div class="${cls}" style="min-width:70px;flex:0 0 70px;"><div class="dn">${da[dt.getDay()]}</div><div class="dd">${dt.getDate()}</div>${lbl}</div>`;}).join('')}</div>`;
-  }
   const guidText=document.getElementById('wk-guid-text');
   if(guidText){
     const narrative=plan.narrative||D.adaptivePlanCache?.narrative;
