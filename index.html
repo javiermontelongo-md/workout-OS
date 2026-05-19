@@ -81,6 +81,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .le{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:11px 14px;margin-bottom:8px;display:flex;gap:10px;}
 .ld{font-family:var(--mono);font-size:10px;color:var(--t3);white-space:nowrap;min-width:65px;margin-top:2px;}
 .lc{flex:1;}.lt{font-size:13px;color:var(--t);margin-bottom:2px;}.ldt{font-size:11px;color:var(--t2);}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b);font-size:12px;}.info-row:last-child{border-bottom:none;}.info-row-label{font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;}
 .wkg{display:flex;gap:8px;overflow-x:auto;margin-bottom:18px;padding-bottom:4px;scrollbar-width:none;}
 .wkg::-webkit-scrollbar{display:none;}
 .dc{background:var(--s2);border:1px solid var(--b);border-radius:var(--r);padding:11px 9px;min-height:100px;min-width:85px;flex:1;}
@@ -589,6 +590,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <div id="panel-recovery" class="panel">
   <div class="h1">Recovery &amp; <span>fatigue</span></div>
 
+  <!-- Apple Watch Health Log -->
+  <div class="card" id="health-log-card" style="display:none;margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="lbl" style="margin:0;">apple watch · last night</div>
+      <div id="health-sync-time" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
+    </div>
+    <div id="health-log-content"></div>
+  </div>
+
   <!-- Daily Check-in Input -->
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -841,7 +851,7 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,rpeConfirmations:[],checkins:[]}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null}; }
 
 // ============================================================
 // INIT
@@ -881,6 +891,7 @@ function onLoad(){
   renderSnapshotCharts();
   renderRecoveryHistoryCharts();
   renderProgramTab();
+  renderHealthLog();
 }
 
 // ============================================================
@@ -1315,8 +1326,14 @@ function getAccessoryVariation(liftKey){
 }
 
 function localDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function getRestingHR(){
+  const logs=(D.healthLogs||[]).filter(h=>h.restingHR);
+  if(logs.length===0) return 52;
+  const recent=logs.slice(-7);
+  return Math.round(recent.reduce((s,h)=>s+h.restingHR,0)/recent.length);
+}
 function estimateVO2max(run){
-  const HR_REST=52;
+  const HR_REST=getRestingHR();
   if(!run||!run.heartRateAvg||run.distance<2) return null;
   const speedMs=(run.distance*1609.34)/run.duration;
   const hrAvg=run.heartRateAvg;
@@ -1466,14 +1483,21 @@ function buildPlanContext(){
   const avgFatigue=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.fatigueScore,0)/recentCheckins.length).toFixed(1):null;
   const rpeConfirmations=(D.rpeConfirmations||[]).slice(-20);
   const trainingMode=document.getElementById('mode-sel')?.value||'normal';
+  const recentHealth=(D.healthLogs||[]).slice(-7);
+  const avgRestingHR=recentHealth.filter(h=>h.restingHR).length?Math.round(recentHealth.filter(h=>h.restingHR).reduce((s,h)=>s+h.restingHR,0)/recentHealth.filter(h=>h.restingHR).length):getRestingHR();
+  const avgHRV=recentHealth.filter(h=>h.hrv).length?Math.round(recentHealth.filter(h=>h.hrv).reduce((s,h)=>s+h.hrv,0)/recentHealth.filter(h=>h.hrv).length):null;
+  const latestHealth=recentHealth.length?recentHealth[recentHealth.length-1]:null;
+  const latestWristTemp=latestHealth?.wristTemp||null;
+  const avgExerciseMins=recentHealth.filter(h=>h.exerciseMinutes).length?Math.round(recentHealth.filter(h=>h.exerciseMinutes).reduce((s,h)=>s+h.exerciseMinutes,0)/recentHealth.filter(h=>h.exerciseMinutes).length):null;
+  const appleVO2max=recentHealth.filter(h=>h.vo2maxApple).length?recentHealth.filter(h=>h.vo2maxApple).slice(-1)[0].vo2maxApple:null;
   const liftBests={bench:0,ohp:0,squat:0,dl:0};
   sessions.forEach(s=>{['bench','ohp','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if(set.w&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
   if(!liftBests.bench)liftBests.bench=255;if(!liftBests.ohp)liftBests.ohp=120;if(!liftBests.squat)liftBests.squat=215;if(!liftBests.dl)liftBests.dl=215;
-  return{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,totalSessions:sessions.length,totalRuns:runs.length};
+  return{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,totalSessions:sessions.length,totalRuns:runs.length,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max};
 }
 
 function buildPlanPrompt(ctx){
-  const{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests}=ctx;
+  const{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max}=ctx;
   const sessLines=recentSessions.map(s=>`${s.date} [${s.dayType}] RPE:${s.rpe||'?'} Energy:${s.energy||'?'} Sleep:${s.sleep||'?'}h\n  Bench:${s.bench||'none'} OHP:${s.ohp||'none'} Squat:${s.squat||'none'} DL:${s.dl||'none'}`).join('\n')||'No sessions yet';
   const runLines=recentRuns.map(r=>`${r.date} [${r.type||'?'}] ${r.distance}mi @ ${r.pace||'?'} · HR avg ${r.hrAvg||'?'} max ${r.hrMax||'?'} (${r.name||''})`).join('\n')||'No runs logged';
   const rpeLines=rpeConfirmations.length?rpeConfirmations.map(r=>`${r.lift}: predicted ${r.predictedRPE} actual ${r.actualRPE} @ ${r.weight}lb`).join('\n'):'No RPE confirmations yet';
@@ -1494,9 +1518,22 @@ ${sessLines}
 RECENT RUNS (last 10):
 ${runLines}
 
-RECOVERY (last 7 days): Sleep avg ${avgSleep||'?'}h · Energy avg ${avgEnergy||'?'}/10 · Fatigue avg ${avgFatigue||'?'}/10
+RECOVERY & BIOMETRICS (last 7 days, Apple Watch Series 10):
+- Resting HR: ${avgRestingHR} bpm (baseline 52 — >57 = under-recovered)
+- HRV: ${avgHRV||'no data'} ms (drops >20% from baseline = reduce intensity)
+- Wrist temp deviation: ${latestWristTemp!==null?(latestWristTemp>0?'+':'')+latestWristTemp+'°C':'no data'} (>+0.5°C = elevated stress or illness)
+- Avg sleep: ${avgSleep||'?'}h total
+- Avg energy: ${avgEnergy||'?'}/10
+- Avg fatigue: ${avgFatigue||'?'}/10
+- Avg exercise minutes/day: ${avgExerciseMins||'?'} min (includes non-logged activity)
+- Apple Watch VO2max: ${appleVO2max||'not available'} ml/kg/min
+- Calculated VO2max: ${vo2max||'?'} ml/kg/min (HR reserve + elevation corrected, resting HR ${avgRestingHR})
 
-PHYSIOLOGICAL BASELINE: Resting HR 52 bpm · VO2max estimate ${vo2max||'unknown'} ml/kg/min · Target 55 ml/kg/min · Gap ${vo2max?Math.round((55-vo2max)*10)/10+' ml/kg/min to go':'unknown'}
+BIOMETRIC RULES (apply these, not just the checkin data):
+- Wrist temp >+0.5°C → mandatory easy day, flag recovery concern
+- HRV drop >20% from 7-day avg → downgrade all intensity this week
+- Resting HR >5 bpm above baseline → treat as fatigued regardless of subjective feel
+- Both HRV low AND resting HR elevated → full rest or very easy only, no exceptions
 
 RPE CALIBRATION:
 ${rpeLines}
@@ -2132,6 +2169,38 @@ function renderWeekNav(){
   const bbEl=document.getElementById('wn-block-badge');
   if(bbEl) bbEl.innerHTML=`<span style="font-family:var(--mono);font-size:10px;padding:3px 12px;border-radius:4px;background:${phase.color}18;color:${phase.color};border:1px solid ${phase.color}40;">W${phase.weekNum} · ${phase.label}</span>`;
   renderWeekNavLifts(offset);
+}
+function renderHealthLog(){
+  const logs=D.healthLogs||[];
+  if(logs.length===0) return;
+  const card=document.getElementById('health-log-card');
+  const content=document.getElementById('health-log-content');
+  if(!card||!content) return;
+  card.style.display='block';
+  const latest=logs[logs.length-1];
+  const recentHRVs=logs.slice(-14).filter(h=>h.hrv).map(h=>h.hrv);
+  const avgHRV14=recentHRVs.length?recentHRVs.reduce((s,v)=>s+v,0)/recentHRVs.length:null;
+  const hrvDrop=latest.hrv&&avgHRV14?((avgHRV14-latest.hrv)/avgHRV14*100):null;
+  const hrvStatus=hrvDrop===null?'--':hrvDrop>20?'⚠ Low (-'+Math.round(hrvDrop)+'%)':hrvDrop<-10?'↑ Elevated (good)':'✓ Normal';
+  const hrvColor=hrvStatus.includes('⚠')?'var(--a4)':hrvStatus.includes('↑')?'var(--a3)':'var(--t)';
+  const recentRHRs=logs.slice(-14).filter(h=>h.restingHR).map(h=>h.restingHR);
+  const avgRHR14=recentRHRs.length?recentRHRs.reduce((s,v)=>s+v,0)/recentRHRs.length:52;
+  const rhrDiff=latest.restingHR?latest.restingHR-avgRHR14:null;
+  const rhrStatus=rhrDiff===null?'--':rhrDiff>5?'⚠ +'+Math.round(rhrDiff)+' bpm elevated':rhrDiff<-3?'↓ Lower than usual (good)':'✓ Normal';
+  const rhrColor=rhrStatus.includes('⚠')?'var(--a4)':rhrStatus.includes('↓')?'var(--a3)':'var(--t)';
+  const tempStatus=latest.wristTemp===null?'--':latest.wristTemp>0.5?'⚠ +'+(+latest.wristTemp).toFixed(1)+'°C elevated':latest.wristTemp>0?'+'+(+latest.wristTemp).toFixed(1)+'°C normal range':(+latest.wristTemp).toFixed(1)+'°C normal';
+  const tempColor=latest.wristTemp>0.5?'var(--a4)':'var(--t)';
+  content.innerHTML=`
+    <div class="info-row"><span class="info-row-label">Resting HR</span><span style="font-weight:700;color:${rhrColor}">${latest.restingHR||'--'} bpm · ${rhrStatus}</span></div>
+    <div class="info-row"><span class="info-row-label">HRV</span><span style="font-weight:700;color:${hrvColor}">${latest.hrv||'--'} ms · ${hrvStatus}</span></div>
+    <div class="info-row"><span class="info-row-label">Wrist Temp</span><span style="font-weight:700;color:${tempColor}">${tempStatus}</span></div>
+    <div class="info-row"><span class="info-row-label">Sleep</span><span style="font-weight:700;">${latest.sleepHours||'--'}h · ${latest.sleepDeep||'--'}h deep · ${latest.sleepREM||'--'}h REM</span></div>
+    <div class="info-row"><span class="info-row-label">Steps</span><span style="font-weight:700;">${latest.steps?latest.steps.toLocaleString():'--'}</span></div>
+    <div class="info-row"><span class="info-row-label">Exercise mins</span><span style="font-weight:700;">${latest.exerciseMinutes||'--'} min</span></div>
+    <div class="info-row"><span class="info-row-label">Apple VO2max</span><span style="font-weight:700;color:var(--a)">${latest.vo2maxApple||'--'} ml/kg/min</span></div>
+  `;
+  const syncEl=document.getElementById('health-sync-time');
+  if(syncEl&&D.healthLastSync){const d=new Date(D.healthLastSync);syncEl.textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
 }
 </script>
 </body>
