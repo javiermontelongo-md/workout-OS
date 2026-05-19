@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-17",
+  "lastUpdated": "2026-05-19",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -238,5 +238,275 @@
       "runType": "easy"
     }
   ],
-  "stravaLastSync": "2026-05-18T23:10:03.289Z"
+  "stravaLastSync": "2026-05-18T23:10:03.289Z",
+  "adaptivePlanCache": {
+    "narrative": "Week 2 of strength emphasis building on last week's bench work. Your easy runs are being performed at threshold HR (165-175) when they should be conversational Zone 2 (130-145). This is sabotaging both recovery and aerobic base development.",
+    "weeklyFocus": "Run easy runs EASY: HR must stay 130-145 bpm, walk breaks mandatory if drift occurs",
+    "autoRegulationRule": "If easy run average HR exceeds 150 bpm, next run must include 1 min walk breaks every 5 minutes",
+    "lifts": {
+      "bench": {
+        "weight": 195,
+        "sets": 4,
+        "reps": 4,
+        "targetRPE": 8,
+        "variation": "Barbell Bench Press",
+        "trend": "up",
+        "confidence": "medium",
+        "coachNote": "190×5@7 was solid. Moving to 4×4 at higher intensity. Control eccentric, explode up."
+      },
+      "ohp": {
+        "weight": 90,
+        "sets": 4,
+        "reps": 4,
+        "targetRPE": 7.5,
+        "variation": "Barbell OHP",
+        "trend": "flat",
+        "confidence": "low",
+        "coachNote": "Conservative start. Strict form, no leg drive. Brace hard at bottom."
+      },
+      "squat": {
+        "weight": 165,
+        "sets": 4,
+        "reps": 4,
+        "targetRPE": 8,
+        "variation": "Back Squat",
+        "trend": "up",
+        "confidence": "low",
+        "coachNote": "Building from estimated e1RM 215. Focus on depth and bracing. Bar speed indicator."
+      },
+      "dl": {
+        "weight": 165,
+        "sets": 3,
+        "reps": 4,
+        "targetRPE": 8,
+        "variation": "Conventional Deadlift",
+        "trend": "up",
+        "confidence": "low",
+        "coachNote": "Match squat progression. Reset each rep. Lat tension throughout pull."
+      }
+    },
+    "runs": {
+      "tuesday": {
+        "type": "easy",
+        "targetHR": "130-145",
+        "targetPace": "12:00-13:00/mile",
+        "duration": 30,
+        "coachNote": "SLOW DOWN. If HR climbs above 145, take 1 min walk breaks. Goal is aerobic base, not fitness demonstration. Conversational throughout."
+      },
+      "thursday": {
+        "type": "intervals",
+        "workout": "8 × 400m with 90s rest",
+        "targetPace": "7:15-7:30/mile per rep",
+        "warmup": "10 min easy jog + 4 strides",
+        "cooldown": "10 min easy",
+        "coachNote": "Based on current fitness. Hit 1:49-1:53 per 400m. If pace falls off >5s, stop at 6 reps. Recovery jog between."
+      },
+      "saturday": {
+        "type": "long",
+        "distance": 5,
+        "targetHR": "135-150",
+        "targetPace": "11:30-12:30/mile",
+        "coachNote": "Build aerobic capacity. First half HR 135-145, can drift to 150 second half. Walk 1 min at miles 2 and 4 to control drift."
+      }
+    },
+    "accessories": {
+      "dayA": [
+        "Face Pulls 3×15",
+        "Barbell Row 3×8 @RPE7",
+        "Pullups 3×AMRAP-2",
+        "Tricep Pushdown 3×12"
+      ],
+      "dayB": [
+        "Bulgarian Split Squat 3×8 each",
+        "Leg Curl 3×10",
+        "Pallof Press 3×10 each side",
+        "Calf Raises 3×20"
+      ],
+      "dayC": [
+        "Romanian DL 3×8 @60% DL weight",
+        "Step-ups 3×10 each",
+        "Copenhagen Plank 3×20s each",
+        "Dead Bug 3×10 each",
+        "90/90 Hip Stretch 2×90s each"
+      ]
+    },
+    "vo2maxEstimate": 31.7,
+    "estimated5KTime": "31:20",
+    "recoveryFlag": "CRITICAL: Easy runs performed at threshold pace. Must slow down to HR 130-145 or aerobic development and recovery will continue to be compromised.",
+    "generatedDate": "2026-05-19",
+    "blockWeek": {
+      "weekNum": 2,
+      "label": "Strength Emphasis"
+    },
+    "schedule": [
+      {
+        "date": "2026-05-18",
+        "dayType": "A",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-19",
+        "dayType": "run_easy",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-20",
+        "dayType": "B",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-21",
+        "dayType": "run_quality",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-22",
+        "dayType": "C",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-23",
+        "dayType": "run_long",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-24",
+        "dayType": "rest",
+        "isRest": true,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-25",
+        "dayType": "A",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-26",
+        "dayType": "run_easy",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-27",
+        "dayType": "B",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-28",
+        "dayType": "run_quality",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-29",
+        "dayType": "C",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-30",
+        "dayType": "run_long",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-05-31",
+        "dayType": "rest",
+        "isRest": true,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-01",
+        "dayType": "A",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-02",
+        "dayType": "run_easy",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-03",
+        "dayType": "B",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-04",
+        "dayType": "run_quality",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-05",
+        "dayType": "C",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-06",
+        "dayType": "run_long",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-07",
+        "dayType": "rest",
+        "isRest": true,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-08",
+        "dayType": "A",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-09",
+        "dayType": "run_easy",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-10",
+        "dayType": "B",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-11",
+        "dayType": "run_quality",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-12",
+        "dayType": "C",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-13",
+        "dayType": "run_long",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-14",
+        "dayType": "rest",
+        "isRest": true,
+        "wasShifted": false
+      }
+    ]
+  }
 }
