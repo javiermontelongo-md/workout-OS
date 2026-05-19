@@ -246,6 +246,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .cal-badge.run-easy{background:rgba(127,255,110,.12);color:var(--a3);border:1px solid rgba(127,255,110,.2);}
 .cal-badge.run-quality{background:rgba(79,195,247,.12);color:var(--a2);}
 .cal-badge.run-long{background:rgba(79,195,247,.12);color:var(--a2);}
+.cal-badge.run-moderate{background:rgba(206,147,216,.12);color:var(--a5);border:1px solid rgba(206,147,216,.2);}
 </style>
 </head>
 <body>
@@ -1097,7 +1098,7 @@ function getActivityBadges(sessions,dateStr){
   });
   if(dateStr&&!sessions.length){
     const run=(D.runs||[]).find(r=>r.date===dateStr);
-    if(run){const rb={easy:{label:'Easy Run',cls:'run-easy'},long:{label:'Long Run',cls:'run-long'},intervals:{label:'Intervals',cls:'run-quality'},tempo:{label:'Tempo',cls:'run-quality'}};const rb2=rb[run.runType]||{label:'Run',cls:'run-easy'};html+=`<span class="cal-badge ${rb2.cls}">${rb2.label}</span>`;}
+    if(run){const rb={easy:{label:'Easy Run',cls:'run-easy'},long:{label:'Long Run',cls:'run-long'},intervals:{label:'Intervals',cls:'run-quality'},tempo:{label:'Tempo',cls:'run-quality'},moderate:{label:'Moderate Run',cls:'run-moderate'}};const rb2=rb[run.runType]||{label:'Run',cls:'run-easy'};html+=`<span class="cal-badge ${rb2.cls}">${rb2.label}</span>`;}
   }
   return html;
 }
@@ -1314,6 +1315,20 @@ function getAccessoryVariation(liftKey){
 }
 
 function localDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function estimateVO2max(run){
+  const HR_REST=52;
+  if(!run||!run.heartRateAvg||run.distance<2) return null;
+  const speedMs=(run.distance*1609.34)/run.duration;
+  const hrAvg=run.heartRateAvg;
+  const hrMax=run.heartRateMax||180;
+  const elevationFt=run.elevationGain||0;
+  const hrElevationBias=(elevationFt/100)*1.5;
+  const hrAvgCorrected=Math.max(hrAvg-hrElevationBias,HR_REST+10);
+  const hrReserve=(hrAvgCorrected-HR_REST)/(hrMax-HR_REST);
+  if(hrReserve<=0||hrReserve>1) return null;
+  const vo2max=(speedMs/hrReserve)*14.72+3.5;
+  return Math.round(Math.max(20,Math.min(85,vo2max))*10)/10;
+}
 function calcRunMetrics(){
   const runs=(D.runs||[]).filter(r=>r.type==='run'&&r.distance>=1);
   if(runs.length<2) return null;
@@ -1324,8 +1339,13 @@ function calcRunMetrics(){
   const mins=Math.floor(estimated5KSeconds/60);
   const secs=Math.round(estimated5KSeconds%60);
   const estimated5KTime=`${mins}:${String(secs).padStart(2,'0')}`;
-  const paceMinsPerMile=avgPace/60;
-  const vo2maxEstimate=Math.round(483/paceMinsPerMile);
+  const hrRuns=runs.filter(r=>r.heartRateAvg&&r.distance>=2);
+  let vo2maxEstimate=null;
+  if(hrRuns.length>0){
+    const estimates=hrRuns.map(r=>estimateVO2max(r)).filter(v=>v!==null);
+    if(estimates.length>0){estimates.sort((a,b)=>a-b);vo2maxEstimate=estimates[Math.floor(estimates.length/2)];}
+  }
+  if(!vo2maxEstimate){const paceMinsPerMile=avgPace/60;vo2maxEstimate=Math.round(483/paceMinsPerMile);}
   return{estimated5KTime,estimated5KSeconds,racePacePerMile:racePace,vo2maxEstimate,totalRuns:runs.length,avgPace};
 }
 function renderRunMetricsSummary(){
@@ -1346,7 +1366,9 @@ function renderRunMetricsSummary(){
   const sec5k=parseTime(estimated5KTime);
   const tColor=sec5k<1200?'var(--a3)':sec5k<1500?'var(--a)':'var(--t2)';
   const vo2Color=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
-  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div><div class="sl">Est. VO2max</div></div><div class="stat"><div class="sv g" style="font-size:18px;">${totalRuns}</div><div class="sl">Total runs</div></div>`;
+  const vo2Pct=vo2maxEstimate?Math.min(100,Math.round((vo2maxEstimate/55)*100)):0;
+  const vo2BarColor=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
+  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div><div class="sl">Est. VO2max</div><div class="pbw" style="margin-top:8px;"><div class="pbl"><span>Target 55</span><span>${vo2Pct}%</span></div><div class="pbb"><div class="pbf" style="width:${vo2Pct}%;background:${vo2BarColor};"></div></div></div></div><div class="stat"><div class="sv g" style="font-size:18px;">${totalRuns}</div><div class="sl">Total runs</div></div>`;
 }
 function renderRunChart(type='pace'){
   const canvas=document.getElementById('run-chart');
@@ -1377,10 +1399,10 @@ function renderRunChart(type='pace'){
       const mon=new Date(d);mon.setDate(d.getDate()-((dow+6)%7));
       const wk=localDS(mon);
       if(!byWeek[wk])byWeek[wk]=[];
-      const pm=r.pace/60;if(pm>0)byWeek[wk].push(Math.round(483/pm));
+      const v=estimateVO2max(r);if(v)byWeek[wk].push(v);else{const pm=r.pace/60;if(pm>0)byWeek[wk].push(Math.round(483/pm));}
     });
-    Object.keys(byWeek).sort().forEach(wk=>{const avg=Math.round(byWeek[wk].reduce((a,b)=>a+b,0)/byWeek[wk].length);weeklyLabels.push(wk);weeklyVO2.push(avg);});
-    window._runChart=new Chart(canvas,{type:'line',data:{labels:weeklyLabels,datasets:[{label:'Est. VO2max',data:weeklyVO2,borderColor:'rgba(79,195,247,0.8)',backgroundColor:'rgba(79,195,247,0.08)',borderWidth:2,pointRadius:4,tension:0.3},{label:'Target VO2max 50',data:weeklyLabels.map(()=>50),borderColor:'rgba(127,255,110,0.4)',borderDash:[5,5],borderWidth:1.5,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    Object.keys(byWeek).sort().forEach(wk=>{const arr=byWeek[wk];if(!arr.length)return;arr.sort((a,b)=>a-b);const med=arr[Math.floor(arr.length/2)];weeklyLabels.push(wk);weeklyVO2.push(med);});
+    window._runChart=new Chart(canvas,{type:'line',data:{labels:weeklyLabels,datasets:[{label:'Est. VO2max',data:weeklyVO2,borderColor:'rgba(79,195,247,0.8)',backgroundColor:'rgba(79,195,247,0.08)',borderWidth:2,pointRadius:4,tension:0.3},{label:'Target VO2max 55',data:weeklyLabels.map(()=>55),borderColor:'rgba(127,255,110,0.4)',borderDash:[5,5],borderWidth:1.5,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
   }
 }
 function setRunChart(type){renderRunChart(type);}
@@ -1435,9 +1457,9 @@ function buildPlanContext(){
     pace:r.pace?`${Math.floor(r.pace/60)}:${String(r.pace%60).padStart(2,'0')}/mile`:null,
     hrAvg:r.heartRateAvg,hrMax:r.heartRateMax,name:r.name
   }));
-  const longRuns=runs.filter(r=>r.type==='run'&&r.distance>=4&&r.heartRateAvg);
+  const hrRuns=runs.filter(r=>r.type==='run'&&r.distance>=2&&r.heartRateAvg);
   let vo2max=null;
-  if(longRuns.length){const best=longRuns[longRuns.length-1];const spd=(best.distance*1609.34)/best.duration;vo2max=Math.round((spd*209.3/best.heartRateAvg)*10)/10;}
+  if(hrRuns.length>0){const estimates=hrRuns.map(r=>estimateVO2max(r)).filter(v=>v!==null);if(estimates.length>0){estimates.sort((a,b)=>a-b);vo2max=estimates[Math.floor(estimates.length/2)];}}
   const recentCheckins=checkins.slice(-7);
   const avgSleep=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.sleep,0)/recentCheckins.length).toFixed(1):null;
   const avgEnergy=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.energy,0)/recentCheckins.length).toFixed(1):null;
@@ -1474,7 +1496,7 @@ ${runLines}
 
 RECOVERY (last 7 days): Sleep avg ${avgSleep||'?'}h · Energy avg ${avgEnergy||'?'}/10 · Fatigue avg ${avgFatigue||'?'}/10
 
-VO2MAX ESTIMATE: ${vo2max||'unknown'} ml/kg/min (target 50+)
+PHYSIOLOGICAL BASELINE: Resting HR 52 bpm · VO2max estimate ${vo2max||'unknown'} ml/kg/min · Target 55 ml/kg/min · Gap ${vo2max?Math.round((55-vo2max)*10)/10+' ml/kg/min to go':'unknown'}
 
 RPE CALIBRATION:
 ${rpeLines}
