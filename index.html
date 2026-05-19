@@ -570,9 +570,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">body composition</div>
     <div style="display:flex;gap:6px;">
-      <button class="btn bs bi" onclick="setBodyChart('weight')" id="body-chart-weight" style="font-size:10px;padding:5px 10px;">WEIGHT</button>
-      <button class="btn bs bi" onclick="setBodyChart('waist')" id="body-chart-waist" style="font-size:10px;padding:5px 10px;">WAIST</button>
-      <button class="btn bs bi" onclick="setBodyChart('bmi')" id="body-chart-bmi" style="font-size:10px;padding:5px 10px;">BMI</button>
+      <button class="btn bs bi" onclick="setBodyChart('weight')" id="body-btn-weight" style="font-size:10px;padding:5px 10px;">WEIGHT</button>
+      <button class="btn bs bi" onclick="setBodyChart('waist')" id="body-btn-waist" style="font-size:10px;padding:5px 10px;">WAIST</button>
+      <button class="btn bs bi" onclick="setBodyChart('bmi')" id="body-btn-bmi" style="font-size:10px;padding:5px 10px;">BMI</button>
     </div>
   </div>
   <div style="position:relative;height:180px;"><canvas id="body-chart"></canvas></div>
@@ -1800,7 +1800,8 @@ async function saveCheckin(){
   const waistInches=parseFloat(document.getElementById('ci-waist')?.value)||null;
   if(!D.checkins)D.checkins=[];
   const existing=D.checkins.findIndex(c=>c.date===today);
-  const entry={date:today,energy,sleep,soreness,motivation,fatigueScore,sleepHoursLogged:sleepHours};
+  const entry={date:today,energy,sleep,soreness,motivation,fatigueScore};
+  if(sleepHours)entry.sleepHours=sleepHours;
   if(existing>=0)D.checkins[existing]=entry;else D.checkins.push(entry);
   if(weightLbs||waistInches){
     if(!D.bodyMetrics)D.bodyMetrics=[];
@@ -1887,9 +1888,9 @@ function renderSnapshotCharts(){
     return `<div class="spark-bar good" style="height:${h}px;background:var(--a2);" title="${d}: ${v.toLocaleString()} steps"></div>`;
   }).join('');
   html+=`<div class="spark-row"><div class="spark-label">STEPS</div><div class="spark-avg">${stepsAvgStr}</div><div class="spark-bars">${stepsBars}</div></div>`;
-  // Sleep (merged checkins sleepHoursLogged + healthLogs sleepHours)
+  // Sleep (merged checkins sleepHours + healthLogs sleepHours)
   const sleepVals=days30.map(d=>{
-    const ci=ciByDate[d];if(ci?.sleepHoursLogged!=null)return ci.sleepHoursLogged;
+    const ci=ciByDate[d];if(ci?.sleepHours!=null)return ci.sleepHours;
     const hl=hlByDate[d];if(hl?.sleepHours!=null)return hl.sleepHours;
     return null;
   });
@@ -1945,9 +1946,9 @@ function initCheckinTab(){
   updateFatiguePreview();
   const today2=new Date().toISOString().split('T')[0];
   const todayCheckin=(D.checkins||[]).find(c=>c.date===today2);
-  if(todayCheckin?.sleepHoursLogged){
-    const h=Math.floor(todayCheckin.sleepHoursLogged);
-    const m=Math.round((todayCheckin.sleepHoursLogged-h)*60);
+  if(todayCheckin?.sleepHours){
+    const h=Math.floor(todayCheckin.sleepHours);
+    const m=Math.round((todayCheckin.sleepHours-h)*60);
     const si=document.getElementById('ci-sleep-input');if(si)si.value=`${h}:${String(m).padStart(2,'0')}`;
   }
   const todayBody=(D.bodyMetrics||[]).find(b=>b.date===today2);
@@ -2343,30 +2344,46 @@ function renderBodyChart(type='weight'){
   const card=document.getElementById('body-metrics-card');
   if(!card)return;
   if(!metrics.length){card.style.display='none';return;}
-  card.style.display='block';
-  document.querySelectorAll('[id^="body-chart-"]').forEach(b=>b.classList.remove('active'));
-  const ab=document.getElementById('body-chart-'+type);if(ab)ab.classList.add('active');
+  card.style.display='';
   const canvas=document.getElementById('body-chart');
   if(!canvas||typeof Chart==='undefined')return;
   if(window._bodyChart){window._bodyChart.destroy();window._bodyChart=null;}
   const labels=metrics.map(m=>m.date);
   const legendEl=document.getElementById('body-chart-legend');
+  let data,color,yLabel,legendHTML;
   if(type==='weight'){
-    const data=metrics.map(m=>m.weightLbs);
-    const latest=data.filter(v=>v).slice(-1)[0];
-    window._bodyChart=new Chart(canvas,{type:'line',data:{labels,datasets:[{label:'Weight (lbs)',data,borderColor:'rgba(255,183,77,0.8)',backgroundColor:'rgba(255,183,77,0.06)',borderWidth:2,pointRadius:4,tension:0.3,spanGaps:true},{label:'Current',data:labels.map(()=>latest),borderColor:'rgba(255,183,77,0.3)',borderDash:[5,5],borderWidth:1,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
-    if(legendEl)legendEl.textContent=latest?`Current: ${latest} lbs`:'';
+    data=metrics.map(m=>m.weightLbs);
+    color='rgba(255,183,77,0.9)';
+    yLabel='lbs';
+    const latestEntry=metrics.filter(m=>m.weightLbs).slice(-1)[0];
+    legendHTML=latestEntry?`Latest: ${latestEntry.weightLbs} lbs`:'';
   }else if(type==='waist'){
-    const data=metrics.map(m=>m.waistInches);
-    window._bodyChart=new Chart(canvas,{type:'line',data:{labels,datasets:[{label:'Waist (in)',data,borderColor:'rgba(79,195,247,0.8)',backgroundColor:'rgba(79,195,247,0.06)',borderWidth:2,pointRadius:4,tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
-    if(legendEl)legendEl.textContent='';
+    data=metrics.map(m=>m.waistInches);
+    color='rgba(79,195,247,0.9)';
+    yLabel='inches';
+    const latestEntry=metrics.filter(m=>m.waistInches).slice(-1)[0];
+    legendHTML=latestEntry?`Latest: ${latestEntry.waistInches}"`:'';
   }else{
-    const data=metrics.map(m=>m.bmi);
-    window._bodyChart=new Chart(canvas,{type:'line',data:{labels,datasets:[{label:'BMI',data,borderColor:'rgba(127,255,110,0.8)',backgroundColor:'rgba(127,255,110,0.06)',borderWidth:2,pointRadius:4,tension:0.3,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:15,max:40,ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
-    if(legendEl)legendEl.innerHTML='<span style="color:var(--a3);">18.5–25 healthy</span> · <span style="color:var(--a);">25–30 overweight</span> · <span style="color:var(--a4);">>30 obese</span>';
+    data=metrics.map(m=>m.bmi);
+    color='rgba(127,255,110,0.9)';
+    yLabel='BMI';
+    const latestEntry=metrics.filter(m=>m.bmi).slice(-1)[0];
+    legendHTML=latestEntry?`BMI: ${latestEntry.bmi} — Healthy: 18.5–24.9`:'';
   }
+  if(legendEl)legendEl.textContent=legendHTML;
+  window._bodyChart=new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:[{data,borderColor:color,backgroundColor:color.replace('0.9','0.15'),borderWidth:2,pointRadius:3,tension:0.3,spanGaps:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} ${yLabel}`}}},scales:{x:{ticks:{font:{family:'monospace',size:9},color:'#888',maxTicksLimit:6},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{font:{family:'monospace',size:9},color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
 }
-function setBodyChart(type){renderBodyChart(type);}
+function setBodyChart(type){
+  ['weight','waist','bmi'].forEach(t=>{
+    const btn=document.getElementById(`body-btn-${t}`);
+    if(btn)btn.style.opacity=t===type?'1':'0.5';
+  });
+  renderBodyChart(type);
+}
 function renderHealthLog(){
   const logs=D.healthLogs||[];
   if(logs.length===0) return;
