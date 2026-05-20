@@ -1055,6 +1055,10 @@ ldPrev();
 function hOv(){ const e=document.getElementById('ov'); if(e){ e.style.opacity='0'; e.style.transition='opacity .4s'; setTimeout(()=>e.remove(),400); } }
 
 function onLoad(){
+  // Enforce initial panel visibility: hide all except the one with .on
+  document.querySelectorAll('.panel').forEach(p=>{
+    if(p.classList.contains('on')){p.style.display='';}else{p.style.display='none';}
+  });
   if(D.checks) restChk();
   updProgressStats();
   renderSessHist();
@@ -1084,16 +1088,20 @@ function onLoad(){
 // NAV
 // ============================================================
 function gT(n,el){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  // Belt-and-suspenders: use both class toggle AND inline style so
+  // no CSS rule (regardless of specificity) can keep an inactive panel visible
+  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on');p.style.display='none';});
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  const p=document.getElementById('panel-'+n); if(p) p.classList.add('on');
+  const p=document.getElementById('panel-'+n);
+  if(p){p.classList.add('on');p.style.display='';}  // '' lets CSS (grid / block) take over
   if(el) el.classList.add('on');
   if(n==='week') renderCalendar();
 }
 function gM(n,el){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on');p.style.display='none';});
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
-  const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); p.scrollTop=0; }
+  const p=document.getElementById('panel-'+n);
+  if(p){p.classList.add('on');p.style.display='';p.scrollTop=0;}
   if(el) el.classList.add('on');
   if(n==='week') renderCalendar();
 }
