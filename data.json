@@ -2401,12 +2401,12 @@
       "restingHR": 56,
       "hrv": 60.61685093060343,
       "wristTemp": 94.97133255004876,
-      "sleepHours": 26.6,
+      "sleepHours": null,
       "sleepDeep": null,
       "sleepREM": null,
       "sleepLight": null,
       "sleepAwake": null,
-      "steps": 8158,
+      "steps": 8335,
       "exerciseMinutes": 19,
       "walkingHR": null,
       "respiratoryRate": 17,
@@ -2414,7 +2414,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-05-20T12:46:44.901Z",
+  "healthLastSync": "2026-05-20T13:10:32.514Z",
   "checkins": [
     {
       "date": "2026-05-20",
