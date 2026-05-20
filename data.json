@@ -2397,5 +2397,26 @@
       "vo2maxApple": null
     }
   ],
-  "healthLastSync": "2026-05-19T19:25:51.349957Z"
+  "healthLastSync": "2026-05-19T19:25:51.349957Z",
+  "checkins": [
+    {
+      "date": "2026-05-20",
+      "energy": 8,
+      "sleep": 7.35,
+      "soreness": 3,
+      "motivation": 5,
+      "stress": 9,
+      "fatigueScore": 3.9,
+      "sleepHours": 7.35
+    }
+  ],
+  "bodyMetrics": [
+    {
+      "date": "2026-05-20",
+      "weightLbs": 225,
+      "waistInches": 36,
+      "bmi": 32.7,
+      "waistHeightRatio": 0.52
+    }
+  ]
 }
