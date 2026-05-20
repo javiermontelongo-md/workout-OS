@@ -2420,10 +2420,10 @@
       "date": "2026-05-20",
       "energy": 8,
       "sleep": 7.35,
-      "soreness": 3,
-      "motivation": 5,
-      "stress": 9,
-      "fatigueScore": 3.9,
+      "soreness": 2,
+      "motivation": 8,
+      "stress": 8,
+      "fatigueScore": 2.9,
       "sleepHours": 7.35
     }
   ],
