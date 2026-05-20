@@ -449,6 +449,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       </div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;" id="run-presc-reminders"></div>
     </div>
+    <div id="run-presc-complete-area"></div>
     <div id="run-presc-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;min-height:16px;"></div>
   </div>
 
@@ -611,19 +612,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="stat"><div class="sv b" id="pr-hr">165</div><div class="sl">Zone 2 avg HR</div></div>
     <div class="stat"><div class="sv g" id="pr-pu">5</div><div class="sl">Max clean pullups</div></div>
     <div class="stat"><div class="sv" id="pr-bw">225</div><div class="sl">Bodyweight (lb)</div></div>
-  </div>
-  <div class="card" style="margin-bottom:14px;">
-    <div class="lbl">best recent volume</div>
-    <div class="g2">
-      <div>
-        <div class="pbw"><div class="pbl"><span>Bench</span><span id="vol-bench">190x5x5</span></div><div class="pbb"><div class="pbf" id="vb-bench" style="width:75%;"></div></div></div>
-        <div class="pbw"><div class="pbl"><span>OHP</span><span id="vol-ohp">90x3x5</span></div><div class="pbb"><div class="pbf" id="vb-ohp" style="width:45%;"></div></div></div>
-      </div>
-      <div>
-        <div class="pbw"><div class="pbl"><span>Squat</span><span id="vol-squat">160x5x5</span></div><div class="pbb"><div class="pbf" id="vb-squat" style="width:60%;"></div></div></div>
-        <div class="pbw"><div class="pbl"><span>Deadlift</span><span id="vol-dl">160x3x5</span></div><div class="pbb"><div class="pbf" id="vb-dl" style="width:60%;"></div></div></div>
-      </div>
-    </div>
   </div>
   <div class="card" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -911,7 +899,7 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[]}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,runPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[]}; }
 
 // ============================================================
 // INIT
@@ -1067,7 +1055,8 @@ async function saveSession(){
   if(session.pullups.reps&&session.pullups.reps>(D.currentLifts.pullups||0)) D.currentLifts.pullups=session.pullups.reps;
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
-  if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); D.adaptivePlanCache=null; buildLocalPlan(); renderAdaptivePlan(); renderPredictionChart(); updateLogTabPlanned(); }
+  if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); D.adaptivePlanCache=null; // D.runPrescriptions intentionally NOT touched
+ buildLocalPlan(); renderAdaptivePlan(); renderPredictionChart(); updateLogTabPlanned(); }
   else { D.sessions.pop(); D.adherence.completed--; }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
@@ -1538,12 +1527,9 @@ function onDayTypeChange(value){
       const labelEl=document.getElementById('run-presc-day-label');
       if(labelEl)labelEl.textContent=labels[value]||value;
       runCard.dataset.dayType=value;
-      const placeholder=document.getElementById('run-presc-placeholder');
-      const output=document.getElementById('run-presc-output');
       const msg=document.getElementById('run-presc-msg');
-      if(placeholder)placeholder.style.display='';
-      if(output)output.style.display='none';
       if(msg){msg.textContent='';msg.style.color='';}
+      renderRunPrescriptionCard(); // show existing prescription or placeholder
     }
   }
 }
@@ -1558,111 +1544,193 @@ function startLoggingSession(){
     onDayTypeChange(todayDay);
   }
 }
-async function generateRunPrescription(){
-  const btn=document.getElementById('run-presc-btn');
-  const msg=document.getElementById('run-presc-msg');
+async function generateRunPrescription(targetDate) {
+  if (!targetDate) {
+    const n = new Date();
+    targetDate = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+  }
+  const todayD = new Date();
+  const today = todayD.getFullYear()+'-'+String(todayD.getMonth()+1).padStart(2,'0')+'-'+String(todayD.getDate()).padStart(2,'0');
+  const isFuture = targetDate > today;
+
+  const btn = document.getElementById('run-presc-btn');
+  const msg = document.getElementById('run-presc-msg');
+  const placeholder = document.getElementById('run-presc-placeholder');
+  const output = document.getElementById('run-presc-output');
+
+  if (D.runPrescriptions && D.runPrescriptions[targetDate]) {
+    const label = targetDate === today ? 'today' : targetDate;
+    if (!confirm('Regenerate run plan for '+label+'? This will replace the current prescription.')) return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
+  if (msg) { msg.textContent = 'Analyzing your run history...'; msg.style.color = 'var(--t3)'; }
+
+  try {
+    const dayType = document.getElementById('log-day')?.value || document.getElementById('run-prescription-card')?.dataset.dayType;
+    const runTypeLabel = {'run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals or Tempo','run_long':'Long Run'}[dayType] || 'Run';
+
+    const runs = (D.runs||[]).filter(r=>r.date<=today).slice(-20).map(r=>({
+      date:r.date, type:r.runType, distance:r.distance,
+      pace:r.pace?Math.floor(r.pace/60)+':'+String(r.pace%60).padStart(2,'0')+'/mile':null,
+      hrAvg:r.heartRateAvg, hrMax:r.heartRateMax
+    }));
+
+    const plannedRuns = [];
+    if (isFuture && D.runPrescriptions) {
+      Object.entries(D.runPrescriptions).forEach(([d,p])=>{
+        if (d>today && d<targetDate && p && p.primaryRecommendation) {
+          const pr = p.primaryRecommendation;
+          plannedRuns.push('PLANNED (not yet completed): '+d+' — '+pr.type+' '+pr.distance+' @ '+pr.pace+' HR '+pr.heartRate);
+        }
+      });
+    }
+
+    const rh = (D.healthLogs||[]).slice(-7);
+    const rhrArr = rh.filter(h=>h.restingHR);
+    const hrvArr = rh.filter(h=>h.hrv);
+    const avgRHR = rhrArr.length?Math.round(rhrArr.reduce((s,h)=>s+h.restingHR,0)/rhrArr.length):null;
+    const avgHRV = hrvArr.length?Math.round(hrvArr.reduce((s,h)=>s+h.hrv,0)/hrvArr.length):null;
+    const todayCI = (D.checkins||[]).find(c=>c.date===today);
+    const recentS = (D.sessions||[]).slice(-5).map(s=>({date:s.date,dayType:s.day,rpe:s.rpe}));
+    const lastRun = runs[runs.length-1];
+    const lastLift = recentS[recentS.length-1];
+
+    const prompt = 'You are an expert running coach for Javier, a PGY-1 IM resident.\n'+
+'GOAL: Sub-20 min 5K, maximize VO2max (currently ~44-48 ml/kg/min, target 55+)\n'+
+'TODAY\'S SCHEDULED RUN TYPE: '+runTypeLabel+'\n'+
+'PRESCRIPTION DATE: '+targetDate+(isFuture?' (FUTURE DATE — factor in predicted fatigue from planned runs below)':'')+'\n'+
+'TODAY\'S DATE: '+today+'\n\n'+
+'RECENT COMPLETED RUNS (last 20, up to today):\n'+
+(runs.map(r=>r.date+' ['+r.type+'] '+r.distance+'mi @ '+(r.pace||'?')+'/mile · HR avg '+(r.hrAvg||'?')+' max '+(r.hrMax||'?')).join('\n')||'none')+'\n\n'+
+(plannedRuns.length?'PLANNED RUNS BETWEEN TODAY AND '+targetDate+':\n'+plannedRuns.join('\n')+'\n\n':'')+
+'RECENT LIFTING (last 5):\n'+(recentS.map(s=>s.date+' Day '+s.dayType+' RPE '+s.rpe).join('\n')||'none')+'\n\n'+
+'RECOVERY (last 7 days): Avg RHR '+(avgRHR||'?')+' bpm, HRV '+(avgHRV||'?')+' ms\n'+
+"Today's check-in: Energy "+(todayCI?.energy||'?')+'/10, Soreness '+(todayCI?.soreness||'?')+'/10, Stress '+(todayCI?.stress||'?')+'/10\n\n'+
+'LAST RUN: '+(lastRun?lastRun.date+' '+lastRun.type+' '+lastRun.distance+'mi @ '+lastRun.pace+' HR '+lastRun.hrAvg:'none')+'\n'+
+'LAST LIFT: '+(lastLift?lastLift.date+' Day '+lastLift.dayType+' RPE '+lastLift.rpe:'none')+'\n\n'+
+'Output ONLY valid JSON, no markdown:\n'+
+'{"primaryRecommendation":{"type":"easy|intervals|tempo|long","distance":"X-Y miles","pace":"MM:SS-MM:SS/mile","heartRate":"XXX-XXX bpm","duration":"XX-XX min","keyInstruction":"one sentence"},"alternatives":[{"condition":"...","recommendation":"..."}],"watchOutFor":["..."],"reminders":["Log this run on Strava","Dynamic warm-up before","..."],"coachNote":"1-2 sentences"}\n\n'+
+'Rules: Be specific to their data. Last heavy lower body session → HR cap <=145 bpm. Low HRV or elevated RHR → downgrade intensity. Zone 2 = 130-145 bpm. Intervals ~6:30-7:00/mile. Tempo ~7:30-8:00/mile. JSON only.';
+
+    if (msg) msg.textContent = 'Generating prescription...';
+    const response = await ai(prompt);
+    if (!response) throw new Error('No response');
+    const clean = response.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const presc = JSON.parse(clean.slice(clean.indexOf('{'),clean.lastIndexOf('}')+1));
+
+    if (!D.runPrescriptions) D.runPrescriptions = {};
+    D.runPrescriptions[targetDate] = {...presc, generatedAt:new Date().toISOString(), completed:false, postRunFeedback:null};
+    if (typeof pushSilent==='function') await pushSilent();
+
+    renderRunPrescriptionCard(targetDate);
+    if (msg) { msg.textContent='Plan saved ✓'; msg.style.color='var(--a3)'; setTimeout(()=>{if(msg)msg.textContent='';},3000); }
+  } catch(err) {
+    console.error('Run prescription failed:',err);
+    if (msg) { msg.textContent='Failed — check API key in Settings'; msg.style.color='var(--a4)'; }
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent=(D.runPrescriptions&&D.runPrescriptions[targetDate])?'Regenerate Plan':'Get Today\'s Plan'; }
+  }
+}
+function renderRunPrescriptionCard(targetDate) {
+  if (!targetDate) {
+    const n=new Date();
+    targetDate=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+  }
+  const todayD=new Date();
+  const today=todayD.getFullYear()+'-'+String(todayD.getMonth()+1).padStart(2,'0')+'-'+String(todayD.getDate()).padStart(2,'0');
+
   const placeholder=document.getElementById('run-presc-placeholder');
   const output=document.getElementById('run-presc-output');
-  if(btn)btn.disabled=true;
-  if(msg){msg.textContent='Analyzing your run history...';msg.style.color='var(--t3)';}
-  try{
-    const dayType=document.getElementById('log-day')?.value||
-                  document.getElementById('run-prescription-card')?.dataset.dayType;
-    const runTypeLabel={'run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals or Tempo','run_long':'Long Run'}[dayType]||'Run';
-    const runs=(D.runs||[]).slice(-20).map(r=>({
-      date:r.date,type:r.runType,distance:r.distance,
-      pace:r.pace?`${Math.floor(r.pace/60)}:${String(r.pace%60).padStart(2,'0')}/mile`:null,
-      hrAvg:r.heartRateAvg,hrMax:r.heartRateMax
-    }));
-    const recentHealth=(D.healthLogs||[]).slice(-7);
-    const withRHR=recentHealth.filter(h=>h.restingHR);
-    const withHRV=recentHealth.filter(h=>h.hrv);
-    const avgRestingHR=withRHR.length?Math.round(withRHR.reduce((s,h)=>s+h.restingHR,0)/withRHR.length):null;
-    const avgHRV=withHRV.length?Math.round(withHRV.reduce((s,h)=>s+h.hrv,0)/withHRV.length):null;
-    const today=localDS(new Date());
-    const todayCheckin=(D.checkins||[]).find(c=>c.date===today);
-    const recentSessions=(D.sessions||[]).slice(-5).map(s=>({date:s.date,dayType:s.day,rpe:s.rpe}));
-    const lastRun=runs[runs.length-1];
-    const lastLift=recentSessions[recentSessions.length-1];
-    const prompt=`You are an expert running coach for Javier, a PGY-1 IM resident.
+  const btn=document.getElementById('run-presc-btn');
+  const completeArea=document.getElementById('run-presc-complete-area');
 
-GOAL: Sub-20 min 5K, maximize VO2max (currently ~44-48 ml/kg/min, target 55+)
-TODAY'S SCHEDULED RUN TYPE: ${runTypeLabel}
-TODAY'S DATE: ${today}
+  const presc=D.runPrescriptions&&D.runPrescriptions[targetDate];
+  if (!presc) {
+    if(placeholder)placeholder.style.display='';
+    if(output)output.style.display='none';
+    if(btn)btn.textContent='Get Today\'s Plan';
+    if(completeArea)completeArea.innerHTML='';
+    return;
+  }
 
-RECENT RUNS (last 20):
-${runs.map(r=>`${r.date} [${r.type}] ${r.distance}mi @ ${r.pace||'?'}/mile · HR avg ${r.hrAvg||'?'} max ${r.hrMax||'?'}`).join('\n')}
+  if(placeholder)placeholder.style.display='none';
+  if(output)output.style.display='block';
+  if(btn)btn.textContent='Regenerate Plan';
 
-RECENT LIFTING (last 5 sessions):
-${recentSessions.map(s=>`${s.date} Day ${s.dayType} RPE ${s.rpe}`).join('\n')}
+  const p=presc.primaryRecommendation;
+  const primaryEl=document.getElementById('run-presc-primary');
+  if(primaryEl) primaryEl.innerHTML=
+    '<div style="font-size:15px;font-weight:500;color:var(--a);margin-bottom:8px;">'+p.type.toUpperCase()+' · '+p.distance+' · '+p.duration+'</div>'+
+    '<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:6px;">Pace: '+p.pace+'&nbsp;·&nbsp;HR: '+p.heartRate+'</div>'+
+    '<div style="font-size:12px;color:var(--t);margin-top:8px;padding-top:8px;border-top:1px solid var(--b);">'+p.keyInstruction+'</div>'+
+    (presc.coachNote?'<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;font-style:italic;">'+presc.coachNote+'</div>':'');
 
-RECOVERY METRICS (last 7 days):
-- Avg resting HR: ${avgRestingHR||'?'} bpm (baseline 52)
-- Avg HRV: ${avgHRV||'?'} ms
-- Today's check-in: Energy ${todayCheckin?.energy||'not logged'}/10, Soreness ${todayCheckin?.soreness||'not logged'}/10, Stress ${todayCheckin?.stress||'not logged'}/10
+  const altEl=document.getElementById('run-presc-alternatives');
+  if(altEl) altEl.innerHTML=(presc.alternatives||[]).map(a=>'<div style="margin-bottom:6px;"><span style="color:var(--a3);">'+a.condition+':</span> '+a.recommendation+'</div>').join('');
 
-LAST RUN: ${lastRun?`${lastRun.date} ${lastRun.type} ${lastRun.distance}mi @ ${lastRun.pace}/mile HR ${lastRun.hrAvg}`:'no recent run'}
-LAST LIFT: ${lastLift?`${lastLift.date} Day ${lastLift.dayType} RPE ${lastLift.rpe}`:'no recent lift'}
+  const watchEl=document.getElementById('run-presc-watchout');
+  if(watchEl) watchEl.innerHTML=(presc.watchOutFor||[]).map(w=>'<div style="margin-bottom:4px;">&#9888; '+w+'</div>').join('');
 
-Output ONLY a valid JSON object with NO additional text:
+  const remEl=document.getElementById('run-presc-reminders');
+  if(remEl) remEl.innerHTML=(presc.reminders||[]).map(r=>'<div style="margin-bottom:3px;">&#10003; '+r+'</div>').join('');
 
-{
-  "primaryRecommendation": {
-    "type": "easy|intervals|tempo|long",
-    "distance": "X-Y miles",
-    "pace": "MM:SS-MM:SS/mile",
-    "heartRate": "XXX-XXX bpm",
-    "duration": "XX-XX min",
-    "keyInstruction": "one sentence on the most important thing to focus on"
-  },
-  "alternatives": [
-    {"condition": "if you feel great / if you feel tired / etc", "recommendation": "specific alternative with distance/pace/HR"}
-  ],
-  "watchOutFor": ["specific warning based on their data"],
-  "reminders": ["Log this run on Strava", "Dynamic warm-up before", "other specific reminder"],
-  "coachNote": "1-2 sentence coaching note explaining the reasoning"
+  if(!completeArea) return;
+
+  const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
+  const isCompleted=presc.completed===true;
+  const hasPostRunFeedback=!!presc.postRunFeedback;
+
+  if(hasPostRunFeedback){
+    completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:9px;color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:12px;color:var(--t2);line-height:1.7;">'+presc.postRunFeedback+'</div></div>';
+  } else if(isCompleted && stravaRun){
+    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
+  } else if(isCompleted){
+    completeArea.innerHTML='<div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight. Check back tomorrow for AI feedback.</div>';
+  } else {
+    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
+  }
 }
-
-Rules:
-- Be specific to their actual data — reference their recent run paces, HRs, and sessions
-- If last session was heavy lower body (squat/deadlift) → keep HR cap strict (<=145 bpm)
-- If HRV is low or resting HR elevated → downgrade intensity regardless of scheduled type
-- Zone 2 HR for Javier = 130-145 bpm (resting HR 52, max ~180)
-- Interval pace target = current 5K effort pace (~6:30-7:00/mile)
-- Tempo pace = comfortably hard, ~7:30-8:00/mile
-- Output valid JSON only, no markdown`;
-    if(msg)msg.textContent='Generating prescription...';
-    const response=await ai(prompt);
-    if(!response)throw new Error('No response');
-    const clean=response.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-    const start=clean.indexOf('{');
-    const end=clean.lastIndexOf('}');
-    const presc=JSON.parse(clean.slice(start,end+1));
+async function markRunComplete(targetDate) {
+  if (!D.runPrescriptions||!D.runPrescriptions[targetDate]) return;
+  D.runPrescriptions[targetDate].completed=true;
+  D.runPrescriptions[targetDate].completedAt=new Date().toISOString();
+  if(typeof pushSilent==='function') await pushSilent();
+  renderRunPrescriptionCard(targetDate);
+}
+async function generatePostRunFeedback(targetDate) {
+  const completeArea=document.getElementById('run-presc-complete-area');
+  if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;text-align:center;">Generating post-run analysis...</div>';
+  try {
+    const presc=D.runPrescriptions&&D.runPrescriptions[targetDate];
+    if(!presc) throw new Error('No prescription found');
+    const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
+    if(!stravaRun) throw new Error('No Strava run found for '+targetDate);
     const p=presc.primaryRecommendation;
-    document.getElementById('run-presc-primary').innerHTML=`
-      <div style="font-size:15px;font-weight:500;color:var(--a);margin-bottom:8px;">${p.type.toUpperCase()} · ${p.distance} · ${p.duration}</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:6px;">Pace: ${p.pace}&nbsp;&nbsp;·&nbsp;&nbsp;HR: ${p.heartRate}</div>
-      <div style="font-size:12px;color:var(--t);margin-top:8px;padding-top:8px;border-top:1px solid var(--b);">${p.keyInstruction}</div>
-      ${presc.coachNote?`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;font-style:italic;">${presc.coachNote}</div>`:''}
-    `;
-    document.getElementById('run-presc-alternatives').innerHTML=
-      (presc.alternatives||[]).map(a=>`<div style="margin-bottom:6px;"><span style="color:var(--a3);">${a.condition}:</span> ${a.recommendation}</div>`).join('');
-    document.getElementById('run-presc-watchout').innerHTML=
-      (presc.watchOutFor||[]).map(w=>`<div style="margin-bottom:4px;">⚠ ${w}</div>`).join('');
-    document.getElementById('run-presc-reminders').innerHTML=
-      (presc.reminders||[]).map(r=>`<div style="margin-bottom:3px;">✓ ${r}</div>`).join('');
-    if(placeholder)placeholder.style.display='none';
-    if(output)output.style.display='block';
-    if(!D.adaptivePlanCache)D.adaptivePlanCache={};
-    if(!D.adaptivePlanCache.runPrescriptions)D.adaptivePlanCache.runPrescriptions={};
-    D.adaptivePlanCache.runPrescriptions[today]=presc;
-    if(typeof pushSilent==='function')await pushSilent();
-    if(msg){msg.textContent='Plan saved ✓';msg.style.color='var(--a3)';setTimeout(()=>{if(msg)msg.textContent='';},3000);}
-  }catch(err){
-    console.error('Run prescription failed:',err);
-    if(msg){msg.textContent='Failed — check API key in Settings';msg.style.color='var(--a4)';}
-  }finally{
-    if(btn)btn.disabled=false;
+    const todayD=new Date(targetDate);
+    const rh=(D.healthLogs||[]).filter(h=>{const hd=new Date(h.date);const diff=(todayD-hd)/86400000;return diff>=0&&diff<=7;});
+    const ciForDate=(D.checkins||[]).find(c=>c.date===targetDate);
+    const prompt='You are an expert running coach analyzing how well Javier executed his prescribed run.\n\n'+
+'PRESCRIBED RUN ('+targetDate+'):\n'+
+'- Type: '+p.type+'\n- Distance: '+p.distance+'\n- Pace: '+p.pace+'\n- HR: '+p.heartRate+'\n'+
+'- Key instruction: '+p.keyInstruction+'\n'+(presc.coachNote?'- Coach note: '+presc.coachNote+'\n':'')+
+'\nACTUAL RUN (Strava):\n'+
+'- Distance: '+stravaRun.distance+' miles\n'+
+'- Duration: '+Math.floor(stravaRun.duration/60)+' min '+(stravaRun.duration%60)+' sec\n'+
+'- Pace: '+(stravaRun.pace?Math.floor(stravaRun.pace/60)+':'+(String(stravaRun.pace%60).padStart(2,'0'))+'/mile':'unknown')+'\n'+
+'- Avg HR: '+(stravaRun.heartRateAvg||'unknown')+' bpm\n- Max HR: '+(stravaRun.heartRateMax||'unknown')+' bpm\n'+
+'- Elevation: '+(stravaRun.elevationGain||0)+' ft\n\n'+
+'RECOVERY DATA AROUND THAT DATE:\n'+(rh.map(h=>h.date+': RHR '+(h.restingHR||'?')+' HRV '+(h.hrv||'?')+' Sleep '+(h.sleepHours||'?')+'h').join('\n')||'none')+'\n\n'+
+'CHECK-IN: Energy '+(ciForDate?.energy||'?')+'/10, Soreness '+(ciForDate?.soreness||'?')+'/10\n\n'+
+'In 3-4 short paragraphs: (1) How well did Javier execute? (2) What does the data say about fitness vs prescription? (3) What adjustments for the next run? Be specific, data-driven, no fluff.';
+    const response=await ai(prompt);
+    if(!response) throw new Error('No response');
+    D.runPrescriptions[targetDate].postRunFeedback=response;
+    if(typeof pushSilent==='function') await pushSilent();
+    renderRunPrescriptionCard(targetDate);
+  } catch(err) {
+    console.error('Post-run feedback failed:',err);
+    if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--a4);padding:10px;">Failed: '+err.message+'</div>';
   }
 }
 function buildSchedule(){
