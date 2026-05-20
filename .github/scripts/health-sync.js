@@ -24,25 +24,28 @@ function extractSimpleNumber(raw, key) {
 }
 
 function extractSleepSeconds(raw) {
-  // Sleep is sent from the Shortcut as total seconds of ASLEEP time.
-  // It must NOT include HKCategoryValueSleepAnalysisInBed samples — only
-  // AsleepCore, AsleepDeep, AsleepREM, and AsleepUnspecified.
-  // InBed is a wrapper that spans all stages and double-counts if included.
+  // Sleep is sent from the Shortcut as total seconds.
+  // IMPORTANT: The Shortcut should only sum AsleepCore + AsleepDeep + AsleepREM +
+  // AsleepUnspecified samples. HKCategoryValueSleepAnalysisInBed is a wrapper that
+  // spans the entire in-bed window and double-counts all stage samples inside it.
+  // If InBed is included the raw seconds will be ~2-4x the real sleep time.
   const re = /"*sleepHours"*\s*:\s*([\d.]+)/i;
   const match = raw.match(re);
   if (match) {
     const seconds = parseFloat(match[1]);
     console.log(`Sleep raw value from Shortcut: ${seconds} seconds`);
     if (isNaN(seconds) || seconds <= 0) return null;
-    const hours = Math.round((seconds / 3600) * 10) / 10;
-    // Sanity cap: >14h is impossible for a single night — reject and log
+    // Single division by 3600 — this is the only place this conversion happens
+    const hours = seconds / 3600;
+    // Sanity clamp: >14h means the Shortcut included InBed samples; clamp rather
+    // than discard so we at least store something, but log a warning
     if (hours > 14) {
-      console.log(`Sleep rejected (${hours}h > 14h max) — Shortcut is likely including InBed samples. Fix: filter to AsleepCore + AsleepDeep + AsleepREM + AsleepUnspecified only.`);
-      return null;
+      console.log(`Sleep clamped from ${Math.round(hours * 10) / 10}h to 14h — Shortcut is likely including InBed samples.`);
     }
+    const clamped = Math.min(hours, 14);
     // Minimum meaningful sleep: 1 hour
-    if (hours < 1) return null;
-    return hours;
+    if (clamped < 1) return null;
+    return Math.round(clamped * 10) / 10;
   }
   return null;
 }
@@ -79,7 +82,14 @@ async function main() {
   const date = extractDate(healthDataRaw);
   const restingHR = extractSimpleNumber(healthDataRaw, 'restingHR');
   const hrv = extractSimpleNumber(healthDataRaw, 'hrv');
-  const wristTemp = extractSimpleNumber(healthDataRaw, 'wristTemp');
+  // wristTemp arrives as raw Fahrenheit skin temperature (~94-96°F).
+  // Convert to °C deviation from normal body temp (98.6°F):
+  //   deviation = (rawF - 98.6) × (5/9)
+  // Negative = cooler than baseline, positive = warmer (e.g. fever/illness)
+  const wristTempRaw = extractSimpleNumber(healthDataRaw, 'wristTemp');
+  const wristTemp = wristTempRaw !== null
+    ? Math.round((wristTempRaw - 98.6) * (5 / 9) * 100) / 100
+    : null;
   const sleepHours = extractSleepSeconds(healthDataRaw);
   const steps = extractStepsTotal(healthDataRaw);
   const exerciseMinutes = extractSimpleNumber(healthDataRaw, 'exerciseMinutes');
