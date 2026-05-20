@@ -546,7 +546,7 @@
       "runType": "easy"
     }
   ],
-  "stravaLastSync": "2026-05-20T18:01:45.266Z",
+  "stravaLastSync": "2026-05-19T17:30:46.143Z",
   "adaptivePlanCache": {
     "narrative": "Your biometrics show significant recovery concerns: resting HR is 12 bpm above baseline (64 vs 52) and wrist temp is massively elevated (+95.7°C is clearly a sensor error, but any deviation flags stress). Recent runs show you're running threshold effort (HR 165-171) when trying to go easy. This week we prioritize genuine aerobic development at true Zone 2 and manage fatigue.",
     "weeklyFocus": "Establish true easy pace discipline (HR 130-145) and monitor recovery markers daily",
@@ -813,40 +813,7 @@
         "isRest": false,
         "wasShifted": false
       }
-    ],
-    "runPrescriptions": {
-      "2026-05-19": {
-        "primaryRecommendation": {
-          "type": "easy",
-          "distance": "3-4 miles",
-          "pace": "11:30-12:30/mile",
-          "heartRate": "130-145 bpm",
-          "duration": "35-50 min",
-          "keyInstruction": "Slow way down—your recent easy runs are consistently 15-25 bpm too hot for aerobic development"
-        },
-        "alternatives": [
-          {
-            "condition": "if HR climbs above 145 bpm despite slow pace",
-            "recommendation": "Cut to 2 miles and add 1-2 min walk breaks every 0.5 mile to keep HR under 145"
-          },
-          {
-            "condition": "if resting HR elevated >8 bpm above 52",
-            "recommendation": "Easy walk 2-3 miles at conversational effort instead"
-          }
-        ],
-        "watchOutFor": [
-          "Resting HR currently 60 bpm (baseline 52)—you're carrying fatigue from the 9-day training gap",
-          "Every 'easy' run since April has averaged 151-174 HR—way above Zone 2, limiting aerobic base building",
-          "Your 10:07 pace on 5/16 spiked HR to 171—need 11:30+ pace to stay aerobic"
-        ],
-        "reminders": [
-          "Log this run on Strava",
-          "Dynamic warm-up before",
-          "Check HR at 0.5 mile—if >145, slow down immediately"
-        ],
-        "coachNote": "Your easy runs are tempo efforts in disguise. Resting HR 8 bpm elevated signals incomplete recovery. To hit sub-20 5K, you need true aerobic base work at 130-145 bpm, even if it feels painfully slow. Slow down to speed up long-term."
-      }
-    }
+    ]
   },
   "healthLogs": [
     {
@@ -2395,117 +2362,18 @@
       "walkingHR": null,
       "respiratoryRate": 16.72,
       "vo2maxApple": null
-    },
-    {
-      "date": "2026-05-20",
-      "restingHR": 56,
-      "hrv": 60.61685093060343,
-      "wristTemp": -2.02,
-      "sleepHours": null,
-      "sleepDeep": null,
-      "sleepREM": null,
-      "sleepLight": null,
-      "sleepAwake": null,
-      "steps": 10674,
-      "exerciseMinutes": 1,
-      "walkingHR": 114,
-      "respiratoryRate": 17,
-      "vo2maxApple": null,
-      "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-05-20T14:18:56.221Z",
-  "checkins": [
+  "healthLastSync": "2026-05-19T19:25:51.349957Z",
+  "rpeConfirmations": [
     {
       "date": "2026-05-20",
-      "energy": 8,
-      "sleep": 7.35,
-      "soreness": 2,
-      "motivation": 8,
-      "stress": 8,
-      "fatigueScore": 2.9,
-      "sleepHours": 7.35
+      "lift": "bench",
+      "predictedRPE": 8,
+      "actualRPE": 10,
+      "weight": 192.5,
+      "sets": 4,
+      "reps": 4
     }
-  ],
-  "bodyMetrics": [
-    {
-      "date": "2026-05-20",
-      "weightLbs": 225,
-      "waistInches": 36,
-      "bmi": 32.7,
-      "waistHeightRatio": 0.52
-    }
-  ],
-  "trainingMode": "performance",
-  "racePredictions": {
-    "generatedAt": "2026-05-20T19:35:01.668Z",
-    "vo2maxUsed": 44.48,
-    "runCount": 23,
-    "methodLabel": "VO2max / VDOT",
-    "predictions": {
-      "s5k": {
-        "seconds": 1734,
-        "ciSeconds": 295,
-        "method": "VO2max / VDOT"
-      },
-      "s10k": {
-        "seconds": 3580,
-        "ciSeconds": 791,
-        "method": "VO2max / VDOT"
-      },
-      "shalf": {
-        "seconds": 7810,
-        "ciSeconds": 2257,
-        "method": "VO2max / VDOT"
-      },
-      "sfull": {
-        "seconds": 16194,
-        "ciSeconds": 7158,
-        "method": "VO2max / VDOT"
-      }
-    },
-    "medianTrainingPace": 661.2,
-    "debugInfo": {
-      "riegelPred": {
-        "s5k": 2081,
-        "s10k": 4339,
-        "shalf": 9574,
-        "sfull": 19961,
-        "anchor": {
-          "date": "2026-05-02",
-          "stravaId": 18353167787,
-          "name": "Ez run",
-          "type": "run",
-          "distance": 2.5,
-          "duration": 1653,
-          "pace": 661,
-          "elevationGain": 94,
-          "heartRateAvg": 151.5,
-          "heartRateMax": 166,
-          "source": "strava",
-          "runType": "easy"
-        },
-        "anchorType": "median of last 5 runs"
-      },
-      "vdotPred": {
-        "s5k": 1482,
-        "s10k": 3084,
-        "shalf": 6768,
-        "sfull": 14196
-      },
-      "hrPred": {
-        "s5k": 1841,
-        "s10k": 3683,
-        "shalf": 7770,
-        "sfull": 15540
-      },
-      "weights": {
-        "riegel": 0.3,
-        "vdot": 0.5,
-        "hr": 0.2
-      },
-      "vo2maxSource": "Apple Watch",
-      "medianPace": 661.2
-    }
-  }
+  ]
 }
