@@ -2374,6 +2374,15 @@
       "weight": 192.5,
       "sets": 4,
       "reps": 4
+    },
+    {
+      "date": "2026-05-20",
+      "lift": "ohp",
+      "predictedRPE": 7,
+      "actualRPE": 9,
+      "weight": 90,
+      "sets": 3,
+      "reps": 5
     }
   ]
 }
