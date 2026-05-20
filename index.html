@@ -389,7 +389,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         </select>
       </div>
       <div id="day-prev"></div>
-      <button class="btn bp" style="width:100%;margin-top:10px;" onclick="gT('log',document.querySelector('.tab:nth-child(2)'))">Start logging this session</button>
+      <button class="btn bp" style="width:100%;margin-top:10px;" onclick="startLoggingSession()">Start logging this session</button>
     </div>
     <div class="card">
       <div class="lbl">session checklist</div>
@@ -417,24 +417,56 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="g3" style="margin-bottom:10px;">
       <div class="ig"><label>Date</label><input type="date" id="log-date"></div>
       <div class="ig"><label>Day type</label>
-        <select id="log-day" onchange="toggleRunLogSection()">
-          <option value="A">Lift A — Upper Strength (Mon)</option><option value="run_easy">Easy Run — Zone 2 (Tue)</option><option value="B">Lift B — Squat (Wed)</option><option value="run_quality">Quality Run — Intervals/Tempo (Thu)</option><option value="C">Lift C — Deadlift &amp; Resilience (Fri)</option><option value="run_long">Long Run (Sat)</option><option value="rest">Rest Day</option>
+        <select id="log-day" onchange="onDayTypeChange(this.value)">
+          <option value="">-- Select day type --</option>
+<option value="A">Lift A — Upper Strength</option>
+<option value="B">Lift B — Squat</option>
+<option value="C">Lift C — Deadlift &amp; Resilience</option>
+<option value="run_easy">Easy Run — Zone 2</option>
+<option value="run_quality">Quality Run — Intervals/Tempo</option>
+<option value="run_long">Long Run</option>
+<option value="rest">Rest Day</option>
         </select>
       </div>
       <div class="ig"><label>Session RPE (1-10)</label><input type="number" id="log-rpe" min="1" max="10" placeholder="e.g. 7"></div>
     </div>
     <div class="g2 k2" style="margin-bottom:10px;">
       <div class="ig"><label>Duration (min)</label><input type="number" id="log-dur" placeholder="e.g. 65"></div>
-      <div class="ig"><label>Energy (1-10)</label><input type="number" id="log-energy" min="1" max="10" placeholder="e.g. 7"></div>
-    </div>
-    <div class="g2 k2" style="margin-bottom:10px;">
-      <div class="ig"><label>Bodyweight (lb)</label><input type="number" id="log-bw" placeholder="225"></div>
-      <div class="ig"><label>Sleep last night (hrs)</label><input type="number" id="log-sleep" step="0.5" placeholder="7"></div>
+      <div class="ig"><label>Session notes (optional)</label><input type="hidden" id="log-energy"><input type="hidden" id="log-bw"><input type="hidden" id="log-sleep"></div>
     </div>
   </div>
 
+  <div id="run-prescription-card" style="display:none;" class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;">Run Prescription</div>
+        <div id="run-presc-day-label" style="font-size:15px;font-weight:500;color:var(--t);margin-top:4px;"></div>
+      </div>
+      <button class="btn bp" id="run-presc-btn" onclick="generateRunPrescription()" style="font-size:11px;padding:8px 16px;">Get Today's Plan</button>
+    </div>
+    <div id="run-presc-placeholder" style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">
+      Tap "Get Today's Plan" for an AI-generated run prescription based on your last 90 days of data.
+    </div>
+    <div id="run-presc-output" style="display:none;">
+      <div style="background:var(--s2);border:1px solid var(--a);border-radius:8px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--a);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Primary Recommendation</div>
+        <div id="run-presc-primary" style="font-size:13px;color:var(--t);line-height:1.6;"></div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Alternatives Based on How You Feel</div>
+        <div id="run-presc-alternatives" style="font-size:12px;color:var(--t2);line-height:1.7;"></div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Watch Out For</div>
+        <div id="run-presc-watchout" style="font-size:12px;color:var(--t2);line-height:1.7;"></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;" id="run-presc-reminders"></div>
+    </div>
+    <div id="run-presc-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;min-height:16px;"></div>
+  </div>
+
   <!-- v2026-05-17 19:25:02 -->
-  <div class="card">
+  <div class="card" id="bench-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BENCH PRESS</span><span id="planned-bench" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 190</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="bench-sets"></div>
@@ -447,7 +479,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 
   <!-- v2026-05-17 19:25:02 -->
-  <div class="card">
+  <div class="card" id="ohp-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">OVERHEAD PRESS</span><span id="planned-ohp" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 90</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="ohp-sets"></div>
@@ -460,7 +492,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 
   <!-- v2026-05-17 19:25:02 -->
-  <div class="card">
+  <div class="card" id="squat-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BACK SQUAT</span><span id="planned-squat" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="squat-sets"></div>
@@ -473,7 +505,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 
   <!-- v2026-05-17 19:25:02 -->
-  <div class="card">
+  <div class="card" id="deadlift-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">DEADLIFT</span><span id="planned-dl" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="dl-sets"></div>
@@ -486,7 +518,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 
   <!-- v2026-05-17 19:25:02 -->
-  <div class="card">
+  <div class="card" id="pullup-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span class="bdg a">PULLUPS</span><span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5 sets x 3 clean reps</span></div>
     <div class="g2 k2" style="gap:8px;">
       <div class="ig"><label>Sets completed</label><input type="number" id="pu-sets" placeholder="5"></div>
@@ -1478,6 +1510,163 @@ function toggleRunLogSection(){
   const day=document.getElementById('log-day')?.value||'';
   const sec=document.getElementById('run-log-section');
   if(sec)sec.style.display=['run_easy','run_quality','run_long'].includes(day)?'block':'none';
+}
+function onDayTypeChange(value){
+  const blocks={
+    bench:document.getElementById('bench-block'),
+    ohp:document.getElementById('ohp-block'),
+    squat:document.getElementById('squat-block'),
+    deadlift:document.getElementById('deadlift-block'),
+    pullup:document.getElementById('pullup-block')
+  };
+  const runCard=document.getElementById('run-prescription-card');
+  const showBench=value==='A';
+  const showOhp=value==='A';
+  const showPullup=value==='A';
+  const showSquat=value==='B';
+  const showDeadlift=value==='C';
+  const showRun=['run_easy','run_quality','run_long'].includes(value);
+  if(blocks.bench)blocks.bench.style.display=showBench?'':'none';
+  if(blocks.ohp)blocks.ohp.style.display=showOhp?'':'none';
+  if(blocks.pullup)blocks.pullup.style.display=showPullup?'':'none';
+  if(blocks.squat)blocks.squat.style.display=showSquat?'':'none';
+  if(blocks.deadlift)blocks.deadlift.style.display=showDeadlift?'':'none';
+  // also toggle run-log-section for legacy run log card
+  const sec=document.getElementById('run-log-section');
+  if(sec)sec.style.display=showRun?'block':'none';
+  if(runCard){
+    runCard.style.display=showRun?'':'none';
+    if(showRun){
+      const labels={'run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals/Tempo','run_long':'Long Run'};
+      const labelEl=document.getElementById('run-presc-day-label');
+      if(labelEl)labelEl.textContent=labels[value]||value;
+      runCard.dataset.dayType=value;
+      const placeholder=document.getElementById('run-presc-placeholder');
+      const output=document.getElementById('run-presc-output');
+      const msg=document.getElementById('run-presc-msg');
+      if(placeholder)placeholder.style.display='';
+      if(output)output.style.display='none';
+      if(msg){msg.textContent='';msg.style.color='';}
+    }
+  }
+}
+function startLoggingSession(){
+  const todayDay=document.getElementById('today-day-select')?.value||
+                 document.getElementById('today-day')?.value||
+                 document.querySelector('[data-today-day]')?.dataset.todayDay;
+  gT('log',document.querySelector('.tab:nth-child(2)'));
+  const logDaySelect=document.getElementById('log-day');
+  if(logDaySelect&&todayDay){
+    logDaySelect.value=todayDay;
+    onDayTypeChange(todayDay);
+  }
+}
+async function generateRunPrescription(){
+  const btn=document.getElementById('run-presc-btn');
+  const msg=document.getElementById('run-presc-msg');
+  const placeholder=document.getElementById('run-presc-placeholder');
+  const output=document.getElementById('run-presc-output');
+  if(btn)btn.disabled=true;
+  if(msg){msg.textContent='Analyzing your run history...';msg.style.color='var(--t3)';}
+  try{
+    const dayType=document.getElementById('log-day')?.value||
+                  document.getElementById('run-prescription-card')?.dataset.dayType;
+    const runTypeLabel={'run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals or Tempo','run_long':'Long Run'}[dayType]||'Run';
+    const runs=(D.runs||[]).slice(-20).map(r=>({
+      date:r.date,type:r.runType,distance:r.distance,
+      pace:r.pace?`${Math.floor(r.pace/60)}:${String(r.pace%60).padStart(2,'0')}/mile`:null,
+      hrAvg:r.heartRateAvg,hrMax:r.heartRateMax
+    }));
+    const recentHealth=(D.healthLogs||[]).slice(-7);
+    const withRHR=recentHealth.filter(h=>h.restingHR);
+    const withHRV=recentHealth.filter(h=>h.hrv);
+    const avgRestingHR=withRHR.length?Math.round(withRHR.reduce((s,h)=>s+h.restingHR,0)/withRHR.length):null;
+    const avgHRV=withHRV.length?Math.round(withHRV.reduce((s,h)=>s+h.hrv,0)/withHRV.length):null;
+    const today=localDS(new Date());
+    const todayCheckin=(D.checkins||[]).find(c=>c.date===today);
+    const recentSessions=(D.sessions||[]).slice(-5).map(s=>({date:s.date,dayType:s.day,rpe:s.rpe}));
+    const lastRun=runs[runs.length-1];
+    const lastLift=recentSessions[recentSessions.length-1];
+    const prompt=`You are an expert running coach for Javier, a PGY-1 IM resident.
+
+GOAL: Sub-20 min 5K, maximize VO2max (currently ~44-48 ml/kg/min, target 55+)
+TODAY'S SCHEDULED RUN TYPE: ${runTypeLabel}
+TODAY'S DATE: ${today}
+
+RECENT RUNS (last 20):
+${runs.map(r=>`${r.date} [${r.type}] ${r.distance}mi @ ${r.pace||'?'}/mile · HR avg ${r.hrAvg||'?'} max ${r.hrMax||'?'}`).join('\n')}
+
+RECENT LIFTING (last 5 sessions):
+${recentSessions.map(s=>`${s.date} Day ${s.dayType} RPE ${s.rpe}`).join('\n')}
+
+RECOVERY METRICS (last 7 days):
+- Avg resting HR: ${avgRestingHR||'?'} bpm (baseline 52)
+- Avg HRV: ${avgHRV||'?'} ms
+- Today's check-in: Energy ${todayCheckin?.energy||'not logged'}/10, Soreness ${todayCheckin?.soreness||'not logged'}/10, Stress ${todayCheckin?.stress||'not logged'}/10
+
+LAST RUN: ${lastRun?`${lastRun.date} ${lastRun.type} ${lastRun.distance}mi @ ${lastRun.pace}/mile HR ${lastRun.hrAvg}`:'no recent run'}
+LAST LIFT: ${lastLift?`${lastLift.date} Day ${lastLift.dayType} RPE ${lastLift.rpe}`:'no recent lift'}
+
+Output ONLY a valid JSON object with NO additional text:
+
+{
+  "primaryRecommendation": {
+    "type": "easy|intervals|tempo|long",
+    "distance": "X-Y miles",
+    "pace": "MM:SS-MM:SS/mile",
+    "heartRate": "XXX-XXX bpm",
+    "duration": "XX-XX min",
+    "keyInstruction": "one sentence on the most important thing to focus on"
+  },
+  "alternatives": [
+    {"condition": "if you feel great / if you feel tired / etc", "recommendation": "specific alternative with distance/pace/HR"}
+  ],
+  "watchOutFor": ["specific warning based on their data"],
+  "reminders": ["Log this run on Strava", "Dynamic warm-up before", "other specific reminder"],
+  "coachNote": "1-2 sentence coaching note explaining the reasoning"
+}
+
+Rules:
+- Be specific to their actual data — reference their recent run paces, HRs, and sessions
+- If last session was heavy lower body (squat/deadlift) → keep HR cap strict (<=145 bpm)
+- If HRV is low or resting HR elevated → downgrade intensity regardless of scheduled type
+- Zone 2 HR for Javier = 130-145 bpm (resting HR 52, max ~180)
+- Interval pace target = current 5K effort pace (~6:30-7:00/mile)
+- Tempo pace = comfortably hard, ~7:30-8:00/mile
+- Output valid JSON only, no markdown`;
+    if(msg)msg.textContent='Generating prescription...';
+    const response=await ai(prompt);
+    if(!response)throw new Error('No response');
+    const clean=response.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const start=clean.indexOf('{');
+    const end=clean.lastIndexOf('}');
+    const presc=JSON.parse(clean.slice(start,end+1));
+    const p=presc.primaryRecommendation;
+    document.getElementById('run-presc-primary').innerHTML=`
+      <div style="font-size:15px;font-weight:500;color:var(--a);margin-bottom:8px;">${p.type.toUpperCase()} · ${p.distance} · ${p.duration}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:6px;">Pace: ${p.pace}&nbsp;&nbsp;·&nbsp;&nbsp;HR: ${p.heartRate}</div>
+      <div style="font-size:12px;color:var(--t);margin-top:8px;padding-top:8px;border-top:1px solid var(--b);">${p.keyInstruction}</div>
+      ${presc.coachNote?`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;font-style:italic;">${presc.coachNote}</div>`:''}
+    `;
+    document.getElementById('run-presc-alternatives').innerHTML=
+      (presc.alternatives||[]).map(a=>`<div style="margin-bottom:6px;"><span style="color:var(--a3);">${a.condition}:</span> ${a.recommendation}</div>`).join('');
+    document.getElementById('run-presc-watchout').innerHTML=
+      (presc.watchOutFor||[]).map(w=>`<div style="margin-bottom:4px;">⚠ ${w}</div>`).join('');
+    document.getElementById('run-presc-reminders').innerHTML=
+      (presc.reminders||[]).map(r=>`<div style="margin-bottom:3px;">✓ ${r}</div>`).join('');
+    if(placeholder)placeholder.style.display='none';
+    if(output)output.style.display='block';
+    if(!D.adaptivePlanCache)D.adaptivePlanCache={};
+    if(!D.adaptivePlanCache.runPrescriptions)D.adaptivePlanCache.runPrescriptions={};
+    D.adaptivePlanCache.runPrescriptions[today]=presc;
+    if(typeof pushSilent==='function')await pushSilent();
+    if(msg){msg.textContent='Plan saved ✓';msg.style.color='var(--a3)';setTimeout(()=>{if(msg)msg.textContent='';},3000);}
+  }catch(err){
+    console.error('Run prescription failed:',err);
+    if(msg){msg.textContent='Failed — check API key in Settings';msg.style.color='var(--a4)';}
+  }finally{
+    if(btn)btn.disabled=false;
+  }
 }
 function buildSchedule(){
   const today=new Date(); today.setHours(0,0,0,0);
