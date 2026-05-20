@@ -2400,7 +2400,7 @@
       "date": "2026-05-20",
       "restingHR": 56,
       "hrv": 60.61685093060343,
-      "wristTemp": 94.97133255004876,
+      "wristTemp": -2.02,
       "sleepHours": null,
       "sleepDeep": null,
       "sleepREM": null,
@@ -2414,7 +2414,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-05-20T13:10:32.514Z",
+  "healthLastSync": "2026-05-20T13:27:04.127Z",
   "checkins": [
     {
       "date": "2026-05-20",
