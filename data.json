@@ -2418,5 +2418,6 @@
       "bmi": 32.7,
       "waistHeightRatio": 0.52
     }
-  ]
+  ],
+  "trainingMode": "performance"
 }
