@@ -24,14 +24,25 @@ function extractSimpleNumber(raw, key) {
 }
 
 function extractSleepSeconds(raw) {
-  // Sleep comes as sum of durations in seconds
+  // Sleep is sent from the Shortcut as total seconds of ASLEEP time.
+  // It must NOT include HKCategoryValueSleepAnalysisInBed samples — only
+  // AsleepCore, AsleepDeep, AsleepREM, and AsleepUnspecified.
+  // InBed is a wrapper that spans all stages and double-counts if included.
   const re = /"*sleepHours"*\s*:\s*([\d.]+)/i;
   const match = raw.match(re);
   if (match) {
     const seconds = parseFloat(match[1]);
-    if (!isNaN(seconds) && seconds > 3600) {
-      return Math.round((seconds / 3600) * 10) / 10;
+    console.log(`Sleep raw value from Shortcut: ${seconds} seconds`);
+    if (isNaN(seconds) || seconds <= 0) return null;
+    const hours = Math.round((seconds / 3600) * 10) / 10;
+    // Sanity cap: >14h is impossible for a single night — reject and log
+    if (hours > 14) {
+      console.log(`Sleep rejected (${hours}h > 14h max) — Shortcut is likely including InBed samples. Fix: filter to AsleepCore + AsleepDeep + AsleepREM + AsleepUnspecified only.`);
+      return null;
     }
+    // Minimum meaningful sleep: 1 hour
+    if (hours < 1) return null;
+    return hours;
   }
   return null;
 }
