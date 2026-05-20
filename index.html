@@ -294,19 +294,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <!-- v2026-05-17 19:25:02 -->
 <div id="panel-today" class="panel on">
   <div class="h1">Today's <span>training</span></div>
-  <div style="background:linear-gradient(135deg,rgba(255,183,77,.06),rgba(79,195,247,.06));border:1px solid rgba(255,183,77,.15);border-radius:var(--rl);padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-    <div>
-      <div class="lbl">program state</div>
-      <div style="font-family:var(--serif);font-size:19px;font-weight:300;color:var(--a);">Fat loss + strength base</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Block 1/4 - Volume accumulation</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <select id="mode-sel" style="width:190px;" onchange="modeChg()">
-        <option value="normal">NORMAL mode</option><option value="stress">HIGH STRESS mode</option><option value="maintenance">MAINTENANCE mode</option><option value="deload">DELOAD mode</option><option value="recovery">RECOVERY mode</option><option value="minimum">MINIMUM VIABLE</option>
-      </select>
-      <button class="btn bp bi" onclick="genToday()">AI plan</button>
-    </div>
-  </div>
   <div class="card" id="today-checkin-snapshot">
     <div class="lbl">recovery snapshot · 30 days</div>
     <div id="snapshot-charts"></div>
@@ -402,7 +389,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="ci" id="ci-sl"><input type="checkbox" id="cb-sl" onchange="chk('ci-sl')"><label for="cb-sl">Sleep target -- 7+ hours tonight</label></div>
     </div>
   </div>
-  <div class="card"><div class="lbl">ai coach</div><div id="today-out"><div class="air"><div class="al">TRAINING COACH</div><p>Check your fatigue score above first. If moderate or higher, reduce working weight 5-10% and protect bar speed over ego.</p><p><strong>Recovery rules the program.</strong> Sustainable training during residency beats optimal training every time. A 70% effort session that happens is worth more than a perfect session that doesn't.</p></div></div><div class="brow"><button class="btn bs bi" onclick="genToday()">Regenerate</button></div></div>
+  <div class="card"><div class="lbl">ai coach</div><div id="today-out"><div class="air"><div class="al">TRAINING COACH</div><p>Check your fatigue score above first. If moderate or higher, reduce working weight 5-10% and protect bar speed over ego.</p><p><strong>Recovery rules the program.</strong> Sustainable training during residency beats optimal training every time. A 70% effort session that happens is worth more than a perfect session that doesn't.</p></div></div><div class="brow"><button class="btn bs bi" onclick="genToday()">Regenerate</button></div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;padding:0 4px;">Today's coaching narrative only — does not change your plan weights or prescriptions</div></div>
   <div class="g2">
     <div class="card"><div class="lbl" style="color:var(--a);">reduce if:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>Fatigue score above 70</div><div>Sleep average below 6 hours</div><div>Performance declining 2+ weeks</div><div>Persistent joint soreness</div><div>Cardio metrics regressing</div><div>Severe residency stress (ICU, nights)</div></div></div>
     <div class="card"><div class="lbl" style="color:var(--a3);">reduction order:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>1. Reduce volume first</div><div>2. Reduce intensity second</div><div>3. Reduce frequency third</div><div>4. Switch to minimum viable</div></div><div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:var(--r);font-size:12px;color:var(--a);line-height:1.6;">Reduced training is always preferred over missed training. Consistency during residency IS success.</div></div>
@@ -526,21 +513,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
 
-  <!-- v2026-05-17 19:25:02 -->
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span class="bdg b">CARDIO</span></div>
-    <div class="g2 k2" style="margin-bottom:10px;">
-      <div class="ig"><label>Type</label><select id="card-type"><option>Zone 2 Run</option><option>Intervals</option><option>Bike Zone 2</option><option>Incline Walk</option><option>Other</option></select></div>
-      <div class="ig"><label>Duration (min)</label><input type="number" id="card-dur" placeholder="30"></div>
-    </div>
-    <div class="g3" style="margin-bottom:10px;">
-      <div class="ig"><label>Distance (mi)</label><input type="number" id="card-dist" step="0.1" placeholder="3.5"></div>
-      <div class="ig"><label>Avg HR (bpm)</label><input type="number" id="card-hr" placeholder="150"></div>
-      <div class="ig"><label>Pace (min/mi)</label><input type="text" id="card-pace" placeholder="10:30"></div>
-    </div>
-    <div class="ig"><label>Notes</label><input type="text" id="card-notes" placeholder="Could hold conversation? Legs or lungs limiting?"></div>
-  </div>
-
   <div id="run-log-section" style="display:none;">
     <div class="card">
       <div class="lbl">run log</div>
@@ -578,6 +550,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-week-summary" id="cal-week-summary"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;white-space:nowrap;">Training Mode</div>
+      <select id="training-mode" onchange="setTrainingMode(this.value)"
+        style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:5px 10px;cursor:pointer;">
+        <option value="normal">NORMAL</option>
+        <option value="performance">PERFORMANCE</option>
+        <option value="recovery">RECOVERY</option>
+        <option value="deload">DELOAD</option>
+      </select>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--t3);flex:1;" id="training-mode-desc">Standard progressive overload, balanced volume</div>
+    <button class="btn bp" onclick="generateAdaptivePlan()" style="font-size:11px;padding:8px 14px;white-space:nowrap;">Generate AI Plan</button>
+  </div>
+  <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:-10px;margin-bottom:14px;">
+    Sets lift weights, sets/reps, and run prescriptions for the whole week · Cached until you log a session
   </div>
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -964,6 +953,8 @@ function onLoad(){
   renderProgramTab();
   renderHealthLog();
   renderBodyChart('weight');
+  const modeSelect=document.getElementById('training-mode');
+  if(modeSelect&&D.trainingMode){modeSelect.value=D.trainingMode;setTrainingMode(D.trainingMode);}
 }
 
 // ============================================================
@@ -1009,9 +1000,15 @@ function upF(){
 }
 
 function modeChg(){
-  const m=document.getElementById('mode-sel').value;
+  const m=document.getElementById('mode-sel')?.value||'normal';
   const t={normal:'<p><strong>Normal:</strong> Follow prescribed volume. Compound lifts first, accessories second.</p>',stress:'<p><strong>High stress:</strong> Reduce volume 20-30%. Keep compound weight, cut sets. Drop accessories.</p>',maintenance:'<p><strong>Maintenance:</strong> One heavy set per lift. Preserve, do not accumulate fatigue.</p>',deload:'<p><strong>Deload:</strong> Reduce load 30-50%. Maintain movement patterns. Sleep and eat. No grinders.</p>',recovery:'<p><strong>Recovery:</strong> Zone 2 cardio and mobility only. No heavy loading.</p>',minimum:'<p><strong>Minimum viable:</strong> Main lift only OR cardio only. Getting there is the win.</p>'};
-  document.getElementById('today-out').innerHTML='<div class="air"><div class="al">MODE</div>'+t[m]+'</div>';
+  const out=document.getElementById('today-out');if(out)out.innerHTML='<div class="air"><div class="al">MODE</div>'+t[m]+'</div>';
+}
+function setTrainingMode(val){
+  const descs={normal:'Standard progressive overload, balanced volume',performance:'Push intensity, prioritize PRs, reduce accessories',recovery:'Reduce volume 20–30%, keep frequency, no new PRs',deload:'50% volume, easy runs only, active recovery week'};
+  const el=document.getElementById('training-mode-desc');
+  if(el)el.textContent=descs[val]||'';
+  if(D){D.trainingMode=val;if(typeof pushSilent==='function')pushSilent();}
 }
 
 // ============================================================
@@ -1057,7 +1054,7 @@ async function saveSession(){
   const date=document.getElementById('log-date').value,day=document.getElementById('log-day').value;
   if(!date||!day){ msg('log-smsg','Fill in date and day type'); return; }
   const getLift=l=>({sets:SD[l].filter(s=>s.w||s.r).map(s=>({w:+s.w||null,r:+s.r||null,rpe:+s.rpe||null})),notes:document.getElementById(l+'-notes')?.value||''});
-  const session={date,day,rpe:+document.getElementById('log-rpe').value||null,duration:+document.getElementById('log-dur').value||null,energy:+document.getElementById('log-energy').value||null,bw:+document.getElementById('log-bw').value||null,sleep:+document.getElementById('log-sleep').value||null,notes:document.getElementById('log-notes').value,bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullups:{sets:+document.getElementById('pu-sets').value||null,reps:+document.getElementById('pu-reps').value||null},cardio:{type:document.getElementById('card-type').value,dur:+document.getElementById('card-dur').value||null,dist:+document.getElementById('card-dist').value||null,hr:+document.getElementById('card-hr').value||null,pace:document.getElementById('card-pace').value,notes:document.getElementById('card-notes').value},ts:Date.now()};
+  const session={date,day,rpe:+document.getElementById('log-rpe').value||null,duration:+document.getElementById('log-dur').value||null,energy:+document.getElementById('log-energy').value||null,bw:+document.getElementById('log-bw').value||null,sleep:+document.getElementById('log-sleep').value||null,notes:document.getElementById('log-notes').value,bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullups:{sets:+document.getElementById('pu-sets').value||null,reps:+document.getElementById('pu-reps').value||null},cardio:{type:'',dur:null,dist:null,hr:null,pace:'',notes:''},ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
   D.adherence=(D.adherence||{});D.adherence.completed=(D.adherence.completed||0)+1;
@@ -1075,7 +1072,7 @@ async function saveSession(){
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
 function resetLogForm(){
-  ['log-rpe','log-dur','log-energy','log-bw','log-sleep','log-notes','card-dur','card-dist','card-hr','card-pace','card-notes','pu-sets','pu-reps'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['log-rpe','log-dur','log-energy','log-bw','log-sleep','log-notes','pu-sets','pu-reps'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   initSets();
 }
 function renderSessHist(){
@@ -2235,8 +2232,8 @@ function renderSnapshotCharts(){
         plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
         scales:{
           x:{ticks:{color:'#4a5068',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'}},
-          yResting:{type:'linear',position:'left',min:40,max:80,ticks:{color:'rgba(255,99,71,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.04)'}},
-          yWalking:{type:'linear',position:'right',min:80,max:140,ticks:{color:'rgba(255,183,77,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{display:false}}
+          yResting:{type:'linear',position:'left',min:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.1,2);return Math.floor(rMin-rPad);})(),max:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.1,2);return Math.ceil(rMax+rPad);})(),ticks:{color:'rgba(255,99,71,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.04)'}},
+          yWalking:{type:'linear',position:'right',min:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.1,2);return Math.floor(wMin-wPad);})(),max:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.1,2);return Math.ceil(wMax+wPad);})(),ticks:{color:'rgba(255,183,77,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{display:false}}
         }
       }
     });
