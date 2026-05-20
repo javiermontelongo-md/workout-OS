@@ -2438,31 +2438,74 @@
   ],
   "trainingMode": "performance",
   "racePredictions": {
-    "generatedAt": "2026-05-20T15:02:08.537Z",
+    "generatedAt": "2026-05-20T15:03:54.440Z",
     "vo2maxUsed": 44.48,
     "runCount": 23,
-    "methodLabel": "Riegel",
+    "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1666,
-        "ciSeconds": 283,
-        "method": "Riegel"
+        "seconds": 1734,
+        "ciSeconds": 295,
+        "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3440,
-        "ciSeconds": 760,
-        "method": "Riegel"
+        "seconds": 3580,
+        "ciSeconds": 791,
+        "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 7504,
-        "ciSeconds": 2169,
-        "method": "Riegel"
+        "seconds": 7810,
+        "ciSeconds": 2257,
+        "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 15546,
-        "ciSeconds": 6872,
-        "method": "Riegel"
+        "seconds": 16194,
+        "ciSeconds": 7158,
+        "method": "VO2max / VDOT"
       }
+    },
+    "medianTrainingPace": 661.2,
+    "debugInfo": {
+      "riegelPred": {
+        "s5k": 2081,
+        "s10k": 4339,
+        "shalf": 9574,
+        "sfull": 19961,
+        "anchor": {
+          "date": "2026-05-02",
+          "stravaId": 18353167787,
+          "name": "Ez run",
+          "type": "run",
+          "distance": 2.5,
+          "duration": 1653,
+          "pace": 661,
+          "elevationGain": 94,
+          "heartRateAvg": 151.5,
+          "heartRateMax": 166,
+          "source": "strava",
+          "runType": "easy"
+        },
+        "anchorType": "median of last 5 runs"
+      },
+      "vdotPred": {
+        "s5k": 1482,
+        "s10k": 3084,
+        "shalf": 6768,
+        "sfull": 14196
+      },
+      "hrPred": {
+        "s5k": 1841,
+        "s10k": 3683,
+        "shalf": 7770,
+        "sfull": 15540
+      },
+      "weights": {
+        "riegel": 0.3,
+        "vdot": 0.5,
+        "hr": 0.2
+      },
+      "vo2maxSource": "Apple Watch",
+      "medianPace": 661.2
     }
   }
 }
