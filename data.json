@@ -2436,5 +2436,33 @@
       "waistHeightRatio": 0.52
     }
   ],
-  "trainingMode": "performance"
+  "trainingMode": "performance",
+  "racePredictions": {
+    "generatedAt": "2026-05-20T14:29:59.403Z",
+    "vo2maxUsed": 44.48,
+    "runCount": 23,
+    "methodLabel": "Riegel",
+    "predictions": {
+      "s5k": {
+        "seconds": 1666,
+        "ciSeconds": 283,
+        "method": "Riegel"
+      },
+      "s10k": {
+        "seconds": 3440,
+        "ciSeconds": 760,
+        "method": "Riegel"
+      },
+      "shalf": {
+        "seconds": 7504,
+        "ciSeconds": 2169,
+        "method": "Riegel"
+      },
+      "sfull": {
+        "seconds": 15546,
+        "ciSeconds": 6872,
+        "method": "Riegel"
+      }
+    }
+  }
 }
