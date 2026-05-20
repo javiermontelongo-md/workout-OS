@@ -46,6 +46,82 @@
         "notes": ""
       },
       "ts": 1779026884276
+    },
+    {
+      "date": "2026-05-20",
+      "day": "A",
+      "rpe": null,
+      "duration": null,
+      "energy": null,
+      "bw": null,
+      "sleep": null,
+      "notes": "",
+      "bench": {
+        "sets": [
+          {
+            "w": 205,
+            "r": 3,
+            "rpe": 9
+          },
+          {
+            "w": 205,
+            "r": 4,
+            "rpe": 10
+          },
+          {
+            "w": 205,
+            "r": 4,
+            "rpe": 10
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 100,
+            "r": null,
+            "rpe": null
+          },
+          {
+            "w": 100,
+            "r": 7,
+            "rpe": 7
+          },
+          {
+            "w": 100,
+            "r": 7,
+            "rpe": 8
+          },
+          {
+            "w": 100,
+            "r": 7,
+            "rpe": 8
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullups": {
+        "sets": 3,
+        "reps": null
+      },
+      "cardio": {
+        "type": "Zone 2 Run",
+        "dur": null,
+        "dist": null,
+        "hr": null,
+        "pace": "",
+        "notes": ""
+      },
+      "ts": 1779309550700
     }
   ],
   "recoveryLogs": [],
@@ -63,7 +139,7 @@
     "benchE1RM": 255,
     "squatE1RM": 215,
     "deadliftE1RM": 215,
-    "ohpE1RM": 120,
+    "ohpE1RM": 123,
     "pullups": 5
   },
   "cardioBaseline": {
@@ -79,7 +155,7 @@
   },
   "adherence": {
     "planned": 5,
-    "completed": 1,
+    "completed": 2,
     "missed": 0
   },
   "runs": [
