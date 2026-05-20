@@ -664,25 +664,36 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">5K</div>
         <div style="font-size:20px;font-weight:600;color:var(--a);" id="pred-5k-time">--:--</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-5k-pace"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-5k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">10K</div>
         <div style="font-size:20px;font-weight:600;color:var(--a);" id="pred-10k-time">--:--</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-10k-pace"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-10k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Half Marathon</div>
         <div style="font-size:20px;font-weight:600;color:var(--a2);" id="pred-half-time">--:--</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-half-pace"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-half-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Marathon</div>
         <div style="font-size:20px;font-weight:600;color:var(--t2);" id="pred-full-time">--:--</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-full-pace"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-full-ci"></div>
       </div>
     </div>
     <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-bottom:14px;" id="race-pred-method"></div>
+
+    <details style="margin-bottom:14px;" id="race-pred-details">
+      <summary style="font-family:var(--mono);font-size:10px;color:var(--t3);cursor:pointer;user-select:none;list-style:none;padding:6px 0;">
+        How this is calculated ▾
+      </summary>
+      <div id="race-pred-formula" style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;padding:10px;background:var(--s2);border-radius:6px;margin-top:6px;white-space:pre-wrap;"></div>
+    </details>
 
     <!-- Trajectory chart -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -1498,21 +1509,18 @@ function vdotPredict(vo2max) {
 }
 
 function riegelPredict(runs) {
-  // Find best pace run for each distance bracket in last 90 days
   const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
   const cutoffStr = cutoff.getFullYear()+'-'+String(cutoff.getMonth()+1).padStart(2,'0')+'-'+String(cutoff.getDate()).padStart(2,'0');
   const recent = runs.filter(r => r.date >= cutoffStr && r.distance > 0 && r.duration > 0);
   if (recent.length === 0) return null;
 
-  // Best pace run overall (anchor)
-  const best = recent.reduce((b, r) => {
-    const pace = r.duration / r.distance;
-    const bpace = b.duration / b.distance;
-    return pace < bpace ? r : b;
-  });
+  // Use median pace of last 5 runs as anchor (more representative than best pace)
+  const last5 = recent.slice(-5);
+  const sorted = [...last5].sort((a,b) => (a.duration/a.distance) - (b.duration/b.distance));
+  const medianRun = sorted[Math.floor(sorted.length/2)];
 
-  const T1 = best.duration; // seconds
-  const D1 = best.distance * 1609.34; // meters
+  const T1 = medianRun.duration;
+  const D1 = medianRun.distance * 1609.34;
   const riegel = (D2) => T1 * Math.pow(D2 / D1, 1.06);
 
   return {
@@ -1520,7 +1528,8 @@ function riegelPredict(runs) {
     s10k: Math.round(riegel(10000)),
     shalf:Math.round(riegel(21097)),
     sfull:Math.round(riegel(42195)),
-    anchor: best
+    anchor: medianRun,
+    anchorType: 'median of last 5 runs'
   };
 }
 
@@ -1579,10 +1588,21 @@ function calcRacePredictions() {
   const vdot = vo2max ? vdotPredict(vo2max) : null;
   const hrReg = runCount >= 3 ? hrRegressionPredict(runs) : null;
 
+  // Median training pace for reality check
+  const last5runs = runs.slice(-5).filter(r=>r.distance>0&&r.duration>0);
+  const medianTrainingPace = last5runs.length > 0 ? (() => {
+    const paces = last5runs.map(r=>r.duration/r.distance).sort((a,b)=>a-b);
+    return paces[Math.floor(paces.length/2)];
+  })() : null;
+
+  console.log('Race predictions - Riegel:', riegel ? {s5k:secsToRaceTime(riegel.s5k), s10k:secsToRaceTime(riegel.s10k)} : 'N/A',
+    'VO2max:', vdot ? {s5k:secsToRaceTime(vdot.s5k), s10k:secsToRaceTime(vdot.s10k)} : 'N/A',
+    'HRreg:', hrReg ? {s5k:secsToRaceTime(hrReg.s5k), s10k:secsToRaceTime(hrReg.s10k)} : 'N/A');
+
   const distances = ['s5k','s10k','shalf','sfull'];
 
   // Determine weights based on available methods
-  let w = { riegel: riegel ? 0.4 : 0, vdot: vdot ? 0.4 : 0, hr: hrReg ? 0.2 : 0 };
+  let w = { riegel: riegel ? 0.3 : 0, vdot: vdot ? 0.5 : 0, hr: hrReg ? 0.2 : 0 };
   const wSum = w.riegel + w.vdot + w.hr;
   if (wSum === 0) return null;
   // Normalize weights
@@ -1616,9 +1636,20 @@ function calcRacePredictions() {
     if (vals.length === 0) { predictions[d] = null; return; }
 
     // Weighted average
-    const wt = vals.reduce((s,v,i)=>s+v*weights[i],0) / weights.reduce((s,w)=>s+w,0);
+    let wt = vals.reduce((s,v,i)=>s+v*weights[i],0) / weights.reduce((s,w)=>s+w,0);
     const ciPct = (baseCI + sdFactor) * distFactors[d];
     const ciSecs = Math.round(wt * ciPct);
+
+    // Reality check for 5K: if prediction is >15% faster than median training pace, cap it
+    if (d === 's5k' && medianTrainingPace) {
+      const predictedPacePerMile = wt / 3.107; // sec/mile for 5K
+      const maxReasonablePace = medianTrainingPace * 0.92; // 8% faster than training = race effort
+      if (predictedPacePerMile < maxReasonablePace * 0.85) { // >15% too fast
+        const cappedTime = maxReasonablePace * 3.107;
+        console.log(`Reality check: 5K capped from ${secsToRaceTime(Math.round(wt))} to ${secsToRaceTime(Math.round(cappedTime))} (training pace ${secsToRaceTime(Math.round(medianTrainingPace))}/mi)`);
+        wt = cappedTime;
+      }
+    }
 
     predictions[d] = { seconds: Math.round(wt), ciSeconds: ciSecs, method: methodLabel };
   });
@@ -1628,7 +1659,16 @@ function calcRacePredictions() {
     vo2maxUsed: vo2max,
     runCount,
     methodLabel,
-    predictions
+    predictions,
+    medianTrainingPace,
+    debugInfo: {
+      riegelPred: riegel,
+      vdotPred: vdot,
+      hrPred: hrReg,
+      weights: w,
+      vo2maxSource: latestVO2 ? 'Apple Watch' : (calcVO2 ? 'HR reserve calc' : null),
+      medianPace: medianTrainingPace
+    }
   };
 }
 
@@ -1639,6 +1679,14 @@ function secsToRaceTime(s) {
   const sec = s % 60;
   if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
   return `${m}:${String(sec).padStart(2,'0')}`;
+}
+
+function secsToPace(totalSecs, miles) {
+  if (!totalSecs || !miles) return '';
+  const paceSecPerMile = totalSecs / miles;
+  const m = Math.floor(paceSecPerMile / 60);
+  const s = Math.round(paceSecPerMile % 60);
+  return `~ ${m}:${String(s).padStart(2,'0')} /mi`;
 }
 
 function renderRacePredictions() {
@@ -1667,20 +1715,53 @@ function renderRacePredictions() {
   const method = document.getElementById('race-pred-method');
   if (method) method.textContent = `Primary method: ${pred.methodLabel}`;
 
+  const distMiles = { s5k:3.107, s10k:6.214, shalf:13.109, sfull:26.219 };
+
   const display = [
-    { key:'s5k',  elT:'pred-5k-time',   elCI:'pred-5k-ci'   },
-    { key:'s10k', elT:'pred-10k-time',  elCI:'pred-10k-ci'  },
-    { key:'shalf',elT:'pred-half-time', elCI:'pred-half-ci' },
-    { key:'sfull',elT:'pred-full-time', elCI:'pred-full-ci' }
+    { key:'s5k',  elT:'pred-5k-time',   elCI:'pred-5k-ci',   elP:'pred-5k-pace'   },
+    { key:'s10k', elT:'pred-10k-time',  elCI:'pred-10k-ci',  elP:'pred-10k-pace'  },
+    { key:'shalf',elT:'pred-half-time', elCI:'pred-half-ci', elP:'pred-half-pace' },
+    { key:'sfull',elT:'pred-full-time', elCI:'pred-full-ci', elP:'pred-full-pace' }
   ];
 
-  display.forEach(({key, elT, elCI}) => {
+  display.forEach(({key, elT, elCI, elP}) => {
     const p = pred.predictions[key];
     const tEl = document.getElementById(elT);
     const cEl = document.getElementById(elCI);
+    const pEl = document.getElementById(elP);
     if (tEl) tEl.textContent = p ? secsToRaceTime(p.seconds) : '--:--';
+    if (pEl) pEl.textContent = p ? secsToPace(p.seconds, distMiles[key]) : '';
     if (cEl) cEl.textContent = p ? `± ${secsToRaceTime(p.ciSeconds)}` : '';
   });
+
+  // Populate the "How this is calculated" collapsible
+  const formulaEl = document.getElementById('race-pred-formula');
+  if (formulaEl && pred.debugInfo) {
+    const db = pred.debugInfo;
+    const r = db.riegelPred;
+    const v = db.vdotPred;
+    const h = db.hrPred;
+    const anchorPace = r?.anchor ? secsToPace(r.anchor.duration, r.anchor.distance) : '?';
+    const anchorDate = r?.anchor?.date || '?';
+    const hrPaceStr = h ? secsToPace(h.s5k, 3.107) : 'insufficient data';
+    const hrRunCount = (D.runs||[]).filter(r=>r.heartRateAvg&&r.distance>0).length;
+    const threshHR = 167;
+
+    formulaEl.textContent = [
+      `Riegel formula (${Math.round((db.weights.riegel||0)*100)}%): T2 = T1 × (D2/D1)^1.06`,
+      `  Anchor run: ${anchorDate}  ${r?.anchor?.distance?.toFixed(1)||'?'} mi @ ${anchorPace}`,
+      ``,
+      `VO2max method (${Math.round((db.weights.vdot||0)*100)}%): VDOT table lookup`,
+      `  VO2max used: ~${pred.vo2maxUsed ? Math.round(pred.vo2maxUsed) : '?'} ml/kg/min`,
+      `  Source: ${db.vo2maxSource || 'not available'}`,
+      ``,
+      `HR-pace regression (${Math.round((db.weights.hr||0)*100)}%): linear fit across ${hrRunCount} runs`,
+      `  Threshold HR: ${threshHR} bpm → projected pace: ${hrPaceStr}`,
+      ``,
+      `Weighted average of all three methods.`,
+      `Confidence interval widens with distance and narrows with more data.`
+    ].join('\n');
+  }
 
   setRacePredChart('5k');
 }
@@ -1703,101 +1784,139 @@ function renderRacePredChart(dist) {
   if (_racePredChart) { _racePredChart.destroy(); _racePredChart = null; }
 
   const runs = (D.runs||[]).filter(r=>r.type==='run').sort((a,b)=>a.date.localeCompare(b.date));
-  if (runs.length < 1) return;
-
   const distKey = { '5k':'s5k', '10k':'s10k', 'half':'shalf', 'full':'sfull' }[dist];
-  const labels = [];
-  const dataPoints = [];
-  const ciUpper = [];
-  const ciLower = [];
+  const distLabel = {s5k:'5K',s10k:'10K',shalf:'Half Marathon',sfull:'Marathon'}[distKey];
 
-  // Rolling prediction at each run date using only data up to that point
-  runs.forEach((run, i) => {
-    const subset = runs.slice(0, i+1);
-    const subRuns = subset;
-    const latestVO2 = (D.healthLogs||[]).filter(h=>h.vo2maxApple&&h.date<=run.date).slice(-1)[0]?.vo2maxApple;
-    const calcVO2 = (() => {
-      const estimates = subRuns.slice(-10).map(r=>estimateVO2max(r)).filter(v=>v!==null);
-      if (!estimates.length) return null;
-      estimates.sort((a,b)=>a-b);
-      return estimates[Math.round(estimates.length*0.7)] || estimates[estimates.length-1];
+  // Build 90-day window: 45 days ago to 45 days from now
+  const todayD = new Date();
+  const todayStr = todayD.getFullYear()+'-'+String(todayD.getMonth()+1).padStart(2,'0')+'-'+String(todayD.getDate()).padStart(2,'0');
+
+  const allLabels = [];
+  const todayIndex = 45;
+  for (let i = -45; i <= 45; i++) {
+    const d = new Date(todayD);
+    d.setDate(d.getDate() + i);
+    allLabels.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
+  }
+
+  // Past data: rolling prediction at each run date (only runs in the window)
+  const pastData = allLabels.map(() => null);
+  const pastRuns = runs.filter(r => r.date >= allLabels[0] && r.date <= todayStr);
+
+  pastRuns.forEach(run => {
+    const idx = allLabels.indexOf(run.date);
+    if (idx < 0) return;
+    const subset = runs.filter(r => r.date <= run.date);
+    const lvo2 = (D.healthLogs||[]).filter(h=>h.vo2maxApple&&h.date<=run.date).slice(-1)[0]?.vo2maxApple;
+    const cv = (() => {
+      const est = subset.slice(-10).map(r=>estimateVO2max(r)).filter(v=>v!=null);
+      if (!est.length) return null;
+      est.sort((a,b)=>a-b);
+      return est[Math.round(est.length*0.7)] || est[est.length-1];
     })();
-    const vo2 = latestVO2 || calcVO2;
-
-    const r = subRuns.length >= 1 ? riegelPredict(subRuns) : null;
+    const vo2 = lvo2 || cv;
+    const r = subset.length>=1 ? riegelPredict(subset) : null;
     const v = vo2 ? vdotPredict(vo2) : null;
-    const h = subRuns.length >= 3 ? hrRegressionPredict(subRuns) : null;
-
-    let w = { r: r?0.4:0, v: v?0.4:0, h: h?0.2:0 };
+    const h = subset.length>=3 ? hrRegressionPredict(subset) : null;
+    let w = {r:r?0.3:0, v:v?0.5:0, h:h?0.2:0};
     const ws = w.r+w.v+w.h;
-    if (ws === 0) return;
+    if (ws===0) return;
     Object.keys(w).forEach(k=>w[k]/=ws);
-
-    const vals = [], wts = [];
-    if (r&&r[distKey]){vals.push(r[distKey]);wts.push(w.r);}
-    if (v&&v[distKey]){vals.push(v[distKey]);wts.push(w.v);}
-    if (h&&h[distKey]){vals.push(h[distKey]);wts.push(h.h||w.h);}
-    if (!vals.length) return;
-
+    const vals=[],wts=[];
+    if(r&&r[distKey]){vals.push(r[distKey]);wts.push(w.r);}
+    if(v&&v[distKey]){vals.push(v[distKey]);wts.push(w.v);}
+    if(h&&h[distKey]){vals.push(h[distKey]);wts.push(w.h);}
+    if(!vals.length) return;
     const wt = vals.reduce((s,v,i)=>s+v*wts[i],0)/wts.reduce((s,w)=>s+w,0);
-    const ci = wt * (subRuns.length < 5 ? 0.15 : subRuns.length < 15 ? 0.10 : 0.07);
-
-    labels.push(run.date);
-    dataPoints.push(Math.round(wt / 60 * 10) / 10); // minutes
-    ciUpper.push(Math.round((wt + ci) / 60 * 10) / 10);
-    ciLower.push(Math.round((wt - ci) / 60 * 10) / 10);
+    pastData[idx] = Math.round(wt/60*10)/10;
   });
 
-  if (labels.length === 0) return;
+  // Get current prediction (most recent non-null past point or from today)
+  const currentPred = calcRacePredictions();
+  const currentSecs = currentPred?.predictions?.[distKey]?.seconds;
+  const currentMins = currentSecs ? currentSecs/60 : null;
 
-  // Goal line: sub-20 for 5K, Riegel-scaled for others
+  // Future projection: 0.5% improvement per week
+  const futureData = allLabels.map(()=>null);
+  const futureCIUpper = allLabels.map(()=>null);
+  const futureCILower = allLabels.map(()=>null);
+
+  if (currentMins) {
+    const improvPerDay = 0.005 / 7; // 0.5% per week
+    const coneWidenPerDay = 0.02 / 7; // 2% per week
+    const baseCIpct = (D.runs||[]).length < 5 ? 0.15 : (D.runs||[]).length < 15 ? 0.10 : 0.07;
+
+    for (let i = todayIndex; i < allLabels.length; i++) {
+      const daysAhead = i - todayIndex;
+      const projMins = currentMins * (1 - improvPerDay * daysAhead);
+      const ciWidth = currentMins * (baseCIpct + coneWidenPerDay * daysAhead);
+      futureData[i] = Math.round(projMins * 10) / 10;
+      futureCIUpper[i] = Math.round((projMins + ciWidth) * 10) / 10;
+      futureCILower[i] = Math.round((projMins - ciWidth) * 10) / 10;
+    }
+    // Connect past to future at today
+    if (pastData[todayIndex] === null) pastData[todayIndex] = Math.round(currentMins * 10) / 10;
+  }
+
+  // Goal
   const goalSecs5k = 1200;
   const goalDistM = {s5k:5000,s10k:10000,shalf:21097,sfull:42195};
   const goalSecs = goalSecs5k * Math.pow(goalDistM[distKey]/5000, 1.06);
-  const goalMins = Math.round(goalSecs / 60 * 10) / 10;
+  const goalMins = Math.round(goalSecs/60*10)/10;
 
-  const distLabel = {s5k:'5K',s10k:'10K',shalf:'Half Marathon',sfull:'Marathon'}[distKey];
   const legend = document.getElementById('race-pred-chart-legend');
-  if (legend) legend.textContent = `${distLabel} prediction trend · Goal: ${secsToRaceTime(Math.round(goalSecs))} · Lower = faster`;
+  if (legend) legend.textContent = `${distLabel} · Solid = past data · Dashed = projection · Goal: ${secsToRaceTime(Math.round(goalSecs))}`;
 
   _racePredChart = new Chart(canvas.getContext('2d'), {
     type: 'line',
     data: {
-      labels,
+      labels: allLabels,
       datasets: [
         {
-          label: 'Predicted',
-          data: dataPoints,
+          label: 'Past prediction',
+          data: pastData,
           borderColor: 'rgba(255,183,77,0.9)',
-          backgroundColor: 'rgba(255,183,77,0.1)',
-          pointRadius: 3,
+          backgroundColor: 'transparent',
+          pointRadius: (ctx) => pastData[ctx.dataIndex] !== null ? 3 : 0,
           tension: 0.3,
           fill: false,
-          spanGaps: true
+          spanGaps: false
+        },
+        {
+          label: 'Future projection',
+          data: futureData,
+          borderColor: 'rgba(255,183,77,0.5)',
+          borderDash: [5,4],
+          pointRadius: 0,
+          tension: 0.3,
+          fill: false,
+          spanGaps: false
         },
         {
           label: 'CI Upper',
-          data: ciUpper,
-          borderColor: 'rgba(255,183,77,0.2)',
+          data: futureCIUpper,
+          borderColor: 'rgba(255,183,77,0.15)',
           borderDash: [3,3],
           pointRadius: 0,
           fill: false,
-          tension: 0.3
+          tension: 0.3,
+          spanGaps: false
         },
         {
           label: 'CI Lower',
-          data: ciLower,
-          borderColor: 'rgba(255,183,77,0.2)',
+          data: futureCILower,
+          borderColor: 'rgba(255,183,77,0.15)',
           borderDash: [3,3],
           pointRadius: 0,
           fill: '-1',
-          backgroundColor: 'rgba(255,183,77,0.06)',
-          tension: 0.3
+          backgroundColor: 'rgba(255,183,77,0.07)',
+          tension: 0.3,
+          spanGaps: false
         },
         {
           label: 'Goal',
-          data: labels.map(()=>goalMins),
-          borderColor: 'rgba(127,255,110,0.5)',
+          data: allLabels.map(()=>goalMins),
+          borderColor: 'rgba(127,255,110,0.45)',
           borderDash: [6,4],
           pointRadius: 0,
           fill: false,
@@ -1811,25 +1930,33 @@ function renderRacePredChart(dist) {
       plugins: {
         legend: { display: false },
         tooltip: {
+          filter: item => item.dataset.label === 'Past prediction' || item.dataset.label === 'Future projection',
           callbacks: {
-            label: ctx => {
-              const mins = ctx.parsed.y;
-              const totalSecs = Math.round(mins * 60);
-              return ctx.dataset.label + ': ' + secsToRaceTime(totalSecs);
-            }
+            label: ctx => ctx.dataset.label+': '+secsToRaceTime(Math.round(ctx.parsed.y*60))
           }
         }
       },
       scales: {
         x: {
-          ticks: { color:'#4a5068', font:{size:9}, maxTicksLimit:8, maxRotation:0 },
-          grid: { color:'rgba(255,255,255,0.04)' }
+          ticks: {
+            color:'#4a5068', font:{size:9}, maxTicksLimit:9, maxRotation:0,
+            callback: function(val, i) {
+              const lbl = allLabels[i];
+              if (!lbl) return '';
+              if (lbl === todayStr) return 'TODAY';
+              // Show every ~7 days
+              if (i % 9 === 0) return lbl.slice(5);
+              return '';
+            }
+          },
+          grid: {
+            color: (ctx) => ctx.index === todayIndex ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.04)'
+          }
         },
         y: {
           reverse: true,
           ticks: {
-            color:'#4a5068',
-            font:{size:9},
+            color:'#4a5068', font:{size:9},
             callback: v => secsToRaceTime(Math.round(v*60))
           },
           grid: { color:'rgba(255,255,255,0.04)' }
