@@ -122,14 +122,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
 @media(max-width:768px){
   .hdr{display:none;}
-  .mbar{display:flex !important;background:var(--s1);border-bottom:1px solid var(--b);padding:11px 16px 9px;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .mbar{display:flex;background:var(--s1);border-bottom:1px solid var(--b);padding:11px 16px 9px;align-items:center;justify-content:space-between;flex-shrink:0;}
   .mlogo{font-family:var(--serif);font-size:19px;font-weight:300;color:var(--a);}
   .mlogo span{color:var(--t2);font-style:italic;}
   .app{height:100dvh;overflow:hidden;}
   .main{padding:0;max-width:100%;flex:1;overflow:hidden;position:relative;}
   .app .panel{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(var(--nav) + var(--safe) + 14px);display:none;}
   .app .panel.on{display:block;}
-  .bnav{display:flex !important;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b);padding-bottom:var(--safe);z-index:100;height:calc(var(--nav) + var(--safe));overflow-x:auto;scrollbar-width:none;}
+  .bnav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b);padding-bottom:var(--safe);z-index:100;height:calc(var(--nav) + var(--safe));overflow-x:auto;scrollbar-width:none;}
   .bnav::-webkit-scrollbar{display:none;}
   .ni{flex:1;min-width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 2px;cursor:pointer;gap:3px;border:none;background:none;}
   .nicon{font-family:var(--mono);font-size:14px;color:var(--t2);}
@@ -987,19 +987,6 @@ function sync(state,label){
 }
 function msg(id,html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
 
-// ============================================================
-// FATIGUE METER
-// ============================================================
-function upF(){
-  const e=+document.getElementById('sle').value,s=+document.getElementById('sls').value,sr=+document.getElementById('slsr').value,m=+document.getElementById('slm').value;
-  document.getElementById('ve').textContent=e+'/10';document.getElementById('vs').textContent=s+'h';document.getElementById('vsr').textContent=sr+'/10';document.getElementById('vm').textContent=m+'/10';
-  const fat=Math.max(0,Math.min(100,Math.round(((10-e)+(10-s/9*10)+sr+(10-m))/4*10)));
-  document.getElementById('bfill').style.width=fat+'%';
-  const c=fat<25?'var(--a3)':fat<50?'var(--a)':fat<75?'var(--a4)':'var(--red)';
-  const l=fat<25?'LOW':fat<50?'MODERATE':fat<75?'HIGH':'CRITICAL';
-  document.getElementById('bfill').style.background=c;document.getElementById('flbl').textContent=l;document.getElementById('flbl').style.color=c;
-}
-
 function modeChg(){
   const m=document.getElementById('mode-sel')?.value||'normal';
   const t={normal:'<p><strong>Normal:</strong> Follow prescribed volume. Compound lifts first, accessories second.</p>',stress:'<p><strong>High stress:</strong> Reduce volume 20-30%. Keep compound weight, cut sets. Drop accessories.</p>',maintenance:'<p><strong>Maintenance:</strong> One heavy set per lift. Preserve, do not accumulate fatigue.</p>',deload:'<p><strong>Deload:</strong> Reduce load 30-50%. Maintain movement patterns. Sleep and eat. No grinders.</p>',recovery:'<p><strong>Recovery:</strong> Zone 2 cardio and mobility only. No heavy loading.</p>',minimum:'<p><strong>Minimum viable:</strong> Main lift only OR cardio only. Getting there is the win.</p>'};
@@ -1105,34 +1092,6 @@ function updProgressStats(){
   if(D.cardioBaseline){if(e('pr-pace'))e('pr-pace').textContent=D.cardioBaseline.pace||'10:30';if(e('pr-hr'))e('pr-hr').textContent=D.cardioBaseline.avgHR||165;}
   if(D.profile&&e('pr-bw'))e('pr-bw').textContent=D.profile.bodyweight||225;
   if(D.volumeBests){if(e('vol-bench'))e('vol-bench').textContent=D.volumeBests.bench||'190x5x5';if(e('vol-ohp'))e('vol-ohp').textContent=D.volumeBests.ohp||'90x3x5';if(e('vol-squat'))e('vol-squat').textContent=D.volumeBests.squat||'160x5x5';if(e('vol-dl'))e('vol-dl').textContent=D.volumeBests.deadlift||'160x3x5';}
-}
-
-// ============================================================
-// RECOVERY
-// ============================================================
-function upRec(){
-  const sl=+document.getElementById('rs-sl').value,so=+document.getElementById('rs-so').value,mo=+document.getElementById('rs-mo').value,en=+document.getElementById('rs-en').value;
-  document.getElementById('rv-sl').textContent=sl+'/10';document.getElementById('rv-so').textContent=so+'/10';document.getElementById('rv-mo').textContent=mo+'/10';document.getElementById('rv-en').textContent=en+'/10';
-  const score=+((sl+(10-so)+mo+en)/4).toFixed(1);
-  const pct=score*10;
-  document.getElementById('rec-fill').style.width=pct+'%';
-  const c=pct>70?'var(--a3)':pct>50?'var(--a)':pct>30?'var(--a4)':'var(--red)';
-  document.getElementById('rec-fill').style.background=c;
-  document.getElementById('rec-lbl').textContent=score.toFixed(1)+'/10';
-}
-
-async function saveRecovery(){
-  if(!D){ msg('rec-smsg','Data not loaded yet'); return; }
-  const date=document.getElementById('rec-date').value,bw=+document.getElementById('rec-bw').value||null;
-  const sl=+document.getElementById('rs-sl').value,so=+document.getElementById('rs-so').value,mo=+document.getElementById('rs-mo').value,en=+document.getElementById('rs-en').value;
-  const score=+((sl+(10-so)+mo+en)/4).toFixed(1);
-  const notes=document.getElementById('rec-notes').value;
-  if(!D.recoveryLogs) D.recoveryLogs=[];
-  D.recoveryLogs.push({date,bw,sleep:sl,sor:so,mot:mo,energy:en,score,notes,ts:Date.now()});
-  if(bw) D.profile.bodyweight=bw;
-  const ok=await push('rec-sbtn','rec-smsg');
-  if(ok){ renderRecHist(); updRecStats(); document.getElementById('rec-notes').value=''; }
-  else D.recoveryLogs.pop();
 }
 
 function renderRecHist(){
