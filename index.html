@@ -3233,38 +3233,7 @@ function setBodyChart(type){
   });
   renderBodyChart(type);
 }
-function renderHealthLog(){
-  const logs=D.healthLogs||[];
-  if(logs.length===0) return;
-  const card=document.getElementById('health-log-card');
-  const content=document.getElementById('health-log-content');
-  if(!card||!content) return;
-  card.style.display='block';
-  const latest=logs[logs.length-1];
-  const recentHRVs=logs.slice(-14).filter(h=>h.hrv).map(h=>h.hrv);
-  const avgHRV14=recentHRVs.length?recentHRVs.reduce((s,v)=>s+v,0)/recentHRVs.length:null;
-  const hrvDrop=latest.hrv&&avgHRV14?((avgHRV14-latest.hrv)/avgHRV14*100):null;
-  const hrvStatus=hrvDrop===null?'--':hrvDrop>20?'⚠ Low (-'+Math.round(hrvDrop)+'%)':hrvDrop<-10?'↑ Elevated (good)':'✓ Normal';
-  const hrvColor=hrvStatus.includes('⚠')?'var(--a4)':hrvStatus.includes('↑')?'var(--a3)':'var(--t)';
-  const recentRHRs=logs.slice(-14).filter(h=>h.restingHR).map(h=>h.restingHR);
-  const avgRHR14=recentRHRs.length?recentRHRs.reduce((s,v)=>s+v,0)/recentRHRs.length:52;
-  const rhrDiff=latest.restingHR?latest.restingHR-avgRHR14:null;
-  const rhrStatus=rhrDiff===null?'--':rhrDiff>5?'⚠ +'+Math.round(rhrDiff)+' bpm elevated':rhrDiff<-3?'↓ Lower than usual (good)':'✓ Normal';
-  const rhrColor=rhrStatus.includes('⚠')?'var(--a4)':rhrStatus.includes('↓')?'var(--a3)':'var(--t)';
-  const tempStatus=latest.wristTemp===null?'--':latest.wristTemp>0.5?'⚠ +'+(+latest.wristTemp).toFixed(1)+'°C elevated':latest.wristTemp>0?'+'+(+latest.wristTemp).toFixed(1)+'°C normal range':(+latest.wristTemp).toFixed(1)+'°C normal';
-  const tempColor=latest.wristTemp>0.5?'var(--a4)':'var(--t)';
-  content.innerHTML=`
-    <div class="info-row"><span class="info-row-label">Resting HR</span><span style="font-weight:700;color:${rhrColor}">${latest.restingHR||'--'} bpm · ${rhrStatus}</span></div>
-    <div class="info-row"><span class="info-row-label">HRV</span><span style="font-weight:700;color:${hrvColor}">${latest.hrv||'--'} ms · ${hrvStatus}</span></div>
-    <div class="info-row"><span class="info-row-label">Wrist Temp</span><span style="font-weight:700;color:${tempColor}">${tempStatus}</span></div>
-    <div class="info-row"><span class="info-row-label">Sleep</span><span style="font-weight:700;">${latest.sleepHours||'--'}h · ${latest.sleepDeep||'--'}h deep · ${latest.sleepREM||'--'}h REM</span></div>
-    <div class="info-row"><span class="info-row-label">Steps</span><span style="font-weight:700;">${latest.steps?latest.steps.toLocaleString():'--'}</span></div>
-    <div class="info-row"><span class="info-row-label">Exercise mins</span><span style="font-weight:700;">${latest.exerciseMinutes||'--'} min</span></div>
-    <div class="info-row"><span class="info-row-label">Apple VO2max</span><span style="font-weight:700;color:var(--a)">${latest.vo2maxApple||'--'} ml/kg/min</span></div>
-  `;
-  const syncEl=document.getElementById('health-sync-time');
-  if(syncEl&&D.healthLastSync){const d=new Date(D.healthLastSync);syncEl.textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
-}
+
 </script>
 </body>
 </html>
