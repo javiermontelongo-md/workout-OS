@@ -11,59 +11,10 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,400;0,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root{
-  /* Backgrounds */
-  --bg-primary: #0a0a0f;
-  --bg-card: #111118;
-  --bg-card-hover: #1a1a24;
-  --bg-elevated: #16161f;
-  /* Borders */
-  --border: #2a2a3a;
-  --border-bright: #3d3d55;
-  /* Accents */
-  --accent: #f5a623;
-  --accent-bright: #ffb938;
-  --accent-glow: rgba(245,166,35,0.15);
-  --cyan: #00d4ff;
-  --cyan-dim: #00a8cc;
-  --cyan-glow: rgba(0,212,255,0.12);
-  --green: #00ff88;
-  --green-dim: #00cc6a;
-  --green-glow: rgba(0,255,136,0.12);
-  --red: #ff4757;
-  --red-dim: #cc3344;
-  --red-glow: rgba(255,71,87,0.12);
-  --purple: #a855f7;
-  --purple-dim: #8833dd;
-  --purple-glow: rgba(168,85,247,0.12);
-  /* Text */
-  --text-primary: #f0f0ff;
-  --text-secondary: #8888aa;
-  --text-dim: #555570;
-  --text-label: #666688;
-  /* Legacy aliases — keep so existing JS var() refs work */
-  --bg: var(--bg-primary);
-  --s1: var(--bg-card);
-  --s2: var(--bg-elevated);
-  --s3: #1a1a24;
-  --b: var(--border);
-  --b2: var(--border-bright);
-  --a: var(--accent);
-  --a2: var(--cyan);
-  --a3: var(--green);
-  --a4: var(--red);
-  --a5: var(--purple);
-  --t: var(--text-primary);
-  --t2: var(--text-secondary);
-  --t3: var(--text-label);
-  --mono: 'SF Mono','Fira Code','Cascadia Code',monospace;
-  --serif:'Fraunces',serif;
-  --sans:'DM Sans',sans-serif;
-  --r:10px;--rl:16px;--nav:62px;--safe:env(safe-area-inset-bottom,0px);
-}
+:root{--bg:#0a0c12;--s1:#111420;--s2:#171b2a;--s3:#1e2235;--b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);--a:#ffb74d;--a2:#4fc3f7;--a3:#7fff6e;--a4:#ef9a9a;--a5:#ce93d8;--t:#e8eaf0;--t2:#8a90a8;--t3:#4a5068;--red:#ef5350;--mono:'DM Mono',monospace;--serif:'Fraunces',serif;--sans:'DM Sans',sans-serif;--r:10px;--rl:16px;--nav:62px;--safe:env(safe-area-inset-bottom,0px);}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{height:100%;}
-body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100%;}
+body{background:var(--bg);color:var(--t);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100%;}
 .app{display:flex;flex-direction:column;min-height:100vh;}
 .hdr{padding:18px 32px 0;border-bottom:1px solid var(--b);background:var(--s1);position:sticky;top:0;z-index:50;}
 .htop{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
@@ -77,13 +28,12 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--sa
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
 .tabs{display:flex;gap:2px;overflow-x:auto;padding-bottom:1px;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{font-family:var(--mono);font-size:11px;padding:9px 13px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;border:none;background:none;transition:color .15s;}
-.tab:hover{color:var(--text-secondary);}.tab.on{color:var(--accent);border-bottom:2px solid var(--accent);}
-.main{flex:1;padding:24px 32px;max-width:1400px;width:100%;margin:0 auto;}
+.tab{font-family:var(--mono);font-size:11px;padding:9px 13px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;border:none;background:none;transition:color .15s;}
+.tab:hover{color:var(--t2);}.tab.on{color:var(--a);border-bottom:2px solid var(--a);}
+.main{flex:1;padding:24px 32px;max-width:1100px;width:100%;}
 .panel{display:none;}.panel.on{display:block;}
 .bnav{display:none;}.mbar{display:none;}
-.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;transition:border-color 0.2s,box-shadow 0.2s;}
-.card:hover{border-color:var(--border-bright);box-shadow:0 0 20px var(--accent-glow);}
+.card{background:var(--s1);border:1px solid var(--b);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
@@ -99,11 +49,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 select option{background:var(--s2);}
 textarea{resize:vertical;min-height:75px;line-height:1.5;}
 .ig{margin-bottom:12px;}.ig label{display:block;font-size:11px;color:var(--t2);margin-bottom:4px;font-family:var(--mono);}
-.btn{font-family:var(--mono);font-size:11px;padding:9px 16px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:500;transition:all .15s;}
-.bp{background:var(--accent);color:#000;border:none;font-weight:700;}.bp:hover{background:var(--accent-bright);}.bp:active{background:var(--accent-bright);}
-.bs{background:transparent;color:var(--text-primary);border:1px solid var(--border-bright);}.bs:hover{border-color:var(--accent);}.bs:active{color:var(--accent);border-color:var(--accent);}
-.bi{background:transparent;color:var(--text-secondary);border:1px solid var(--border);}.bi:hover{color:var(--text-primary);border-color:var(--border-bright);}
-.bd{background:transparent;color:var(--red);border:1px solid rgba(255,71,87,.3);}
+.btn{font-family:var(--mono);font-size:11px;padding:9px 16px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+.bp{background:var(--a);color:#0a0c12;font-weight:500;}.bp:active{background:#ffc870;}
+.bs{background:transparent;color:var(--t2);border:1px solid var(--b2);}.bs:active{color:var(--a);border-color:var(--a);}
+.bd{background:transparent;color:var(--red);border:1px solid rgba(239,83,80,.3);}
 .brow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
 input[type=range]{-webkit-appearance:none;height:4px;background:var(--s3);border:none;border-radius:2px;padding:0;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--a);cursor:pointer;box-shadow:0 2px 6px rgba(255,183,77,.3);}
@@ -299,25 +248,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .cal-badge.run-quality{background:rgba(79,195,247,.12);color:var(--a2);}
 .cal-badge.run-long{background:rgba(79,195,247,.12);color:var(--a2);}
 .cal-badge.run-moderate{background:rgba(206,147,216,.12);color:var(--a5);border:1px solid rgba(206,147,216,.2);}
-@media (min-width: 1024px) {
-  #panel-today.on {
-    display: grid;
-    grid-template-columns: 380px 1fr;
-    gap: 20px;
-    align-items: start;
-  }
-  #panel-week.on {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 20px;
-    align-items: start;
-  }
-}
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-.sync-dot { animation: pulse-dot 2s ease-in-out infinite; }
 </style>
 </head>
 <body>
@@ -731,27 +661,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <!-- 2x2 prediction grid -->
   <div id="race-pred-grid" style="display:none;">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-      <div style="background:linear-gradient(135deg,var(--bg-card),rgba(245,166,35,0.08));border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:8px;padding:12px;">
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">5K</div>
-        <div style="font-size:20px;font-weight:600;color:var(--accent);" id="pred-5k-time">--:--</div>
+        <div style="font-size:20px;font-weight:600;color:var(--a);" id="pred-5k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-5k-pace"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-5k-ci"></div>
       </div>
-      <div style="background:linear-gradient(135deg,var(--bg-card),rgba(0,212,255,0.08));border:1px solid var(--border-bright);border-left:3px solid var(--cyan);border-radius:8px;padding:12px;">
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">10K</div>
-        <div style="font-size:20px;font-weight:600;color:var(--cyan);" id="pred-10k-time">--:--</div>
+        <div style="font-size:20px;font-weight:600;color:var(--a);" id="pred-10k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-10k-pace"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-10k-ci"></div>
       </div>
-      <div style="background:linear-gradient(135deg,var(--bg-card),rgba(168,85,247,0.08));border:1px solid var(--border-bright);border-left:3px solid var(--purple);border-radius:8px;padding:12px;">
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Half Marathon</div>
-        <div style="font-size:20px;font-weight:600;color:var(--purple);" id="pred-half-time">--:--</div>
+        <div style="font-size:20px;font-weight:600;color:var(--a2);" id="pred-half-time">--:--</div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-half-pace"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-half-ci"></div>
       </div>
-      <div style="background:linear-gradient(135deg,var(--bg-card),rgba(0,255,136,0.08));border:1px solid var(--border-bright);border-left:3px solid var(--green);border-radius:8px;padding:12px;">
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Marathon</div>
-        <div style="font-size:20px;font-weight:600;color:var(--green);" id="pred-full-time">--:--</div>
+        <div style="font-size:20px;font-weight:600;color:var(--t2);" id="pred-full-time">--:--</div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-full-pace"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-full-ci"></div>
       </div>
@@ -1055,10 +985,6 @@ ldPrev();
 function hOv(){ const e=document.getElementById('ov'); if(e){ e.style.opacity='0'; e.style.transition='opacity .4s'; setTimeout(()=>e.remove(),400); } }
 
 function onLoad(){
-  // Enforce initial panel visibility: hide all except the one with .on
-  document.querySelectorAll('.panel').forEach(p=>{
-    if(p.classList.contains('on')){p.style.display='';}else{p.style.display='none';}
-  });
   if(D.checks) restChk();
   updProgressStats();
   renderSessHist();
@@ -1088,20 +1014,16 @@ function onLoad(){
 // NAV
 // ============================================================
 function gT(n,el){
-  // Belt-and-suspenders: use both class toggle AND inline style so
-  // no CSS rule (regardless of specificity) can keep an inactive panel visible
-  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on');p.style.display='none';});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  const p=document.getElementById('panel-'+n);
-  if(p){p.classList.add('on');p.style.display='';}  // '' lets CSS (grid / block) take over
+  const p=document.getElementById('panel-'+n); if(p) p.classList.add('on');
   if(el) el.classList.add('on');
   if(n==='week') renderCalendar();
 }
 function gM(n,el){
-  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on');p.style.display='none';});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
-  const p=document.getElementById('panel-'+n);
-  if(p){p.classList.add('on');p.style.display='';p.scrollTop=0;}
+  const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); p.scrollTop=0; }
   if(el) el.classList.add('on');
   if(n==='week') renderCalendar();
 }
@@ -1808,16 +1730,7 @@ function renderRacePredictions() {
     const cEl = document.getElementById(elCI);
     const pEl = document.getElementById(elP);
     if (tEl) tEl.textContent = p ? secsToRaceTime(p.seconds) : '--:--';
-    if (pEl && p) {
-      const dist = distMiles[key];
-      const paceBase = secsToPace(p.seconds, dist);
-      const paceCISecs = p.ciSeconds / dist;
-      const pcm = Math.floor(paceCISecs / 60);
-      const pcs = Math.round(paceCISecs % 60);
-      pEl.innerHTML = paceBase + ' <span style="color:var(--text-dim);font-size:9px;">± ' + pcm + ':' + String(pcs).padStart(2,'0') + '</span>';
-    } else if (pEl) {
-      pEl.textContent = '';
-    }
+    if (pEl) pEl.textContent = p ? secsToPace(p.seconds, distMiles[key]) : '';
     if (cEl) cEl.textContent = p ? `± ${secsToRaceTime(p.ciSeconds)}` : '';
   });
 
@@ -2026,7 +1939,7 @@ function renderRacePredChart(dist) {
       scales: {
         x: {
           ticks: {
-            color:'#555570', font:{size:9}, maxTicksLimit:9, maxRotation:0,
+            color:'#4a5068', font:{size:9}, maxTicksLimit:9, maxRotation:0,
             callback: function(val, i) {
               const lbl = allLabels[i];
               if (!lbl) return '';
@@ -2037,16 +1950,16 @@ function renderRacePredChart(dist) {
             }
           },
           grid: {
-            color: (ctx) => ctx.index === todayIndex ? 'rgba(255,255,255,0.3)' : 'rgba(42,42,58,0.5)'
+            color: (ctx) => ctx.index === todayIndex ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.04)'
           }
         },
         y: {
           reverse: true,
           ticks: {
-            color:'#555570', font:{size:9},
+            color:'#4a5068', font:{size:9},
             callback: v => secsToRaceTime(Math.round(v*60))
           },
-          grid: { color:'rgba(42,42,58,0.5)' }
+          grid: { color:'rgba(255,255,255,0.04)' }
         }
       }
     }
@@ -2800,7 +2713,7 @@ function renderSnapshotCharts(){
       </div>
       <div style="position:relative;height:120px;"><canvas id="snap-sleep-chart"></canvas></div>
       <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
-        <span style="color:rgba(168,85,247,0.9);">── Actual sleep</span>
+        <span style="color:rgba(34,197,94,0.8);">── Actual sleep</span>
         <span style="margin-left:10px;">- - Optimal 7h – 7h30m</span>
         <span style="margin-left:10px;color:rgba(255,183,77,0.6);">- - 30d avg</span>
       </div>
@@ -2824,8 +2737,8 @@ function renderSnapshotCharts(){
       </div>
       <div style="position:relative;height:140px;"><canvas id="snap-hr-chart"></canvas></div>
       <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
-        <span style="color:rgba(255,71,87,0.9);">── Resting HR (L, bpm)</span>
-        <span style="margin-left:8px;color:rgba(245,166,35,0.9);">── Walking HR (R, bpm)</span>
+        <span style="color:rgba(255,99,71,0.8);">── Resting HR (L, bpm)</span>
+        <span style="margin-left:8px;color:rgba(255,183,77,0.8);">── Walking HR (R, bpm)</span>
         <span style="margin-left:8px;">- - Avg</span>
       </div>
     </div>
@@ -2849,9 +2762,9 @@ function renderSnapshotCharts(){
       data:{
         labels:dates,
         datasets:[
-          {label:'Sleep',data:sleepData,borderColor:'rgba(168,85,247,0.9)',backgroundColor:'rgba(168,85,247,0.1)',pointRadius:2,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
-          {label:'Optimal min',data:dates.map(()=>7),borderColor:'rgba(168,85,247,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0},
-          {label:'Optimal max',data:dates.map(()=>7.5),borderColor:'rgba(168,85,247,0.3)',borderDash:[4,4],pointRadius:0,fill:'-1',backgroundColor:'rgba(168,85,247,0.06)',tension:0},
+          {label:'Sleep',data:sleepData,borderColor:'rgba(34,197,94,0.8)',backgroundColor:'rgba(34,197,94,0.1)',pointRadius:2,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
+          {label:'Optimal min',data:dates.map(()=>7),borderColor:'rgba(34,197,94,0.35)',borderDash:[4,4],pointRadius:0,fill:false,tension:0},
+          {label:'Optimal max',data:dates.map(()=>7.5),borderColor:'rgba(34,197,94,0.35)',borderDash:[4,4],pointRadius:0,fill:'-1',backgroundColor:'rgba(34,197,94,0.06)',tension:0},
           {label:'30d avg',data:dates.map(()=>avgSleep?parseFloat(avgSleep):null),borderColor:'rgba(255,183,77,0.6)',borderDash:[6,3],pointRadius:0,fill:false,tension:0,spanGaps:true}
         ]
       },
@@ -2863,8 +2776,8 @@ function renderSnapshotCharts(){
           tooltip:{callbacks:{label:ctx=>{if(ctx.dataset.label==='Sleep'){const v=ctx.parsed.y;const h=Math.floor(v);const m=Math.round((v-h)*60);return h+'h '+m+'m';}return null;}}}
         },
         scales:{
-          x:{ticks:{color:'#555570',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(42,42,58,0.5)'}},
-          y:{min:4,max:10,ticks:{color:'#555570',font:{size:9},callback:function(v){return v+'h';}},grid:{color:'rgba(42,42,58,0.5)'}}
+          x:{ticks:{color:'#4a5068',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'}},
+          y:{min:4,max:10,ticks:{color:'#4a5068',font:{size:9},callback:function(v){return v+'h';}},grid:{color:'rgba(255,255,255,0.04)'}}
         }
       }
     });
@@ -2904,8 +2817,8 @@ function renderSnapshotCharts(){
         maintainAspectRatio:false,
         plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
         scales:{
-          x:{ticks:{color:'#555570',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(42,42,58,0.5)'}},
-          ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.6)',font:{size:9},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(42,42,58,0.5)'}},
+          x:{ticks:{color:'#4a5068',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'}},
+          ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.6)',font:{size:9},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.04)'}},
           yExercise:{type:'linear',position:'right',ticks:{color:'rgba(168,85,247,0.6)',font:{size:9},callback:function(v){return v+'m';}},grid:{display:false}}
         }
       }
@@ -2935,10 +2848,10 @@ function renderSnapshotCharts(){
       data:{
         labels:dates,
         datasets:[
-          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,71,87,0.9)',backgroundColor:'rgba(255,71,87,0.05)',pointRadius:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
-          {label:'Resting avg',data:avgResting?dates.map(()=>avgResting):[],borderColor:'rgba(255,71,87,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResting'},
-          {label:'Walking HR',data:walkingHRData,borderColor:'rgba(245,166,35,0.9)',backgroundColor:'rgba(245,166,35,0.05)',pointRadius:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yWalking'},
-          {label:'Walking avg',data:avgWalking?dates.map(()=>avgWalking):[],borderColor:'rgba(245,166,35,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0,yAxisID:'yWalking'}
+          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,99,71,0.8)',backgroundColor:'rgba(255,99,71,0.05)',pointRadius:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
+          {label:'Resting avg',data:avgResting?dates.map(()=>avgResting):[],borderColor:'rgba(255,99,71,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResting'},
+          {label:'Walking HR',data:walkingHRData,borderColor:'rgba(255,183,77,0.8)',backgroundColor:'rgba(255,183,77,0.05)',pointRadius:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yWalking'},
+          {label:'Walking avg',data:avgWalking?dates.map(()=>avgWalking):[],borderColor:'rgba(255,183,77,0.3)',borderDash:[4,4],pointRadius:0,fill:false,tension:0,yAxisID:'yWalking'}
         ]
       },
       options:{
@@ -2946,9 +2859,9 @@ function renderSnapshotCharts(){
         maintainAspectRatio:false,
         plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
         scales:{
-          x:{ticks:{color:'#555570',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(42,42,58,0.5)'}},
-          yResting:{type:'linear',position:'left',min:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.1,2);return Math.floor(rMin-rPad);})(),max:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.1,2);return Math.ceil(rMax+rPad);})(),ticks:{color:'rgba(255,71,87,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{color:'rgba(42,42,58,0.5)'}},
-          yWalking:{type:'linear',position:'right',min:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.1,2);return Math.floor(wMin-wPad);})(),max:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.1,2);return Math.ceil(wMax+wPad);})(),ticks:{color:'rgba(245,166,35,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{display:false}}
+          x:{ticks:{color:'#4a5068',font:{size:9},maxTicksLimit:8,maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'}},
+          yResting:{type:'linear',position:'left',min:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.1,2);return Math.floor(rMin-rPad);})(),max:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.1,2);return Math.ceil(rMax+rPad);})(),ticks:{color:'rgba(255,99,71,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.04)'}},
+          yWalking:{type:'linear',position:'right',min:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.1,2);return Math.floor(wMin-wPad);})(),max:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.1,2);return Math.ceil(wMax+wPad);})(),ticks:{color:'rgba(255,183,77,0.6)',font:{size:9},callback:function(v){return v+' bpm';}},grid:{display:false}}
         }
       }
     });
