@@ -283,7 +283,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <button class="tab" onclick="showTab('week')">THIS WEEK</button>
     <button class="tab" onclick="showTab('progress')">PROGRESS</button>
     <button class="tab" onclick="showTab('program')">PROGRAM</button>
-    <button class="tab" onclick="showTab('recovery')" style="display:none">RECOVERY</button>
     <button class="tab" onclick="showTab('milestones')">MILESTONES</button>
     <button class="tab" onclick="showTab('settings')">SETTINGS</button>
   </div>
@@ -745,49 +744,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 </div>
 
 <!-- v2026-05-22 -->
-<div id="panel-recovery" class="panel">
-  <div class="h1">Recovery &amp; <span>fatigue</span></div>
-
-  <!-- Apple Watch Health Log -->
-  <div class="card" id="health-log-card" style="display:none;margin-bottom:14px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div class="lbl" style="margin:0;">apple watch · last night</div>
-      <div id="health-sync-time" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
-    </div>
-    <div id="health-log-content"></div>
-  </div>
-
-  <!-- 30-day history charts -->
-  <div class="card" style="margin-bottom:14px;">
-    <div class="lbl">30-day history</div>
-    <div id="recovery-history-charts"></div>
-  </div>
-
-  <div class="g4 k2" style="margin-bottom:14px;">
-    <div class="stat"><div class="sv g" id="rec-score">--</div><div class="sl">Recovery score</div></div>
-    <div class="stat"><div class="sv r" id="fat-score">--</div><div class="sl">Fatigue score</div></div>
-    <div class="stat"><div class="sv b" id="rec-sleep">--</div><div class="sl">Sleep avg (7d)</div></div>
-    <div class="stat"><div class="sv a" id="rec-count">0</div><div class="sl">Logs this week</div></div>
-  </div>
-  <div class="card" style="border-color:rgba(255,183,77,.3);">
-    <div class="lbl" style="color:var(--a);">log daily recovery -- saves to data.json</div>
-    <div class="g2 k2" style="margin-bottom:12px;">
-      <div class="ig"><label>Date</label><input type="date" id="rec-date"></div>
-      <div class="ig"><label>Bodyweight (lb)</label><input type="number" id="rec-bw" placeholder="225"></div>
-    </div>
-    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
-      <div style="flex:1;min-width:110px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Sleep quality</span><span id="rv-sl" style="font-family:var(--mono);color:var(--a2);">7/10</span></div><input type="range" min="1" max="10" value="7" id="rs-sl" oninput="upRec()" style="width:100%;"></div>
-      <div style="flex:1;min-width:110px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Soreness</span><span id="rv-so" style="font-family:var(--mono);color:var(--a4);">3/10</span></div><input type="range" min="1" max="10" value="3" id="rs-so" oninput="upRec()" style="width:100%;"></div>
-      <div style="flex:1;min-width:110px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Motivation</span><span id="rv-mo" style="font-family:var(--mono);">7/10</span></div><input type="range" min="1" max="10" value="7" id="rs-mo" oninput="upRec()" style="width:100%;"></div>
-      <div style="flex:1;min-width:110px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:5px;"><span>Energy</span><span id="rv-en" style="font-family:var(--mono);color:var(--a);">7/10</span></div><input type="range" min="1" max="10" value="7" id="rs-en" oninput="upRec()" style="width:100%;"></div>
-    </div>
-    <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:4px;"><span>Recovery score</span><span id="rec-lbl">--</span></div><div class="bbar"><div class="bfill" id="rec-fill" style="width:70%;background:var(--a3);"></div></div></div>
-    <div class="ig"><label>Notes</label><textarea id="rec-notes" placeholder="What is driving recovery debt? Residency stress, poor sleep run, illness?"></textarea></div>
-    <button class="sbtn" id="rec-sbtn" onclick="saveRecovery()">Save recovery log to GitHub</button>
-    <div class="smsg" id="rec-smsg"></div>
-  </div>
-  <div class="card"><div class="lbl">recovery log history</div><div id="rec-hist"><div style="font-size:12px;color:var(--t3);font-style:italic;">No recovery logs yet.</div></div></div>
-</div>
 
 <!-- v2026-05-22 -->
 <div id="panel-milestones" class="panel">
@@ -880,7 +836,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <button class="ni" onclick="showTab('week')"><span class="nicon">W</span><span class="nlbl">WEEK</span></button>
   <button class="ni" onclick="showTab('progress')"><span class="nicon">P</span><span class="nlbl">PROG</span></button>
   <button class="ni" onclick="showTab('program')"><span class="nicon">Pg</span><span class="nlbl">PGRM</span></button>
-  <button class="ni" onclick="showTab('recovery')"><span class="nicon">R</span><span class="nlbl">REC</span></button>
   <button class="ni" onclick="showTab('milestones')"><span class="nicon">G</span><span class="nlbl">GOALS</span></button>
   <button class="ni" onclick="showTab('settings')"><span class="nicon">S</span><span class="nlbl">SET</span></button>
 </nav>
