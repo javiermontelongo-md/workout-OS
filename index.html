@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -31,7 +31,7 @@ body{background:var(--bg);color:var(--t);font-family:var(--sans);font-size:14px;
 .tab{font-family:var(--mono);font-size:11px;padding:9px 13px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;border:none;background:none;transition:color .15s;}
 .tab:hover{color:var(--t2);}.tab.on{color:var(--a);border-bottom:2px solid var(--a);}
 .main{flex:1;padding:24px 32px;max-width:1100px;width:100%;}
-.panel{display:none;}.panel.on{display:block;}
+.app .panel{display:none;}.app .panel.on{display:block;}
 .bnav{display:none;}.mbar{display:none;}
 .card{background:var(--s1);border:1px solid var(--b);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -127,8 +127,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   .mlogo span{color:var(--t2);font-style:italic;}
   .app{height:100dvh;overflow:hidden;}
   .main{padding:0;max-width:100%;flex:1;overflow:hidden;position:relative;}
-  .panel{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(var(--nav) + var(--safe) + 14px);display:none !important;}
-  .panel.on{display:block !important;}
+  .app .panel{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(var(--nav) + var(--safe) + 14px);display:none;}
+  .app .panel.on{display:block;}
   .bnav{display:flex !important;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b);padding-bottom:var(--safe);z-index:100;height:calc(var(--nav) + var(--safe));overflow-x:auto;scrollbar-width:none;}
   .bnav::-webkit-scrollbar{display:none;}
   .ni{flex:1;min-width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 2px;cursor:pointer;gap:3px;border:none;background:none;}
@@ -278,20 +278,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div id="dd" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-left:8px;"></div>
   </div>
   <div class="tabs">
-    <button class="tab on" onclick="gT('today',this)">TODAY</button>
-    <button class="tab" onclick="gT('log',this)">LOG SESSION</button>
-    <button class="tab" onclick="gT('week',this)">THIS WEEK</button>
-    <button class="tab" onclick="gT('progress',this)">PROGRESS</button>
-    <button class="tab" onclick="gT('program',this)">PROGRAM</button>
-    <button class="tab" onclick="gT('recovery',this)" style="display:none">RECOVERY</button>
-    <button class="tab" onclick="gT('milestones',this)">MILESTONES</button>
-    <button class="tab" onclick="gT('settings',this)">SETTINGS</button>
+    <button class="tab on" onclick="showTab('today')">TODAY</button>
+    <button class="tab" onclick="showTab('log')">LOG SESSION</button>
+    <button class="tab" onclick="showTab('week')">THIS WEEK</button>
+    <button class="tab" onclick="showTab('progress')">PROGRESS</button>
+    <button class="tab" onclick="showTab('program')">PROGRAM</button>
+    <button class="tab" onclick="showTab('recovery')" style="display:none">RECOVERY</button>
+    <button class="tab" onclick="showTab('milestones')">MILESTONES</button>
+    <button class="tab" onclick="showTab('settings')">SETTINGS</button>
   </div>
 </div>
 
 <div class="main">
 
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <div id="panel-today" class="panel on">
   <div class="h1">Today's <span>training</span></div>
   <div class="card" id="today-checkin-snapshot">
@@ -396,7 +396,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <div id="panel-log" class="panel">
   <div class="h1">Log <span>session</span></div>
   <div class="card" style="border-color:rgba(255,183,77,.3);">
@@ -453,7 +453,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div id="run-presc-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;min-height:16px;"></div>
   </div>
 
-  <!-- v2026-05-17 19:25:02 -->
+  <!-- v2026-05-22 -->
   <div class="card" id="bench-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BENCH PRESS</span><span id="planned-bench" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 190</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
@@ -466,7 +466,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
 
-  <!-- v2026-05-17 19:25:02 -->
+  <!-- v2026-05-22 -->
   <div class="card" id="ohp-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">OVERHEAD PRESS</span><span id="planned-ohp" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 90</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
@@ -479,7 +479,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
 
-  <!-- v2026-05-17 19:25:02 -->
+  <!-- v2026-05-22 -->
   <div class="card" id="squat-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BACK SQUAT</span><span id="planned-squat" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
@@ -492,7 +492,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
 
-  <!-- v2026-05-17 19:25:02 -->
+  <!-- v2026-05-22 -->
   <div class="card" id="deadlift-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">DEADLIFT</span><span id="planned-dl" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
@@ -505,7 +505,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
 
-  <!-- v2026-05-17 19:25:02 -->
+  <!-- v2026-05-22 -->
   <div class="card" id="pullup-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span class="bdg a">PULLUPS</span><span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5 sets x 3 clean reps</span></div>
     <div class="g2 k2" style="gap:8px;">
@@ -537,7 +537,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card" style="margin-top:16px;"><div class="lbl">recent sessions</div><div id="sess-hist"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div></div>
 </div>
 
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <div id="panel-week" class="panel">
   <div class="h1">This <span>week</span></div>
   <div class="card" id="activity-calendar-card">
@@ -598,7 +598,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <div id="panel-progress" class="panel">
   <div class="h1">Strength &amp; cardio <span>progress</span></div>
   <div class="g4 k2" style="margin-bottom:14px;">
@@ -726,7 +726,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card"><div class="lbl">session history</div><div id="all-sessions"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div></div>
 </div>
 
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <div id="panel-program" class="panel">
   <div class="h1">Program <span>structure</span></div>
   <div style="margin-bottom:20px;">
@@ -744,7 +744,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <div id="panel-recovery" class="panel">
   <div class="h1">Recovery &amp; <span>fatigue</span></div>
 
@@ -789,7 +789,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card"><div class="lbl">recovery log history</div><div id="rec-hist"><div style="font-size:12px;color:var(--t3);font-style:italic;">No recovery logs yet.</div></div></div>
 </div>
 
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <div id="panel-milestones" class="panel">
   <div class="h1">Goals &amp; <span>milestones</span></div>
   <div class="g2">
@@ -824,7 +824,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
-<!-- v2026-05-17 19:25:02 -->
+<!-- v2026-05-22 -->
 <div id="panel-settings" class="panel">
   <div class="h1">Settings &amp; <span>sync</span></div>
   <div class="g2">
@@ -872,19 +872,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
-</div><!-- v2026-05-17 19:25:02 -->
+</div><!-- v2026-05-22 -->
 
 <nav class="bnav">
-  <button class="ni on" onclick="gM('today',this)"><span class="nicon">T</span><span class="nlbl">TODAY</span></button>
-  <button class="ni" onclick="gM('log',this)"><span class="nicon">L</span><span class="nlbl">LOG</span></button>
-  <button class="ni" onclick="gM('week',this)"><span class="nicon">W</span><span class="nlbl">WEEK</span></button>
-  <button class="ni" onclick="gM('progress',this)"><span class="nicon">P</span><span class="nlbl">PROG</span></button>
-  <button class="ni" onclick="gM('program',this)"><span class="nicon">Pg</span><span class="nlbl">PGRM</span></button>
-  <button class="ni" onclick="gM('recovery',this)"><span class="nicon">R</span><span class="nlbl">REC</span></button>
-  <button class="ni" onclick="gM('milestones',this)"><span class="nicon">G</span><span class="nlbl">GOALS</span></button>
-  <button class="ni" onclick="gM('settings',this)"><span class="nicon">S</span><span class="nlbl">SET</span></button>
+  <button class="ni on" onclick="showTab('today')"><span class="nicon">T</span><span class="nlbl">TODAY</span></button>
+  <button class="ni" onclick="showTab('log')"><span class="nicon">L</span><span class="nlbl">LOG</span></button>
+  <button class="ni" onclick="showTab('week')"><span class="nicon">W</span><span class="nlbl">WEEK</span></button>
+  <button class="ni" onclick="showTab('progress')"><span class="nicon">P</span><span class="nlbl">PROG</span></button>
+  <button class="ni" onclick="showTab('program')"><span class="nicon">Pg</span><span class="nlbl">PGRM</span></button>
+  <button class="ni" onclick="showTab('recovery')"><span class="nicon">R</span><span class="nlbl">REC</span></button>
+  <button class="ni" onclick="showTab('milestones')"><span class="nicon">G</span><span class="nlbl">GOALS</span></button>
+  <button class="ni" onclick="showTab('settings')"><span class="nicon">S</span><span class="nlbl">SET</span></button>
 </nav>
-</div><!-- v2026-05-17 19:25:02 -->
+</div><!-- v2026-05-22 -->
 
 <script>
 var SD={bench:[],ohp:[],squat:[],dl:[]};
@@ -1013,18 +1013,11 @@ function onLoad(){
 // ============================================================
 // NAV
 // ============================================================
-function gT(n,el){
+function showTab(n){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  const p=document.getElementById('panel-'+n); if(p) p.classList.add('on');
-  if(el) el.classList.add('on');
-  if(n==='week') renderCalendar();
-}
-function gM(n,el){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.tab,.ni').forEach(t=>t.classList.remove('on'));
   const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); p.scrollTop=0; }
-  if(el) el.classList.add('on');
+  document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='week') renderCalendar();
 }
 
@@ -2097,7 +2090,7 @@ function startLoggingSession(){
   const todayDay=document.getElementById('today-day-select')?.value||
                  document.getElementById('today-day')?.value||
                  document.querySelector('[data-today-day]')?.dataset.todayDay;
-  gT('log',document.querySelector('.tab:nth-child(2)'));
+  showTab('log');
   const logDaySelect=document.getElementById('log-day');
   if(logDaySelect&&todayDay){
     logDaySelect.value=todayDay;
