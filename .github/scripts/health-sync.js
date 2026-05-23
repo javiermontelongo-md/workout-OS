@@ -7,67 +7,17 @@ function localDateStr(date) {
   return `${y}-${m}-${d}`;
 }
 
-function extractDate(raw) {
-  const match = raw.match(/"*date"*\s*:\s*"(\d{4}-\d{2}-\d{2})/);
-  return match ? match[1] : localDateStr(new Date());
+function getMetric(metrics, name) {
+  const m = metrics.find(x => x.name === name);
+  if (!m || !m.data || m.data.length === 0) return null;
+  return m.data[0];
 }
 
-function extractSimpleNumber(raw, key) {
-  // Handles keys with extra quotes like ""restingHR"
-  const re = new RegExp(`"+${key}"+\\s*:\\s*([\\d.]+)`, 'i');
-  const match = raw.match(re);
-  if (match) {
-    const val = parseFloat(match[1]);
-    return isNaN(val) ? null : val;
-  }
-  return null;
-}
-
-function extractSleepSeconds(raw) {
-  // Sleep is sent from the Shortcut as total seconds.
-  // IMPORTANT: The Shortcut should only sum AsleepCore + AsleepDeep + AsleepREM +
-  // AsleepUnspecified samples. HKCategoryValueSleepAnalysisInBed is a wrapper that
-  // spans the entire in-bed window and double-counts all stage samples inside it.
-  // If InBed is included the raw seconds will be ~2-4x the real sleep time.
-  const re = /"*sleepHours"*\s*:\s*([\d.]+)/i;
-  const match = raw.match(re);
-  if (match) {
-    const seconds = parseFloat(match[1]);
-    console.log(`Sleep raw value from Shortcut: ${seconds} seconds`);
-    if (isNaN(seconds) || seconds <= 0) return null;
-    // Single division by 3600 — this is the only place this conversion happens
-    const hours = seconds / 3600;
-    // Sanity clamp: >14h means the Shortcut included InBed samples; clamp rather
-    // than discard so we at least store something, but log a warning
-    if (hours > 14) {
-      console.log(`Sleep clamped from ${Math.round(hours * 10) / 10}h to 14h — Shortcut is likely including InBed samples.`);
-    }
-    const clamped = Math.min(hours, 14);
-    // Minimum meaningful sleep: 1 hour
-    if (clamped < 1) return null;
-    return Math.round(clamped * 10) / 10;
-  }
-  return null;
-}
-
-function extractStepsTotal(raw) {
-  // Steps may come as multiple records — find them all and sum
-  const singleMatch = raw.match(/"*steps"*\s*:\s*([\d.]+)(?:[^\d]|$)/i);
-  if (singleMatch) {
-    const val = parseInt(singleMatch[1]);
-    if (val > 500) return val;
-  }
-
-  const stepsSection = raw.match(/"*steps"*\s*:([\s\S]*?)"*exerciseMinutes"*\s*:/i);
-  if (stepsSection) {
-    const nums = stepsSection[1].match(/\b(\d+)\b/g);
-    if (nums && nums.length > 0) {
-      const total = nums.reduce((s, n) => s + parseInt(n), 0);
-      console.log(`Steps: summed ${nums.length} records = ${total}`);
-      return total;
-    }
-  }
-  return null;
+function getQty(metrics, name) {
+  const entry = getMetric(metrics, name);
+  if (!entry || entry.qty === undefined || entry.qty === null) return null;
+  const val = parseFloat(entry.qty);
+  return isNaN(val) ? null : val;
 }
 
 async function main() {
@@ -77,43 +27,114 @@ async function main() {
     process.exit(0);
   }
 
-  console.log('Raw data preview:', healthDataRaw.substring(0, 2000));
+  console.log('Raw data preview:', healthDataRaw.substring(0, 500));
 
-  const date = extractDate(healthDataRaw);
-  const restingHR = extractSimpleNumber(healthDataRaw, 'restingHR');
-  const hrv = extractSimpleNumber(healthDataRaw, 'hrv');
-  // wristTemp arrives as raw Fahrenheit skin temperature (~94-96°F).
-  // Convert to °C deviation from normal body temp (98.6°F):
-  //   deviation = (rawF - 98.6) × (5/9)
-  // Negative = cooler than baseline, positive = warmer (e.g. fever/illness)
-  const wristTempRaw = extractSimpleNumber(healthDataRaw, 'wristTemp');
-  const wristTemp = wristTempRaw !== null
-    ? Math.round((wristTempRaw - 98.6) * (5 / 9) * 100) / 100
-    : null;
-  const sleepHours = extractSleepSeconds(healthDataRaw);
-  const steps = extractStepsTotal(healthDataRaw);
-  const exerciseMinutes = extractSimpleNumber(healthDataRaw, 'exerciseMinutes');
-  const walkingHR = extractSimpleNumber(healthDataRaw, 'walkingHR');
-  const respiratoryRate = extractSimpleNumber(healthDataRaw, 'respiratoryRate');
-  const vo2max = extractSimpleNumber(healthDataRaw, 'vo2max');
+  let payload;
+  try {
+    payload = JSON.parse(healthDataRaw);
+  } catch (e) {
+    console.error('Failed to parse HEALTH_DATA as JSON:', e.message);
+    process.exit(1);
+  }
 
-  const entry = {
-    date,
-    restingHR,
-    hrv,
-    wristTemp,
-    sleepHours,
-    sleepDeep: null,
-    sleepREM: null,
-    sleepLight: null,
-    sleepAwake: null,
-    steps,
-    exerciseMinutes,
-    walkingHR,
-    respiratoryRate,
-    vo2maxApple: vo2max,
-    source: 'apple_health'
-  };
+  // Support both HAE format { data: { metrics: [...] } } and legacy flat object
+  const isHAE = payload && payload.data && Array.isArray(payload.data.metrics);
+
+  let entry;
+
+  if (isHAE) {
+    console.log('Detected HAE format');
+    const metrics = payload.data.metrics;
+    const date = payload.date || localDateStr(new Date());
+
+    // Sleep
+    const sleepEntry = getMetric(metrics, 'sleep_analysis');
+    const sleepHoursRaw = sleepEntry ? (sleepEntry.totalSleep || sleepEntry.asleep || null) : null;
+    const sleepHours = sleepHoursRaw !== null
+      ? Math.min(Math.round(sleepHoursRaw * 10) / 10, 14)
+      : null;
+    const sleepDeep = sleepEntry ? (sleepEntry.deep || null) : null;
+    const sleepREM = sleepEntry ? (sleepEntry.rem || null) : null;
+    const sleepLight = sleepEntry ? (sleepEntry.core || null) : null;
+    const sleepAwake = sleepEntry
+      ? (sleepEntry.inBed && sleepHoursRaw ? Math.max(0, Math.round((sleepEntry.inBed - sleepHoursRaw) * 10) / 10) : null)
+      : null;
+
+    // Wrist temp: arrives in °F, convert to delta °C
+    const wristTempRaw = getQty(metrics, 'apple_sleeping_wrist_temperature');
+    const wristTemp = wristTempRaw !== null
+      ? Math.round((wristTempRaw - 98.6) * (5 / 9) * 100) / 100
+      : null;
+
+    entry = {
+      date,
+      restingHR: getQty(metrics, 'resting_heart_rate'),
+      hrv: getQty(metrics, 'heart_rate_variability_sdnn'),
+      wristTemp,
+      sleepHours,
+      sleepDeep,
+      sleepREM,
+      sleepLight,
+      sleepAwake,
+      steps: getQty(metrics, 'step_count'),
+      exerciseMinutes: getQty(metrics, 'apple_exercise_time'),
+      walkingHR: getQty(metrics, 'walking_heart_rate_average'),
+      respiratoryRate: getQty(metrics, 'respiratory_rate'),
+      vo2maxApple: getQty(metrics, 'vo2_max'),
+      source: 'apple_health'
+    };
+
+  } else {
+    // Legacy Shortcut flat format — keep old regex parser as fallback
+    console.log('Detected legacy Shortcut format');
+    const raw = healthDataRaw;
+
+    function extractSimpleNumber(str, key) {
+      const re = new RegExp(`"+${key}"+\\s*:\\s*([\\d.]+)`, 'i');
+      const match = str.match(re);
+      if (match) {
+        const val = parseFloat(match[1]);
+        return isNaN(val) ? null : val;
+      }
+      return null;
+    }
+
+    const dateMatch = raw.match(/"*date"*\s*:\s*"(\d{4}-\d{2}-\d{2})/);
+    const date = dateMatch ? dateMatch[1] : localDateStr(new Date());
+
+    const sleepMatch = raw.match(/"*sleepHours"*\s*:\s*([\d.]+)/i);
+    let sleepHours = null;
+    if (sleepMatch) {
+      const seconds = parseFloat(sleepMatch[1]);
+      if (!isNaN(seconds) && seconds > 0) {
+        sleepHours = Math.min(Math.round((seconds / 3600) * 10) / 10, 14);
+        if (sleepHours < 1) sleepHours = null;
+      }
+    }
+
+    const wristTempRaw = extractSimpleNumber(raw, 'wristTemp');
+    const wristTemp = wristTempRaw !== null
+      ? Math.round((wristTempRaw - 98.6) * (5 / 9) * 100) / 100
+      : null;
+
+    entry = {
+      date,
+      restingHR: extractSimpleNumber(raw, 'restingHR'),
+      hrv: extractSimpleNumber(raw, 'hrv'),
+      wristTemp,
+      sleepHours,
+      sleepDeep: null,
+      sleepREM: null,
+      sleepLight: null,
+      sleepAwake: null,
+      steps: extractSimpleNumber(raw, 'steps'),
+      exerciseMinutes: extractSimpleNumber(raw, 'exerciseMinutes'),
+      walkingHR: extractSimpleNumber(raw, 'walkingHR'),
+      respiratoryRate: extractSimpleNumber(raw, 'respiratoryRate'),
+      vo2maxApple: extractSimpleNumber(raw, 'vo2max'),
+      source: 'apple_health'
+    };
+  }
 
   console.log('Extracted entry:', JSON.stringify(entry));
 
@@ -121,19 +142,19 @@ async function main() {
   let data = {};
   try {
     data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-  } catch(e) {
+  } catch (e) {
     console.log('Starting fresh');
   }
 
   if (!data.healthLogs) data.healthLogs = [];
 
-  const existingIdx = data.healthLogs.findIndex(h => h.date === date);
+  const existingIdx = data.healthLogs.findIndex(h => h.date === entry.date);
   if (existingIdx >= 0) {
     data.healthLogs[existingIdx] = entry;
-    console.log(`Updated health log for ${date}`);
+    console.log(`Updated health log for ${entry.date}`);
   } else {
     data.healthLogs.push(entry);
-    console.log(`Added health log for ${date}`);
+    console.log(`Added health log for ${entry.date}`);
   }
 
   data.healthLogs.sort((a, b) => a.date.localeCompare(b.date));
