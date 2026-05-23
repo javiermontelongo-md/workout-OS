@@ -45,7 +45,17 @@ async function main() {
   if (isHAE) {
     console.log('Detected HAE format');
     const metrics = payload.data.metrics;
-    const date = payload.date || localDateStr(new Date());
+    // Extract date from first metric's data array, fall back to today
+    let date = payload.date || null;
+    if (!date) {
+      const firstMetric = metrics.find(m => m.data && m.data.length > 0);
+      if (firstMetric) {
+        const rawDate = firstMetric.data[0].date || '';
+        const dateMatch = rawDate.match(/(\d{4}-\d{2}-\d{2})/);
+        if (dateMatch) date = dateMatch[1];
+      }
+    }
+    if (!date) date = localDateStr(new Date());
 
     // Sleep
     const sleepEntry = getMetric(metrics, 'sleep_analysis');
@@ -69,7 +79,7 @@ async function main() {
     entry = {
       date,
       restingHR: getQty(metrics, 'resting_heart_rate'),
-      hrv: getQty(metrics, 'heart_rate_variability_sdnn'),
+      hrv: getQty(metrics, 'heart_rate_variability_sdnn') ?? getQty(metrics, 'heart_rate_variability'),
       wristTemp,
       sleepHours,
       sleepDeep,
