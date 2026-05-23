@@ -1017,6 +1017,14 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="card"><div class="lbl" style="color:var(--a);">reduce if:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>Fatigue score above 70</div><div>Sleep average below 6 hours</div><div>Performance declining 2+ weeks</div><div>Persistent joint soreness</div><div>Cardio metrics regressing</div><div>Severe residency stress (ICU, nights)</div></div></div>
     <div class="card"><div class="lbl" style="color:var(--a3);">reduction order:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>1. Reduce volume first</div><div>2. Reduce intensity second</div><div>3. Reduce frequency third</div><div>4. Switch to minimum viable</div></div><div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:var(--r);font-size:12px;color:var(--a);line-height:1.6;">Reduced training is always preferred over missed training. Consistency during residency IS success.</div></div>
   </div>
+  <div class="card" id="system-log-card">
+    <div class="lbl">system log · last 7 days</div>
+    <div id="system-log-feed">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:8px 0;">
+        Loading...
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- v2026-05-22 -->
@@ -1542,7 +1550,7 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[]}; }
 
 // ============================================================
 // INIT
@@ -1572,6 +1580,163 @@ function onLoad(){
   rendered.today=true;
   const modeSelect=document.getElementById('training-mode');
   if(modeSelect&&D.trainingMode){modeSelect.value=D.trainingMode;setTrainingMode(D.trainingMode);}
+  renderSystemLog();
+}
+
+function renderSystemLog() {
+  const el = document.getElementById('system-log-feed');
+  if (!el || !D) return;
+  const now = Date.now();
+  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const events = [];
+  const fmtTs = (ts) => {
+    const diff = Math.floor((now - ts) / 60000);
+    if (diff < 60) return diff + 'm ago';
+    if (diff < 1440) return Math.floor(diff / 60) + 'h ago';
+    return Math.floor(diff / 1440) + 'd ago';
+  };
+  const fmtDate = (dateStr) => {
+    if (!dateStr) return null;
+    const ts = new Date(dateStr).getTime();
+    if (isNaN(ts)) return null;
+    return ts;
+  };
+  // Health sync
+  if (D.healthLastSync) {
+    const ts = new Date(D.healthLastSync).getTime();
+    if (ts >= sevenDaysAgo) {
+      const log = (D.healthLogs || []).find(h => {
+        const d = new Date(D.healthLastSync);
+        const s = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        return h.date === s;
+      });
+      const metrics = [];
+      if (log) {
+        if (log.restingHR) metrics.push('RHR ' + log.restingHR);
+        if (log.hrv) metrics.push('HRV ' + Math.round(log.hrv));
+        if (log.sleepHours) metrics.push('sleep ' + log.sleepHours + 'h');
+        if (log.steps) metrics.push('steps ' + log.steps.toLocaleString());
+        if (log.vo2maxApple) metrics.push('VO2 ' + log.vo2maxApple);
+        if (log.wristTemp !== null && log.wristTemp !== undefined) metrics.push('temp ' + (log.wristTemp > 0 ? '+' : '') + log.wristTemp + '°C');
+      }
+      events.push({
+        ts,
+        icon: '⬡',
+        color: 'var(--a3)',
+        title: 'Health Auto Export synced',
+        detail: metrics.length ? metrics.join(' · ') : 'no metrics parsed'
+      });
+    }
+  }
+  // Strava sync
+  if (D.stravaLastSync) {
+    const ts = new Date(D.stravaLastSync).getTime();
+    if (ts >= sevenDaysAgo) {
+      const recentRuns = (D.runs || []).filter(r => {
+        const rt = new Date(r.date + 'T12:00:00').getTime();
+        return rt >= sevenDaysAgo;
+      });
+      const lastRun = recentRuns.slice(-1)[0];
+      events.push({
+        ts,
+        icon: '↯',
+        color: 'var(--a2)',
+        title: 'Strava synced',
+        detail: recentRuns.length + ' run' + (recentRuns.length !== 1 ? 's' : '') + ' this week' + (lastRun ? ' · ' + lastRun.name : '')
+      });
+    }
+  }
+  // GitHub save
+  if (D.lastUpdated) {
+    const ts = fmtDate(D.lastUpdated + 'T12:00:00');
+    if (ts && ts >= sevenDaysAgo) {
+      events.push({
+        ts,
+        icon: '⬆',
+        color: 'var(--t2)',
+        title: 'GitHub data saved',
+        detail: 'data.json last written ' + D.lastUpdated
+      });
+    }
+  }
+  // AI plan
+  if (D.adaptivePlanCache && D.adaptivePlanCache.generatedDate) {
+    const ts = fmtDate(D.adaptivePlanCache.generatedDate + 'T12:00:00');
+    if (ts && ts >= sevenDaysAgo) {
+      const conf = D.adaptivePlanCache.lifts?.bench?.confidence || 'unknown';
+      events.push({
+        ts,
+        icon: '◈',
+        color: 'var(--a)',
+        title: 'AI weekly plan generated',
+        detail: 'confidence: ' + conf + (D.adaptivePlanCache.weeklyFocus ? ' · ' + D.adaptivePlanCache.weeklyFocus.slice(0, 60) : '')
+      });
+    }
+  }
+  // AI run prescriptions
+  if (D.runPrescriptions) {
+    Object.entries(D.runPrescriptions).forEach(([date, presc]) => {
+      if (!presc || !presc.generatedAt) return;
+      const ts = new Date(presc.generatedAt).getTime();
+      if (ts < sevenDaysAgo) return;
+      const dt = presc.primaryRecommendation?.type || 'run';
+      events.push({
+        ts,
+        icon: '◈',
+        color: 'var(--a)',
+        title: 'AI run prescription · ' + date,
+        detail: dt + ' · ' + (presc.primaryRecommendation?.distance || '') + ' ' + (presc.primaryRecommendation?.pace || '')
+      });
+      if (presc.postRunFeedback && presc.completedAt) {
+        const fts = new Date(presc.completedAt).getTime();
+        if (fts >= sevenDaysAgo) {
+          events.push({
+            ts: fts,
+            icon: '◈',
+            color: 'var(--a5)',
+            title: 'AI post-run feedback · ' + date,
+            detail: presc.postRunFeedback.slice(0, 80) + '...'
+          });
+        }
+      }
+    });
+  }
+  // AI coaching log
+  (D.coachingLog || []).forEach(entry => {
+    if (!entry.ts || entry.ts < sevenDaysAgo) return;
+    const labels = {
+      today_coaching: 'AI today coaching generated',
+      week_plan: 'AI weekly plan generated',
+      run_prescription: 'AI run prescription generated',
+      post_run: 'AI post-run feedback generated'
+    };
+    events.push({
+      ts: entry.ts,
+      icon: '◈',
+      color: 'var(--a)',
+      title: labels[entry.type] || 'AI call',
+      detail: entry.label || ''
+    });
+  });
+  // Check-ins
+  (D.checkins || []).forEach(c => {
+    const ts = fmtDate(c.date + 'T08:00:00');
+    if (!ts || ts < sevenDaysAgo) return;
+    events.push({
+      ts,
+      icon: '◉',
+      color: 'var(--a4)',
+      title: 'Daily check-in saved',
+      detail: 'energy ' + (c.energy || '?') + ' · soreness ' + (c.soreness || '?') + ' · fatigue ' + (c.fatigueScore || '?') + ' · sleep ' + (c.sleepHours || c.sleep || '?') + 'h'
+    });
+  });
+  // Sort reverse chronological
+  events.sort((a, b) => b.ts - a.ts);
+  if (!events.length) {
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px 0;">No activity in the last 7 days.</div>';
+    return;
+  }
+  el.innerHTML = events.map(e => `<div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--b);align-items:flex-start;"><div style="font-size:16px;color:${e.color};flex-shrink:0;width:20px;text-align:center;margin-top:1px;">${e.icon}</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><div style="font-size:12px;color:var(--t);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.title}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);flex-shrink:0;">${fmtTs(e.ts)}</div></div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.detail}</div></div></div>`).join('');
 }
 
 // ============================================================
@@ -1869,7 +2034,12 @@ async function ai(prompt){
 }
 function fai(t,id){document.getElementById(id).innerHTML=t?`<div class="air"><div class="al">TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="al">NOTE</div><p>Add your Anthropic API key in Settings -- paste key and click Save key. Or check browser console (F12) for error details.</p></div>`;}
 
-async function genToday(){if(!(document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key'))){fai(null,'today-out');return;}const last=D?.checkins?.slice(-1)[0];const e=last?.energy??7,s=last?.sleep??7,sr=last?.soreness??3;const day=document.getElementById('today-day').value;const recent=D?D.sessions.slice(-3).map(x=>x.date+' Day'+x.day+' RPE'+(x.rpe||'?')).join(', '):'No recent sessions';spin('today-out');fai(await ai(`Today's training plan. Mode: ${document.getElementById('mode-sel').value}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent sessions: ${recent}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');}
+async function genToday(){if(!(document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key'))){fai(null,'today-out');return;}const last=D?.checkins?.slice(-1)[0];const e=last?.energy??7,s=last?.sleep??7,sr=last?.soreness??3;const day=document.getElementById('today-day').value;const recent=D?D.sessions.slice(-3).map(x=>x.date+' Day'+x.day+' RPE'+(x.rpe||'?')).join(', '):'No recent sessions';spin('today-out');fai(await ai(`Today's training plan. Mode: ${document.getElementById('mode-sel').value}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent sessions: ${recent}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');
+if(!D.coachingLog)D.coachingLog=[];
+D.coachingLog.push({ts:Date.now(),type:'today_coaching',label:'Today coaching'});
+if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
+if(typeof pushSilent==='function')pushSilent();
+renderSystemLog();}
 // ============================================================
 // ADAPTIVE PROGRAMMING ENGINE
 // ============================================================
@@ -2703,6 +2873,11 @@ async function generateRunPrescription(targetDate) {
     if (typeof pushSilent==='function') await pushSilent();
 
     renderRunPrescriptionCard(targetDate);
+    if(!D.coachingLog)D.coachingLog=[];
+    const _runTypeLabel={'run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run'}[dayType]||dayType||'Run';
+    D.coachingLog.push({ts:Date.now(),type:'run_prescription',label:_runTypeLabel+' · '+targetDate});
+    if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
+    renderSystemLog();
     if (msg) { msg.textContent='Plan saved ✓'; msg.style.color='var(--a3)'; setTimeout(()=>{if(msg)msg.textContent='';},3000); }
   } catch(err) {
     console.error('Run prescription failed:',err);
@@ -2807,6 +2982,10 @@ async function generatePostRunFeedback(targetDate) {
     D.runPrescriptions[targetDate].postRunFeedback=response;
     if(typeof pushSilent==='function') await pushSilent();
     renderRunPrescriptionCard(targetDate);
+    if(!D.coachingLog)D.coachingLog=[];
+    D.coachingLog.push({ts:Date.now(),type:'post_run',label:targetDate});
+    if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
+    renderSystemLog();
   } catch(err) {
     console.error('Post-run feedback failed:',err);
     if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--a4);padding:10px;">Failed: '+err.message+'</div>';
@@ -2994,6 +3173,10 @@ async function generateAdaptivePlan(){
     renderCalendar();
     renderRunMetricsSummary();
     updateLogTabPlanned();
+    if(!D.coachingLog)D.coachingLog=[];
+    D.coachingLog.push({ts:Date.now(),type:'week_plan',label:'Weekly AI plan'});
+    if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
+    renderSystemLog();
     if(msgEl){msgEl.textContent='Plan updated ✓';msgEl.style.color='var(--a3)';setTimeout(()=>{msgEl.textContent='';},3000);}
   }catch(err){
     console.error('Plan generation failed:',err);
@@ -3160,6 +3343,7 @@ async function saveCheckin(){
     msgEl.textContent=existing>=0?'updated ✓':'saved ✓';
     msgEl.style.color='var(--a3)';
     renderSnapshotCharts();
+    renderSystemLog();
   }else{
     if(existing>=0)D.checkins[existing]={...entry};else D.checkins.pop();
     msgEl.textContent='save failed — check token';
