@@ -3218,6 +3218,7 @@ async function generateAdaptivePlan(){
   if(btn){btn.disabled=true;btn.textContent='Generating...';}
   if(msgEl){msgEl.textContent='Analyzing your training data...';msgEl.style.color='var(--t3)';}
   try{
+    console.log('[plan-debug] starting API call');
     const ctx=buildPlanContext();
     const prompt=buildPlanPrompt(ctx);
     if(msgEl)msgEl.textContent='Generating your personalized plan...';
@@ -3226,6 +3227,7 @@ async function generateAdaptivePlan(){
     if(!apiKey)throw new Error('No API key — add it in Settings');
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2000,system:'You are a strength and running coach. Output only valid JSON. No prose outside the JSON object.',messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
+    console.log('[plan-debug] API response:', JSON.stringify(d).slice(0,300));
     if(d.error)throw new Error('API error: '+d.error.message);
     const response=d.content?.[0]?.text||'';
     const plan=parsePlanResponse(response);
