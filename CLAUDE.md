@@ -82,6 +82,24 @@ TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · SETTIN
 - renderWeekNavLifts() shows all 6 lifts
 - CLAUDE.md push rule
 
+## Canonical Verification Rule
+
+Never use local file grep to verify features.
+Always verify against the remote canonical file directly.
+
+To check if a feature exists in the canonical file:
+  git show origin/main:index.html | grep -c "search-term"
+
+This reads from the remote ref directly, bypassing whatever
+is in the local working tree. Use this for ALL verification
+grep checks, not grep on the local file.
+
+Before reporting any feature as present or absent, run:
+  git show origin/main:index.html | grep -c "feature-string"
+
+Never run: grep -c "string" index.html
+Always run: git show origin/main:index.html | grep -c "string"
+
 ## What Has Been Removed
 - var DP object (deleted — was dead code)
 - Hardcoded cardio struct in saveSession()
