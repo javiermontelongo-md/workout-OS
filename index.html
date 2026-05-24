@@ -3229,6 +3229,7 @@ async function generateAdaptivePlan(){
     if(d.error)throw new Error('API error: '+d.error.message);
     const response=d.content?.[0]?.text||'';
     const plan=parsePlanResponse(response);
+    console.log('[plan-debug] parsePlanResponse returned:', plan===null?'NULL':('object, lifts keys: '+JSON.stringify(Object.keys(plan.lifts))));
     if(!plan)throw new Error('Could not parse AI response as JSON. Raw: '+response.slice(0,300));
     plan.generatedDate=new Date().toISOString().split('T')[0];
     plan.blockWeek=ctx.blockWeek;
