@@ -1136,7 +1136,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- v2026-05-22 -->
-  <div class="card" id="deadlift-block">
+  <div class="card" id="dl-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">DEADLIFT</span><span id="planned-dl" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="dl-sets"></div>
@@ -1150,10 +1150,28 @@ input[type=range]::-webkit-slider-thumb:hover {
 
   <!-- v2026-05-22 -->
   <div class="card" id="pullup-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span class="bdg a">PULLUPS</span><span style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5 sets x 3 clean reps</span></div>
-    <div class="g2 k2" style="gap:8px;">
-      <div class="ig"><label>Sets completed</label><input type="number" id="pu-sets" placeholder="5"></div>
-      <div class="ig"><label>Reps per set</label><input type="number" id="pu-reps" placeholder="3"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">WEIGHTED PULL-UPS</span><span id="planned-pullup" style="font-family:var(--mono);font-size:11px;color:var(--a);"></span></div>
+    <div class="srh"><span>WEIGHT ADDED (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
+    <div id="pullup-sets"></div>
+    <button class="addbtn" onclick="addSet('pullup')">+ Add set</button>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:6px;margin-bottom:2px;">0 lb = bodyweight · enter added plate weight</div>
+    <div class="ig" style="margin-top:6px;margin-bottom:0;"><label>Notes</label><input type="text" id="pullup-notes" placeholder="Notes..."></div>
+    <div id="rpe-confirm-pullup" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID PULL-UPS ACTUALLY FEEL? <span id="rpe-pred-pullup" style="color:var(--a);"></span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-pullup"></div>
+    </div>
+  </div>
+
+  <!-- v2026-05-22 -->
+  <div class="card" id="row-block">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BARBELL ROW</span><span id="planned-row" style="font-family:var(--mono);font-size:11px;color:var(--a);"></span></div>
+    <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
+    <div id="row-sets"></div>
+    <button class="addbtn" onclick="addSet('row')">+ Add set</button>
+    <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="row-notes" placeholder="Notes..."></div>
+    <div id="rpe-confirm-row" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID ROW ACTUALLY FEEL? <span id="rpe-pred-row" style="color:var(--a);"></span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-row"></div>
     </div>
   </div>
 
@@ -1486,8 +1504,8 @@ input[type=range]::-webkit-slider-thumb:hover {
 </div><!-- v2026-05-22 -->
 
 <script>
-var SD={bench:[],ohp:[],squat:[],dl:[]};
-var DEF={bench:190,ohp:90,squat:160,dl:160};
+var SD={bench:[],ohp:[],squat:[],dl:[],pullup:[],row:[]};
+var DEF={bench:190,ohp:90,squat:160,dl:160,pullup:0,row:135};
 var DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var DT={0:'rest',1:'Upper Str',2:'Lower Str',3:'Recovery',4:'Upper Hyp',5:'Lower+Cond',6:'rest'};
 var DC={0:'rt',1:'st',2:'st',3:'cd',4:'hy',5:'hy',6:'rt'};
@@ -1561,7 +1579,7 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[]}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:0,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[]}; }
 
 // ============================================================
 // INIT
@@ -1589,6 +1607,7 @@ function onLoad(){
   initCheckinTab();
   renderSnapshotCharts();
   renderTab('today'); rendered.today=true;
+  onDayTypeChange(document.getElementById('log-day')?.value||'');
   const modeSelect=document.getElementById('training-mode');
   if(modeSelect&&D.trainingMode){modeSelect.value=D.trainingMode;setTrainingMode(D.trainingMode);}
   renderSystemLog();
@@ -1815,7 +1834,7 @@ function restChk(){
 // ============================================================
 // SET-BY-SET LOGGING
 // ============================================================
-function initSets(){ ['bench','ohp','squat','dl'].forEach(l=>{SD[l]=[];addSet(l);}); }
+function initSets(){ ['bench','ohp','pullup','row','squat','dl'].forEach(l=>{SD[l]=[];addSet(l);}); }
 function addSet(lift){
   const i=SD[lift].length; SD[lift].push({w:'',r:'',rpe:''});
   renderSets(lift);
@@ -1836,7 +1855,7 @@ async function saveSession(){
   const date=document.getElementById('log-date').value,day=document.getElementById('log-day').value;
   if(!date||!day){ msg('log-smsg','Fill in date and day type'); return; }
   const getLift=l=>({sets:SD[l].filter(s=>s.w||s.r).map(s=>({w:+s.w||null,r:+s.r||null,rpe:+s.rpe||null})),notes:document.getElementById(l+'-notes')?.value||''});
-  const session={date,day,rpe:+document.getElementById('log-rpe').value||null,duration:+document.getElementById('log-dur').value||null,energy:+document.getElementById('log-energy').value||null,bw:+document.getElementById('log-bw').value||null,sleep:+document.getElementById('log-sleep').value||null,notes:document.getElementById('log-notes').value,bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullups:{sets:+document.getElementById('pu-sets').value||null,reps:+document.getElementById('pu-reps').value||null},cardio:{type:'',dur:null,dist:null,hr:null,pace:'',notes:''},ts:Date.now()};
+  const session={date,day,rpe:+document.getElementById('log-rpe').value||null,duration:+document.getElementById('log-dur').value||null,energy:+document.getElementById('log-energy').value||null,bw:+document.getElementById('log-bw').value||null,sleep:+document.getElementById('log-sleep').value||null,notes:document.getElementById('log-notes').value,bench:getLift('bench'),ohp:getLift('ohp'),pullup:getLift('pullup'),row:getLift('row'),squat:getLift('squat'),dl:getLift('dl'),cardio:{type:'',dur:null,dist:null,hr:null,pace:'',notes:''},ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
   D.adherence=(D.adherence||{});D.adherence.completed=(D.adherence.completed||0)+1;
@@ -1844,9 +1863,10 @@ async function saveSession(){
   const updE=(sets,key)=>{ sets.filter(s=>s.w&&s.r).forEach(s=>{const e=Math.round(s.w*(1+s.r/30));if(e>(D.currentLifts[key]||0))D.currentLifts[key]=e;}); };
   if(session.bench.sets.length) updE(session.bench.sets,'benchE1RM');
   if(session.ohp.sets.length) updE(session.ohp.sets,'ohpE1RM');
+  if(session.pullup.sets.length) updE(session.pullup.sets,'pullupE1RM');
+  if(session.row.sets.length) updE(session.row.sets,'rowE1RM');
   if(session.squat.sets.length) updE(session.squat.sets,'squatE1RM');
   if(session.dl.sets.length) updE(session.dl.sets,'deadliftE1RM');
-  if(session.pullups.reps&&session.pullups.reps>(D.currentLifts.pullups||0)) D.currentLifts.pullups=session.pullups.reps;
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
   if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); D.adaptivePlanCache=null; // D.runPrescriptions intentionally NOT touched
@@ -1855,7 +1875,7 @@ async function saveSession(){
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
 function resetLogForm(){
-  ['log-rpe','log-dur','log-energy','log-bw','log-sleep','log-notes','pu-sets','pu-reps'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['log-rpe','log-dur','log-energy','log-bw','log-sleep','log-notes','pullup-notes','row-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   initSets();
 }
 function buildSessDetail(s){
@@ -2788,28 +2808,22 @@ function toggleRunLogSection(){
   if(sec)sec.style.display=['run_easy','run_quality','run_long'].includes(day)?'block':'none';
 }
 function onDayTypeChange(value){
-  const blocks={
-    bench:document.getElementById('bench-block'),
-    ohp:document.getElementById('ohp-block'),
-    squat:document.getElementById('squat-block'),
-    deadlift:document.getElementById('deadlift-block'),
-    pullup:document.getElementById('pullup-block')
+  const allBlocks=['bench','ohp','pullup','row','squat','dl'];
+  const showMap={
+    'A':          ['bench','ohp'],
+    'B':          ['pullup','row'],
+    'C':          ['squat','dl'],
+    'run_easy':   [],
+    'run_quality':[],
+    'run_long':   [],
+    'rest':       []
   };
-  const runCard=document.getElementById('run-prescription-card');
-  const showBench=value==='A';
-  const showOhp=value==='A';
-  const showPullup=value==='A';
-  const showSquat=value==='B';
-  const showDeadlift=value==='C';
+  const show=showMap[value]||allBlocks;
+  allBlocks.forEach(l=>{const el=document.getElementById(l+'-block');if(el)el.style.display=show.includes(l)?'':'none';});
   const showRun=['run_easy','run_quality','run_long'].includes(value);
-  if(blocks.bench)blocks.bench.style.display=showBench?'':'none';
-  if(blocks.ohp)blocks.ohp.style.display=showOhp?'':'none';
-  if(blocks.pullup)blocks.pullup.style.display=showPullup?'':'none';
-  if(blocks.squat)blocks.squat.style.display=showSquat?'':'none';
-  if(blocks.deadlift)blocks.deadlift.style.display=showDeadlift?'':'none';
-  // also toggle run-log-section for legacy run log card
   const sec=document.getElementById('run-log-section');
   if(sec)sec.style.display=showRun?'block':'none';
+  const runCard=document.getElementById('run-prescription-card');
   if(runCard){
     runCard.style.display=showRun?'':'none';
     if(showRun){
@@ -2819,7 +2833,7 @@ function onDayTypeChange(value){
       runCard.dataset.dayType=value;
       const msg=document.getElementById('run-presc-msg');
       if(msg){msg.textContent='';msg.style.color='';}
-      renderRunPrescriptionCard(); // show existing prescription or placeholder
+      renderRunPrescriptionCard();
     }
   }
 }
@@ -3065,13 +3079,15 @@ function buildLocalPlan(){
 function buildPlanContext(){
   const sessions=D.sessions||[],runs=D.runs||[],checkins=D.checkins||[];
   const blockWeek=detectBlockWeek();
+  const fmtSets=sets=>sets.filter(x=>x.w||x.w===0).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ');
   const recentSessions=sessions.slice(-8).map(s=>({
     date:s.date,dayType:s.day||s.dayType,rpe:s.rpe,energy:s.energy,sleep:s.sleep,
     bench:s.bench?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
     ohp:s.ohp?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
+    pullup:s.pullup?.sets?.length?fmtSets(s.pullup.sets):null,
+    row:s.row?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
     squat:s.squat?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
-    dl:s.dl?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
-    pullups:s.pullups||null
+    dl:s.dl?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null
   }));
   const recentRuns=runs.slice(-10).map(r=>({
     date:r.date,type:r.runType,distance:r.distance,
@@ -3094,9 +3110,9 @@ function buildPlanContext(){
   const latestWristTemp=latestHealth?.wristTemp||null;
   const avgExerciseMins=recentHealth.filter(h=>h.exerciseMinutes).length?Math.round(recentHealth.filter(h=>h.exerciseMinutes).reduce((s,h)=>s+h.exerciseMinutes,0)/recentHealth.filter(h=>h.exerciseMinutes).length):null;
   const appleVO2max=recentHealth.filter(h=>h.vo2maxApple).length?recentHealth.filter(h=>h.vo2maxApple).slice(-1)[0].vo2maxApple:null;
-  const liftBests={bench:0,ohp:0,squat:0,dl:0};
-  sessions.forEach(s=>{['bench','ohp','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if(set.w&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
-  if(!liftBests.bench)liftBests.bench=255;if(!liftBests.ohp)liftBests.ohp=120;if(!liftBests.squat)liftBests.squat=215;if(!liftBests.dl)liftBests.dl=215;
+  const liftBests={bench:0,ohp:0,pullup:0,row:0,squat:0,dl:0};
+  sessions.forEach(s=>{['bench','ohp','pullup','row','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if((set.w||set.w===0)&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
+  if(!liftBests.bench)liftBests.bench=255;if(!liftBests.ohp)liftBests.ohp=120;if(!liftBests.pullup&&liftBests.pullup===0)liftBests.pullup=0;if(!liftBests.row)liftBests.row=95;if(!liftBests.squat)liftBests.squat=215;if(!liftBests.dl)liftBests.dl=215;
   const latestBody=(D.bodyMetrics||[]).slice(-1)[0]||null;
   const currentWeight=latestBody?.weightLbs||null;
   const currentWaist=latestBody?.waistInches||null;
@@ -3106,7 +3122,7 @@ function buildPlanContext(){
 
 function buildPlanPrompt(ctx){
   const{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max,currentWeight,currentWaist,currentBMI,latestBody}=ctx;
-  const sessLines=recentSessions.map(s=>`${s.date} [${s.dayType}] RPE:${s.rpe||'?'} Energy:${s.energy||'?'} Sleep:${s.sleep||'?'}h\n  Bench:${s.bench||'none'} OHP:${s.ohp||'none'} Squat:${s.squat||'none'} DL:${s.dl||'none'}`).join('\n')||'No sessions yet';
+  const sessLines=recentSessions.map(s=>`${s.date} [${s.dayType}] RPE:${s.rpe||'?'} Energy:${s.energy||'?'} Sleep:${s.sleep||'?'}h\n  Bench:${s.bench||'none'} OHP:${s.ohp||'none'} Pullup:${s.pullup||'none'} Row:${s.row||'none'} Squat:${s.squat||'none'} DL:${s.dl||'none'}`).join('\n')||'No sessions yet';
   const runLines=recentRuns.map(r=>`${r.date} [${r.type||'?'}] ${r.distance}mi @ ${r.pace||'?'} · HR avg ${r.hrAvg||'?'} max ${r.hrMax||'?'} (${r.name||''})`).join('\n')||'No runs logged';
   const rpeLines=rpeConfirmations.length?rpeConfirmations.map(r=>`${r.lift}: predicted ${r.predictedRPE} actual ${r.actualRPE} @ ${r.weight}lb`).join('\n'):'No RPE confirmations yet';
   return`You are Javier's personal strength and running coach. PGY-1 IM resident in Philadelphia.
@@ -3118,7 +3134,7 @@ PROGRAM: Mon=Lift A (Push: Bench+OHP as strength compounds, then hypertrophy acc
 CURRENT BLOCK: Week ${blockWeek.weekNum}/4 — ${blockWeek.label}
 TRAINING MODE: ${trainingMode}
 
-LIFT BESTS (e1RM): Bench ${liftBests.bench}lb · OHP ${liftBests.ohp}lb · Squat ${liftBests.squat}lb · DL ${liftBests.dl}lb
+LIFT BESTS (e1RM): Bench ${liftBests.bench}lb · OHP ${liftBests.ohp}lb · Pullup +${liftBests.pullup}lb added · Row ${liftBests.row}lb · Squat ${liftBests.squat}lb · DL ${liftBests.dl}lb
 
 RECENT SESSIONS (last 8):
 ${sessLines}
@@ -3160,10 +3176,15 @@ Populate accessories.dayB with Pull hypertrophy exercises (e.g. Cable Row, Face 
 Populate accessories.dayC with leg stability exercises for runners/cyclists (e.g. Bulgarian Split Squat, Hip Thrust, Copenhagen Plank, Step-ups).
 On Lift C days, alternate primary lift: Squat on blockWeek.weekNum 1&3, Deadlift on blockWeek.weekNum 2&4.
 
+PULL DAY PRESCRIPTION NOTES:
+- pullup.weight = added weight in lb (0 means bodyweight — prescribe 0 if not yet weighted)
+- row and pullup progress independently — do not mirror bench/ohp progression
+- Use actual pullup/row history from RECENT SESSIONS to calibrate
+
 Output ONLY a valid JSON object. No markdown, no explanation, no text outside the JSON.
 
 Schema (use exact field names):
-{"narrative":"2-3 sentence overview","weeklyFocus":"single most important thing this week","autoRegulationRule":"one concrete rule based on data","lifts":{"bench":{"weight":192.5,"sets":4,"reps":4,"targetRPE":8,"variation":"Barbell Bench Press","trend":"up","confidence":"medium","coachNote":"specific instruction"},"ohp":{"weight":90,"sets":3,"reps":5,"targetRPE":8,"variation":"Barbell OHP","trend":"flat","confidence":"low","coachNote":""},"squat":{"weight":160,"sets":4,"reps":4,"targetRPE":8,"variation":"Back Squat","trend":"flat","confidence":"low","coachNote":""},"dl":{"weight":160,"sets":3,"reps":4,"targetRPE":8,"variation":"Conventional Deadlift","trend":"flat","confidence":"low","coachNote":""}},"runs":{"tuesday":{"type":"easy","targetHR":"130-145","targetPace":"11:30-12:30/mile","duration":35,"coachNote":"specific instruction"},"thursday":{"type":"intervals","workout":"8 × 400m with 90s rest","targetPace":"6:30-7:00/mile per rep","warmup":"10 min easy","cooldown":"10 min easy","coachNote":"specific instruction"},"saturday":{"type":"long","distance":5.5,"targetHR":"140-155","targetPace":"11:00-12:00/mile","coachNote":"specific instruction"}},"accessories":{"dayA":["Incline DB Press 3×10-12","Lateral Raises 4×15","Tricep Rope Pushdown 3×12"],"dayB":["Cable Row narrow-grip 3×10","Face Pulls 3×15","Hammer Curls 3×12"],"dayC":["Romanian Deadlift 3×8","Bulgarian Split Squat 3×8 each","Hip Thrust 3×10","Step-ups 3×10 each","Copenhagen Plank 3×20s each"]},"vo2maxEstimate":31.7,"estimated5KTime":"31:20","recoveryFlag":null}
+{"narrative":"2-3 sentence overview","weeklyFocus":"single most important thing this week","autoRegulationRule":"one concrete rule based on data","lifts":{"bench":{"weight":192.5,"sets":4,"reps":4,"targetRPE":8,"variation":"Barbell Bench Press","trend":"up","confidence":"medium","coachNote":"specific instruction"},"ohp":{"weight":90,"sets":3,"reps":5,"targetRPE":8,"variation":"Barbell OHP","trend":"flat","confidence":"low","coachNote":""},"pullup":{"weight":0,"sets":4,"reps":5,"targetRPE":8,"variation":"Weighted Pull-ups","trend":"up","confidence":"medium","coachNote":"0 = bodyweight, positive = added weight in lb"},"row":{"weight":135,"sets":4,"reps":5,"targetRPE":8,"variation":"Barbell Row","trend":"flat","confidence":"medium","coachNote":""},"squat":{"weight":160,"sets":4,"reps":4,"targetRPE":8,"variation":"Back Squat","trend":"flat","confidence":"low","coachNote":""},"dl":{"weight":160,"sets":3,"reps":4,"targetRPE":8,"variation":"Conventional Deadlift","trend":"flat","confidence":"low","coachNote":""}},"runs":{"tuesday":{"type":"easy","targetHR":"130-145","targetPace":"11:30-12:30/mile","duration":35,"coachNote":"specific instruction"},"thursday":{"type":"intervals","workout":"8 × 400m with 90s rest","targetPace":"6:30-7:00/mile per rep","warmup":"10 min easy","cooldown":"10 min easy","coachNote":"specific instruction"},"saturday":{"type":"long","distance":5.5,"targetHR":"140-155","targetPace":"11:00-12:00/mile","coachNote":"specific instruction"}},"accessories":{"dayA":["Incline DB Press 3×10-12","Lateral Raises 4×15","Tricep Rope Pushdown 3×12"],"dayB":["Cable Row narrow-grip 3×10","Face Pulls 3×15","Hammer Curls 3×12"],"dayC":["Romanian Deadlift 3×8","Bulgarian Split Squat 3×8 each","Hip Thrust 3×10","Step-ups 3×10 each","Copenhagen Plank 3×20s each"]},"vo2maxEstimate":31.7,"estimated5KTime":"31:20","recoveryFlag":null}
 
 Rules: weights in lb rounded to nearest 2.5 · pace strings MM:SS/mile · duration in minutes · trend must be up/flat/down · confidence must be high/medium/low · recoveryFlag null if fine or a warning string · if blockWeek 4 reduce all weights 35-40% and all runs easy · if fewer than 3 sessions use baseline values with confidence low · Thursday type→easy if last squat RPE>8 OR avgFatigue>7 OR mode is high_stress/minimum`;
 }
@@ -3321,9 +3342,9 @@ function setChartLift(lift){
 
 function updateLogTabPlanned(){
   const plan=window._adaptivePlan;if(!plan?.lifts)return;
-  const {bench,ohp,squat,dl}=plan.lifts;
+  const {bench,ohp,pullup,row,squat,dl}=plan.lifts;
   const upd=(id,l)=>{if(!l)return;const el=document.getElementById(id);if(el)el.textContent=`Planned: ${l.sets}x${l.reps} @ ${l.weight}`;};
-  upd('planned-bench',bench);upd('planned-ohp',ohp);upd('planned-squat',squat);upd('planned-dl',dl);
+  upd('planned-bench',bench);upd('planned-ohp',ohp);upd('planned-pullup',pullup);upd('planned-row',row);upd('planned-squat',squat);upd('planned-dl',dl);
 }
 
 function showRPEConfirm(lift){
@@ -3700,10 +3721,10 @@ function getDayProgram(dayType){
     const accA=plan?.accessories?.dayA;
     (accA&&accA.length?accA:['Incline DB Press','Lateral Raises','Tricep Rope Pushdown']).forEach(a=>exs.push({name:a,prescription:'',note:null,isPrimary:false,trend:null,confidence:null,isRun:false}));
   } else if(effectiveDT==='B'){
-    const o=plan?.lifts?.ohp;
-    exs.push({name:'Weighted Pull-ups / Lat Pulldown',prescription:o?buildPrescriptionString(o):'See This Week tab for targets',note:o?.coachNote||null,isPrimary:true,trend:o?.trend||null,confidence:o?.confidence||null,isRun:false});
-    const b=plan?.lifts?.bench;
-    exs.push({name:'Barbell Row',prescription:b?buildPrescriptionString(b):'See This Week tab for targets',note:b?.coachNote||null,isPrimary:true,trend:b?.trend||null,confidence:b?.confidence||null,isRun:false});
+    const pu=plan?.lifts?.pullup;
+    exs.push({name:'Weighted Pull-ups / Lat Pulldown',prescription:pu?buildPrescriptionString(pu):'See This Week tab for targets',note:pu?.coachNote||null,isPrimary:true,trend:pu?.trend||null,confidence:pu?.confidence||null,isRun:false});
+    const rw=plan?.lifts?.row;
+    exs.push({name:'Barbell Row',prescription:rw?buildPrescriptionString(rw):'See This Week tab for targets',note:rw?.coachNote||null,isPrimary:true,trend:rw?.trend||null,confidence:rw?.confidence||null,isRun:false});
     const accB=plan?.accessories?.dayB;
     (accB&&accB.length?accB:['Cable Row (narrow grip)','Face Pulls','Hammer Curls']).forEach(a=>exs.push({name:a,prescription:'',note:null,isPrimary:false,trend:null,confidence:null,isRun:false}));
   } else if(effectiveDT==='C'){
