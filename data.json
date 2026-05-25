@@ -638,9 +638,9 @@
   ],
   "stravaLastSync": "2026-05-22T16:11:09.473Z",
   "adaptivePlanCache": {
-    "narrative": "Week 1 of volume accumulation begins with concerning recovery metrics: resting HR 10 bpm above baseline (62 vs 52) and negative wrist temp deviation indicate significant under-recovery. Recent easy runs at HR 165-174 confirm aerobic deficiency—you're running threshold effort when prescriptions call for easy. Lifts show RPE calibration issues (bench and OHP both 2 points harder than predicted), requiring conservative progression.",
-    "weeklyFocus": "Establish true Zone 2 running (HR 130-145) and allow physiological recovery from elevated resting heart rate",
-    "autoRegulationRule": "If resting HR remains >57 bpm on any lift day, reduce all prescribed weights by 10% that session and flag for next check-in",
+    "narrative": "Resting HR is 10 bpm above baseline (62 vs 52) and wrist temp is significantly depressed, indicating incomplete recovery. Recent easy runs are being run at threshold HR (165-174) instead of Zone 2 (130-145), creating excessive fatigue. This week prioritizes recovery through true easy running and conservative lift progressions.",
+    "weeklyFocus": "Restore aerobic base by running at actual Zone 2 heart rates (130-145 bpm) and allow autonomic nervous system recovery",
+    "autoRegulationRule": "If resting HR remains above 57 bpm by Thursday, convert quality run to easy and reduce all lift weights by 10 lb",
     "lifts": {
       "bench": {
         "weight": 192.5,
@@ -650,37 +650,37 @@
         "variation": "Barbell Bench Press",
         "trend": "flat",
         "confidence": "medium",
-        "coachNote": "Last session hit RPE 10 at 205×3-4, indicating overreach. Dropping to 192.5×4×4 to accumulate volume at true RPE 7-8 and recalibrate your effort perception."
+        "coachNote": "Last session at 205×3 hit RPE 9-10, so dropping to 192.5×4×4 for volume accumulation. Stop set immediately if RPE exceeds 8."
       },
       "ohp": {
         "weight": 90,
         "sets": 4,
         "reps": 5,
-        "targetRPE": 8,
+        "targetRPE": 7,
         "variation": "Barbell OHP",
         "trend": "flat",
         "confidence": "medium",
-        "coachNote": "100lb hit RPE 7-8 for sets of 7 last session. Dropping to 90×5 for more sets (4×5) allows volume accumulation with better form and manageable fatigue given current recovery debt."
+        "coachNote": "Last week 100×7 hit RPE 7-8, but that was predicted RPE 7 actual 9 calibration. Using 90 lb for clean volume sets while fatigued."
       },
       "squat": {
         "weight": 160,
         "sets": 4,
         "reps": 4,
-        "targetRPE": 8,
+        "targetRPE": 7,
         "variation": "Back Squat",
         "trend": "flat",
         "confidence": "low",
-        "coachNote": "No recent squat data. Starting conservative at 160×4×4 to establish baseline while managing elevated resting HR. Focus on depth and bracing."
+        "coachNote": "Conservative starting point for volume block given elevated resting HR. Focus on controlled tempo and depth consistency."
       },
       "dl": {
         "weight": 160,
         "sets": 3,
         "reps": 4,
-        "targetRPE": 8,
+        "targetRPE": 7,
         "variation": "Conventional Deadlift",
         "trend": "flat",
         "confidence": "low",
-        "coachNote": "No recent deadlift data. Starting conservative at 160×3×4. Prioritize setup, bracing, and hip hinge pattern over load during volume block."
+        "coachNote": "Match squat loading. Prioritize hip hinge pattern quality and bracing given resident stress levels."
       }
     },
     "runs": {
@@ -689,21 +689,21 @@
         "targetHR": "130-145",
         "targetPace": "12:00-13:00/mile",
         "duration": 30,
-        "coachNote": "Your recent 'easy' runs at HR 165-174 are threshold efforts, not aerobic base work. Walk as needed to keep HR under 145. This is the single most important correction for VO2max and 5K progression."
+        "coachNote": "STRICT Zone 2. Your recent easy runs at 165-174 HR are threshold work. Slow down significantly, walk if needed to stay under 145 bpm. This is the most important session this week for recovery."
       },
       "thursday": {
         "type": "easy",
         "targetHR": "130-145",
         "targetPace": "12:00-13:00/mile",
-        "duration": 35,
-        "coachNote": "With resting HR 10 bpm elevated, no quality work this week. Second easy run to build aerobic base. Run-walk intervals (3min run, 1min walk) acceptable if needed to stay in zone."
+        "duration": 30,
+        "coachNote": "Converting quality run to easy due to resting HR 10 bpm above baseline. Run by HR only, ignore pace completely. Recovery takes priority over fitness this week."
       },
       "saturday": {
         "type": "long",
         "distance": 4.5,
         "targetHR": "135-150",
         "targetPace": "11:30-12:30/mile",
-        "coachNote": "Long run kept moderate duration (4.5mi) given recovery status. Upper HR limit 150 max. If HR drifts above 150 after mile 3, walk 1-2 minutes to reset."
+        "coachNote": "Reduced distance due to recovery concerns. Stay conversational, HR should not exceed 150. Build aerobic base first, then speed later."
       }
     },
     "accessories": {
@@ -719,16 +719,16 @@
         "Pallof Press 3×10 each"
       ],
       "dayC": [
-        "Romanian DL 3×8",
+        "Romanian DL 3×8 @115lb",
         "Step-ups 3×10 each",
         "Copenhagen Plank 3×20s each",
-        "Dead Bug 3×8 each",
-        "Hip Flexor Protocol 2min each"
+        "Dead Bug 3×10 each",
+        "Hip Flexor Stretch 2min each side"
       ]
     },
     "vo2maxEstimate": 44.5,
-    "estimated5KTime": "24:45",
-    "recoveryFlag": "Resting HR 62 bpm is 10 bpm above baseline (52). Wrist temp -1.54°C indicates suppressed recovery. All intensity downgraded this week—no threshold or interval work until resting HR returns to <57 bpm.",
+    "estimated5KTime": "23:45",
+    "recoveryFlag": "RECOVERY CONCERN: Resting HR 10 bpm elevated (62 vs 52 baseline) and wrist temp -1.54°C indicate incomplete recovery. Recent easy runs executed at threshold intensity (HR 165-174) instead of Zone 2 (130-145). All runs this week must be true easy effort to restore autonomic balance. Quality work deferred until HR normalizes.",
     "generatedDate": "2026-05-25",
     "blockWeek": {
       "weekNum": 1,
