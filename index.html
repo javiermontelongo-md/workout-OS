@@ -990,6 +990,15 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">FATIGUE SCORE</div>
       <div style="font-family:var(--mono);font-size:15px;font-weight:500;" id="ci-fatigue-preview">--</div>
     </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:10px;margin-bottom:4px;">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Post-call / no sleep</div>
+      <button id="ci-postcall-btn"
+        onclick="togglePostCall()"
+        style="font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:6px;background:var(--s3);color:var(--t2);border:1px solid var(--b2);cursor:pointer;">
+        No
+      </button>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);">Was last night a call shift or total sleep loss?</div>
+    </div>
     <button class="btn bp" style="width:100%;" onclick="saveCheckin()">Save Check-in to GitHub</button>
     <div id="checkin-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
   </div>
@@ -1523,6 +1532,65 @@ var DP={'1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>B
 // ============================================================
 let D = null;
 let CFG = { tok:'', usr:'javiermontelongo-md', repo:'workout-OS', file:'data.json', api:'' };
+
+const ATHLETE = {
+  age:            28,
+  weightLbs:      225,
+  heightInches:   70,
+  waistInches:    37,
+  mafModifier:    -5,
+  get mafHR()    { return 180 - this.age + this.mafModifier; },
+
+  // Baselines from 95 days of Apple Watch data (Feb–May 2026)
+  hrvBaseline:    53.5,
+  rhrBaseline:    57.2,
+  sleepBaseline:  7.1,
+
+  // Hard rule thresholds
+  HRV_CRASH:      0.80,
+  HRV_WARNING:    0.90,
+  RHR_SPIKE:      8,
+  FEVER_TEMP:     1.5,
+  SLEEP_BLOCK:    5.0,
+  SLEEP_WARNING:  6.5,
+
+  // Recovery windows (hours)
+  RECOVERY: {
+    quality_to_quality:    48,
+    long_to_quality:       72,
+    quality_to_long:       48,
+    easy_to_easy:          8,
+    legs_to_quality_run:   24,
+    legs_to_long_run:      48,
+    upper_to_quality_run:  0,
+    any_lift_to_easy_run:  6,
+  },
+
+  // Volume ceilings — resident-adjusted MRV
+  MRV: {
+    squat: 16, deadlift: 10, bench: 18,
+    ohp: 14, row: 16, pullup: 16,
+  },
+
+  // Rep ranges per lift [min, max]
+  REP_RANGES: {
+    deadlift: [3,5], squat: [4,6], bench: [5,8],
+    ohp: [5,8], row: [6,10], pullup: [6,10],
+    pullup_weighted: [4,6],
+  },
+
+  // Load increments (lb)
+  LOAD_INCREMENTS: {
+    deadlift: 5, squat: 5, bench: 2.5,
+    ohp: 2.5, row: 2.5, pullup_weighted: 5,
+  },
+
+  // Stall detection
+  STALL_THRESHOLD:       2,
+  GLOBAL_STALL_COUNT:    3,
+  DELOAD_FACTOR:         0.90,
+  DELOAD_OVERREACH:      0.80,
+};
 
 function lCFG(){
   try{ const d=localStorage.getItem('wkt_v3'); if(d) Object.assign(CFG,JSON.parse(d)); }catch(e){}
@@ -2177,7 +2245,7 @@ async function ai(prompt){
 }
 function fai(t,id){document.getElementById(id).innerHTML=t?`<div class="air"><div class="al">TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="al">NOTE</div><p>Add your Anthropic API key in Settings -- paste key and click Save key. Or check browser console (F12) for error details.</p></div>`;}
 
-async function genToday(){if(!(document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key'))){fai(null,'today-out');return;}const last=D?.checkins?.slice(-1)[0];const e=last?.energy??7,s=last?.sleep??7,sr=last?.soreness??3;const day=document.getElementById('today-day').value;const recent=D?D.sessions.slice(-3).map(x=>x.date+' Day'+x.day+' RPE'+(x.rpe||'?')).join(', '):'No recent sessions';spin('today-out');fai(await ai(`Today's training plan. Mode: ${document.getElementById('mode-sel').value}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent sessions: ${recent}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');
+async function genToday(){if(!(document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key'))){fai(null,'today-out');return;}const last=D?.checkins?.slice(-1)[0];const e=last?.energy??7,s=last?.sleep??7,sr=last?.soreness??3;const day=document.getElementById('today-day').value;const recent=D?D.sessions.slice(-3).map(x=>x.date+' Day'+x.day+' RPE'+(x.rpe||'?')).join(', '):'No recent sessions';const ts=evaluateTrainingStatus();const hardRules=`Flags: ${ts.activeFlags.join(',')||'none'} | canTrain:${ts.canTrain} | canQuality:${ts.canDoQuality} | RPEcap:${ts.liftRPECap} | vol:${ts.volumeModifier} | mafHR:${ts.mafHR}`;spin('today-out');fai(await ai(`Today's training plan. Mode: ${document.getElementById('mode-sel').value}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent sessions: ${recent}. HARD RULES (enforce): ${hardRules}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');
 if(!D.coachingLog)D.coachingLog=[];
 D.coachingLog.push({ts:Date.now(),type:'today_coaching',label:'Today coaching'});
 if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
@@ -3249,6 +3317,121 @@ function buildLocalPlan(){
   return plan;
 }
 
+function compute7DayMeans(){
+  const logs=D.healthLogs||[];
+  const today=new Date();
+  const cutoff=new Date(today); cutoff.setDate(today.getDate()-7);
+  const cutoffStr=localDS(cutoff);
+  const recent=logs.filter(l=>l.date>=cutoffStr);
+  const hrv7d=recent.filter(l=>l.hrv).map(l=>l.hrv);
+  const rhr7d=recent.filter(l=>l.restingHR).map(l=>l.restingHR);
+  return{
+    hrv:hrv7d.length?hrv7d.reduce((a,b)=>a+b,0)/hrv7d.length:ATHLETE.hrvBaseline,
+    rhr:rhr7d.length?rhr7d.reduce((a,b)=>a+b,0)/rhr7d.length:ATHLETE.rhrBaseline,
+    count:recent.length,
+  };
+}
+
+function evaluateTrainingStatus(){
+  const logs=D.healthLogs||[];
+  const latest=logs[logs.length-1]||{};
+  const means=compute7DayMeans();
+  const checkins=D.checkins||[];
+  const todayCI=checkins[checkins.length-1]||{};
+
+  const flags=[];
+  let canTrain=true,canDoQuality=true,canDoHeavyLifts=true;
+  let liftRPECap=8,volumeModifier=1.0;
+  const reasons=[];
+
+  // ── HARD BLOCKS ──────────────────────────────────────────────
+  if(todayCI.postCall===true){
+    flags.push('POST_CALL');
+    canTrain=false; canDoQuality=false; canDoHeavyLifts=false;
+    volumeModifier=0.0; liftRPECap=0;
+    reasons.push('Post-call: no structured training. Walk ≤30 min at HR <100 only.');
+  }
+
+  const wristTemp=latest.wristTemp??latest.wristTempDeviation??null;
+  if(wristTemp!==null&&wristTemp>=ATHLETE.FEVER_TEMP){
+    flags.push('FEVER_SIGNAL');
+    canTrain=false;
+    reasons.push(`Wrist temp +${wristTemp}°C — fever signal. Rest only.`);
+  }
+
+  const sleepHours=todayCI.sleepHours||todayCI.sleep||null;
+  if(sleepHours!==null&&sleepHours<ATHLETE.SLEEP_BLOCK){
+    flags.push('SLEEP_BLOCK');
+    canDoQuality=false; canDoHeavyLifts=false;
+    liftRPECap=Math.min(liftRPECap,6);
+    volumeModifier=Math.min(volumeModifier,0.80);
+    reasons.push(`Sleep ${sleepHours}h — below 5h block threshold. No quality or heavy lifts.`);
+  }
+
+  // ── QUALITY BLOCKS ────────────────────────────────────────────
+  const latestHRV=latest.hrv||null;
+  if(latestHRV&&means.hrv>0){
+    if(latestHRV<means.hrv*ATHLETE.HRV_CRASH){
+      flags.push('HRV_ACUTE_CRASH');
+      canDoQuality=false; canDoHeavyLifts=false;
+      liftRPECap=Math.min(liftRPECap,6);
+      volumeModifier=Math.min(volumeModifier,0.75);
+      reasons.push(`HRV ${latestHRV}ms is ${Math.round((1-latestHRV/means.hrv)*100)}% below 7d mean (${Math.round(means.hrv)}ms). Quality and heavy work blocked.`);
+    } else if(latestHRV<means.hrv*ATHLETE.HRV_WARNING){
+      flags.push('HRV_WARNING');
+      liftRPECap=Math.min(liftRPECap,7);
+      volumeModifier=Math.min(volumeModifier,0.85);
+      reasons.push(`HRV ${latestHRV}ms — warning zone. Volume reduced, RPE capped at 7.`);
+    }
+  }
+
+  const latestRHR=latest.restingHR||null;
+  if(latestRHR&&means.rhr>0&&latestRHR>means.rhr+ATHLETE.RHR_SPIKE){
+    flags.push('RHR_SPIKE');
+    canDoQuality=false;
+    liftRPECap=Math.min(liftRPECap,7);
+    volumeModifier=Math.min(volumeModifier,0.85);
+    reasons.push(`Resting HR ${latestRHR}bpm is ${Math.round(latestRHR-means.rhr)}bpm above 7d mean. Quality blocked.`);
+  }
+
+  if(sleepHours!==null&&sleepHours>=ATHLETE.SLEEP_BLOCK&&sleepHours<ATHLETE.SLEEP_WARNING){
+    flags.push('SLEEP_WARNING');
+    liftRPECap=Math.min(liftRPECap,7);
+    volumeModifier=Math.min(volumeModifier,0.85);
+    reasons.push(`Sleep ${sleepHours}h — reduced volume and RPE cap 7.`);
+  }
+
+  const bw=window._adaptivePlan?.blockWeek||detectBlockWeek();
+  if(bw.weekNum===4){
+    flags.push('DELOAD_WEEK');
+    canDoQuality=false;
+    liftRPECap=Math.min(liftRPECap,6);
+    volumeModifier=Math.min(volumeModifier,0.60);
+    reasons.push('Week 4 deload — no quality, volume at 60%, RPE cap 6.');
+  }
+
+  const fatigue=todayCI.fatigueScore||null;
+  if(fatigue!==null&&fatigue>=8){
+    liftRPECap=Math.min(liftRPECap,7);
+    volumeModifier=Math.min(volumeModifier,0.85);
+    if(!flags.includes('HRV_ACUTE_CRASH')){
+      reasons.push(`High subjective fatigue (${fatigue}/10) — volume and RPE moderated.`);
+    }
+  }
+
+  let stressScore=0;
+  if(flags.some(f=>['POST_CALL','FEVER_SIGNAL','HRV_ACUTE_CRASH','SLEEP_BLOCK'].includes(f))){
+    stressScore=3;
+  } else if(flags.includes('SLEEP_WARNING')&&flags.includes('RHR_SPIKE')){
+    stressScore=2;
+  } else if(flags.includes('SLEEP_WARNING')||flags.includes('RHR_SPIKE')||flags.includes('HRV_WARNING')){
+    stressScore=1;
+  }
+
+  return{canTrain,canDoQuality,canDoHeavyLifts,liftRPECap,volumeModifier,stressScore,
+    activeFlags:flags,reasons,mafHR:ATHLETE.mafHR,latestHRV,latestRHR,sleepHours,means};
+}
+
 function buildPlanContext(){
   const sessions=D.sessions||[],runs=D.runs||[],checkins=D.checkins||[];
   const blockWeek=detectBlockWeek();
@@ -3292,6 +3475,7 @@ function buildPlanContext(){
 }
 
 function buildPlanPrompt(ctx){
+  const ts=evaluateTrainingStatus();
   const{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max,currentWeight,currentWaist,currentBMI,latestBody}=ctx;
   const sessLines=recentSessions.map(s=>`${s.date} [${s.dayType}] RPE:${s.rpe||'?'} Energy:${s.energy||'?'} Sleep:${s.sleep||'?'}h\n  Bench:${s.bench||'none'} OHP:${s.ohp||'none'} Squat:${s.squat||'none'} DL:${s.dl||'none'}`).join('\n')||'No sessions yet';
   const runLines=recentRuns.map(r=>`${r.date} [${r.type||'?'}] ${r.distance}mi @ ${r.pace||'?'} · HR avg ${r.hrAvg||'?'} max ${r.hrMax||'?'} (${r.name||''})`).join('\n')||'No runs logged';
@@ -3349,11 +3533,21 @@ BODY COMPOSITION:
 - BMI: ${currentBMI||'not calculated'} (height 5'9.5")
 - Waist-to-height ratio: ${latestBody?.waistHeightRatio||'not calculated'}
 
-BIOMETRIC RULES (apply these, not just the checkin data):
-- Wrist temp >+0.5°C → mandatory easy day, flag recovery concern
-- HRV drop >20% from 7-day avg → downgrade all intensity this week
-- Resting HR >5 bpm above baseline → treat as fatigued regardless of subjective feel
-- Both HRV low AND resting HR elevated → full rest or very easy only, no exceptions
+HARD RULE ENGINE OUTPUT (these are non-negotiable — enforce exactly):
+canTrain: ${ts.canTrain}
+canDoQuality: ${ts.canDoQuality}
+canDoHeavyLifts: ${ts.canDoHeavyLifts}
+liftRPECap: ${ts.liftRPECap} (never prescribe RPE above this)
+volumeModifier: ${ts.volumeModifier} (multiply all sets by this — round down to nearest whole set)
+stressScore: ${ts.stressScore}/3
+activeFlags: ${ts.activeFlags.join(', ')||'none'}
+mafHR: ${ts.mafHR} bpm (hard ceiling for ALL easy runs — never exceed)
+reasons: ${ts.reasons.join(' | ')||'all clear'}
+
+ATHLETE PROFILE:
+Age: ${ATHLETE.age} | Weight: ${ATHLETE.weightLbs}lb | Height: 70in | Waist: ${ATHLETE.waistInches}in
+HRV baseline (95d): ${ATHLETE.hrvBaseline}ms | RHR baseline (95d): ${ATHLETE.rhrBaseline}bpm
+MAF HR ceiling: ${ATHLETE.mafHR} bpm
 
 RPE CALIBRATION:
 ${rpeLines}
@@ -3558,6 +3752,16 @@ function updateFatiguePreview(){
   el.style.color=f<4?'var(--a3)':f<6?'var(--a)':'var(--a4)';
 }
 
+function togglePostCall(){
+  const btn=document.getElementById('ci-postcall-btn');
+  if(!btn)return;
+  const isYes=btn.textContent.trim()==='Yes';
+  btn.textContent=isYes?'No':'Yes';
+  btn.style.background=isYes?'var(--s3)':'var(--a4)';
+  btn.style.color=isYes?'var(--t2)':'#fff';
+  btn.style.borderColor=isYes?'var(--b2)':'var(--a4)';
+}
+
 async function saveCheckin(){
   if(!D)return;
   const today=new Date().toISOString().split('T')[0];
@@ -3573,7 +3777,7 @@ async function saveCheckin(){
   const waistInches=parseFloat(document.getElementById('ci-waist')?.value)||null;
   if(!D.checkins)D.checkins=[];
   const existing=D.checkins.findIndex(c=>c.date===today);
-  const entry={date:today,energy,sleep,soreness,motivation,stress,fatigueScore};
+  const entry={date:today,energy,sleep,soreness,motivation,stress,fatigueScore,postCall:document.getElementById('ci-postcall-btn')?.textContent?.trim()==='Yes'};
   if(sleepHours)entry.sleepHours=sleepHours;
   if(existing>=0)D.checkins[existing]=entry;else D.checkins.push(entry);
   if(weightLbs||waistInches){
@@ -3591,6 +3795,8 @@ async function saveCheckin(){
   if(ok){
     msgEl.textContent=existing>=0?'updated ✓':'saved ✓';
     msgEl.style.color='var(--a3)';
+    const pcBtn=document.getElementById('ci-postcall-btn');
+    if(pcBtn){pcBtn.textContent='No';pcBtn.style.background='var(--s3)';pcBtn.style.color='var(--t2)';pcBtn.style.borderColor='var(--b2)';}
     renderSnapshotCharts();
     renderSystemLog();
   }else{
