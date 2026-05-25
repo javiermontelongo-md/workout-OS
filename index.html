@@ -4136,7 +4136,7 @@ function renderWeekNavLifts(offset){
     if(ctxEl) ctxEl.textContent='';
     return;
   }
-  const lds=[{key:'bench',name:'BENCH PRESS'},{key:'ohp',name:'OVERHEAD PRESS'},{key:'squat',name:'BACK SQUAT'},{key:'dl',name:'DEADLIFT'}];
+  const lds=[{key:'bench',name:'BENCH PRESS'},{key:'ohp',name:'OVERHEAD PRESS'},{key:'pullup',name:'WEIGHTED PULL-UPS'},{key:'row',name:'BARBELL ROW'},{key:'squat',name:'BACK SQUAT'},{key:'dl',name:'DEADLIFT'}];
   if(ctxEl){
     if(offset===0){ctxEl.textContent='';ctxEl.style.color='var(--t3)';}
     else if(offset<0){ctxEl.textContent='Actual logged data for this week';ctxEl.style.color='var(--a3)';}
