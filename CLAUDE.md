@@ -74,13 +74,68 @@ TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · SETTIN
 `bench` · `ohp` · `pullup` · `row` · `squat` · `dl`
 
 ## What's Confirmed in Canonical index.html
-- PPL restructure (Push/Pull/Legs day types)
-- pullup-block + row-block as full set-tracking blocks
-- onDayTypeChange() with correct PPL block visibility mapping
-- Conditional cardio write (cardioObj pattern)
-- parsePlanResponse() validates pullup + row keys
-- renderWeekNavLifts() shows all 6 lifts
-- CLAUDE.md push rule
+Verified against origin/main. All features below are present
+and confirmed with grep counts.
+
+### Core Architecture
+- showTab() single nav function
+- pushSilent() saves data.json to GitHub
+- localDS() date formatting
+- defD() default data structure
+
+### PPL Program Structure
+- Push/Pull/Legs day types (A/B/C)
+- PPL labels in both #today-day and #log-day selects
+- onDayTypeChange() shows correct blocks per day type
+- bench-block, ohp-block (Push)
+- pullup-block, row-block (Pull) — full set tracking
+- squat-block, deadlift-block (Legs)
+
+### AI Plan System
+- generateAdaptivePlan() — manual trigger only
+- parsePlanResponse() — validates all 6 lift keys including pullup + row
+- buildPlanContext() — sends pullup/row history to AI
+- buildPlanPrompt() — PPL program description + accessories
+- renderWeekNavLifts() — displays all 6 lifts (bench/ohp/pullup/row/squat/dl)
+- TRAINING MODE RULES enforced numerically in prompt
+
+### Lift Tracking (all 6)
+- getLift('pullup') and getLift('row') in saveSession()
+- pullupE1RM and rowE1RM in defD() and saveSession()
+- benchE1RM, ohpE1RM, squatE1RM, deadliftE1RM also present
+
+### Session Logging
+- cardioObj — conditional write, only on run days with data
+- Run inputs wired: run-distance, run-duration, run-hr, run-rpe, run-notes
+- saveSession() reads all 6 lifts + conditional cardio
+
+### Schedule System
+- buildSchedule() — sets window._schedule and returns array
+- scheduleOverrides in defD()
+- applyScheduleOverride() — ripple logic
+- confirmDayOverride() — UI handler
+- week-day-override dropdown in THIS WEEK tab
+- wasShifted flag on schedule entries
+- detectBlockWeek() — resets on low training density
+
+### THIS WEEK Tab
+- renderCalendar() — grid.onclick delegated listener
+- handleDayCardClick() — routes to drawer or program tab
+- getPlannedBadge() — PPL labels
+- Override dot indicator on overridden days
+
+### Session Detail Drawer
+- openSessionDrawer() — slide-in from right
+- closeSessionDrawer() — animated dismiss
+- buildSessionDrawerContent() — full session detail
+- Handles both old (pullups integer) and new (set array) data shapes
+- Cardio section only shows when dur > 0 or dist > 0
+
+### Infrastructure
+- no-store cache meta tags in <head>
+- CLAUDE.md canonical verification rules
+- git pull --rebase && git push after every commit
+- All greps run against origin/main via git show
 
 ## Canonical Verification Rule
 
@@ -101,8 +156,9 @@ Never run: grep -c "string" index.html
 Always run: git show origin/main:index.html | grep -c "string"
 
 ## What Has Been Removed
-- var DP object (deleted — was dead code)
+- var DP object (deleted)
 - Hardcoded cardio struct in saveSession()
 - Legacy pullups:{sets,reps} aggregate
-- pu-sets and pu-reps input elements
+- pu-sets and pu-reps inputs
 - plan-debug console.log lines
+- deadlift-block renamed back — HTML uses deadlift-block, JS matches
