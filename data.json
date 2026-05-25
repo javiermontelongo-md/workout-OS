@@ -638,9 +638,9 @@
   ],
   "stravaLastSync": "2026-05-22T16:11:09.473Z",
   "adaptivePlanCache": {
-    "narrative": "Your biometrics show significant recovery concerns: resting HR is 12 bpm above baseline (64 vs 52) and wrist temp is massively elevated (+95.7°C is clearly a sensor error, but any deviation flags stress). Recent runs show you're running threshold effort (HR 165-171) when trying to go easy. This week we prioritize genuine aerobic development at true Zone 2 and manage fatigue.",
-    "weeklyFocus": "Establish true easy pace discipline (HR 130-145) and monitor recovery markers daily",
-    "autoRegulationRule": "If resting HR remains >60 bpm tomorrow, convert Thursday intervals to easy run and reduce all lift volumes by 1 set",
+    "narrative": "Week 1 of volume accumulation begins with concerning recovery metrics: resting HR 10 bpm above baseline (62 vs 52) and negative wrist temp deviation indicate significant under-recovery. Recent easy runs at HR 165-174 confirm aerobic deficiency—you're running threshold effort when prescriptions call for easy. Lifts show RPE calibration issues (bench and OHP both 2 points harder than predicted), requiring conservative progression.",
+    "weeklyFocus": "Establish true Zone 2 running (HR 130-145) and allow physiological recovery from elevated resting heart rate",
+    "autoRegulationRule": "If resting HR remains >57 bpm on any lift day, reduce all prescribed weights by 10% that session and flag for next check-in",
     "lifts": {
       "bench": {
         "weight": 192.5,
@@ -648,62 +648,62 @@
         "reps": 4,
         "targetRPE": 8,
         "variation": "Barbell Bench Press",
-        "trend": "up",
+        "trend": "flat",
         "confidence": "medium",
-        "coachNote": "Last session 190×5@7 was strong. Small jump to build on that momentum. Stop set immediately if bar speed slows."
+        "coachNote": "Last session hit RPE 10 at 205×3-4, indicating overreach. Dropping to 192.5×4×4 to accumulate volume at true RPE 7-8 and recalibrate your effort perception."
       },
       "ohp": {
         "weight": 90,
-        "sets": 3,
+        "sets": 4,
         "reps": 5,
-        "targetRPE": 7,
+        "targetRPE": 8,
         "variation": "Barbell OHP",
         "trend": "flat",
-        "confidence": "low",
-        "coachNote": "Conservative start given no recent data. Focus on keeping elbows forward and full lockout overhead."
+        "confidence": "medium",
+        "coachNote": "100lb hit RPE 7-8 for sets of 7 last session. Dropping to 90×5 for more sets (4×5) allows volume accumulation with better form and manageable fatigue given current recovery debt."
       },
       "squat": {
         "weight": 160,
         "sets": 4,
         "reps": 4,
-        "targetRPE": 7,
+        "targetRPE": 8,
         "variation": "Back Squat",
         "trend": "flat",
         "confidence": "low",
-        "coachNote": "Moderate load to assess movement quality. Hit depth every rep, maintain neutral spine throughout."
+        "coachNote": "No recent squat data. Starting conservative at 160×4×4 to establish baseline while managing elevated resting HR. Focus on depth and bracing."
       },
       "dl": {
         "weight": 160,
         "sets": 3,
         "reps": 4,
-        "targetRPE": 7,
+        "targetRPE": 8,
         "variation": "Conventional Deadlift",
         "trend": "flat",
         "confidence": "low",
-        "coachNote": "Same as squat weight—this is intentional given fatigue markers. Film a set to check setup and lockout pattern."
+        "coachNote": "No recent deadlift data. Starting conservative at 160×3×4. Prioritize setup, bracing, and hip hinge pattern over load during volume block."
       }
     },
     "runs": {
       "tuesday": {
         "type": "easy",
         "targetHR": "130-145",
-        "targetPace": "11:45-13:00/mile",
+        "targetPace": "12:00-13:00/mile",
         "duration": 30,
-        "coachNote": "This will feel SLOW. Walk if HR climbs above 145. The goal is actual aerobic adaptation, not cardiovascular fatigue. Check HR every 5 minutes."
+        "coachNote": "Your recent 'easy' runs at HR 165-174 are threshold efforts, not aerobic base work. Walk as needed to keep HR under 145. This is the single most important correction for VO2max and 5K progression."
       },
       "thursday": {
         "type": "easy",
         "targetHR": "130-145",
-        "targetPace": "11:45-13:00/mile",
+        "targetPace": "12:00-13:00/mile",
         "duration": 35,
-        "coachNote": "Converted from intervals due to elevated resting HR. You need aerobic base work more than speed right now. No intervals until recovery markers normalize."
+        "coachNote": "With resting HR 10 bpm elevated, no quality work this week. Second easy run to build aerobic base. Run-walk intervals (3min run, 1min walk) acceptable if needed to stay in zone."
       },
       "saturday": {
         "type": "long",
-        "distance": 5,
+        "distance": 4.5,
         "targetHR": "135-150",
         "targetPace": "11:30-12:30/mile",
-        "coachNote": "Reduced from typical long run volume. Start at 12:30 pace minimum. If HR drifts above 150 after mile 3, slow down further or walk 1 min every mile."
+        "coachNote": "Long run kept moderate duration (4.5mi) given recovery status. Upper HR limit 150 max. If HR drifts above 150 after mile 3, walk 1-2 minutes to reset."
       }
     },
     "accessories": {
@@ -722,54 +722,24 @@
         "Romanian DL 3×8",
         "Step-ups 3×10 each",
         "Copenhagen Plank 3×20s each",
-        "Dead Bug 3×10 each",
-        "90/90 Hip Stretch 2min each side"
+        "Dead Bug 3×8 each",
+        "Hip Flexor Protocol 2min each"
       ]
     },
-    "vo2maxEstimate": 48.5,
-    "estimated5KTime": "21:45",
-    "recoveryFlag": "ELEVATED RESTING HR (+12 bpm above baseline) — all runs must stay true easy pace with strict HR caps. Monitor daily and report any fatigue, soreness, or motivation drops.",
-    "generatedDate": "2026-05-19",
+    "vo2maxEstimate": 44.5,
+    "estimated5KTime": "24:45",
+    "recoveryFlag": "Resting HR 62 bpm is 10 bpm above baseline (52). Wrist temp -1.54°C indicates suppressed recovery. All intensity downgraded this week—no threshold or interval work until resting HR returns to <57 bpm.",
+    "generatedDate": "2026-05-25",
     "blockWeek": {
-      "weekNum": 2,
-      "label": "Strength Emphasis"
+      "weekNum": 1,
+      "label": "Volume Accumulation"
     },
     "schedule": [
       {
-        "date": "2026-05-19",
-        "dayType": "run_easy",
-        "isRest": false,
-        "wasShifted": false
-      },
-      {
-        "date": "2026-05-20",
-        "dayType": "B",
-        "isRest": false,
-        "wasShifted": false
-      },
-      {
-        "date": "2026-05-21",
-        "dayType": "run_quality",
-        "isRest": false,
-        "wasShifted": false
-      },
-      {
-        "date": "2026-05-22",
-        "dayType": "C",
-        "isRest": false,
-        "wasShifted": false
-      },
-      {
-        "date": "2026-05-23",
-        "dayType": "run_long",
-        "isRest": false,
-        "wasShifted": false
-      },
-      {
         "date": "2026-05-24",
-        "dayType": "rest",
-        "isRest": true,
-        "wasShifted": false
+        "dayType": "A",
+        "isRest": false,
+        "wasShifted": true
       },
       {
         "date": "2026-05-25",
@@ -809,9 +779,9 @@
       },
       {
         "date": "2026-05-31",
-        "dayType": "rest",
-        "isRest": true,
-        "wasShifted": false
+        "dayType": "A",
+        "isRest": false,
+        "wasShifted": true
       },
       {
         "date": "2026-06-01",
@@ -900,6 +870,36 @@
       {
         "date": "2026-06-15",
         "dayType": "A",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-16",
+        "dayType": "run_easy",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-17",
+        "dayType": "B",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-18",
+        "dayType": "run_quality",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-19",
+        "dayType": "C",
+        "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-20",
+        "dayType": "run_long",
         "isRest": false,
         "wasShifted": false
       }
@@ -2529,5 +2529,76 @@
   "scheduleOverrides": {
     "2026-05-24": "A",
     "2026-05-31": "A"
+  },
+  "racePredictions": {
+    "generatedAt": "2026-05-25T01:15:08.969Z",
+    "vo2maxUsed": 44.48,
+    "runCount": 23,
+    "methodLabel": "VO2max / VDOT",
+    "predictions": {
+      "s5k": {
+        "seconds": 1734,
+        "ciSeconds": 295,
+        "method": "VO2max / VDOT"
+      },
+      "s10k": {
+        "seconds": 3580,
+        "ciSeconds": 791,
+        "method": "VO2max / VDOT"
+      },
+      "shalf": {
+        "seconds": 7810,
+        "ciSeconds": 2257,
+        "method": "VO2max / VDOT"
+      },
+      "sfull": {
+        "seconds": 16194,
+        "ciSeconds": 7158,
+        "method": "VO2max / VDOT"
+      }
+    },
+    "medianTrainingPace": 661.2,
+    "debugInfo": {
+      "riegelPred": {
+        "s5k": 2081,
+        "s10k": 4339,
+        "shalf": 9574,
+        "sfull": 19961,
+        "anchor": {
+          "date": "2026-05-02",
+          "stravaId": 18353167787,
+          "name": "Ez run",
+          "type": "run",
+          "distance": 2.5,
+          "duration": 1653,
+          "pace": 661,
+          "elevationGain": 94,
+          "heartRateAvg": 151.5,
+          "heartRateMax": 166,
+          "source": "strava",
+          "runType": "easy"
+        },
+        "anchorType": "median of last 5 runs"
+      },
+      "vdotPred": {
+        "s5k": 1482,
+        "s10k": 3084,
+        "shalf": 6768,
+        "sfull": 14196
+      },
+      "hrPred": {
+        "s5k": 1841,
+        "s10k": 3683,
+        "shalf": 7770,
+        "sfull": 15540
+      },
+      "weights": {
+        "riegel": 0.3,
+        "vdot": 0.5,
+        "hr": 0.2
+      },
+      "vo2maxSource": "Apple Watch",
+      "medianPace": 661.2
+    }
   }
 }
