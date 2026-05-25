@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-20",
+  "lastUpdated": "2026-05-25",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -2525,5 +2525,9 @@
       "sets": 3,
       "reps": 5
     }
-  ]
+  ],
+  "scheduleOverrides": {
+    "2026-05-24": "A",
+    "2026-05-31": "A"
+  }
 }
