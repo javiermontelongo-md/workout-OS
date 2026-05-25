@@ -1072,10 +1072,10 @@ input[type=range]::-webkit-slider-thumb:hover {
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;">Run Prescription</div>
         <div id="run-presc-day-label" style="font-size:15px;font-weight:500;color:var(--t);margin-top:4px;"></div>
       </div>
-      <button class="btn bp" id="run-presc-btn" onclick="generateRunPrescription()" style="font-size:11px;padding:8px 16px;">Get Today's Plan</button>
+      <button class="btn bp" id="run-presc-btn" onclick="renderRunPrescriptionCard()" style="font-size:11px;padding:8px 16px;">Refresh Prescription</button>
     </div>
     <div id="run-presc-placeholder" style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">
-      Tap "Get Today's Plan" for an AI-generated run prescription based on your last 90 days of data.
+      Your weekly run prescription will appear here once a plan is generated on the Plan tab.
     </div>
     <div id="run-presc-output" style="display:none;">
       <div style="background:var(--s2);border:1px solid var(--a);border-radius:8px;padding:14px;margin-bottom:12px;">
@@ -3123,59 +3123,99 @@ async function generateRunPrescription(targetDate) {
 function renderRunPrescriptionCard(targetDate) {
   if (!targetDate) {
     const n=new Date();
-    targetDate=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+    targetDate=localDS(n);
   }
-  const todayD=new Date();
-  const today=todayD.getFullYear()+'-'+String(todayD.getMonth()+1).padStart(2,'0')+'-'+String(todayD.getDate()).padStart(2,'0');
 
   const placeholder=document.getElementById('run-presc-placeholder');
   const output=document.getElementById('run-presc-output');
   const btn=document.getElementById('run-presc-btn');
   const completeArea=document.getElementById('run-presc-complete-area');
 
-  const presc=D.runPrescriptions&&D.runPrescriptions[targetDate];
-  if (!presc) {
-    if(placeholder)placeholder.style.display='';
+  // Determine which day of the weekly plan to surface
+  const card=document.getElementById('run-prescription-card');
+  const dayType=card?.dataset?.dayType||'run_easy';
+  const runDayMap={run_easy:'tuesday',run_quality:'thursday',run_long:'saturday'};
+  const planKey=runDayMap[dayType]||'tuesday';
+  const plan=window._adaptivePlan;
+
+  // No weekly plan yet — prompt user to generate one
+  if(!plan||!plan.runs||!plan.runs[planKey]){
+    if(placeholder){
+      placeholder.style.display='';
+      placeholder.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No weekly plan found — <a onclick="showTab(\'plan\')" style="cursor:pointer;color:var(--a3);">go to Plan tab</a> to generate one.</div>';
+    }
     if(output)output.style.display='none';
-    if(btn)btn.textContent='Get Today\'s Plan';
+    if(btn)btn.textContent='Refresh Prescription';
     if(completeArea)completeArea.innerHTML='';
     return;
   }
 
   if(placeholder)placeholder.style.display='none';
   if(output)output.style.display='block';
-  if(btn)btn.textContent='Regenerate Plan';
+  if(btn)btn.textContent='Refresh Prescription';
 
-  const p=presc.primaryRecommendation;
+  const run=plan.runs[planKey];
+  const planAge=plan.generatedDate?Math.floor((Date.now()-new Date(plan.generatedDate).getTime())/86400000):null;
+  const isStale=planAge!==null&&planAge>7;
+
+  // Hard rule engine — deterministic, no AI call
+  const ts=evaluateTrainingStatus();
+
   const primaryEl=document.getElementById('run-presc-primary');
-  if(primaryEl) primaryEl.innerHTML=
-    '<div style="font-size:15px;font-weight:500;color:var(--a);margin-bottom:8px;">'+p.type.toUpperCase()+' · '+p.distance+' · '+p.duration+'</div>'+
-    '<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:6px;">Pace: '+p.pace+'&nbsp;·&nbsp;HR: '+p.heartRate+'</div>'+
-    '<div style="font-size:12px;color:var(--t);margin-top:8px;padding-top:8px;border-top:1px solid var(--b);">'+p.keyInstruction+'</div>'+
-    (presc.coachNote?'<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;font-style:italic;">'+presc.coachNote+'</div>':'');
+  if(primaryEl){
+    let html='';
+    // Stale plan banner
+    if(isStale){
+      html+='<div style="font-family:var(--mono);font-size:10px;color:var(--aw);background:rgba(180,90,0,.1);border:1px solid var(--aw);border-radius:6px;padding:6px 10px;margin-bottom:10px;">&#9888; Plan is '+planAge+' days old — regenerate on the Plan tab.</div>';
+    }
+    // Hard rule flags
+    if(ts.activeFlags&&ts.activeFlags.length){
+      html+='<div style="font-family:var(--mono);font-size:10px;color:var(--a4);background:rgba(220,40,60,.07);border:1px solid rgba(220,40,60,.25);border-radius:6px;padding:8px 10px;margin-bottom:10px;">'+ts.activeFlags.map(f=>'&#9888; '+f).join('<br>')+'</div>';
+    }
+    // Run type header
+    const typeLabel={'easy':'EASY RUN — ZONE 2','intervals':'QUALITY — INTERVALS','tempo':'QUALITY — TEMPO','long':'LONG RUN'}[run.type]||((run.type||'run').toUpperCase());
+    html+='<div style="font-size:15px;font-weight:500;color:var(--a);margin-bottom:8px;">'+typeLabel+'</div>';
+    // Prescription rows
+    if(run.duration)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Duration: '+run.duration+' min</div>';
+    if(run.distance)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Distance: '+run.distance+' miles</div>';
+    if(run.targetHR)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Target HR: '+run.targetHR+' bpm</div>';
+    if(run.targetPace)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Pace: '+run.targetPace+'</div>';
+    if(run.workout)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Workout: '+run.workout+'</div>';
+    if(run.warmup)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Warm-up: '+run.warmup+'</div>';
+    if(run.cooldown)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Cool-down: '+run.cooldown+'</div>';
+    // Hard rule override notes
+    if(!ts.canTrain){
+      html+='<div style="margin-top:10px;font-size:12px;color:var(--a4);border-top:1px solid var(--b);padding-top:8px;">Hard rule: rest recommended today.</div>';
+    }else if(!ts.canDoQuality&&run.type!=='easy'&&run.type!=='long'){
+      html+='<div style="margin-top:10px;font-size:12px;color:var(--aw);border-top:1px solid var(--b);padding-top:8px;">Recovery status: downgrade to easy pace today.</div>';
+    }
+    if(run.coachNote)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;font-style:italic;">'+run.coachNote+'</div>';
+    primaryEl.innerHTML=html;
+  }
 
+  // Clear legacy AI-generated fields (prescription now comes from weekly plan)
   const altEl=document.getElementById('run-presc-alternatives');
-  if(altEl) altEl.innerHTML=(presc.alternatives||[]).map(a=>'<div style="margin-bottom:6px;"><span style="color:var(--a3);">'+a.condition+':</span> '+a.recommendation+'</div>').join('');
-
+  if(altEl)altEl.innerHTML='';
   const watchEl=document.getElementById('run-presc-watchout');
-  if(watchEl) watchEl.innerHTML=(presc.watchOutFor||[]).map(w=>'<div style="margin-bottom:4px;">&#9888; '+w+'</div>').join('');
-
+  if(watchEl)watchEl.innerHTML='';
   const remEl=document.getElementById('run-presc-reminders');
-  if(remEl) remEl.innerHTML=(presc.reminders||[]).map(r=>'<div style="margin-bottom:3px;">&#10003; '+r+'</div>').join('');
+  if(remEl)remEl.innerHTML='';
 
-  if(!completeArea) return;
+  if(!completeArea)return;
 
+  // Post-run feedback workflow — reads completion state from D.runPrescriptions
+  const presc=D.runPrescriptions&&D.runPrescriptions[targetDate];
   const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
-  const isCompleted=presc.completed===true;
-  const hasPostRunFeedback=!!presc.postRunFeedback;
+  const isCompleted=presc?.completed===true;
+  const hasPostRunFeedback=!!presc?.postRunFeedback;
 
   if(hasPostRunFeedback){
     completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:9px;color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:12px;color:var(--t2);line-height:1.7;">'+presc.postRunFeedback+'</div></div>';
-  } else if(isCompleted && stravaRun){
+  }else if(isCompleted&&stravaRun){
     completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
-  } else if(isCompleted){
+  }else if(isCompleted){
     completeArea.innerHTML='<div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight. Check back tomorrow for AI feedback.</div>';
-  } else {
+  }else{
     completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
   }
 }
