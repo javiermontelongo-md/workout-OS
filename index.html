@@ -3373,6 +3373,7 @@ function parsePlanResponse(response){
     if(start===-1||end===-1)return null;
     const plan=JSON.parse(clean.slice(start,end+1));
     if(!plan.lifts||!plan.runs||!plan.narrative)return null;
+    if(!plan.lifts.pullup||!plan.lifts.row)return null;
     return plan;
   }catch(e){console.error('Plan parse error:',e.message,response.slice(0,200));return null;}
 }
