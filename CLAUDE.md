@@ -121,7 +121,7 @@ below are confirmed present.
 
 ### Lift Tracking (all 6)
 - getLift('pullup') and getLift('row') in saveSession()
-- pullupE1RM and rowE1RM in defD() and saveSession()
+- pullupE1RM:0 and rowE1RM:135 in defD() and saveSession()
 - benchE1RM, ohpE1RM, squatE1RM, deadliftE1RM also present
 - e1RM formula: weight * (1 + reps/30)
 - liftBests tracks all 6 lifts for AI context
@@ -174,17 +174,17 @@ below are confirmed present.
 - buildSchedule() — sets window._schedule AND returns array
 - scheduleOverrides{} in defD() and data.json
 - applyScheduleOverride() — full ripple logic:
-  1. Writes today's override
-  2. Finds next default DOW occurrence of same workout
-  3. Sets that day to rest (displaces default)
-  4. Writes workout to today + 7 days
-  Example: Push Sunday → Monday rest, next Sunday Push
+  1. Captures what was previously scheduled for today (displaced)
+  2. Finds next DOW occurrence of the selected workout type
+  3. Places displaced workout there (not rest — swap, not delete)
+  4. Writes selected workout to today + LIFT_SPACING days
+  Example: Push on Sunday → next Push-DOW gets displaced workout
 - confirmDayOverride() — UI handler, syncs log + today tabs
 - week-day-override dropdown in THIS WEEK tab
 - wasShifted flag on schedule entries
 - detectBlockWeek() — resets on <3 sessions in 14 days
 - overrideDot indicator on overridden calendar cells
-- LIFT_SPACING: all types = 7 days
+- LIFT_SPACING: {A:7, B:7, C:7, run_easy:3, run_quality:5, run_long:7}
 - dowToDayType: {0:null,1:A,2:run_easy,3:B,4:run_quality,
   5:C,6:run_long}
 
@@ -253,7 +253,10 @@ Always run: git show origin/main:index.html | grep -c "string"
 - pu-sets and pu-reps input elements
 - plan-debug console.log lines
 - Old BIOMETRIC RULES hardcoded prose in buildPlanPrompt()
-- Daily run AI call (generateRunPrescription removed,
-  replaced by reading plan.runs directly)
+- generateRunPrescription() NOT removed — still exists as
+  async helper called from renderRunPrescriptionCard().
+  The UI button now calls renderRunPrescriptionCard() directly
+  (no standalone AI call button). Function reads plan.runs
+  and falls back to AI only when needed.
 - deadlift-block never renamed — HTML correctly uses 
   deadlift-block, JS matches
