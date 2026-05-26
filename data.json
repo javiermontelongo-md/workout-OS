@@ -758,7 +758,7 @@
     "schedule": [
       {
         "date": "2026-05-25",
-        "dayType": "A",
+        "dayType": "B",
         "isRest": false,
         "wasShifted": true
       },
@@ -2567,7 +2567,7 @@
   "scheduleOverrides": {
     "2026-05-24": "A",
     "2026-05-31": "A",
-    "2026-05-25": "A",
+    "2026-05-25": "B",
     "2026-06-01": "run_long",
     "2026-05-28": "run_easy"
   },
