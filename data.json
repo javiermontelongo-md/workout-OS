@@ -636,7 +636,7 @@
       "runType": "walk"
     }
   ],
-  "stravaLastSync": "2026-05-25T16:10:27.790Z",
+  "stravaLastSync": "2026-05-26T18:07:08.342Z",
   "adaptivePlanCache": {
     "narrative": "HRV is in warning zone (39ms vs 53.5ms baseline). Volume reduced to 85% and RPE capped at 7 per hard rules. Recent easy runs too fast (HR 165-171) — must slow to true Zone 2 (130-145 bpm).",
     "weeklyFocus": "Rebuild aerobic base with disciplined Zone 2 running while managing reduced training capacity from HRV suppression",
