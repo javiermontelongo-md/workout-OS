@@ -911,6 +911,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <button class="tab" onclick="showTab('progress')">PROGRESS</button>
     <button class="tab" onclick="showTab('program')">PROGRAM</button>
     <button class="tab" onclick="showTab('milestones')">MILESTONES</button>
+    <button class="tab" onclick="showTab('rules')">RULES</button>
     <button class="tab" onclick="showTab('settings')">SETTINGS</button>
   </div>
 </div>
@@ -1459,6 +1460,135 @@ input[type=range]::-webkit-slider-thumb:hover {
 </div>
 
 <!-- v2026-05-22 -->
+<div id="panel-rules" class="panel">
+  <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Training <span style="color:var(--a);">rules</span></h2>
+  <p style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:24px;">How the app decides what to prescribe — and what it won't let you do.</p>
+
+  <!-- HARD RULES -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="lbl">Hard rules — enforced in code</div>
+    <p style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:16px;line-height:1.6;">These run before every AI call. The AI cannot override them. They protect against injury, overreaching, and training in a physiologically unsafe state.</p>
+    <div id="rules-hard-list"></div>
+  </div>
+
+  <!-- SOFT RULES -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="lbl">Soft rules — AI judgment within bounds</div>
+    <p style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:16px;line-height:1.6;">These are evidence-based guidelines the AI follows when prescribing. They can be adjusted by context — your history, block phase, and recovery state all influence how the AI applies them.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Progressive overload</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Double progression: reps first, then load. Add weight only when all sets reach the top of the rep range at RPE ≤8.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Rep ranges</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Deadlift 3–5 · Squat 4–6 · Bench/OHP 5–8 · Row/Pullup 6–10. Weighted pullups 4–6.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Load increments</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Lower body: +5lb when earned. Upper body: +2.5lb. Pullup belt: +5lb.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Stall detection</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">2 consecutive sessions below rep range minimum → auto-deload to 90% of working weight.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Zone 2 pacing</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">All easy runs at HR ≤147 bpm (MAF formula: 180 − 28 − 5). Current easy runs at 165–174 are threshold, not aerobic.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">80/20 polarization</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">~80% of weekly run volume at easy/Zone 2 pace. ~20% at quality intensity. Source: Seiler (2009).</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">4-week block structure</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Week 1: accumulate (baseline volume). Week 2: build (+33% sets). Week 3: peak (+67% sets). Week 4: deload (−40% volume, no quality).</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Volume ceilings</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Resident-adjusted maximum recoverable volume: Squat 16 sets/wk · Deadlift 10 · Bench 18 · OHP 14 · Row 16 · Pullup 16.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Run volume</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Maximum 10% weekly mileage increase. Long run ≤35% of weekly total. Deload week: 50% of peak mileage.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Recovery windows</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Quality → quality: 48h min. Long run → quality: 72h. Legs → quality run: 24h. Legs → long run: 48h.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT AI DOES -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="lbl">What AI contributes</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Weekly prescription</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Sets exact weights, sets, reps, and RPE targets for all 6 lifts based on your session history and biometric state.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Run prescription</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Prescribes target HR, pace, duration, and structure for each of your 3 weekly runs based on fitness trend.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Accessory selection</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Chooses hypertrophy and stability accessories for each day based on block phase and your weak points.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Coaching narrative</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Explains its reasoning — what it noticed in your data, what to watch for, and why it prescribed what it did.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Auto-regulation</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Provides a specific rule for how to adjust the session in real time based on how it feels (e.g. stop set if RPE hits 9 early).</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Recovery flag</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Raises a warning when biometrics indicate significant under-recovery, even if no single hard rule fires.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER GUIDANCE -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="lbl">When to do what</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Generate AI Plan</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">After logging a session. Monday morning. After any rest period of 5+ days. When biometrics spike (resting HR +10 bpm or HRV drops 30%+). Not more than once per day.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Log a session</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Immediately after training while details are fresh. Log RPE honestly — it's the primary signal the AI uses for progressive overload. One session per day type.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Daily check-in</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Every morning before training. Takes 30 seconds. Energy, sleep, and post-call status are the most important inputs — they directly control what the hard rule engine allows today.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Mark post-call</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">Any morning after a call shift or night of total sleep loss. This is a hard block — the app will prevent quality and heavy training regardless of how you feel (catecholamine false readiness).</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Override schedule</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">When life forces you to do a different workout than scheduled. Use the Today's Workout dropdown in THIS WEEK tab. The schedule ripples forward automatically.</div>
+      </div>
+      <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">When to rest</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.5;">When the hard rule engine flags POST_CALL, FEVER_SIGNAL, or SLEEP_BLOCK. When HRV drops >20% below your 7-day mean. When you've had 3+ stalled lifts in 14 days (systemic overreaching signal).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOURCES -->
+  <div class="card">
+    <div class="lbl">Evidence base</div>
+    <p style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;">
+      Maffetone (2010) · Seiler &amp; Tønnessen (2009) · Daniels (2013) · NSCA Essentials 4th ed. · Zourdos et al. (2016) · Israetel/Renaissance Periodization · Milewski et al. (2014) · Dawson &amp; Reid (1997) · Leveritt &amp; Abernethy (1999) · Schumann et al. (2014) · Plews et al. (2013) · Foster et al. (2001) · Besedovsky et al. (2019) · Blumert et al. (2007)
+    </p>
+  </div>
+</div>
 <div id="panel-settings" class="panel">
   <div class="h1">Settings &amp; <span>sync</span></div>
   <div class="g2">
@@ -1515,6 +1645,10 @@ input[type=range]::-webkit-slider-thumb:hover {
   <button class="ni" onclick="showTab('progress')"><span class="nicon">P</span><span class="nlbl">PROG</span></button>
   <button class="ni" onclick="showTab('program')"><span class="nicon">Pg</span><span class="nlbl">PGRM</span></button>
   <button class="ni" onclick="showTab('milestones')"><span class="nicon">G</span><span class="nlbl">GOALS</span></button>
+  <button class="ni" onclick="showTab('rules')">
+    <div style="font-size:18px;">📋</div>
+    <div>Rules</div>
+  </button>
   <button class="ni" onclick="showTab('settings')"><span class="nicon">S</span><span class="nlbl">SET</span></button>
 </nav>
 </div><!-- v2026-05-22 -->
@@ -1848,12 +1982,42 @@ function renderSystemLog() {
 // NAV
 // ============================================================
 const rendered={};
+function renderRulesTab(){
+  const el=document.getElementById('rules-hard-list');
+  if(!el)return;
+  const ts=evaluateTrainingStatus();
+  const rules=[
+    {title:'Post-call / sleep deprivation',desc:'After a call shift or <5h sleep: no structured training. Walk ≤30 min at HR <100 only.',flag:'POST_CALL',threshold:'Trigger: post-call toggle = Yes'},
+    {title:'Fever signal',desc:'Wrist temperature deviation ≥+1.5°C blocks all training. Medical contraindication.',flag:'FEVER_SIGNAL',threshold:'Trigger: wrist temp ≥ +1.5°C'},
+    {title:'Sleep block',desc:'Sleep <5h blocks quality work and heavy lifts. Volume reduced to 80%, RPE capped at 6.',flag:'SLEEP_BLOCK',threshold:'Trigger: sleep < 5.0h'},
+    {title:'Sleep warning',desc:'Sleep 5–6.5h reduces volume to 85% and caps RPE at 7.',flag:'SLEEP_WARNING',threshold:'Trigger: sleep 5.0–6.4h'},
+    {title:'HRV acute crash',desc:'HRV >20% below 7-day mean blocks quality work and heavy lifts. Volume at 75%, RPE cap 6.',flag:'HRV_ACUTE_CRASH',threshold:'Trigger: HRV < '+Math.round(ts.means.hrv*0.80)+'ms (today: '+(ts.latestHRV||'—')+'ms)'},
+    {title:'HRV warning',desc:'HRV 10–20% below 7-day mean reduces volume to 85% and caps RPE at 7.',flag:'HRV_WARNING',threshold:'Trigger: HRV '+Math.round(ts.means.hrv*0.80)+'–'+Math.round(ts.means.hrv*0.90)+'ms'},
+    {title:'Resting HR spike',desc:'Resting HR >8 bpm above 7-day mean blocks quality runs. Volume at 85%, RPE cap 7.',flag:'RHR_SPIKE',threshold:'Trigger: RHR > '+Math.round(ts.means.rhr+8)+'bpm (today: '+(ts.latestRHR||'—')+'bpm)'},
+    {title:'Deload week (Week 4)',desc:'Week 4 of every block: no quality runs, volume at 60%, RPE capped at 6. Non-negotiable even with good biometrics.',flag:'DELOAD_WEEK',threshold:'Trigger: blockWeek.weekNum === 4'},
+    {title:'MAF HR ceiling',desc:'All easy runs hard-capped at '+ATHLETE.mafHR+' bpm (MAF formula: 180 − '+ATHLETE.age+' − 5). Slow down or walk if exceeded.',flag:null,threshold:'Your MAF: '+ATHLETE.mafHR+' bpm. Current easy runs: 165–174 bpm (too high).'},
+  ];
+  el.innerHTML=rules.map(rule=>{
+    const active=rule.flag&&ts.activeFlags.includes(rule.flag);
+    const color=active?'var(--a4)':'var(--a2)';
+    const status=active?'⚠ ACTIVE':'✓ clear';
+    return '<div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid '+(active?'rgba(220,40,60,.25)':'var(--b)')+';margin-bottom:8px;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">'+
+      '<div style="font-family:var(--mono);font-size:11px;color:'+color+';">'+rule.title+'</div>'+
+      '<div style="font-family:var(--mono);font-size:10px;color:'+color+';white-space:nowrap;margin-left:12px;">'+status+'</div>'+
+      '</div>'+
+      '<div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:6px;">'+rule.desc+'</div>'+
+      '<div style="font-family:var(--mono);font-size:10px;color:var(--t3);">'+rule.threshold+'</div>'+
+      '</div>';
+  }).join('');
+}
 function showTab(n){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab,.ni').forEach(t=>t.classList.remove('on'));
   const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); p.scrollTop=0; }
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='week') renderCalendar();
+  if(n==='rules') renderRulesTab();
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
