@@ -54,6 +54,15 @@ After every edit, run grep checks to confirm:
 - Deleted code has 0 hits
 - No orphaned references remain
 
+## Canonical Verification Rule
+Never use local file grep to verify features.
+Always verify against the remote canonical file directly.
+
+  git show origin/main:index.html | grep -c "search-term"
+
+Never run: grep -c "string" index.html
+Always run: git show origin/main:index.html | grep -c "string"
+
 ## Commit Messages
 Use conventional commit format:
   feat: description
@@ -73,190 +82,274 @@ TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · RULES 
 ## Lift Keys (all 6 must exist in adaptivePlanCache.lifts)
 `bench` · `ohp` · `pullup` · `row` · `squat` · `dl`
 
-## What's Confirmed in Canonical index.html
-Verified against origin/main via git show. All features 
-below are confirmed present.
+---
 
-### Core Architecture
-- showTab() single nav function
-- pushSilent() saves data.json to GitHub (data.json only)
-- localDS() date formatting
-- defD() default data structure including scheduleOverrides{}
-- ATHLETE constants object:
-  age 28, weight 225lb, height 70in, waist 37in,
-  HRV baseline 53.5ms, RHR baseline 57.2bpm,
-  MAF HR 147bpm (180 − 28 − 5),
-  sleep baseline 7.1h from 95 days Apple Watch data
-- compute7DayMeans() — rolling 7-day HRV/RHR averages
-  with fallback to ATHLETE baselines when data sparse
-- evaluateTrainingStatus() — 28-rule deterministic hard 
-  rule engine, runs before every AI call, returns 
-  TrainingStatus object with canTrain, canDoQuality,
-  canDoHeavyLifts, liftRPECap, volumeModifier, 
-  stressScore, activeFlags, reasons, mafHR
-- no-store cache meta tags in head (no browser caching)
+## Function Index
+All line numbers are from origin/main. Verify before editing:
+  git show origin/main:index.html | grep -n "function functionName"
 
-### PPL Program Structure
-- Push/Pull/Legs day types (A/B/C)
-- PPL labels in #today-day, #log-day, #week-day-override
-- onDayTypeChange() shows correct blocks per day:
-  Push (A): bench-block + ohp-block
-  Pull (B): pullup-block + row-block
-  Legs (C): squat-block + deadlift-block
-  Run days: run-log-section only
+### Config & Data
+| Line | Function | Purpose |
+|------|----------|---------|
+| 1729 | lCFG() | Load config from localStorage |
+| 1733 | sCFG() | Save config to localStorage |
+| 1739 | fetchData() | GET data.json from GitHub API |
+| 1768 | push(btnId, msgId) | PUT data.json to GitHub API |
+| 1792 | defD() | Default data structure — all data.json fields |
+| 3794 | pushSilent() | Silent PUT data.json — no UI feedback |
 
-### AI Plan System
-- generateAdaptivePlan() — manual trigger only
-- parsePlanResponse() — validates all 6 lift keys 
-  including pullup + row (rejects if missing)
-- buildPlanContext() — sends pullup/row history to AI
-- buildPlanPrompt() — receives evaluateTrainingStatus() 
-  output, passes TrainingStatus to AI instead of raw 
-  biometric prose. Old hardcoded BIOMETRIC RULES block 
-  replaced with computed hard rule engine output.
-- renderWeekNavLifts() — displays all 6 lifts 
-  (bench/ohp/pullup/row/squat/dl) in THIS WEEK panel
-- TRAINING MODE RULES enforced numerically in prompt
-- Auto-correct: plan rejected if pullup or row missing
+### Boot & Navigation
+| Line | Function | Purpose |
+|------|----------|---------|
+| 1811 | hOv() | Hover handlers |
+| 1813 | onLoad() | App boot — fetches data, renders tabs |
+| 2014 | showTab(n) | Single nav function — all tab switching goes here |
+| 2023 | renderTab(n) | Renders content for a given tab |
+| 2033 | sync(state, label) | Sync status indicator |
+| 2039 | msg(id, html) | Inline message renderer |
 
-### Lift Tracking (all 6)
-- getLift('pullup') and getLift('row') in saveSession()
-- pullupE1RM:0 and rowE1RM:135 in defD() and saveSession()
-- benchE1RM, ohpE1RM, squatE1RM, deadliftE1RM also present
-- e1RM formula: weight * (1 + reps/30)
-- liftBests tracks all 6 lifts for AI context
+### Settings & Config UI
+| Line | Function | Purpose |
+|------|----------|---------|
+| 2041 | modeChg() | Training mode change handler |
+| 2046 | setTrainingMode(val) | Sets D.trainingMode |
+| 2348 | saveCFG() | Save settings |
+| 2355 | testCon() | Test GitHub connection |
+| 2363 | saveAPI() | Save Anthropic API key |
+| 2364 | clearAPI() | Clear API key |
+| 2365 | debugAPI() | Debug API key state |
+| 2392 | clrCFG() | Clear all config |
+| 2391 | exportData() | Export data.json |
+| 2376 | runMig() | Run data migrations |
+
+### AI Layer
+| Line | Function | Purpose |
+|------|----------|---------|
+| — | buildAthleteContext() | NEW — single shared context object for all AI calls. Calls evaluateTrainingStatus() once. Returns athlete, hardRules, biometrics, training, checkin, schedule, body. |
+| — | liftTrend(key, sessions, weeks) | NEW — computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
+| 2398 | ai(prompt, maxTokens=800) | Shared Anthropic fetch wrapper — system prompt built from buildAthleteContext(). All AI calls route here. |
+| 2412 | fai(t, id) | Renders AI text response into a DOM element |
+| 2414 | genToday() | Daily coaching narrative — calls ai(1000). Returns JSON with coaching + optional scheduleNote + scheduleAdjustment. Caches result keyed on date+checkin+HRV. |
+| 3196 | generateRunPrescription(targetDate) | Run prescription JSON — calls ai(1200). Validates required keys, retries once if missing. |
+| 3395 | generatePostRunFeedback(targetDate) | Post-run feedback — requires D.runPrescriptions[targetDate] AND matching Strava run. Compares prescribed vs actual. |
+| 3806 | generateAdaptivePlan() | Weekly plan — direct fetch to Anthropic (2000 tokens). Writes to window._adaptivePlan + D.adaptivePlanCache. |
+
+### Hard Rule Engine
+| Line | Function | Purpose |
+|------|----------|---------|
+| 3552 | evaluateTrainingStatus() | 28-rule deterministic engine. Called ONLY inside buildAthleteContext() and RULES tab render. Returns TrainingStatus: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR |
+| 3537 | compute7DayMeans() | Rolling 7-day HRV/RHR averages with fallback to ATHLETE baselines |
 
 ### Session Logging
-- cardioObj — conditional write, only on run days with data
-- Run inputs wired: run-distance, run-duration, run-hr, 
-  run-rpe, run-notes all read in saveSession()
-- Auto-calculated pace from distance + duration
-- saveSession() reads all 6 lifts + conditional cardio
-- No hardcoded cardio struct — clean conditional only
+| Line | Function | Purpose |
+|------|----------|---------|
+| 2056 | chk(id) | Checkbox state helper |
+| 2063 | restChk() | Rest day checkbox handler |
+| 2075 | initSets() | Initialize set tracking state |
+| 2076 | addSet(lift) | Add a set to a lift block |
+| 2081 | removeSet(lift, i) | Remove a set from a lift block |
+| 2082 | renderSets(lift) | Render set inputs for a lift |
+| 2090 | saveSession() | Save session to D.sessions[], clears adaptivePlanCache |
+| 2124 | resetLogForm() | Reset log form to defaults |
+| 2128 | renderSessHist() | Render session history list |
+| 3141 | toggleRunLogSection() | Show/hide run inputs |
+| 3146 | onDayTypeChange(value) | Shows correct lift blocks per day type |
+| 3185 | startLoggingSession() | Initialize log tab for today |
 
-### Daily Check-in
-- ci-energy slider (1-10)
-- ci-sleep-input (HH:MM format)
-- ci-postcall-btn — post-call toggle (No/Yes)
-  Hard block: POST_CALL flag blocks all quality and 
-  heavy training regardless of other biometrics
-- postCall field saved in every checkin entry
-- fatigueScore, soreness, motivation, stress also saved
+### Check-in
+| Line | Function | Purpose |
+|------|----------|---------|
+| 3955 | calcFatigue(energy,sleep,soreness,motivation,stress) | Computes fatigueScore 0-10 |
+| 3960 | updateFatiguePreview() | Live fatigue preview in check-in UI |
+| 3972 | togglePostCall() | POST_CALL flag toggle — blocks all quality/heavy |
+| 3982 | saveCheckin() | Save check-in to D.checkins[] |
+| 4027 | _buildSparkRows(checkins30, larger) | Sparkline row builder for snapshot |
+| 4062 | renderSnapshotCharts() | Render check-in snapshot charts |
+| 4251 | initCheckinTab() | Initialize check-in tab |
+| 4277 | updateTodayPreview() | Live preview of today's plan |
 
-### Hard Rule Engine (evaluateTrainingStatus)
-28 Category A rules — deterministic, never AI-dependent:
-- POST_CALL → canTrain=false, volumeModifier=0
-- FEVER_SIGNAL (wrist temp ≥+1.5°C) → canTrain=false
-- SLEEP_BLOCK (<5h) → no quality, no heavy, RPE cap 6
-- SLEEP_WARNING (5-6.5h) → volume 85%, RPE cap 7
-- HRV_ACUTE_CRASH (<80% of 7d mean) → no quality/heavy,
-  volume 75%, RPE cap 6
-- HRV_WARNING (80-90% of 7d mean) → volume 85%, RPE cap 7
-- RHR_SPIKE (>8bpm above 7d mean) → no quality, RPE cap 7
-- DELOAD_WEEK (blockWeek 4) → no quality, volume 60%
-- Subjective fatigue ≥8/10 → volume 85%, RPE cap 7
-- All rules use min() so multiple flags stack correctly
-- stressScore 0-3 composite passed to AI
-
-### Run Prescription
-- renderRunPrescriptionCard() reads from plan.runs 
-  (no second AI call)
-- runDayMap: run_easy→tuesday, run_quality→thursday,
-  run_long→saturday
-- Hard rule warnings shown inline in card
-- Quality run downgraded warning when canDoQuality=false
-- MAF HR ceiling (147 bpm) displayed in prescription
-- Stale plan warning shown after 3 days
-- Zero fetch() calls inside renderRunPrescriptionCard
-- Falls back gracefully if no plan exists
+### Calendar & Week View
+| Line | Function | Purpose |
+|------|----------|---------|
+| 2168 | getWeekStart(offset) | Returns week start date for offset |
+| 2174 | getSessionsForDate(dateStr) | Filter sessions for a date |
+| 2178 | getActivityBadges(sessions, dateStr) | Activity badge HTML for calendar |
+| 2192 | getPlannedBadge(dateStr) | Planned workout badge for calendar |
+| 2201 | calNav(dir) | Calendar navigation |
+| 2205 | renderCalendar() | Full calendar render |
+| 2251 | handleDayCardClick(dateStr) | Day card click — past→drawer, future→program, rest→no-op |
+| 2265 | openSessionDrawer(session, dateStr) | Slide-in session detail drawer |
+| 2288 | closeSessionDrawer() | Dismiss session drawer |
+| 2297 | buildSessionDrawerContent(session, dateStr) | Full session detail HTML |
+| 4484 | weekNavNav(dir) | THIS WEEK nav arrows |
+| 4490 | getWeekLabel(offset) | Week label string |
+| 4494 | getWeekDateRange(offset) | Week date range string |
+| 4500 | getBlockPhaseForOffset(offset) | Block phase for a week offset |
+| 4523 | getActualLiftsForWeek(offset) | Actual lifts logged for a week |
+| 4541 | getPlannedLiftsForWeek(offset) | Planned lifts for a week |
+| 4555 | renderWeekNavLifts(offset) | Lift display in THIS WEEK panel |
+| 4608 | renderWeekNav() | Full THIS WEEK panel render |
 
 ### Schedule System
-- buildSchedule() — sets window._schedule AND returns array
-- scheduleOverrides{} in defD() and data.json
-- applyScheduleOverride() — full ripple logic:
-  1. Captures what was previously scheduled for today (displaced)
-  2. Finds next DOW occurrence of the selected workout type
-  3. Places displaced workout there (not rest — swap, not delete)
-  4. Writes selected workout to today + LIFT_SPACING days
-  Example: Push on Sunday → next Push-DOW gets displaced workout
-- confirmDayOverride() — UI handler, syncs log + today tabs
-- week-day-override dropdown in THIS WEEK tab
-- wasShifted flag on schedule entries
-- detectBlockWeek() — resets on <3 sessions in 14 days
-- overrideDot indicator on overridden calendar cells
-- LIFT_SPACING: {A:7, B:7, C:7, run_easy:3, run_quality:5, run_long:7}
-- dowToDayType: {0:null,1:A,2:run_easy,3:B,4:run_quality,
-  5:C,6:run_long}
+| Line | Function | Purpose |
+|------|----------|---------|
+| 3434 | buildSchedule() | Generates window._schedule — 28-day array respecting scheduleOverrides |
+| 3458 | applyScheduleOverride(date, dayType) | Swap model ripple: captures displaced workout, finds next DOW slot for selected type, places displaced there, writes selected type to today + LIFT_SPACING |
+| 3497 | confirmDayOverride() | UI handler for week-day-override dropdown |
+| 3522 | buildLocalPlan() | Hydrates window._adaptivePlan from D.adaptivePlanCache |
+| 2343 | ldPrev() | Load previous week |
 
-### THIS WEEK Tab
-- renderCalendar() — grid.onclick delegated listener
-  (survives innerHTML replacement)
-- handleDayCardClick() — past day with session → drawer,
-  future scheduled day → program tab, rest → no-op
-- getPlannedBadge() — PPL labels (Push/Pull/Legs)
-- Override dot indicator on overridden days
+### Program & Plan
+| Line | Function | Purpose |
+|------|----------|---------|
+| 2443 | detectBlockWeek() | Block week 1-4, resets on <3 sessions in 14 days |
+| 2476 | getBlockParams(blockWeek) | Sets/reps/targetRPE per block week |
+| 2481 | buildPredictions(currentE1RM, slope) | 4-week e1RM projections |
+| 2492 | predictLift(liftKey, blockWeek) | Predicted e1RM for a lift |
+| 2519 | getAccessoryVariation(liftKey) | Accessory exercise variation string |
+| 3652 | buildPlanContext() | Assembles context object for generateAdaptivePlan |
+| 3694 | buildPlanPrompt(ctx) | Builds AI prompt for weekly plan |
+| 3782 | parsePlanResponse(response) | Validates + parses AI plan JSON. Rejects if any of 6 lift keys missing. |
+| 3865 | renderAdaptivePlan() | Renders plan in THIS WEEK tab |
+| 3848 | confirmRPE(lift, actualRPE) | RPE confirmation after session |
+| 3942 | showRPEConfirm(lift) | RPE confirmation UI |
+| 4296 | getTodayDayType() | Returns today's day type from schedule |
+| 4308 | buildPrescriptionString(lift) | Prescription string for a lift |
+| 4312 | getDayProgram(dayType) | Program details for a day type |
+| 4391 | renderDayCard(dayType, isToday, isExpanded) | Program day card HTML |
+| 4428 | toggleProgDay(el, dayType) | Toggle program day expansion |
+| 4436 | renderProgramTab() | Full PROGRAM tab render |
+| 1825 | renderSystemLog() | System activity feed |
+| 1985 | renderRulesTab() | RULES tab render with live hard rule status |
 
-### Session Detail Drawer
-- openSessionDrawer() — slide-in from right, animated
-- closeSessionDrawer() — animated dismiss, removes DOM
-- buildSessionDrawerContent() — full session detail:
-  header with date + day label, meta chips 
-  (duration/RPE/energy/sleep/BW), lift sets with 
-  weight/reps/RPE per set, legacy pullups display,
-  cardio section, session notes
-- Handles both old (pullups integer) and new 
-  (pullup/row set arrays) data shapes gracefully
-- Cardio only shown when dur>0 or dist>0
-- Future day tap → showTab('program')
+### Run Metrics & Prescription
+| Line | Function | Purpose |
+|------|----------|---------|
+| 2528 | getRestingHR() | Latest RHR from healthLogs |
+| 2534 | estimateVO2max(run) | VO2max estimate from HR runs |
+| 2561 | vdotPredict(vo2max) | VDOT pace predictions |
+| 2585 | riegelPredict(runs) | Riegel race prediction |
+| 2610 | hrRegressionPredict(runs) | HR regression pace prediction |
+| 2643 | calcRacePredictions() | Full race prediction calculation |
+| 2749 | secsToRaceTime(s) | Format seconds as race time |
+| 2758 | secsToPace(totalSecs, miles) | Format seconds as pace |
+| 2766 | renderRacePredictions() | Render race prediction cards |
+| 2846 | setRacePredChart(dist) | Set active race pred chart distance |
+| 2855 | renderRacePredChart(dist) | Render race prediction chart |
+| 3049 | calcRunMetrics() | Compute run metrics from D.runs |
+| 3068 | renderRunMetricsSummary() | Render run metrics summary |
+| 3091 | renderRunChart(type) | Render run chart (pace/HR/distance) |
+| 3140 | setRunChart(type) | Set active run chart type |
+| 3289 | renderRunPrescriptionCard(targetDate) | Render run prescription — reads from plan.runs, zero AI calls |
+| 3388 | markRunComplete(targetDate) | Mark run complete + trigger post-run feedback |
 
-### RULES Tab
-- panel-rules with full static content
-- renderRulesTab() called from showTab('rules')
-- 9 hard rules with live ✓ clear / ⚠ ACTIVE status
-  using real computed thresholds from evaluateTrainingStatus
-- 10 soft rules with evidence citations
-- 6 AI contribution cards
-- 6 user guidance cards (when to generate, log, rest etc.)
-- 14-source evidence base (Maffetone, Seiler, Daniels,
-  NSCA, Zourdos, Israetel/RP, Milewski, Dawson, 
-  Leveritt, Schumann, Plews, Foster, Besedovsky, Blumert)
+### Body Metrics
+| Line | Function | Purpose |
+|------|----------|---------|
+| 4632 | formatSleepInput(input) | Format sleep input string |
+| 4643 | parseSleepHHMM(str) | Parse HH:MM sleep string to hours |
+| 4651 | updateBodyCalcs() | Update BMI + body calc display |
+| 4665 | renderBodyChart(type) | Render body metrics chart |
+| 4709 | setBodyChart(type) | Set active body chart type |
 
-### Infrastructure
-- no-store cache meta tags prevent browser caching
-- CLAUDE.md canonical verification rules
-- git pull --rebase && git push after every commit
-- All greps run against origin/main via git show
-- Never use local file grep — always git show origin/main
+### Utilities
+| Line | Function | Purpose |
+|------|----------|---------|
+| 2424 | calcE1RM(weight, reps) | Epley e1RM formula, rounded to 2.5lb |
+| 2426 | getLiftHistory(liftKey, daysBack=60) | Filter sessions, compute e1RM with recency weights |
+| 2527 | localDS(d) | Date → YYYY-MM-DD string in local timezone |
+| 2145 | updProgressStats() | Update progress tab stats |
+| 3891 | renderPredictionChart(lift) | e1RM prediction chart |
+| 3928 | setChartLift(lift) | Set active lift for prediction chart |
+| 3934 | updateLogTabPlanned() | Update log tab with today's planned workout |
+| 2397 | spin(id) | Spinner toggle helper |
 
-## Canonical Verification Rule
+---
 
-Never use local file grep to verify features.
-Always verify against the remote canonical file directly.
+## AI Architecture (post-refactor)
 
-To check if a feature exists in the canonical file:
-  git show origin/main:index.html | grep -c "search-term"
+### Call Hierarchy
+```
+buildAthleteContext()  ← called once per AI invocation
+  └── evaluateTrainingStatus()  ← hard rules, single call
+  └── compute7DayMeans()        ← biometrics
+  └── detectBlockWeek()         ← block state (cached in const)
+      └── getBlockParams()
+  └── estimateVO2max()
 
-This reads from the remote ref directly, bypassing whatever
-is in the local working tree. Use this for ALL verification
-grep checks, not grep on the local file.
+ai(prompt, maxTokens=800)  ← shared fetch wrapper
+  └── buildAthleteContext()  ← system prompt built here
+  └── called by:
+      ├── genToday()                    (1000 tokens)
+      ├── generateRunPrescription()     (1200 tokens)
+      └── generatePostRunFeedback()     (800 tokens)
 
-Before reporting any feature as present or absent, run:
-  git show origin/main:index.html | grep -c "feature-string"
+generateAdaptivePlan()  ← direct fetch, bypasses ai()
+  └── buildPlanContext()   ← separate context builder
+  └── buildPlanPrompt()    ← separate prompt builder
+```
 
-Never run: grep -c "string" index.html
-Always run: git show origin/main:index.html | grep -c "string"
+### evaluateTrainingStatus() Call Sites (exactly 2)
+1. buildAthleteContext() — feeds all ai() calls
+2. renderRulesTab() — live status display in RULES tab
+
+### coachingLog Write Sites (4)
+All use identical pattern: push → slice(-50) → renderSystemLog()
+- genToday() → type: 'today_coaching'
+- generateRunPrescription() → type: 'run_prescription'
+- generatePostRunFeedback() → type: 'post_run'
+- generateAdaptivePlan() → type: 'week_plan'
+
+### genToday() Cache
+Keyed on: `${date}|${energy}|${sleep}|${hrv}`
+Stored in: window._genTodayCache = { key, response }
+Invalidated: automatically on next day or checkin change
+
+### Schedule Note System
+genToday() returns JSON with optional fields:
+- scheduleNote: plain string shown in #week-schedule-note banner
+- scheduleAdjustment: {date: dayType} written to scheduleOverrides
+  Only dates within next 14 days accepted. Max 14-day horizon.
+
+---
+
+## ATHLETE Constant Fields
+```
+age: 28
+weightLbs: 225
+heightInches: 70
+waistInches: 37
+mafHR: 147  (getter: 180 − age − mafModifier)
+mafModifier: −5
+hrvBaseline: 53.5ms   (95 days Apple Watch Feb–May 2026)
+rhrBaseline: 57.2bpm  (95 days Apple Watch Feb–May 2026)
+sleepBaseline: 7.1h
+HRV_CRASH: 0.80
+HRV_WARNING: 0.90
+RHR_SPIKE: 8
+FEVER_TEMP: 1.5
+SLEEP_BLOCK: 5.0
+SLEEP_WARNING: 6.5
+```
+
+## Schedule Constants
+```
+LIFT_SPACING:  {A:7, B:7, C:7, run_easy:3, run_quality:5, run_long:7}
+dowToDayType:  {0:null,1:'A',2:'run_easy',3:'B',4:'run_quality',5:'C',6:'run_long'}
+runDayMap:     {run_easy:'tuesday', run_quality:'thursday', run_long:'saturday'}
+```
 
 ## What Has Been Removed
-- var DP object (deleted — was dead code with numeric keys)
+- var DP object (deleted — dead code with numeric keys)
 - Hardcoded cardio struct in saveSession()
 - Legacy pullups:{sets,reps} aggregate in saveSession()
 - pu-sets and pu-reps input elements
 - plan-debug console.log lines
 - Old BIOMETRIC RULES hardcoded prose in buildPlanPrompt()
-- generateRunPrescription() NOT removed — still exists as
-  async helper called from renderRunPrescriptionCard().
-  The UI button now calls renderRunPrescriptionCard() directly
-  (no standalone AI call button). Function reads plan.runs
-  and falls back to AI only when needed.
-- deadlift-block never renamed — HTML correctly uses 
-  deadlift-block, JS matches
+- Hardcoded "Kaiser SF" string in ai() system prompt
+  (now lives in buildAthleteContext().athlete.location)
+- Duplicate evaluateTrainingStatus() calls in genToday()
+  and buildPlanPrompt() (now single call in buildAthleteContext())
+- Dead top-level statements after genToday() closing brace
+  (coachingLog.push, pushSilent, renderSystemLog were
+  executing at page load — moved inside function body)
