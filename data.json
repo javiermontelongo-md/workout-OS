@@ -2566,7 +2566,7 @@
   ],
   "scheduleOverrides": {
     "2026-05-24": "A",
-    "2026-05-31": "A",
+    "2026-05-31": "rest",
     "2026-05-25": "B",
     "2026-06-01": "run_long",
     "2026-05-28": "run_easy"
@@ -2647,6 +2647,11 @@
       "ts": 1779765246582,
       "type": "week_plan",
       "label": "Weekly AI plan"
+    },
+    {
+      "date": "2026-05-26",
+      "type": "today_coaching",
+      "response": "Today's easy run should be 25–35 minutes at strictly MAF-capped HR (147bpm ceiling). With HRV at 32ms in the warning zone, prioritize nasal breathing and walk breaks as needed to keep HR compliant—consistency under the ceiling matters more than pace. If HR drifts above 147 even at easy effort, cut the session short at 20 minutes. Prioritize 8+ hours sleep tonight and hydration throughout the day to support HRV recovery."
     }
   ]
 }
