@@ -62,7 +62,7 @@ Use conventional commit format:
   refactor: description
 
 ## Current Tabs
-TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · SETTINGS
+TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · RULES · SETTINGS
 
 ## Key data.json fields
 `sessions[]` · `runs[]` · `checkins[]` · `healthLogs[]` · 
@@ -82,6 +82,9 @@ and confirmed with grep counts.
 - pushSilent() saves data.json to GitHub
 - localDS() date formatting
 - defD() default data structure
+- ATHLETE constants object (age 28, weight 225lb, height 70in, waist 37in, HRV baseline 53.5ms, RHR baseline 57.2bpm, MAF HR 147bpm)
+- compute7DayMeans() — rolling 7-day HRV/RHR averages
+- evaluateTrainingStatus() — 28-rule hard rule engine
 
 ### PPL Program Structure
 - Push/Pull/Legs day types (A/B/C)
@@ -96,6 +99,8 @@ and confirmed with grep counts.
 - parsePlanResponse() — validates all 6 lift keys including pullup + row
 - buildPlanContext() — sends pullup/row history to AI
 - buildPlanPrompt() — PPL program description + accessories
+- buildPlanPrompt() receives evaluateTrainingStatus() output
+- Hard rule engine output replaces raw biometric prose in prompt
 - renderWeekNavLifts() — displays all 6 lifts (bench/ohp/pullup/row/squat/dl)
 - TRAINING MODE RULES enforced numerically in prompt
 
@@ -108,6 +113,24 @@ and confirmed with grep counts.
 - cardioObj — conditional write, only on run days with data
 - Run inputs wired: run-distance, run-duration, run-hr, run-rpe, run-notes
 - saveSession() reads all 6 lifts + conditional cardio
+- Post-call toggle in daily check-in (ci-postcall-btn)
+- postCall field saved in checkin entries
+
+### Run Prescription
+- renderRunPrescriptionCard() reads from plan.runs — no AI call
+- runDayMap routes easy/quality/long to plan.runs keys (tuesday/thursday/saturday)
+- Hard rule warnings shown inline from evaluateTrainingStatus()
+- Stale plan warning after 7 days
+- Zero fetch() calls inside renderRunPrescriptionCard()
+- Post-run feedback workflow preserved via D.runPrescriptions
+
+### RULES Tab
+- panel-rules with live hard rule status (renderRulesTab called from showTab)
+- 9 hard rules with ✓ clear / ⚠ ACTIVE live status from evaluateTrainingStatus()
+- 10 soft rules (progressive overload, rep ranges, load increments, stall detection, Zone 2, 80/20, block structure, volume ceilings, run volume, recovery windows)
+- 6 AI contribution cards (weekly prescription, run prescription, accessory selection, coaching narrative, auto-regulation, recovery flag)
+- 6 user guidance cards (generate AI plan, log session, daily check-in, mark post-call, override schedule, when to rest)
+- 14-source evidence base (Maffetone, Seiler, Daniels, NSCA, Zourdos, Israetel/RP, Milewski, Dawson, Leveritt, Schumann, Plews, Foster, Besedovsky, Blumert)
 
 ### Schedule System
 - buildSchedule() — sets window._schedule and returns array
