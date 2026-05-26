@@ -3459,19 +3459,30 @@ function applyScheduleOverride(date,dayType){
   if(!D) return;
   if(!D.scheduleOverrides) D.scheduleOverrides={};
 
+  const dowMap={0:null,1:'A',2:'run_easy',3:'B',4:'run_quality',5:'C',6:'run_long'};
+  const prevOvr=D.scheduleOverrides[date];
+  const displaced=(prevOvr!==undefined)?prevOvr:(()=>{const d=new Date(date+'T12:00:00');const dt=dowMap[d.getDay()];return dt===null?'rest':dt;})();
+
+  if(dayType!=='rest'&&displaced!==dayType&&displaced!=='rest'){
+    const tDOW=parseInt(Object.entries(dowMap).find(([,v])=>v===dayType)?.[0]);
+    if(!isNaN(tDOW)){
+      const sd=new Date(date+'T12:00:00');
+      for(let i=1;i<=28;i++){
+        const c=new Date(sd);c.setDate(sd.getDate()+i);
+        if(c.getDay()===tDOW){const ns=localDS(c);if(!D.scheduleOverrides[ns])D.scheduleOverrides[ns]=displaced;break;}
+      }
+    }
+  }
+
   D.scheduleOverrides[date]=dayType;
 
   const LIFT_SPACING={A:7,B:7,C:7,run_easy:3,run_quality:5,run_long:7};
   const spacing=LIFT_SPACING[dayType];
-
   if(spacing&&dayType!=='rest'){
-    const overrideDate=new Date(date+'T12:00:00');
-    const nextOccurrence=new Date(overrideDate);
-    nextOccurrence.setDate(overrideDate.getDate()+spacing);
-    const nextStr=localDS(nextOccurrence);
-    if(!D.scheduleOverrides[nextStr]){
-      D.scheduleOverrides[nextStr]=dayType;
-    }
+    const od=new Date(date+'T12:00:00');
+    const nd=new Date(od);nd.setDate(od.getDate()+spacing);
+    const ns=localDS(nd);
+    if(!D.scheduleOverrides[ns])D.scheduleOverrides[ns]=dayType;
   }
 
   buildSchedule();
