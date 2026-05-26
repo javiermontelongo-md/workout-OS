@@ -1214,6 +1214,12 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-week-summary" id="cal-week-summary"></div>
   </div>
+  <div id="week-schedule-note"
+       style="display:none;padding:8px 12px;margin:8px 0;
+              background:rgba(180,90,0,.08);color:var(--t2);
+              border-left:3px solid var(--aw);border-radius:4px;
+              font-family:var(--mono);font-size:0.82rem;
+              line-height:1.4;"></div>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
     <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;white-space:nowrap;letter-spacing:.06em;">Today's workout</div>
     <select id="week-day-override"
@@ -2395,13 +2401,210 @@ function clrCFG(){if(confirm('Clear local settings (token, API key)? Your data o
 // AI
 // ============================================================
 function spin(id){document.getElementById(id).innerHTML='<div class="spin"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Generating...</span></div>';}
-async function ai(prompt){
+function liftTrend(key, sessions, weeks = 4) {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - (weeks * 7));
+  const cutoffStr = localDS(cutoff);
+  const relevant = (sessions || [])
+    .filter(s => s.date >= cutoffStr && s[key]?.sets?.length);
+  if (relevant.length < 2) return 'insufficient_data';
+  const e1rms = relevant.map(s =>
+    Math.max(...(s[key].sets || [])
+      .map(x => calcE1RM(x.weight, x.reps)))
+  );
+  const half = Math.ceil(e1rms.length / 2);
+  const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+  const delta = avg(e1rms.slice(half)) - avg(e1rms.slice(0, half));
+  if (delta > 2.5)  return 'improving';
+  if (delta < -2.5) return 'declining';
+  return 'plateauing';
+}
+function buildAthleteContext() {
+  const ts = evaluateTrainingStatus();
+  const sevenDay = compute7DayMeans();
+  const lastCI = D.checkins?.slice(-1)[0] || {};
+  const lastHL = D.healthLogs?.slice(-1)[0] || {};
+  const lastBody = D.bodyMetrics?.slice(-1)[0] || {};
+  const blockWeek = detectBlockWeek();
+
+  // All 6 lifts with per-set detail
+  const recentSessions = (D.sessions || []).slice(-8).map(s => {
+    const fmt = sets => (sets || [])
+      .map(x => `${x.weight}×${x.reps}@${x.rpe}`).join(',');
+    return {
+      date: s.date, type: s.type,
+      bench:  fmt(s.bench?.sets),
+      ohp:    fmt(s.ohp?.sets),
+      pullup: fmt(s.pullup?.sets),
+      row:    fmt(s.row?.sets),
+      squat:  fmt(s.squat?.sets),
+      dl:     fmt(s.dl?.sets)
+    };
+  });
+
+  // e1RM bests — all 6 lifts
+  const liftKeys = ['bench','ohp','pullup','row','squat','dl'];
+  const fallbacks = {bench:95,ohp:65,pullup:0,row:95,squat:135,dl:185};
+  const liftBests = {};
+  liftKeys.forEach(k => {
+    let best = 0;
+    (D.sessions || []).forEach(s =>
+      (s[k]?.sets || []).forEach(x => {
+        const e = calcE1RM(x.weight, x.reps);
+        if (e > best) best = e;
+      })
+    );
+    liftBests[k] = best || fallbacks[k];
+  });
+
+  // Lift trends — computed deterministically before AI sees data
+  const liftTrends = {};
+  liftKeys.forEach(k => { liftTrends[k] = liftTrend(k, D.sessions); });
+
+  // Recent runs — last 10
+  const recentRuns = (D.runs || []).slice(-10).map(r => ({
+    date: r.date, type: r.type,
+    distanceMi: r.distanceMi,
+    pace: r.paceMinkm || r.pace,
+    hrAvg: r.hrAvg, hrMax: r.hrMax
+  }));
+
+  // 14-day schedule
+  const today = localDS(new Date());
+  const dowMap = {0:null,1:'A',2:'run_easy',3:'B',
+                  4:'run_quality',5:'C',6:'run_long'};
+  const next14 = [];
+  for (let i = 0; i < 14; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const ds = localDS(d);
+    next14.push({
+      date: ds,
+      dayType: D.scheduleOverrides?.[ds] ?? (dowMap[d.getDay()] || 'rest')
+    });
+  }
+
+  // 7-day checkin averages
+  const recentCI = (D.checkins || []).slice(-7);
+  const ciAvg = key => {
+    const vals = recentCI.map(c => c[key]).filter(Number.isFinite);
+    return vals.length
+      ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*10)/10
+      : null;
+  };
+
+  // Recent coaching — last 5 today_coaching entries, trimmed
+  const recentCoaching = (D.coachingLog || [])
+    .filter(c => c.type === 'today_coaching')
+    .slice(-5)
+    .map(c => ({
+      date: c.date,
+      summary: typeof c.response === 'string'
+        ? c.response.slice(0, 200) : null
+    }));
+
+  // Active plan — today's specific prescription if available
+  const activePlan = window._adaptivePlan ? {
+    weeklyFocus: window._adaptivePlan.weeklyFocus || null,
+    todayPlan: window._adaptivePlan.schedule?.[next14[0]?.dayType] || null
+  } : null;
+
+  return {
+    athlete: {
+      age:         ATHLETE.age,
+      weightLbs:   ATHLETE.weightLbs,
+      heightIn:    ATHLETE.heightInches,
+      waistIn:     ATHLETE.waistInches,
+      mafHR:       ATHLETE.mafHR,
+      hrvBaseline: ATHLETE.hrvBaseline,
+      rhrBaseline: ATHLETE.rhrBaseline,
+      location:    'Kaiser SF',
+      schedule:    'Lift A Mon · Lift B Wed · Lift C Fri · Easy Run Tue · Quality Run Thu · Long Run Sat · Rest Sun'
+    },
+    hardRules: {
+      canTrain:        ts.canTrain,
+      canDoQuality:    ts.canDoQuality,
+      canDoHeavyLifts: ts.canDoHeavyLifts,
+      liftRPECap:      ts.liftRPECap,
+      volumeModifier:  ts.volumeModifier,
+      mafHR:           ts.mafHR,
+      activeFlags:     ts.activeFlags,
+      reasons:         ts.reasons,
+      stressScore:     ts.stressScore
+    },
+    biometrics: {
+      todayHRV:    lastHL.hrv       || null,
+      todayRHR:    lastHL.rhr       || null,
+      todayTemp:   lastHL.wristTemp || null,
+      sevenDayHRV: sevenDay.hrv    || null,
+      sevenDayRHR: sevenDay.rhr    || null,
+      todaySleep:  lastCI.sleepHours ?? lastCI.sleep ?? null,
+      vo2max:      lastHL.vo2max    || estimateVO2max()
+    },
+    training: {
+      blockWeek,
+      blockParams:      getBlockParams(blockWeek),
+      liftBests,
+      liftTrends,
+      currentLifts:     D.currentLifts || {},
+      recentSessions,
+      recentRuns,
+      rpeConfirmations: (D.rpeLog || []).slice(-20),
+      recentCoaching
+    },
+    checkin: {
+      energy:       lastCI.energy       || null,
+      sleep:        lastCI.sleepHours   ?? lastCI.sleep ?? null,
+      soreness:     lastCI.soreness     || null,
+      fatigueScore: lastCI.fatigueScore || null,
+      mood:         lastCI.mood         || null,
+      avg7Day: {
+        energy:   ciAvg('energy'),
+        sleep:    ciAvg('sleepHours') ?? ciAvg('sleep'),
+        soreness: ciAvg('soreness'),
+        fatigue:  ciAvg('fatigueScore')
+      }
+    },
+    schedule: {
+      today,
+      todayType:  next14[0]?.dayType || 'rest',
+      next14,
+      activePlan,
+      overrides: Object.fromEntries(
+        Object.entries(D.scheduleOverrides || {})
+          .filter(([d]) => d >= today)
+          .sort(([a],[b]) => a.localeCompare(b))
+          .slice(0, 14)
+      )
+    },
+    body: {
+      weightLbs: lastBody.weight || ATHLETE.weightLbs,
+      waistIn:   lastBody.waist  || ATHLETE.waistInches,
+      bmi:       lastBody.bmi    || null
+    }
+  };
+}
+async function ai(prompt, maxTokens = 800) {
   const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
   if(!apiKey){ console.error('AI: no key found'); return null; }
   console.log('AI: key prefix', apiKey.substring(0,12));
   try{
-    const lifts=D?`Bench e1RM ${D.currentLifts?.benchE1RM||255}, Squat e1RM ${D.currentLifts?.squatE1RM||215}, DL e1RM ${D.currentLifts?.deadliftE1RM||215}, OHP e1RM ${D.currentLifts?.ohpE1RM||120}, Pullups ${D.currentLifts?.pullups||5} reps. Running: ${D.cardioBaseline?.pace||'10:30'} @ ${D.cardioBaseline?.avgHR||165} HR.`:'Baseline lifts.';
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:800,system:`You are Javier Montelongo's strength and running coach. PGY-1 IM resident at Kaiser SF. Program: 3+3 hybrid (Lift A/B/C Mon/Wed/Fri + Easy/Quality/Long Run Tue/Thu/Sat, rest Sun). Goal: sub-20 5K + compound strength. Current lifts: ${lifts} Cross-training rules: heavy lower body lifting creates fatigue affecting next-day run quality. High-mileage runs affect lifting if consecutive. Sleep below 6h reduces intensity regardless of session type. ICU rotation: protect sleep and recovery above all else. Deload weeks apply to both lifting AND running. Philosophy: sustainable beats optimal, recovery overrides progression. Be specific and practical, 150 words max.`,messages:[{role:'user',content:prompt}]})});
+    const ctx = buildAthleteContext();
+    const systemPrompt = [
+      `You are a strength and running coach.`,
+      `Athlete: ${ctx.athlete.age}yo male, ${ctx.athlete.weightLbs}lb, ${ctx.athlete.heightIn}in, waist ${ctx.athlete.waistIn}in. Location: ${ctx.athlete.location}.`,
+      `Schedule: ${ctx.athlete.schedule}.`,
+      `MAF HR ceiling: ${ctx.athlete.mafHR}bpm — hard ceiling for all easy runs, never exceed.`,
+      `HRV baseline: ${ctx.athlete.hrvBaseline}ms. RHR baseline: ${ctx.athlete.rhrBaseline}bpm.`,
+      `HARD RULES — non-negotiable, never override:`,
+      `  canTrain=${ctx.hardRules.canTrain} | canDoQuality=${ctx.hardRules.canDoQuality} | canDoHeavyLifts=${ctx.hardRules.canDoHeavyLifts}`,
+      `  RPEcap=${ctx.hardRules.liftRPECap} | volumeModifier=${ctx.hardRules.volumeModifier}`,
+      `  activeFlags: ${ctx.hardRules.activeFlags.join(', ') || 'none'}`,
+      `  reasons: ${ctx.hardRules.reasons.join(' | ') || 'all clear'}`,
+      `Current lift baselines: ${JSON.stringify(ctx.training.currentLifts)}.`,
+      `Lift trends (last 4 weeks): ${JSON.stringify(ctx.training.liftTrends)}.`
+    ].join('\n');
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:maxTokens,system:systemPrompt,messages:[{role:'user',content:prompt}]})});
     console.log('AI: status', r.status);
     const d=await r.json();
     console.log('AI: response', JSON.stringify(d).substring(0,200));
@@ -2411,12 +2614,111 @@ async function ai(prompt){
 }
 function fai(t,id){document.getElementById(id).innerHTML=t?`<div class="air"><div class="al">TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="al">NOTE</div><p>Add your Anthropic API key in Settings -- paste key and click Save key. Or check browser console (F12) for error details.</p></div>`;}
 
-async function genToday(){if(!(document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key'))){fai(null,'today-out');return;}const last=D?.checkins?.slice(-1)[0];const e=last?.energy??7,s=last?.sleep??7,sr=last?.soreness??3;const day=document.getElementById('today-day').value;const recent=D?D.sessions.slice(-3).map(x=>x.date+' Day'+x.day+' RPE'+(x.rpe||'?')).join(', '):'No recent sessions';const ts=evaluateTrainingStatus();const hardRules=`Flags: ${ts.activeFlags.join(',')||'none'} | canTrain:${ts.canTrain} | canQuality:${ts.canDoQuality} | RPEcap:${ts.liftRPECap} | vol:${ts.volumeModifier} | mafHR:${ts.mafHR}`;spin('today-out');fai(await ai(`Today's training plan. Mode: ${document.getElementById('mode-sel').value}. Energy: ${e}/10. Sleep: ${s}h. Soreness: ${sr}/10. Day: ${day}. Recent sessions: ${recent}. HARD RULES (enforce): ${hardRules}. Give specific loading recommendation, one auto-regulation rule, one recovery priority.`),'today-out');
-if(!D.coachingLog)D.coachingLog=[];
-D.coachingLog.push({ts:Date.now(),type:'today_coaching',label:'Today coaching'});
-if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
-if(typeof pushSilent==='function')pushSilent();
-renderSystemLog();}
+async function genToday() {
+  const ctx = buildAthleteContext();
+
+  // Cache — skip API if inputs unchanged since last call
+  const cacheKey = [
+    ctx.schedule.today,
+    ctx.checkin.energy,
+    ctx.checkin.sleep,
+    ctx.biometrics.todayHRV
+  ].join('|');
+  if (window._genTodayCache?.key === cacheKey &&
+      window._genTodayCache?.response) {
+    fai(window._genTodayCache.response, 'today-out');
+    return;
+  }
+
+  const prompt = [
+    `Today is ${ctx.schedule.today}. Day type: ${ctx.schedule.todayType}.`,
+    `Training mode: ${D.trainingMode || 'normal'}.`,
+    `Block: week ${ctx.training.blockWeek.weekNum}, ${ctx.training.blockParams.label}.`,
+    `Check-in — energy: ${ctx.checkin.energy}/5, sleep: ${ctx.checkin.sleep}h, soreness: ${ctx.checkin.soreness}/5, fatigue: ${ctx.checkin.fatigueScore}/10.`,
+    `7-day averages — energy: ${ctx.checkin.avg7Day.energy}, sleep: ${ctx.checkin.avg7Day.sleep}h, soreness: ${ctx.checkin.avg7Day.soreness}.`,
+    `Biometrics — HRV: ${ctx.biometrics.todayHRV}ms (7d avg: ${ctx.biometrics.sevenDayHRV}ms), RHR: ${ctx.biometrics.todayRHR}bpm.`,
+    `Lift bests: ${Object.entries(ctx.training.liftBests).map(([k,v])=>`${k}:${v}lb`).join(', ')}.`,
+    `Last 3 sessions: ${JSON.stringify(ctx.training.recentSessions.slice(-3))}.`,
+    `Next 7 days: ${ctx.schedule.next14.slice(0,7).map(d=>`${d.date}=${d.dayType}`).join(', ')}.`,
+    ctx.schedule.activePlan
+      ? `Weekly plan focus: ${ctx.schedule.activePlan.weeklyFocus}. Today's plan: ${JSON.stringify(ctx.schedule.activePlan.todayPlan)}.`
+      : '',
+    ctx.training.recentCoaching.length
+      ? `Recent coaching (do not repeat these themes): ${ctx.training.recentCoaching.map(c=>c.summary).join(' | ')}.`
+      : '',
+    ``,
+    `Respond ONLY with valid JSON, no markdown fencing:`,
+    `{`,
+    `  "coaching": "3-4 sentences. Specific loading rec for today, one auto-regulation rule, one recovery priority.",`,
+    `  "scheduleNote": "optional — one sentence describing a conflict in the next 7 days and the fix. Omit key entirely if schedule is clean.",`,
+    `  "scheduleAdjustment": {"YYYY-MM-DD": "dayType"}`,
+    `  // optional — only if scheduleNote present. Next 14 days only. Omit entirely if no adjustment needed.`,
+    `}`
+  ].filter(Boolean).join('\n');
+
+  spin('today-out');
+  const raw = await ai(prompt, 1000);
+  if (!raw) return;
+
+  // Parse JSON — fallback to plain text if malformed
+  let parsed = null;
+  try {
+    const clean = raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
+    parsed = JSON.parse(clean);
+  } catch(e) {
+    fai(raw, 'today-out');
+    return;
+  }
+
+  // Render coaching narrative
+  const coachingText = parsed.coaching || raw;
+  fai(coachingText, 'today-out');
+
+  // Cache result
+  window._genTodayCache = { key: cacheKey, response: coachingText };
+
+  // Apply schedule adjustment — 14-day horizon only
+  if (parsed.scheduleAdjustment &&
+      typeof parsed.scheduleAdjustment === 'object') {
+    if (!D.scheduleOverrides) D.scheduleOverrides = {};
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() + 14);
+    const cutoffStr = localDS(cutoff);
+    Object.entries(parsed.scheduleAdjustment).forEach(([date, type]) => {
+      if (date >= ctx.schedule.today && date <= cutoffStr) {
+        D.scheduleOverrides[date] = type;
+      }
+    });
+    buildSchedule();
+    renderCalendar();
+    if (document.getElementById('panel-week')?.classList.contains('on')) {
+      renderWeekNav();
+    }
+  }
+
+  // Show or hide schedule note banner in THIS WEEK
+  const banner = document.getElementById('week-schedule-note');
+  if (banner) {
+    if (parsed.scheduleNote) {
+      banner.textContent = parsed.scheduleNote;
+      banner.style.display = 'block';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  // Write to coaching log — INSIDE function (bug fix)
+  if (!D.coachingLog) D.coachingLog = [];
+  D.coachingLog.push({
+    date: ctx.schedule.today,
+    type: 'today_coaching',
+    response: coachingText
+  });
+  D.coachingLog = D.coachingLog.slice(-50);
+
+  pushSilent();
+  renderSystemLog();
+}
 // ============================================================
 // ADAPTIVE PROGRAMMING ENGINE
 // ============================================================
@@ -3219,54 +3521,39 @@ async function generateRunPrescription(targetDate) {
     const dayType = document.getElementById('log-day')?.value || document.getElementById('run-prescription-card')?.dataset.dayType;
     const runTypeLabel = {'run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals or Tempo','run_long':'Long Run'}[dayType] || 'Run';
 
-    const runs = (D.runs||[]).filter(r=>r.date<=today).slice(-20).map(r=>({
-      date:r.date, type:r.runType, distance:r.distance,
-      pace:r.pace?Math.floor(r.pace/60)+':'+String(r.pace%60).padStart(2,'0')+'/mile':null,
-      hrAvg:r.heartRateAvg, hrMax:r.heartRateMax
-    }));
-
-    const plannedRuns = [];
-    if (isFuture && D.runPrescriptions) {
-      Object.entries(D.runPrescriptions).forEach(([d,p])=>{
-        if (d>today && d<targetDate && p && p.primaryRecommendation) {
-          const pr = p.primaryRecommendation;
-          plannedRuns.push('PLANNED (not yet completed): '+d+' — '+pr.type+' '+pr.distance+' @ '+pr.pace+' HR '+pr.heartRate);
-        }
-      });
-    }
-
-    const rh = (D.healthLogs||[]).slice(-7);
-    const rhrArr = rh.filter(h=>h.restingHR);
-    const hrvArr = rh.filter(h=>h.hrv);
-    const avgRHR = rhrArr.length?Math.round(rhrArr.reduce((s,h)=>s+h.restingHR,0)/rhrArr.length):null;
-    const avgHRV = hrvArr.length?Math.round(hrvArr.reduce((s,h)=>s+h.hrv,0)/hrvArr.length):null;
-    const todayCI = (D.checkins||[]).find(c=>c.date===today);
-    const recentS = (D.sessions||[]).slice(-5).map(s=>({date:s.date,dayType:s.day,rpe:s.rpe}));
-    const lastRun = runs[runs.length-1];
-    const lastLift = recentS[recentS.length-1];
-
-    const prompt = 'You are an expert running coach for Javier, a PGY-1 IM resident.\n'+
-'GOAL: Sub-20 min 5K, maximize VO2max (currently ~44-48 ml/kg/min, target 55+)\n'+
-'TODAY\'S SCHEDULED RUN TYPE: '+runTypeLabel+'\n'+
-'PRESCRIPTION DATE: '+targetDate+(isFuture?' (FUTURE DATE — factor in predicted fatigue from planned runs below)':'')+'\n'+
-'TODAY\'S DATE: '+today+'\n\n'+
-'RECENT COMPLETED RUNS (last 20, up to today):\n'+
-(runs.map(r=>r.date+' ['+r.type+'] '+r.distance+'mi @ '+(r.pace||'?')+'/mile · HR avg '+(r.hrAvg||'?')+' max '+(r.hrMax||'?')).join('\n')||'none')+'\n\n'+
-(plannedRuns.length?'PLANNED RUNS BETWEEN TODAY AND '+targetDate+':\n'+plannedRuns.join('\n')+'\n\n':'')+
-'RECENT LIFTING (last 5):\n'+(recentS.map(s=>s.date+' Day '+s.dayType+' RPE '+s.rpe).join('\n')||'none')+'\n\n'+
-'RECOVERY (last 7 days): Avg RHR '+(avgRHR||'?')+' bpm, HRV '+(avgHRV||'?')+' ms\n'+
-"Today's check-in: Energy "+(todayCI?.energy||'?')+'/10, Soreness '+(todayCI?.soreness||'?')+'/10, Stress '+(todayCI?.stress||'?')+'/10\n\n'+
-'LAST RUN: '+(lastRun?lastRun.date+' '+lastRun.type+' '+lastRun.distance+'mi @ '+lastRun.pace+' HR '+lastRun.hrAvg:'none')+'\n'+
-'LAST LIFT: '+(lastLift?lastLift.date+' Day '+lastLift.dayType+' RPE '+lastLift.rpe:'none')+'\n\n'+
-'Output ONLY valid JSON, no markdown:\n'+
-'{"primaryRecommendation":{"type":"easy|intervals|tempo|long","distance":"X-Y miles","pace":"MM:SS-MM:SS/mile","heartRate":"XXX-XXX bpm","duration":"XX-XX min","keyInstruction":"one sentence"},"alternatives":[{"condition":"...","recommendation":"..."}],"watchOutFor":["..."],"reminders":["Log this run on Strava","Dynamic warm-up before","..."],"coachNote":"1-2 sentences"}\n\n'+
-'Rules: Be specific to their data. Last heavy lower body session → HR cap <=145 bpm. Low HRV or elevated RHR → downgrade intensity. Zone 2 = 130-145 bpm. Intervals ~6:30-7:00/mile. Tempo ~7:30-8:00/mile. JSON only.';
+    const ctx = buildAthleteContext();
+    const prompt = [
+      `Generate a run prescription for ${targetDate} (${runTypeLabel}).`,
+      `MAF HR ceiling: ${ctx.athlete.mafHR}bpm — never exceed for easy runs.`,
+      `HARD RULES: canDoQuality=${ctx.hardRules.canDoQuality}, activeFlags=${ctx.hardRules.activeFlags.join(',') || 'none'}.`,
+      `Last 10 runs: ${JSON.stringify(ctx.training.recentRuns)}.`,
+      `Biometrics: HRV ${ctx.biometrics.todayHRV}ms (7d avg ${ctx.biometrics.sevenDayHRV}ms), RHR ${ctx.biometrics.todayRHR}bpm, sleep ${ctx.biometrics.todaySleep}h.`,
+      `VO2max estimate: ${ctx.biometrics.vo2max}.`,
+      `Upcoming 14 days: ${JSON.stringify(ctx.schedule.next14)}.`,
+      `Respond ONLY with valid JSON, no markdown fencing:`,
+      `{"primaryRecommendation":{"distance":0,"pace":"","hrCap":0,"effort":"","notes":""},"alternatives":[{"description":"","distance":0,"pace":""}],"watchOutFor":[]}`
+    ].join('\n');
 
     if (msg) msg.textContent = 'Generating prescription...';
-    const response = await ai(prompt);
-    if (!response) throw new Error('No response');
-    const clean = response.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-    const presc = JSON.parse(clean.slice(clean.indexOf('{'),clean.lastIndexOf('}')+1));
+    const raw = await ai(prompt, 1200);
+    if (!raw) throw new Error('No response');
+    const clean = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    let presc = JSON.parse(clean.slice(clean.indexOf('{'),clean.lastIndexOf('}')+1));
+
+    const required = ['primaryRecommendation','alternatives','watchOutFor'];
+    const missing = required.filter(k => !presc[k]);
+    if (missing.length) {
+      console.warn('Run prescription missing keys:', missing);
+      const retryPrompt = prompt +
+        `\n\nYour previous response was missing: ${missing.join(', ')}. Return ALL required keys.`;
+      const retryRaw = await ai(retryPrompt, 1200);
+      if (retryRaw) {
+        const retryClean = retryRaw.slice(
+          retryRaw.indexOf('{'), retryRaw.lastIndexOf('}') + 1
+        );
+        presc = JSON.parse(retryClean);
+      }
+    }
 
     if (!D.runPrescriptions) D.runPrescriptions = {};
     D.runPrescriptions[targetDate] = {...presc, generatedAt:new Date().toISOString(), completed:false, postRunFeedback:null};
@@ -3396,14 +3683,12 @@ async function generatePostRunFeedback(targetDate) {
   const completeArea=document.getElementById('run-presc-complete-area');
   if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;text-align:center;">Generating post-run analysis...</div>';
   try {
+    const ctx = buildAthleteContext();
     const presc=D.runPrescriptions&&D.runPrescriptions[targetDate];
     if(!presc) throw new Error('No prescription found');
     const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
     if(!stravaRun) throw new Error('No Strava run found for '+targetDate);
     const p=presc.primaryRecommendation;
-    const todayD=new Date(targetDate);
-    const rh=(D.healthLogs||[]).filter(h=>{const hd=new Date(h.date);const diff=(todayD-hd)/86400000;return diff>=0&&diff<=7;});
-    const ciForDate=(D.checkins||[]).find(c=>c.date===targetDate);
     const prompt='You are an expert running coach analyzing how well Javier executed his prescribed run.\n\n'+
 'PRESCRIBED RUN ('+targetDate+'):\n'+
 '- Type: '+p.type+'\n- Distance: '+p.distance+'\n- Pace: '+p.pace+'\n- HR: '+p.heartRate+'\n'+
@@ -3414,8 +3699,8 @@ async function generatePostRunFeedback(targetDate) {
 '- Pace: '+(stravaRun.pace?Math.floor(stravaRun.pace/60)+':'+(String(stravaRun.pace%60).padStart(2,'0'))+'/mile':'unknown')+'\n'+
 '- Avg HR: '+(stravaRun.heartRateAvg||'unknown')+' bpm\n- Max HR: '+(stravaRun.heartRateMax||'unknown')+' bpm\n'+
 '- Elevation: '+(stravaRun.elevationGain||0)+' ft\n\n'+
-'RECOVERY DATA AROUND THAT DATE:\n'+(rh.map(h=>h.date+': RHR '+(h.restingHR||'?')+' HRV '+(h.hrv||'?')+' Sleep '+(h.sleepHours||'?')+'h').join('\n')||'none')+'\n\n'+
-'CHECK-IN: Energy '+(ciForDate?.energy||'?')+'/10, Soreness '+(ciForDate?.soreness||'?')+'/10\n\n'+
+'RECOVERY (7d avg): HRV '+(ctx.biometrics.sevenDayHRV||'?')+'ms, RHR '+(ctx.biometrics.sevenDayRHR||'?')+'bpm, Sleep '+(ctx.biometrics.todaySleep||'?')+'h\n\n'+
+'CHECK-IN: Energy '+(ctx.checkin.energy||'?')+'/5, Soreness '+(ctx.checkin.soreness||'?')+'/5\n\n'+
 'In 3-4 short paragraphs: (1) How well did Javier execute? (2) What does the data say about fitness vs prescription? (3) What adjustments for the next run? Be specific, data-driven, no fluff.';
     const response=await ai(prompt);
     if(!response) throw new Error('No response');
