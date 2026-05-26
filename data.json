@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-25",
+  "lastUpdated": "2026-05-26",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -638,39 +638,59 @@
   ],
   "stravaLastSync": "2026-05-25T16:10:27.790Z",
   "adaptivePlanCache": {
-    "narrative": "Resting HR is 10 bpm above baseline (62 vs 52) and wrist temp is significantly depressed, indicating incomplete recovery. Recent easy runs are being run at threshold HR (165-174) instead of Zone 2 (130-145), creating excessive fatigue. This week prioritizes recovery through true easy running and conservative lift progressions.",
-    "weeklyFocus": "Restore aerobic base by running at actual Zone 2 heart rates (130-145 bpm) and allow autonomic nervous system recovery",
-    "autoRegulationRule": "If resting HR remains above 57 bpm by Thursday, convert quality run to easy and reduce all lift weights by 10 lb",
+    "narrative": "HRV is in warning zone (39ms vs 53.5ms baseline). Volume reduced to 85% and RPE capped at 7 per hard rules. Recent easy runs too fast (HR 165-171) — must slow to true Zone 2 (130-145 bpm).",
+    "weeklyFocus": "Rebuild aerobic base with disciplined Zone 2 running while managing reduced training capacity from HRV suppression",
+    "autoRegulationRule": "If resting HR remains above 60 bpm for 3+ consecutive days, convert Thursday intervals to easy run and reduce lift volume by additional 15%",
     "lifts": {
-      "bench": {
-        "weight": 192.5,
-        "sets": 4,
-        "reps": 4,
-        "targetRPE": 8,
-        "variation": "Barbell Bench Press",
-        "trend": "flat",
-        "confidence": "medium",
-        "coachNote": "Last session at 205×3 hit RPE 9-10, so dropping to 192.5×4×4 for volume accumulation. Stop set immediately if RPE exceeds 8."
-      },
-      "ohp": {
-        "weight": 90,
+      "pullup": {
+        "weight": 0,
         "sets": 4,
         "reps": 5,
+        "targetRPE": 7,
+        "variation": "Bodyweight Pull-ups",
+        "trend": "flat",
+        "confidence": "low",
+        "coachNote": "0 = bodyweight, positive = added weight in lb. Focus on controlled tempo given reduced capacity."
+      },
+      "row": {
+        "weight": 135,
+        "sets": 3,
+        "reps": 6,
+        "targetRPE": 7,
+        "variation": "Barbell Row",
+        "trend": "flat",
+        "confidence": "low",
+        "coachNote": "Conservative load. Maintain position quality over weight."
+      },
+      "bench": {
+        "weight": 190,
+        "sets": 3,
+        "reps": 5,
+        "targetRPE": 7,
+        "variation": "Barbell Bench Press",
+        "trend": "down",
+        "confidence": "medium",
+        "coachNote": "Reduced from 205lb given HRV warning and previous RPE 9-10 responses. Your RPE runs hot — 190×5 should feel controlled at RPE 7."
+      },
+      "ohp": {
+        "weight": 100,
+        "sets": 3,
+        "reps": 7,
         "targetRPE": 7,
         "variation": "Barbell OHP",
         "trend": "flat",
         "confidence": "medium",
-        "coachNote": "Last week 100×7 hit RPE 7-8, but that was predicted RPE 7 actual 9 calibration. Using 90 lb for clean volume sets while fatigued."
+        "coachNote": "Maintaining 100×7 from last session which hit RPE 7-8. Stop at RPE 7 today."
       },
       "squat": {
         "weight": 160,
-        "sets": 4,
-        "reps": 4,
+        "sets": 3,
+        "reps": 5,
         "targetRPE": 7,
         "variation": "Back Squat",
         "trend": "flat",
         "confidence": "low",
-        "coachNote": "Conservative starting point for volume block given elevated resting HR. Focus on controlled tempo and depth consistency."
+        "coachNote": "Conservative starting point given no recent data. Prioritize depth and bracing."
       },
       "dl": {
         "weight": 160,
@@ -680,67 +700,62 @@
         "variation": "Conventional Deadlift",
         "trend": "flat",
         "confidence": "low",
-        "coachNote": "Match squat loading. Prioritize hip hinge pattern quality and bracing given resident stress levels."
+        "coachNote": "Starting conservative. Focus on setup and bar path consistency."
       }
     },
     "runs": {
       "tuesday": {
         "type": "easy",
         "targetHR": "130-145",
-        "targetPace": "12:00-13:00/mile",
-        "duration": 30,
-        "coachNote": "STRICT Zone 2. Your recent easy runs at 165-174 HR are threshold work. Slow down significantly, walk if needed to stay under 145 bpm. This is the most important session this week for recovery."
+        "targetPace": "11:30-12:30/mile",
+        "duration": 35,
+        "coachNote": "MAF ceiling 147 bpm. Recent runs at 165-171 are tempo effort, not easy. Slow way down — walk breaks if needed to stay under 145 bpm."
       },
       "thursday": {
-        "type": "easy",
-        "targetHR": "130-145",
-        "targetPace": "12:00-13:00/mile",
-        "duration": 30,
-        "coachNote": "Converting quality run to easy due to resting HR 10 bpm above baseline. Run by HR only, ignore pace completely. Recovery takes priority over fitness this week."
+        "type": "intervals",
+        "workout": "6 × 400m with 2min rest",
+        "targetPace": "7:15-7:45/mile per rep",
+        "warmup": "10 min easy",
+        "cooldown": "10 min easy",
+        "coachNote": "Reduced reps (6 vs 8) due to HRV warning. Full recovery between reps. Stop session if any rep exceeds RPE 8."
       },
       "saturday": {
         "type": "long",
-        "distance": 4.5,
-        "targetHR": "135-150",
+        "distance": 5,
+        "targetHR": "130-145",
         "targetPace": "11:30-12:30/mile",
-        "coachNote": "Reduced distance due to recovery concerns. Stay conversational, HR should not exceed 150. Build aerobic base first, then speed later."
+        "coachNote": "Reduced from typical long run volume. Stay strictly in Zone 2. This builds aerobic base for sub-20 5K goal."
       }
     },
     "accessories": {
       "dayA": [
         "Face Pulls 3×15",
-        "Tricep Pushdown 3×12",
-        "Hammer Curls 3×10"
+        "Tricep Pushdown 2×10",
+        "Hammer Curls 2×10"
       ],
       "dayB": [
-        "Bulgarian Split Squat 3×8 each",
-        "Leg Curl 3×10",
-        "Calf Raises 3×15",
-        "Pallof Press 3×10 each"
+        "Bulgarian Split Squat 3×6 each",
+        "Leg Curl 2×10",
+        "Calf Raises 3×12",
+        "Pallof Press 2×10 each"
       ],
       "dayC": [
-        "Romanian DL 3×8 @115lb",
-        "Step-ups 3×10 each",
-        "Copenhagen Plank 3×20s each",
-        "Dead Bug 3×10 each",
-        "Hip Flexor Stretch 2min each side"
+        "Romanian DL 3×6",
+        "Step-ups 2×8 each",
+        "Copenhagen Plank 3×15s each",
+        "Dead Bug 2×8 each",
+        "Hip Flexor Protocol 2min each"
       ]
     },
-    "vo2maxEstimate": 44.5,
+    "vo2maxEstimate": 48.3,
     "estimated5KTime": "23:45",
-    "recoveryFlag": "RECOVERY CONCERN: Resting HR 10 bpm elevated (62 vs 52 baseline) and wrist temp -1.54°C indicate incomplete recovery. Recent easy runs executed at threshold intensity (HR 165-174) instead of Zone 2 (130-145). All runs this week must be true easy effort to restore autonomic balance. Quality work deferred until HR normalizes.",
-    "generatedDate": "2026-05-25",
+    "recoveryFlag": "HRV suppressed (39ms vs 53.5ms baseline). Monitor resting HR daily — if stays elevated >3 days reduce all intensity further.",
+    "generatedDate": "2026-05-26",
     "blockWeek": {
       "weekNum": 1,
       "label": "Volume Accumulation"
     },
     "schedule": [
-      {
-        "date": "2026-05-24",
-        "dayType": "A",
-        "isRest": false,
-        "wasShifted": true
-      },
       {
         "date": "2026-05-25",
         "dayType": "A",
@@ -901,6 +916,12 @@
         "date": "2026-06-20",
         "dayType": "run_long",
         "isRest": false,
+        "wasShifted": false
+      },
+      {
+        "date": "2026-06-21",
+        "dayType": "rest",
+        "isRest": true,
         "wasShifted": false
       }
     ]
@@ -2548,7 +2569,7 @@
     "2026-05-31": "A"
   },
   "racePredictions": {
-    "generatedAt": "2026-05-25T01:15:08.969Z",
+    "generatedAt": "2026-05-26T03:13:11.145Z",
     "vo2maxUsed": 44.48,
     "runCount": 23,
     "methodLabel": "VO2max / VDOT",
