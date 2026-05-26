@@ -758,9 +758,9 @@
     "schedule": [
       {
         "date": "2026-05-25",
-        "dayType": "A",
-        "isRest": false,
-        "wasShifted": false
+        "dayType": "rest",
+        "isRest": true,
+        "wasShifted": true
       },
       {
         "date": "2026-05-26",
@@ -2566,7 +2566,8 @@
   ],
   "scheduleOverrides": {
     "2026-05-24": "A",
-    "2026-05-31": "A"
+    "2026-05-31": "A",
+    "2026-05-25": "rest"
   },
   "racePredictions": {
     "generatedAt": "2026-05-26T03:13:11.145Z",
@@ -2638,5 +2639,12 @@
       "vo2maxSource": "Apple Watch",
       "medianPace": 661.2
     }
-  }
+  },
+  "coachingLog": [
+    {
+      "ts": 1779765246582,
+      "type": "week_plan",
+      "label": "Weekly AI plan"
+    }
+  ]
 }
