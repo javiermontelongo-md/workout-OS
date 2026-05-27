@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-26",
+  "lastUpdated": "2026-05-27",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -2585,11 +2585,11 @@
     "2026-05-24": "A",
     "2026-05-31": "rest",
     "2026-05-25": "B",
-    "2026-06-01": "run_long",
+    "2026-06-01": "run_easy",
     "2026-05-28": "run_easy"
   },
   "racePredictions": {
-    "generatedAt": "2026-05-26T03:13:11.145Z",
+    "generatedAt": "2026-05-27T00:09:35.932Z",
     "vo2maxUsed": 44.48,
     "runCount": 23,
     "methodLabel": "VO2max / VDOT",
@@ -2669,6 +2669,11 @@
       "date": "2026-05-26",
       "type": "today_coaching",
       "response": "Today's easy run should be 25–35 minutes at strictly MAF-capped HR (147bpm ceiling). With HRV at 32ms in the warning zone, prioritize nasal breathing and walk breaks as needed to keep HR compliant—consistency under the ceiling matters more than pace. If HR drifts above 147 even at easy effort, cut the session short at 20 minutes. Prioritize 8+ hours sleep tonight and hydration throughout the day to support HRV recovery."
+    },
+    {
+      "date": "2026-05-26",
+      "type": "today_coaching",
+      "response": "Your HRV jumped to 44ms today—up 16% from your 7-day average and much closer to your baseline. Run easy for 30–35 minutes at strict MAF cap (147bpm ceiling), starting conservatively and allowing HR to settle naturally. If you feel strong in the second half and HR stays comfortably under 145bpm, you can extend to 40 minutes, but walk immediately if you approach 147bpm. Prioritize sleep tonight to consolidate this HRV recovery before tomorrow's Lift B session."
     }
   ]
 }
