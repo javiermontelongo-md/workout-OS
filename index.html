@@ -20,18 +20,18 @@
   --s2: #141824;
   --s3: #1a1f2e;
   --s4: #1f2538;
-  --b: rgba(124,131,247,0.08);
-  --b2: rgba(124,131,247,0.18);
-  --b3: rgba(124,131,247,0.32);
-  --a: #7c83f7;
-  --a2: #34c98e;
-  --a3: #4a9df7;
-  --a4: #e85d8a;
-  --a5: #c084fc;
-  --aw: #e07b4a;
-  --t: #e2e6f4;
-  --t2: #8892b0;
-  --t3: #4a5270;
+  --b: rgba(104,110,210,0.10);
+  --b2: rgba(104,110,210,0.20);
+  --b3: rgba(104,110,210,0.34);
+  --a: #6870c8;
+  --a2: #2aa070;
+  --a3: #3d88d4;
+  --a4: #c24d72;
+  --a5: #a066d4;
+  --aw: #b86035;
+  --t: #b8c0d4;
+  --t2: #72798e;
+  --t3: #454d62;
   --red: #e85d8a;
   --mono: 'DM Mono', monospace;
   --serif: 'Fraunces', serif;
@@ -3721,6 +3721,39 @@ async function generateDailyPrescription(workoutType,durationMins){
     if(genMsg)genMsg.textContent='Generating prescription...';
     const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
     if(!apiKey)throw new Error('No API key — add it in Settings tab');
+    const isLiftDay=['push','pull','legs'].includes(workoutType);
+    const isRunDay=['run','cycling'].includes(workoutType);
+    // Build lift schema example specific to workout type — never show run fields to lift days
+    const liftSchemaByType={
+      push:`"lifts": {
+        "bench": {"sets":4,"reps":5,"weight":190,"targetRPE":8,"variation":"Barbell Bench Press","coachNote":"specific tip"},
+        "ohp":   {"sets":3,"reps":5,"weight":90, "targetRPE":8,"variation":"Barbell Strict OHP","coachNote":""},
+        "row":   {"sets":4,"reps":6,"weight":115,"targetRPE":7,"variation":"Barbell Bent-Over Row","coachNote":""},
+        "pullup":{"sets":4,"reps":"max","weight":0,"targetRPE":8,"variation":"Pull-ups","coachNote":"0=BW"}
+      },
+      "accessories": ["Face Pulls 3×15","Overhead Tricep Extension 3×10","Hammer Curls 3×10"]`,
+      pull:`"lifts": {
+        "row":   {"sets":4,"reps":6,"weight":135,"targetRPE":7,"variation":"Barbell Bent-Over Row","coachNote":""},
+        "pullup":{"sets":5,"reps":"max","weight":0,"targetRPE":8,"variation":"Pull-ups","coachNote":"0=BW"}
+      },
+      "accessories": ["Face Pulls 3×15","Lat Pulldown 3×10","Incline DB Curl 3×12"]`,
+      legs:`"lifts": {
+        "squat": {"sets":4,"reps":5,"weight":160,"targetRPE":8,"variation":"Back Squat","coachNote":""},
+        "dl":    {"sets":3,"reps":5,"weight":160,"targetRPE":8,"variation":"Conventional Deadlift","coachNote":""}
+      },
+      "accessories": ["Bulgarian Split Squat 3×8ea","Leg Curl 3×10","Copenhagen Plank 3×20s"]`
+    };
+    const runSchema=`"runType": "easy",
+      "mainSet": "full description of the run",
+      "totalDistance": "4-5 miles",
+      "paceTarget": "11:30-12:30/mile",
+      "hrCeiling": 145,
+      "effort": "conversational — can speak full sentences"`;
+    const mainWorkSchema=isLiftDay
+      ? `{\n      "summary": "e.g. 4 main lifts · 3 accessories",\n      ${liftSchemaByType[workoutType]||liftSchemaByType.push}\n    }`
+      : `{\n      "summary": "e.g. Zone 2 easy run · 4 miles",\n      ${runSchema}\n    }`;
+    // Only include run data sections for run/cycling days
+    const runDataSection=isRunDay?`\nRECENT RUNS (last 15):\n${JSON.stringify(recentRuns)}\n\nZONE 2 NOTE: Javier's Zone 2 is HR 130-145bpm. Recent easy runs show HR 165-171 — that is threshold, NOT Zone 2. Cap all easy run prescriptions at ${ts.mafHR}bpm. Prescribe a pace slow enough to actually stay under this ceiling.\n`:'';
     const prompt=`You are Javier's personal strength and running coach. PGY-1 IM resident in Philadelphia. Generate today's complete workout prescription AND 7-day suggestions in one JSON response.
 
 TODAY: ${today} (${dowNames[todayDOW]})
@@ -3733,61 +3766,37 @@ Approach: ${ATHLETE.goals.approach}
 
 LIFT e1RM BESTS: Bench ${liftBests.bench}lb · OHP ${liftBests.ohp}lb · Squat ${liftBests.squat}lb · DL ${liftBests.dl}lb
 
-HARD RULES (non-negotiable, engine-enforced):
+HARD RULES (non-negotiable):
 canTrain: ${ts.canTrain}
-canDoQuality: ${ts.canDoQuality}
 canDoHeavyLifts: ${ts.canDoHeavyLifts}
-liftRPECap: ${ts.liftRPECap} — never prescribe above this
+liftRPECap: ${ts.liftRPECap} — never exceed this
 volumeModifier: ${ts.volumeModifier} — multiply all set counts by this (round down, min 2)
-mafHR: ${ts.mafHR}bpm — hard ceiling for all easy runs
 activeFlags: ${ts.activeFlags.join(', ')||'none'}
 reasons: ${ts.reasons.join(' | ')||'all clear'}
 
 RECENT SESSIONS (last 8):
 ${JSON.stringify(recentSessions)}
-
-RECENT RUNS (last 15):
-${JSON.stringify(recentRuns)}
-
+${runDataSection}
 BIOMETRICS (7-day means):
-Resting HR: ${means.rhr||'?'}bpm · HRV: ${means.hrv||'?'}ms · 7-day health entries: ${means.count}
+Resting HR: ${means.rhr||'?'}bpm · HRV: ${means.hrv||'?'}ms · 7-day entries: ${means.count}
 ${memStr}${notesStr}
-
-CRITICAL RUNNING NOTE: Zone 2 for Javier is HR 130-145bpm. Recent easy runs show HR 165-171 — that is threshold pace, NOT Zone 2. Easy run prescriptions MUST cap HR at 145bpm. Prescribe slow enough pace to keep HR under ${ts.mafHR}bpm.
 
 NEXT 7 DAYS FOR SUGGESTIONS: ${next7Days.map(d=>d.date+'('+d.dow+')').join(', ')}
 
-Output ONLY valid JSON. No markdown fences. No text outside the JSON object.
+Output ONLY valid JSON. No markdown. No text outside the JSON.
 
 {
   "todayPrescription": {
     "type": "${workoutType}",
     "duration": ${durationMins},
-    "summary": "one-line title e.g. Push — Upper Strength",
-    "reasoning": "2-3 sentences explaining this prescription based on current data",
+    "summary": "short title, e.g. ${workoutLabel[workoutType]||workoutType}",
+    "reasoning": "2-3 sentences about THIS ${isLiftDay?'lift':'run'} session based on recent data",
     "warmup": "warmup description",
-    "mainWork": {
-      "summary": "one-line summary of total main work",
-      "lifts": {
-        "bench": {"sets":4,"reps":5,"weight":190,"targetRPE":8,"variation":"Barbell Bench Press","coachNote":"specific tip"},
-        "ohp": {"sets":3,"reps":5,"weight":90,"targetRPE":8,"variation":"Barbell OHP","coachNote":""},
-        "row": {"sets":4,"reps":6,"weight":135,"targetRPE":7,"variation":"Barbell Row","coachNote":""},
-        "pullup": {"sets":5,"reps":"max","weight":0,"targetRPE":8,"variation":"Pull-ups","coachNote":"0=BW, positive=added lb"},
-        "squat": {"sets":4,"reps":5,"weight":160,"targetRPE":8,"variation":"Back Squat","coachNote":""},
-        "dl": {"sets":3,"reps":5,"weight":160,"targetRPE":8,"variation":"Conventional Deadlift","coachNote":""}
-      },
-      "accessories": ["Face Pulls 3x15","Tricep Pushdown 3x10","Hammer Curls 3x10"],
-      "runType": "easy",
-      "totalDistance": "4-5 miles",
-      "paceTarget": "11:30-12:30/mile",
-      "hrCeiling": 145,
-      "effort": "conversational — can speak full sentences",
-      "mainSet": "full description of the main set for runs"
-    },
+    "mainWork": ${mainWorkSchema},
     "cooldown": "cooldown description",
-    "coachNote": "specific actionable note based on data patterns",
-    "ifTooHard": "specific modification if this is too hard today",
-    "watchOutFor": ["specific concern 1","specific concern 2"]
+    "coachNote": "one focused insight about ${isLiftDay?'the lift session — technique, load selection, or recovery':'pacing, HR discipline, or effort level'}",
+    "ifTooHard": "specific modification",
+    "watchOutFor": ["concern 1","concern 2"]
   },
   "weekPlan": [
     {"date":"YYYY-MM-DD","dow":"Mon","suggestion":"Push","confidence":"high","reason":"one line"}
@@ -3795,14 +3804,13 @@ Output ONLY valid JSON. No markdown fences. No text outside the JSON object.
 }
 
 RULES:
-- Include only lifts relevant to the workout type: push→bench,ohp,row,pullup; pull→row,pullup and OHP as accessory; legs→squat,dl; run/cycling→no lifts object
-- For run/cycling workouts: include runType, totalDistance, paceTarget, hrCeiling, effort, mainSet — omit lifts and accessories
+- This is a ${isLiftDay?'LIFT':'RUN/REST'} day. ${isLiftDay?'Do NOT mention running in reasoning, coachNote, summary, or watchOutFor. Focus 100% on the lift session.':'Do NOT include lifts object. Focus entirely on the run/rest.'}
 - Weights in lb, nearest 2.5lb
 - Apply volumeModifier ${ts.volumeModifier} to all set counts (multiply, round down, min 2)
-- RPE cap: never exceed ${ts.liftRPECap} for any lift
-- If canTrain=false: type must be "rest", explain in reasoning
-- weekPlan must have exactly 7 entries for the exact dates provided above
-- confidence: high=data clearly supports this, medium=reasonable given patterns, low=depends on recovery day-of`;
+- RPE cap: never exceed ${ts.liftRPECap}
+- If canTrain=false: type="rest", explain in reasoning
+- weekPlan: exactly 7 entries for the exact dates provided above
+- confidence: high=data clearly supports, medium=reasonable given patterns, low=depends on recovery`;
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2500,system:'You are a strength and running coach. Output only valid JSON. No text outside the JSON object.',messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
     if(d.error)throw new Error('API error: '+d.error.message);
@@ -3908,13 +3916,13 @@ function renderPrescriptionCard(prescription){
     }).join('');
     const accessories=(mw.accessories||[]);
     const accessHtml=accessories.length?`<div style="margin-top:10px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;margin-bottom:6px;">ACCESSORIES</div>${accessories.map(a=>`<div style="font-size:12px;color:var(--t2);padding:3px 0;">· ${a}</div>`).join('')}</div>`:'';
-    mainHtml=`<div style="background:var(--s3);border-radius:8px;padding:14px;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:8px;">MAIN WORK</div>${liftRows}${accessHtml}</div>`;
+    mainHtml=`<div style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:16px;margin-bottom:2px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:10px;text-transform:uppercase;">Main Work</div>${liftRows}${accessHtml}</div>`;
   }
-  const watchHtml=(prescription.watchOutFor||[]).length?`<div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--a4);">WATCH: ${prescription.watchOutFor.join(' · ')}</div>`:'';
-  const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:10px;padding:10px 12px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:6px;font-size:12px;color:var(--a);"><span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;">IF TOO HARD: </span>${prescription.ifTooHard}</div>`:'';
+  const watchHtml=(prescription.watchOutFor||[]).length?`<div style="margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;">WATCH: ${prescription.watchOutFor.join(' · ')}</div>`:'';
+  const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:12px;padding:10px 14px;background:rgba(184,96,53,.07);border:1px solid rgba(184,96,53,.2);border-radius:8px;font-size:12px;color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--aw);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">If too hard</span>${prescription.ifTooHard}</div>`:'';
   el.className='prog-day-card prog-today';
   el.style.borderColor=color;
-  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${label}</div><div class="prog-day-title">${prescription.summary||''}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:14px 0;">${prescription.reasoning?`<div style="font-size:13px;color:var(--t2);font-style:italic;line-height:1.6;margin-bottom:14px;">${prescription.reasoning}</div>`:''}${prescription.warmup?`<div style="margin-bottom:10px;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;">WARMUP </span><span style="font-size:12px;color:var(--t2);">${prescription.warmup}</span></div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:10px;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;">COOLDOWN </span><span style="font-size:12px;color:var(--t2);">${prescription.cooldown}</span></div>`:''}${prescription.coachNote?`<div style="margin-top:10px;padding:10px 12px;background:var(--s3);border-left:3px solid ${color};border-radius:0 6px 6px 0;font-size:12px;color:var(--t2);line-height:1.5;">${prescription.coachNote}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
+  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${label}</div><div class="prog-day-title">${prescription.summary||''}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:16px 18px;">${prescription.reasoning?`<div style="font-size:13px;color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:var(--s2);border-radius:8px;">${prescription.reasoning}</div>`:''}${prescription.warmup?`<div style="margin-bottom:12px;font-size:12px;color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Warmup</span>${prescription.warmup}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:12px;color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Cooldown</span>${prescription.cooldown}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:var(--s2);border-left:2px solid ${color}80;border-radius:0 8px 8px 0;font-size:12px;color:var(--t2);line-height:1.6;">${prescription.coachNote}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
 }
 
 function renderWeekSuggestions(weekPlan){
