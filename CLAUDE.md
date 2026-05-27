@@ -118,32 +118,34 @@ TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · RULES 
 /* Text */
 --t:  #e2eaf8   primary body text
 --t2: #a8b4cc   secondary labels, subtext
---t3: #6a7490   tertiary hints, timestamps
+--t3: #7e8caa   tertiary hints, timestamps
 ```
 
 ### Typography
 ```
-body font-size: 29px   (base — all rem/em values scale from here)
-line-height:    1.6
+body font-size: 26px   (base)
+line-height:    1.7
 --mono: 'DM Mono', monospace
 --serif: 'Fraunces', serif
 --sans: 'DM Sans', sans-serif
 
-All desktop font-size declarations are +10px relative to the original
-design. Mobile media query (@media max-width:768px, line 801+) retains
-its own values and is NOT affected by desktop font changes.
+Font scaling rule (desktop CSS, lines 17-800):
+  >= 26px  →  × 0.9  (big elements shrink ~10%)
+  22-25px  →  unchanged (mid-range)
+  <= 21px  →  × 1.2  (small labels grow ~20%)
+Mobile media query (@media max-width:768px, line 801+) is NOT affected.
 
-Key desktop sizes (post-bump):
-  .logo          31px   header wordmark
-  .tab           21px   nav tab labels
-  .ptag / .spill 20px   header badges + sync status
-  .h1            32px   section headings
-  .sv            36px   stat card values
-  .btn           21px   all buttons
-  input/select   23px   form fields
-  .bdg           20px   inline badges
-  .cal-date      22px   calendar day numbers
-  .cal-hdr       19px   SUN/MON/... column headers
+Key desktop sizes (current):
+  .logo          28px   header wordmark
+  .tab           25px   nav tab labels
+  .ptag / .spill 24px   header badges + sync status
+  .h1            29px   section headings
+  .sv            32px   stat card values
+  .btn           25px   all buttons
+  input/select   23px   form fields (mid-range, unchanged)
+  .bdg           24px   inline badges
+  .cal-date      22px   calendar day numbers (mid-range)
+  .cal-hdr       23px   SUN/MON/... column headers
 ```
 
 ### Layout
