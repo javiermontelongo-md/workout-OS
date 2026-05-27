@@ -1008,7 +1008,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="lbl">today's workout</div>
       <div class="ig"><label>Select day</label>
         <select id="today-day" onchange="ldPrev()">
-          <option value="A">Push — Upper Strength (Mon)</option><option value="run_easy">Easy Run (Tue)</option><option value="B">Pull — Back &amp; Biceps (Wed)</option><option value="run_quality">Quality Run (Thu)</option><option value="C">Legs — Strength &amp; Stability (Fri)</option><option value="run_long">Long Run (Sat)</option><option value="rest">Rest Day (Sun)</option>
+          <option value="A">Push — Upper Strength (Mon)</option><option value="B">Pull — Back &amp; Biceps (Wed)</option><option value="C">Legs — Strength &amp; Stability (Fri)</option><option value="run">Run (Tue/Thu/Sat)</option><option value="rest">Rest Day (Sun)</option>
         </select>
       </div>
       <div id="day-prev"></div>
@@ -1053,9 +1053,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 <option value="A">Push — Upper Strength</option>
 <option value="B">Pull — Back &amp; Biceps</option>
 <option value="C">Legs — Strength &amp; Stability</option>
-<option value="run_easy">Easy Run</option>
-<option value="run_quality">Quality Run</option>
-<option value="run_long">Long Run</option>
+<option value="run">Run</option>
 <option value="rest">Rest Day</option>
         </select>
       </div>
@@ -1228,9 +1226,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       <option value="A">Push — Upper Strength</option>
       <option value="B">Pull — Back &amp; Biceps</option>
       <option value="C">Legs — Strength &amp; Stability</option>
-      <option value="run_easy">Easy Run</option>
-      <option value="run_quality">Quality Run</option>
-      <option value="run_long">Long Run</option>
+      <option value="run">Run</option>
       <option value="rest">Rest Day</option>
     </select>
     <button class="btn bp" onclick="confirmDayOverride()" style="font-size:11px;padding:8px 14px;white-space:nowrap;">Set &amp; Update Schedule</button>
@@ -2099,13 +2095,13 @@ async function saveSession(){
   const date=document.getElementById('log-date').value,day=document.getElementById('log-day').value;
   if(!date||!day){ msg('log-smsg','Fill in date and day type'); return; }
   const getLift=l=>({sets:SD[l].filter(s=>s.w||s.r).map(s=>({w:+s.w||null,r:+s.r||null,rpe:+s.rpe||null})),notes:document.getElementById(l+'-notes')?.value||''});
-  const isRunDay=['run_easy','run_quality','run_long'].includes(day);
+  const isRunDay=['run','run_easy','run_quality','run_long'].includes(day);
   const runDur=+document.getElementById('run-duration')?.value||null;
   const runDist=+document.getElementById('run-distance')?.value||null;
   const runHr=+document.getElementById('run-hr')?.value||null;
   const runRpe=+document.getElementById('run-rpe')?.value||null;
   const runNotes=document.getElementById('run-notes')?.value||'';
-  const cardioTypeMap={run_easy:'Easy Run',run_quality:'Quality Run',run_long:'Long Run'};
+  const cardioTypeMap={run:'Run',run_easy:'Easy Run',run_quality:'Quality Run',run_long:'Long Run'};
   const hasCardioData=isRunDay&&(runDur||runDist||runHr||runNotes);
   const cardioObj=hasCardioData?{type:cardioTypeMap[day]||'Run',dur:runDur,dist:runDist,hr:runHr,rpe:runRpe,pace:(runDist&&runDur)?`${Math.floor(runDur/runDist)}:${String(Math.round((runDur/runDist%1)*60)).padStart(2,'0')}`:'',notes:runNotes}:null;
   const session={date,day,rpe:+document.getElementById('log-rpe').value||null,duration:+document.getElementById('log-dur').value||null,energy:+document.getElementById('log-energy').value||null,bw:+document.getElementById('log-bw').value||null,sleep:+document.getElementById('log-sleep').value||null,notes:document.getElementById('log-notes').value,bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),ts:Date.now()};
@@ -2133,7 +2129,7 @@ function resetLogForm(){
 }
 function renderSessHist(){
   const legacyDayMap={1:'A',2:'B',3:'C',4:'A',5:'B'};
-  const dayNames={'A':'Lift A — Upper','B':'Lift B — Squat','C':'Lift C — Deadlift','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run','1':'Upper Strength','2':'Lower Strength','3':'Recovery/Cardio','4':'Upper Hypertrophy','5':'Lower+Conditioning'};
+  const dayNames={'A':'Lift A — Upper','B':'Lift B — Squat','C':'Lift C — Deadlift','run':'Run','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run','1':'Upper Strength','2':'Lower Strength','3':'Recovery/Cardio','4':'Upper Hypertrophy','5':'Lower+Conditioning'};
   const render=(id,limit)=>{
     const el=document.getElementById(id);if(!el) return;
     if(!D||!D.sessions||!D.sessions.length){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div>';return;}
@@ -2182,7 +2178,7 @@ function getSessionsForDate(dateStr){
   return D.sessions.filter(s=>s.date===dateStr);
 }
 function getActivityBadges(sessions,dateStr){
-  const DAY_BADGE={'A':{label:'Upper Str',cls:'strength'},'B':{label:'Squat',cls:'strength'},'C':{label:'Deadlift',cls:'strength'},'run_easy':{label:'Easy Run',cls:'run-easy'},'run_quality':{label:'Intervals',cls:'run-quality'},'run_long':{label:'Long Run',cls:'run-long'},'1':{label:'Upper Str',cls:'strength'},'2':{label:'Lower Str',cls:'strength'},'3':{label:'Recovery',cls:'cardio'},'4':{label:'Upper Hyp',cls:'strength'},'5':{label:'Lower+Cond',cls:'strength'}};
+  const DAY_BADGE={'A':{label:'Upper Str',cls:'strength'},'B':{label:'Squat',cls:'strength'},'C':{label:'Deadlift',cls:'strength'},'run':{label:'Run',cls:'run-easy'},'run_easy':{label:'Easy Run',cls:'run-easy'},'run_quality':{label:'Intervals',cls:'run-quality'},'run_long':{label:'Long Run',cls:'run-long'},'1':{label:'Upper Str',cls:'strength'},'2':{label:'Lower Str',cls:'strength'},'3':{label:'Recovery',cls:'cardio'},'4':{label:'Upper Hyp',cls:'strength'},'5':{label:'Lower+Cond',cls:'strength'}};
   let html='';
   sessions.forEach(s=>{
     const badge=DAY_BADGE[String(s.day)];
@@ -2200,7 +2196,7 @@ function getPlannedBadge(dateStr){
   if(!sched) return '';
   const entry=sched.find(d=>d.date===dateStr);
   if(!entry||entry.isRest) return '';
-  const DAY_LABEL={'A':'Push','B':'Pull','C':'Legs','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run',1:'Lift A',2:'Lift B',3:'Easy Run',4:'Lift C',5:'Quality Run'};
+  const DAY_LABEL={'A':'Push','B':'Pull','C':'Legs','run':'Run','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run',1:'Lift A',2:'Lift B',3:'Easy Run',4:'Lift C',5:'Quality Run'};
   const lbl=DAY_LABEL[entry.dayType]||'Training';
   return `<span class="cal-badge planned">${lbl}</span>`;
 }
@@ -2301,7 +2297,7 @@ function closeSessionDrawer(){
   }
 }
 function buildSessionDrawerContent(session,dateStr){
-  const dayLabels={'A':'Push — Upper Strength','B':'Pull — Back & Biceps','C':'Legs — Strength & Stability','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run','rest':'Rest Day','1':'Lift A','2':'Lift B','3':'Easy Run','4':'Lift C','5':'Quality Run'};
+  const dayLabels={'A':'Push — Upper Strength','B':'Pull — Back & Biceps','C':'Legs — Strength & Stability','run':'Run','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run','rest':'Rest Day','1':'Lift A','2':'Lift B','3':'Easy Run','4':'Lift C','5':'Quality Run'};
   const dateObj=new Date(dateStr+'T12:00:00');
   const dateDisplay=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const dayLabel=dayLabels[String(session.day)]||session.day||'Workout';
@@ -2471,8 +2467,8 @@ function buildAthleteContext() {
 
   // 14-day schedule
   const today = localDS(new Date());
-  const dowMap = {0:null,1:'A',2:'run_easy',3:'B',
-                  4:'run_quality',5:'C',6:'run_long'};
+  const dowMap = {0:null,1:'A',2:'run',3:'B',
+                  4:'run',5:'C',6:'run'};
   const next14 = [];
   for (let i = 0; i < 14; i++) {
     const d = new Date();
@@ -2519,7 +2515,7 @@ function buildAthleteContext() {
       hrvBaseline: ATHLETE.hrvBaseline,
       rhrBaseline: ATHLETE.rhrBaseline,
       location:    'Kaiser SF',
-      schedule:    'Lift A Mon · Lift B Wed · Lift C Fri · Easy Run Tue · Quality Run Thu · Long Run Sat · Rest Sun'
+      schedule:    'Lift A Mon · Run Tue · Lift B Wed · Run Thu · Lift C Fri · Run Sat · Rest Sun'
     },
     hardRules: {
       canTrain:        ts.canTrain,
@@ -3461,7 +3457,7 @@ function onDayTypeChange(value){
   const showRow=value==='B';
   const showSquat=value==='C';
   const showDl=value==='C';
-  const showRun=['run_easy','run_quality','run_long'].includes(value);
+  const showRun=['run','run_easy','run_quality','run_long'].includes(value);
   if(blocks.bench)blocks.bench.style.display=showBench?'':'none';
   if(blocks.ohp)blocks.ohp.style.display=showOhp?'':'none';
   if(blocks.pullup)blocks.pullup.style.display=showPullup?'':'none';
@@ -3719,7 +3715,7 @@ async function generatePostRunFeedback(targetDate) {
 function buildSchedule(){
   const today=new Date(); today.setHours(0,0,0,0);
   const schedule=[];
-  const dowToDayType={0:null,1:'A',2:'run_easy',3:'B',4:'run_quality',5:'C',6:'run_long'};
+  const dowToDayType={0:null,1:'A',2:'run',3:'B',4:'run',5:'C',6:'run'};
 
   for(let i=0;i<28;i++){
     const d=new Date(today); d.setDate(today.getDate()+i);
@@ -3744,7 +3740,7 @@ function applyScheduleOverride(date,dayType){
   if(!D) return;
   if(!D.scheduleOverrides) D.scheduleOverrides={};
 
-  const dowMap={0:null,1:'A',2:'run_easy',3:'B',4:'run_quality',5:'C',6:'run_long'};
+  const dowMap={0:null,1:'A',2:'run',3:'B',4:'run',5:'C',6:'run'};
   const prevOvr=D.scheduleOverrides[date];
   const displaced=(prevOvr!==undefined)?prevOvr:(()=>{const d=new Date(date+'T12:00:00');const dt=dowMap[d.getDay()];return dt===null?'rest':dt;})();
 
@@ -3761,7 +3757,7 @@ function applyScheduleOverride(date,dayType){
 
   D.scheduleOverrides[date]=dayType;
 
-  const LIFT_SPACING={A:7,B:7,C:7,run_easy:3,run_quality:5,run_long:7};
+  const LIFT_SPACING={A:7,B:7,C:7,run:5};
   const spacing=LIFT_SPACING[dayType];
   if(spacing&&dayType!=='rest'){
     const od=new Date(date+'T12:00:00');
@@ -3790,7 +3786,7 @@ function confirmDayOverride(){
   const today=localDS(new Date());
   applyScheduleOverride(today,val);
 
-  const labels={A:'Lift A set for today',B:'Lift B set for today',C:'Lift C set for today',run_easy:'Easy run set for today',run_quality:'Quality run set for today',run_long:'Long run set for today',rest:'Rest day set'};
+  const labels={A:'Lift A set for today',B:'Lift B set for today',C:'Lift C set for today',run:'Run set for today',run_easy:'Easy run set for today',run_quality:'Quality run set for today',run_long:'Long run set for today',rest:'Rest day set'};
   if(msg){
     msg.textContent=(labels[val]||'Updated')+' · schedule rippled ✓';
     msg.style.color='var(--a2)';
@@ -3997,7 +3993,7 @@ You are Javier's personal strength and running coach. PGY-1 IM resident in Phila
 
 GOALS: Maximize bench/OHP/row/pullups/squat/deadlift strength. Sub-20 min 5K. VO2max 50+. Long-term injury prevention.
 
-PROGRAM: Mon=Lift A (Bench+OHP+Row+Pullups), Tue=Easy Run, Wed=Lift B (Squat), Thu=Quality Run, Fri=Lift C (Deadlift+prevention), Sat=Long Run, Sun=Rest.
+PROGRAM: Mon=Lift A (Bench+OHP+Row+Pullups), Tue=Run (AI prescribes type), Wed=Lift B (Squat+Row), Thu=Run (AI prescribes type), Fri=Lift C (Deadlift+prevention), Sat=Run (AI prescribes type+distance), Sun=Rest.
 
 CURRENT BLOCK: Week ${blockWeek.weekNum}/4 — ${blockWeek.label}
 TRAINING MODE: ${trainingMode}
@@ -4586,7 +4582,7 @@ function getTodayDayType(){
     if(entry) return {dayType:entry.isRest?null:entry.dayType,isRest:!!entry.isRest};
   }
   const dow=new Date().getDay();
-  const dowMap={0:null,1:'A',2:'run_easy',3:'B',4:'run_quality',5:'C',6:'run_long'};
+  const dowMap={0:null,1:'A',2:'run',3:'B',4:'run',5:'C',6:'run'};
   const dayType=dowMap[dow];
   return {dayType,isRest:dayType===null};
 }
@@ -4627,6 +4623,16 @@ function getDayProgram(dayType){
     exs.push({name:'Copenhagen Plank',prescription:'3×20s each side',note:'Groin/adductor protection',isPrimary:false,trend:null,confidence:null,isRun:false});
     exs.push({name:'Dead Bug',prescription:'3×8 each side · slow',note:'Core stability for running posture',isPrimary:false,trend:null,confidence:null,isRun:false});
     exs.push({name:'Hip Flexor Protocol',prescription:'2min each side · hold + contract',note:'Running posture — do this every Friday',isPrimary:false,trend:null,confidence:null,isRun:false});
+  } else if(effectiveDT==='run'){
+    exs.push({
+      name:'Run — AI Prescribed',
+      prescription:'Generate AI Plan for today\'s run prescription',
+      note:'The AI will determine run type, pace, and distance based on your biometrics and goals',
+      isPrimary:true,
+      trend:null,
+      confidence:null,
+      isRun:true
+    });
   } else if(effectiveDT==='run_easy'){
     const pr=plan?.runs?.tuesday;
     if(pr){
@@ -4676,15 +4682,15 @@ function getDayProgram(dayType){
 function renderDayCard(dayType,isToday,isExpanded){
   const legacyMap={1:'A',2:'B',3:'C',4:'A',5:'B'};
   const effectiveDT=(typeof dayType==='number')?legacyMap[dayType]||null:dayType;
-  const DAY_NAMES={'A':'Lift A — Upper Strength','B':'Lift B — Squat','C':'Lift C — Deadlift & Resilience','run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals/Tempo','run_long':'Long Run'};
-  const DAY_TYPE_LABELS={'A':'LIFT A','B':'LIFT B','C':'LIFT C','run_easy':'EASY RUN','run_quality':'QUALITY RUN','run_long':'LONG RUN'};
-  const DAY_COLORS={'A':'var(--a)','B':'var(--a)','C':'var(--a)','run_easy':'var(--a3)','run_quality':'var(--a2)','run_long':'var(--a2)'};
-  const DOW_NAMES={'A':'Monday','B':'Wednesday','C':'Friday','run_easy':'Tuesday','run_quality':'Thursday','run_long':'Saturday'};
+  const DAY_NAMES={'A':'Lift A — Upper Strength','B':'Lift B — Squat','C':'Lift C — Deadlift & Resilience','run':'Run — AI Prescribed','run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals/Tempo','run_long':'Long Run'};
+  const DAY_TYPE_LABELS={'A':'LIFT A','B':'LIFT B','C':'LIFT C','run':'RUN','run_easy':'EASY RUN','run_quality':'QUALITY RUN','run_long':'LONG RUN'};
+  const DAY_COLORS={'A':'var(--a)','B':'var(--a)','C':'var(--a)','run':'var(--a3)','run_easy':'var(--a3)','run_quality':'var(--a2)','run_long':'var(--a2)'};
+  const DOW_NAMES={'A':'Monday','B':'Wednesday','C':'Friday','run':'Tue/Thu/Sat','run_easy':'Tuesday','run_quality':'Thursday','run_long':'Saturday'};
   const TREND_ICON={up:'↑',flat:'→',down:'↓'};
   const TREND_TEXT={up:'progressing',flat:'holding',down:'regressing'};
 
   const exs=getDayProgram(effectiveDT);
-  const isRunDay=['run_easy','run_quality','run_long'].includes(effectiveDT);
+  const isRunDay=['run','run_easy','run_quality','run_long'].includes(effectiveDT);
   const exHtml=exs.map(ex=>{
     const cls='prog-exercise '+(ex.isPrimary?'primary':'accessory')+(ex.isRun?' run':'');
     let h=`<div class="${cls}"><div class="prog-ex-name">${ex.name}</div><div class="prog-ex-presc">${ex.prescription}</div>`;
