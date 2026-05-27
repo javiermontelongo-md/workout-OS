@@ -903,10 +903,10 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
   <div class="tabs">
     <button class="tab on" onclick="showTab('today')">TODAY</button>
+    <button class="tab" onclick="showTab('program')">PROGRAM</button>
     <button class="tab" onclick="showTab('log')">LOG SESSION</button>
     <button class="tab" onclick="showTab('week')">THIS WEEK</button>
     <button class="tab" onclick="showTab('progress')">PROGRESS</button>
-    <button class="tab" onclick="showTab('program')">PROGRAM</button>
     <button class="tab" onclick="showTab('milestones')">MILESTONES</button>
     <button class="tab" onclick="showTab('rules')">RULES</button>
     <button class="tab" onclick="showTab('settings')">SETTINGS</button>
@@ -1000,39 +1000,15 @@ input[type=range]::-webkit-slider-thumb:hover {
     <button class="btn bp" style="width:100%;" onclick="saveCheckin()">Save Check-in to GitHub</button>
     <div id="checkin-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
   </div>
-  <div class="g2">
-    <div class="card">
-      <div class="lbl">today's prescription</div>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-        <select id="presc-workout-type" style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;flex:1;min-width:160px;">
-          <option value="push">Push — Upper Strength</option>
-          <option value="pull">Pull — Back &amp; Biceps</option>
-          <option value="legs">Legs — Strength &amp; Stability</option>
-          <option value="run">Run</option>
-          <option value="cycling">Cycling</option>
-          <option value="rest">Rest Day</option>
-        </select>
-        <select id="presc-duration" style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;">
-          <option value="30">30 min</option>
-          <option value="60" selected>60 min</option>
-          <option value="90">90 min</option>
-        </select>
-        <button class="btn bp" id="presc-gen-btn" onclick="generateDailyPrescription(document.getElementById('presc-workout-type').value,+document.getElementById('presc-duration').value)">Get Prescription</button>
-      </div>
-      <div id="presc-summary" style="min-height:28px;margin-bottom:4px;"></div>
-      <div id="presc-gen-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);min-height:16px;margin-bottom:6px;"></div>
-      <button class="btn bp" style="width:100%;margin-top:8px;" onclick="startLoggingSession()">Start logging this session</button>
-    </div>
-    <div class="card">
-      <div class="lbl">session checklist</div>
-      <div class="ci" id="ci-wu"><input type="checkbox" id="cb-wu" onchange="chk('ci-wu')"><label for="cb-wu">Warm-up -- 5-10 min mobility</label></div>
-      <div class="ci" id="ci-mn"><input type="checkbox" id="cb-mn" onchange="chk('ci-mn')"><label for="cb-mn">Compound lifts completed</label></div>
-      <div class="ci" id="ci-ac"><input type="checkbox" id="cb-ac" onchange="chk('ci-ac')"><label for="cb-ac">Accessory work completed</label></div>
-      <div class="ci" id="ci-cd"><input type="checkbox" id="cb-cd" onchange="chk('ci-cd')"><label for="cb-cd">Cardio / conditioning done</label></div>
-      <div class="ci" id="ci-lg"><input type="checkbox" id="cb-lg" onchange="chk('ci-lg')"><label for="cb-lg">Session saved to GitHub</label></div>
-      <div class="ci" id="ci-pr"><input type="checkbox" id="cb-pr" onchange="chk('ci-pr')"><label for="cb-pr">Post-workout protein within 1 hour</label></div>
-      <div class="ci" id="ci-sl"><input type="checkbox" id="cb-sl" onchange="chk('ci-sl')"><label for="cb-sl">Sleep target -- 7+ hours tonight</label></div>
-    </div>
+  <div class="card">
+    <div class="lbl">session checklist</div>
+    <div class="ci" id="ci-wu"><input type="checkbox" id="cb-wu" onchange="chk('ci-wu')"><label for="cb-wu">Warm-up -- 5-10 min mobility</label></div>
+    <div class="ci" id="ci-mn"><input type="checkbox" id="cb-mn" onchange="chk('ci-mn')"><label for="cb-mn">Compound lifts completed</label></div>
+    <div class="ci" id="ci-ac"><input type="checkbox" id="cb-ac" onchange="chk('ci-ac')"><label for="cb-ac">Accessory work completed</label></div>
+    <div class="ci" id="ci-cd"><input type="checkbox" id="cb-cd" onchange="chk('ci-cd')"><label for="cb-cd">Cardio / conditioning done</label></div>
+    <div class="ci" id="ci-lg"><input type="checkbox" id="cb-lg" onchange="chk('ci-lg')"><label for="cb-lg">Session saved to GitHub</label></div>
+    <div class="ci" id="ci-pr"><input type="checkbox" id="cb-pr" onchange="chk('ci-pr')"><label for="cb-pr">Post-workout protein within 1 hour</label></div>
+    <div class="ci" id="ci-sl"><input type="checkbox" id="cb-sl" onchange="chk('ci-sl')"><label for="cb-sl">Sleep target -- 7+ hours tonight</label></div>
   </div>
   <div class="card"><div class="lbl">ai coach</div><div id="today-out"><div class="air"><div class="al">TRAINING COACH</div><p>Check your fatigue score above first. If moderate or higher, reduce working weight 5-10% and protect bar speed over ego.</p><p><strong>Recovery rules the program.</strong> Sustainable training during residency beats optimal training every time. A 70% effort session that happens is worth more than a perfect session that doesn't.</p></div></div><div class="brow"><button class="btn bs bi" onclick="genToday()">Regenerate</button></div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;padding:0 4px;">Today's coaching narrative only — does not change your plan weights or prescriptions</div></div>
   <div class="g2">
@@ -1052,27 +1028,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 <!-- v2026-05-22 -->
 <div id="panel-log" class="panel">
   <div class="h1">Log <span>session</span></div>
-  <div class="card" style="border-color:rgba(255,183,77,.3);">
-    <div class="lbl" style="color:var(--a);">session info -- saves to data.json</div>
-    <div class="g3" style="margin-bottom:10px;">
-      <div class="ig"><label>Date</label><input type="date" id="log-date"></div>
-      <div class="ig"><label>Day type</label>
-        <select id="log-day" onchange="onDayTypeChange(this.value)">
-          <option value="">-- Select day type --</option>
-<option value="A">Push — Upper Strength</option>
-<option value="B">Pull — Back &amp; Biceps</option>
-<option value="C">Legs — Strength &amp; Stability</option>
-<option value="run">Run</option>
-<option value="rest">Rest Day</option>
-        </select>
-      </div>
-      <div class="ig"><label>Session RPE (1-10)</label><input type="number" id="log-rpe" min="1" max="10" placeholder="e.g. 7"></div>
-    </div>
-    <div class="g2 k2" style="margin-bottom:10px;">
-      <div class="ig"><label>Duration (min)</label><input type="number" id="log-dur" placeholder="e.g. 65"></div>
-      <div class="ig"><label>Session notes (optional)</label><input type="hidden" id="log-energy"><input type="hidden" id="log-bw"><input type="hidden" id="log-sleep"></div>
-    </div>
-  </div>
 
   <div id="run-prescription-card" style="display:none;" class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -1223,7 +1178,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
   <div class="card" id="week-suggestions-card" style="margin-bottom:14px;">
     <div class="lbl">7-day suggestions</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · go to Today tab to regenerate</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · go to Program tab to regenerate</div>
     <div id="week-suggestions"></div>
   </div>
 </div>
@@ -1359,6 +1314,28 @@ input[type=range]::-webkit-slider-thumb:hover {
 <!-- v2026-05-22 -->
 <div id="panel-program" class="panel">
   <div class="h1">Today's <span>prescription</span></div>
+  <div class="card" style="margin-bottom:18px;">
+    <div class="lbl">generate prescription</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+      <select id="presc-workout-type" style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;flex:1;min-width:160px;">
+        <option value="push">Push — Upper Strength</option>
+        <option value="pull">Pull — Back &amp; Biceps</option>
+        <option value="legs">Legs — Strength &amp; Stability</option>
+        <option value="run">Run</option>
+        <option value="cycling">Cycling</option>
+        <option value="rest">Rest Day</option>
+      </select>
+      <select id="presc-duration" style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;">
+        <option value="30">30 min</option>
+        <option value="60" selected>60 min</option>
+        <option value="90">90 min</option>
+      </select>
+      <button class="btn bp" id="presc-gen-btn" onclick="generateDailyPrescription(document.getElementById('presc-workout-type').value,+document.getElementById('presc-duration').value)">Get Prescription</button>
+    </div>
+    <div id="presc-summary" style="min-height:28px;margin-bottom:4px;"></div>
+    <div id="presc-gen-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);min-height:16px;margin-bottom:6px;"></div>
+    <button class="btn bp" style="width:100%;margin-top:8px;" onclick="startLoggingSession()">Start logging this session</button>
+  </div>
   <div style="margin-bottom:20px;">
     <div id="prog-date-header" style="font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;"></div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -1368,8 +1345,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
   <div id="prog-today-card" class="prog-day-card prog-today" style="margin-bottom:12px;"></div>
   <div id="prog-no-plan" style="display:none;padding:20px;text-align:center;">
-    <div style="font-family:var(--mono);font-size:12px;color:var(--t3);margin-bottom:12px;">No prescription generated yet.</div>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Go to the Today tab, select your workout type and duration, and tap "Get Prescription".</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--t3);">Select workout type and duration above, then tap "Get Prescription".</div>
   </div>
 </div>
 
@@ -1752,7 +1728,6 @@ function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().spl
 const now=new Date();
 if(document.getElementById('dd')) document.getElementById('dd').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 if(document.getElementById('md')) document.getElementById('md').textContent=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-const di=document.getElementById('log-date'); if(di) di.value=now.toISOString().split('T')[0];
 const di2=document.getElementById('rec-date'); if(di2) di2.value=now.toISOString().split('T')[0];
 if(CFG.tok) document.getElementById('gh-tok').value=CFG.tok;
 document.getElementById('gh-usr').value=CFG.usr;
@@ -2056,8 +2031,8 @@ function renderSets(lift){
 async function saveSession(){
   try{
   if(!D){ msg('log-smsg','Data not loaded -- go to Settings, check your token, then tap Reload data'); return; }
-  const date=document.getElementById('log-date').value,day=document.getElementById('log-day').value;
-  if(!date||!day){ msg('log-smsg','Fill in date and day type'); return; }
+  const date=localDS(new Date()),day=window._logDayType||'';
+  if(!day){ msg('log-smsg','Start a session from the Program tab first'); return; }
   const getLift=l=>({sets:SD[l].filter(s=>s.w||s.r).map(s=>({w:+s.w||null,r:+s.r||null,rpe:+s.rpe||null})),notes:document.getElementById(l+'-notes')?.value||''});
   const isRunDay=['run','run_easy','run_quality','run_long'].includes(day);
   const runDur=+document.getElementById('run-duration')?.value||null;
@@ -2068,7 +2043,7 @@ async function saveSession(){
   const cardioTypeMap={run:'Run',run_easy:'Easy Run',run_quality:'Quality Run',run_long:'Long Run'};
   const hasCardioData=isRunDay&&(runDur||runDist||runHr||runNotes);
   const cardioObj=hasCardioData?{type:cardioTypeMap[day]||'Run',dur:runDur,dist:runDist,hr:runHr,rpe:runRpe,pace:(runDist&&runDur)?`${Math.floor(runDur/runDist)}:${String(Math.round((runDur/runDist%1)*60)).padStart(2,'0')}`:'',notes:runNotes}:null;
-  const session={date,day,rpe:+document.getElementById('log-rpe').value||null,duration:+document.getElementById('log-dur').value||null,energy:+document.getElementById('log-energy').value||null,bw:+document.getElementById('log-bw').value||null,sleep:+document.getElementById('log-sleep').value||null,notes:document.getElementById('log-notes').value,bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),ts:Date.now()};
+  const session={date,day,notes:document.getElementById('log-notes')?.value||'',bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
   D.adherence=(D.adherence||{});D.adherence.completed=(D.adherence.completed||0)+1;
@@ -2088,7 +2063,7 @@ async function saveSession(){
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
 function resetLogForm(){
-  ['log-rpe','log-dur','log-energy','log-bw','log-sleep','log-notes','pullup-notes','row-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['log-notes','pullup-notes','row-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   initSets();
 }
 function renderSessHist(){
@@ -3397,7 +3372,7 @@ function renderRunChart(type='pace'){
 }
 function setRunChart(type){renderRunChart(type);}
 function toggleRunLogSection(){
-  const day=document.getElementById('log-day')?.value||'';
+  const day=window._logDayType||'';
   const sec=document.getElementById('run-log-section');
   if(sec)sec.style.display=['run_easy','run_quality','run_long'].includes(day)?'block':'none';
 }
@@ -3444,9 +3419,9 @@ function startLoggingSession(){
   const prescType=document.getElementById('presc-workout-type')?.value||'';
   const typeMap={push:'A',pull:'B',legs:'C',run:'run',cycling:'run',rest:'rest'};
   const todayDay=typeMap[prescType]||prescType;
+  window._logDayType=todayDay;
   showTab('log');
-  const logDaySelect=document.getElementById('log-day');
-  if(logDaySelect&&todayDay){logDaySelect.value=todayDay;onDayTypeChange(todayDay);}
+  if(todayDay) onDayTypeChange(todayDay);
 }
 function renderRunLogCard(targetDate){
   if(!targetDate)targetDate=localDS(new Date());
@@ -3455,7 +3430,7 @@ function renderRunLogCard(targetDate){
   const completeArea=document.getElementById('run-presc-complete-area');
   const presc=D.dailyPrescriptions?.[targetDate]||D.runPrescriptions?.[targetDate];
   if(!presc){
-    if(placeholder){placeholder.style.display='';placeholder.textContent='Generate a prescription in the Today tab, then return here to log.';}
+    if(placeholder){placeholder.style.display='';placeholder.textContent='Generate a prescription in the Program tab, then return here to log.';}
     if(output)output.style.display='none';
     if(completeArea)completeArea.innerHTML='';
     return;
@@ -3930,7 +3905,7 @@ function renderWeekSuggestions(weekPlan){
   const el=document.getElementById('week-suggestions');
   if(!el)return;
   if(!weekPlan||!weekPlan.length){
-    el.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">Tap "Get Prescription" on the Today tab to generate week suggestions.</div>`;
+    el.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">Tap "Get Prescription" on the Program tab to generate week suggestions.</div>`;
     return;
   }
   const CONF_COLORS={high:'var(--a3)',medium:'var(--a)',low:'var(--t3)'};
