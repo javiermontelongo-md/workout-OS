@@ -123,11 +123,27 @@ TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · RULES 
 
 ### Typography
 ```
-body font-size: 19px   (base — all rem/em values scale from here)
+body font-size: 29px   (base — all rem/em values scale from here)
 line-height:    1.6
 --mono: 'DM Mono', monospace
 --serif: 'Fraunces', serif
 --sans: 'DM Sans', sans-serif
+
+All desktop font-size declarations are +10px relative to the original
+design. Mobile media query (@media max-width:768px, line 801+) retains
+its own values and is NOT affected by desktop font changes.
+
+Key desktop sizes (post-bump):
+  .logo          31px   header wordmark
+  .tab           21px   nav tab labels
+  .ptag / .spill 20px   header badges + sync status
+  .h1            32px   section headings
+  .sv            36px   stat card values
+  .btn           21px   all buttons
+  input/select   23px   form fields
+  .bdg           20px   inline badges
+  .cal-date      22px   calendar day numbers
+  .cal-hdr       19px   SUN/MON/... column headers
 ```
 
 ### Layout
