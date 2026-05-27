@@ -125,20 +125,21 @@ All line numbers are from origin/main. Verify before editing:
 ### AI Layer
 | Line | Function | Purpose |
 |------|----------|---------|
-| — | buildAthleteContext() | NEW — single shared context object for all AI calls. Calls evaluateTrainingStatus() once. Returns athlete, hardRules, biometrics, training, checkin, schedule, body. |
-| — | liftTrend(key, sessions, weeks) | NEW — computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
-| 2398 | ai(prompt, maxTokens=800) | Shared Anthropic fetch wrapper — system prompt built from buildAthleteContext(). All AI calls route here. |
-| 2412 | fai(t, id) | Renders AI text response into a DOM element |
-| 2414 | genToday() | Daily coaching narrative — calls ai(1000). Returns JSON with coaching + optional scheduleNote + scheduleAdjustment. Caches result keyed on date+checkin+HRV. |
-| 3196 | generateRunPrescription(targetDate) | Run prescription JSON — calls ai(1200). Validates required keys, retries once if missing. |
-| 3395 | generatePostRunFeedback(targetDate) | Post-run feedback — requires D.runPrescriptions[targetDate] AND matching Strava run. Compares prescribed vs actual. |
-| 3806 | generateAdaptivePlan() | Weekly plan — direct fetch to Anthropic (2000 tokens). Writes to window._adaptivePlan + D.adaptivePlanCache. |
+| 2410 | liftTrend(key, sessions, weeks=4) | Computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
+| 2428 | buildAthleteContext() | Single shared context object for all AI calls. Returns athlete (with goals + vo2maxEstimate), hardRules, biometrics, training, checkin, schedule, body. Calls evaluateTrainingStatus() once. |
+| 2604 | ai(prompt, maxTokens=800) | Shared Anthropic fetch wrapper — system prompt built from buildAthleteContext(). All AI calls route here. |
+| 2635 | fai(t, id) | Renders AI text response into a DOM element |
+| 2637 | genToday() | Daily coaching narrative — calls ai(1000). Returns JSON with coaching + optional scheduleNote + scheduleAdjustment. Caches result keyed on date+checkin+HRV. |
+| 3518 | buildRunProfile() | Pass 1 of run prescription — sends last 80 runs to AI, returns compact profile: typicalEasyPaceMi, qualityCapacity, sub20Readiness, recommendedIntensityThisBlock, etc. Cached window._runProfileCache keyed on floor(runs.length/5). |
+| 3589 | generateRunPrescription(targetDate) | Pass 2 — calls buildRunProfile() then ai(1200). AI picks easy/quality/long based on profile + biometrics. New JSON shape: recommendedType, reasoning, workout{name,warmup,mainSet,cooldown,totalDistance,paceTarget,hrCeiling,effort}, ifTooHard, watchOutFor[]. |
+| 3826 | generatePostRunFeedback(targetDate) | Post-run feedback — requires D.runPrescriptions[targetDate] AND matching Strava run. Compares prescribed vs actual. Reads presc.workout with fallback to presc.primaryRecommendation for backward compat. |
+| 4240 | generateAdaptivePlan() | Weekly plan — direct fetch to Anthropic (2000 tokens). Writes to window._adaptivePlan + D.adaptivePlanCache. |
 
 ### Hard Rule Engine
 | Line | Function | Purpose |
 |------|----------|---------|
-| 3552 | evaluateTrainingStatus() | 28-rule deterministic engine. Called ONLY inside buildAthleteContext() and RULES tab render. Returns TrainingStatus: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR |
-| 3537 | compute7DayMeans() | Rolling 7-day HRV/RHR averages with fallback to ATHLETE baselines |
+| 3986 | evaluateTrainingStatus() | 28-rule deterministic engine. Called in buildAthleteContext(), renderRulesTab(), and renderRunPrescriptionCard(). Returns TrainingStatus: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR |
+| 3971 | compute7DayMeans() | Rolling 7-day HRV/RHR averages with fallback to ATHLETE baselines |
 
 ### Session Logging
 | Line | Function | Purpose |
@@ -207,41 +208,43 @@ All line numbers are from origin/main. Verify before editing:
 | 2481 | buildPredictions(currentE1RM, slope) | 4-week e1RM projections |
 | 2492 | predictLift(liftKey, blockWeek) | Predicted e1RM for a lift |
 | 2519 | getAccessoryVariation(liftKey) | Accessory exercise variation string |
-| 3652 | buildPlanContext() | Assembles context object for generateAdaptivePlan |
-| 3694 | buildPlanPrompt(ctx) | Builds AI prompt for weekly plan |
-| 3782 | parsePlanResponse(response) | Validates + parses AI plan JSON. Rejects if any of 6 lift keys missing. |
-| 3865 | renderAdaptivePlan() | Renders plan in THIS WEEK tab |
-| 3848 | confirmRPE(lift, actualRPE) | RPE confirmation after session |
-| 3942 | showRPEConfirm(lift) | RPE confirmation UI |
-| 4296 | getTodayDayType() | Returns today's day type from schedule |
-| 4308 | buildPrescriptionString(lift) | Prescription string for a lift |
-| 4312 | getDayProgram(dayType) | Program details for a day type |
-| 4391 | renderDayCard(dayType, isToday, isExpanded) | Program day card HTML |
-| 4428 | toggleProgDay(el, dayType) | Toggle program day expansion |
-| 4436 | renderProgramTab() | Full PROGRAM tab render |
-| 1825 | renderSystemLog() | System activity feed |
+| 4086 | buildPlanContext() | Assembles context object for generateAdaptivePlan |
+| 4128 | buildPlanPrompt(ctx) | Builds AI prompt for weekly plan |
+| — | parsePlanResponse(response) | Validates + parses AI plan JSON. Rejects if any of 6 lift keys missing. |
+| — | renderAdaptivePlan() | Renders plan in THIS WEEK tab |
+| — | confirmRPE(lift, actualRPE) | RPE confirmation after session |
+| — | showRPEConfirm(lift) | RPE confirmation UI |
+| — | getTodayDayType() | Returns today's day type from schedule |
+| — | buildPrescriptionString(lift) | Prescription string for a lift |
+| — | getDayProgram(dayType) | Program details for a day type — 'run' branch shows live presc if available |
+| — | renderDayCard(dayType, isToday, isExpanded) | Program day card HTML |
+| — | toggleProgDay(el, dayType) | Toggle program day expansion |
+| — | renderProgramTab() | Full PROGRAM tab render |
+| 1825 | renderSystemLog() | System activity feed — reads recommendedType + workout.totalDistance for run prescriptions |
 | 1985 | renderRulesTab() | RULES tab render with live hard rule status |
 
 ### Run Metrics & Prescription
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2528 | getRestingHR() | Latest RHR from healthLogs |
-| 2534 | estimateVO2max(run) | VO2max estimate from HR runs |
-| 2561 | vdotPredict(vo2max) | VDOT pace predictions |
-| 2585 | riegelPredict(runs) | Riegel race prediction |
-| 2610 | hrRegressionPredict(runs) | HR regression pace prediction |
-| 2643 | calcRacePredictions() | Full race prediction calculation |
-| 2749 | secsToRaceTime(s) | Format seconds as race time |
-| 2758 | secsToPace(totalSecs, miles) | Format seconds as pace |
-| 2766 | renderRacePredictions() | Render race prediction cards |
-| 2846 | setRacePredChart(dist) | Set active race pred chart distance |
-| 2855 | renderRacePredChart(dist) | Render race prediction chart |
-| 3049 | calcRunMetrics() | Compute run metrics from D.runs |
-| 3068 | renderRunMetricsSummary() | Render run metrics summary |
-| 3091 | renderRunChart(type) | Render run chart (pace/HR/distance) |
-| 3140 | setRunChart(type) | Set active run chart type |
-| 3289 | renderRunPrescriptionCard(targetDate) | Render run prescription — reads from plan.runs, zero AI calls |
-| 3388 | markRunComplete(targetDate) | Mark run complete + trigger post-run feedback |
+| — | getRestingHR() | Latest RHR from healthLogs |
+| — | estimateVO2max(run) | VO2max estimate from single run w/ HR. Requires run.heartRateAvg + distance≥2. Returns null if called with no arg. |
+| — | vdotPredict(vo2max) | VDOT pace predictions |
+| — | riegelPredict(runs) | Riegel race prediction |
+| — | hrRegressionPredict(runs) | HR regression pace prediction |
+| — | calcRacePredictions() | Full race prediction calculation |
+| — | secsToRaceTime(s) | Format seconds as race time |
+| — | secsToPace(totalSecs, miles) | Format seconds as pace |
+| — | renderRacePredictions() | Render race prediction cards |
+| — | setRacePredChart(dist) | Set active race pred chart distance |
+| — | renderRacePredChart(dist) | Render race prediction chart |
+| — | calcRunMetrics() | Compute run metrics from D.runs |
+| — | renderRunMetricsSummary() | Render run metrics summary |
+| — | renderRunChart(type) | Render run chart (pace/HR/distance) |
+| — | setRunChart(type) | Set active run chart type |
+| 3518 | buildRunProfile() | See AI Layer above |
+| 3589 | generateRunPrescription(targetDate) | See AI Layer above |
+| 3726 | renderRunPrescriptionCard(targetDate) | Reads D.runPrescriptions[targetDate] directly. No runDayMap. No plan.runs dependency. Calls evaluateTrainingStatus() for hard rule flags. |
+| 3819 | markRunComplete(targetDate) | Mark run complete + trigger post-run feedback |
 
 ### Body Metrics
 | Line | Function | Purpose |
@@ -275,27 +278,43 @@ buildAthleteContext()  ← called once per AI invocation
   └── compute7DayMeans()        ← biometrics
   └── detectBlockWeek()         ← block state (cached in const)
       └── getBlockParams()
-  └── estimateVO2max()
+  └── estimateVO2max(_bestHRRun)  ← IIFE — finds latest run w/ HR + dist≥2
 
 ai(prompt, maxTokens=800)  ← shared fetch wrapper
   └── buildAthleteContext()  ← system prompt built here
   └── called by:
       ├── genToday()                    (1000 tokens)
-      ├── generateRunPrescription()     (1200 tokens)
+      ├── buildRunProfile()             (1500 tokens) — Pass 1
+      ├── generateRunPrescription()     (1200 tokens) — Pass 2
       └── generatePostRunFeedback()     (800 tokens)
 
 generateAdaptivePlan()  ← direct fetch, bypasses ai()
   └── buildPlanContext()   ← separate context builder
   └── buildPlanPrompt()    ← separate prompt builder
+
+generateRunPrescription(targetDate)  ← two-pass
+  └── buildRunProfile()    ← Pass 1: full history profile (cached)
+  └── buildAthleteContext()  ← Pass 2: live biometrics + hard rules
+  └── ai(prompt, 1200)
 ```
 
-### evaluateTrainingStatus() Call Sites (exactly 2)
+### evaluateTrainingStatus() Call Sites (3)
 1. buildAthleteContext() — feeds all ai() calls
 2. renderRulesTab() — live status display in RULES tab
+3. renderRunPrescriptionCard() — hard rule flag display in card
 
-### coachingLog Write Sites (4)
+### _runProfileCache
+Stored in: window._runProfileCache = { key: floor(runs.length/5), profile }
+Invalidated: automatically after every 5 new runs logged
+Fields: currentFitnessLevel, typicalEasyPaceMi, typicalEasyPaceKm,
+        bestRecentPace, qualityCapacity, volumeTrend, hrTrend,
+        consistencyPattern, watchPatterns, sub20Readiness,
+        recommendedIntensityThisBlock, profileSummary
+
+### coachingLog Write Sites (5)
 All use identical pattern: push → slice(-50) → renderSystemLog()
 - genToday() → type: 'today_coaching'
+- buildRunProfile() → type: 'run_profile'
 - generateRunPrescription() → type: 'run_prescription'
 - generatePostRunFeedback() → type: 'post_run'
 - generateAdaptivePlan() → type: 'week_plan'
@@ -330,13 +349,33 @@ RHR_SPIKE: 8
 FEVER_TEMP: 1.5
 SLEEP_BLOCK: 5.0
 SLEEP_WARNING: 6.5
+
+goals: {
+  primary:         'sub-20 5K'
+  secondary:       'increase VO2max'
+  approach:        'polarized training — 80% easy zone 2, 20% quality work'
+  currentEstimate5K: null
+}
 ```
 
 ## Schedule Constants
 ```
-LIFT_SPACING:  {A:7, B:7, C:7, run_easy:3, run_quality:5, run_long:7}
-dowToDayType:  {0:null,1:'A',2:'run_easy',3:'B',4:'run_quality',5:'C',6:'run_long'}
-runDayMap:     {run_easy:'tuesday', run_quality:'thursday', run_long:'saturday'}
+LIFT_SPACING:  {A:7, B:7, C:7, run:5}
+dowToDayType:  {0:null, 1:'A', 2:'run', 3:'B', 4:'run', 5:'C', 6:'run'}
+```
+
+## D.runs[] Entry Shape
+```
+date:         'YYYY-MM-DD'
+type:         'run'
+runType:      'easy' | 'long' | 'intervals' | 'tempo' | 'moderate'
+              (NOTE: 'quality' filter must also include 'intervals' and 'tempo')
+distanceMi:   miles (float)
+paceMinkm:    pace (also aliased as r.pace)
+heartRateAvg: bpm
+heartRateMax: bpm
+duration:     seconds
+elevationGain: feet
 ```
 
 ## What Has Been Removed
@@ -353,3 +392,12 @@ runDayMap:     {run_easy:'tuesday', run_quality:'thursday', run_long:'saturday'}
 - Dead top-level statements after genToday() closing brace
   (coachingLog.push, pushSilent, renderSystemLog were
   executing at page load — moved inside function body)
+- runDayMap {run_easy:'tuesday',...} — removed from renderRunPrescriptionCard()
+  (card now reads D.runPrescriptions[targetDate] directly)
+- Old run prescription JSON shape: primaryRecommendation{distance,pace,hrCap,effort,notes}
+  (replaced with: recommendedType, reasoning, workout{...}, ifTooHard, watchOutFor[])
+- Schedule types run_easy / run_quality / run_long consolidated to single 'run'
+  (AI prescribes intensity via generateRunPrescription two-pass flow)
+- User-selected run type dropdown (run_easy/quality/long) — AI decides now
+- estimateVO2max() called with no arg in buildAthleteContext (always returned null)
+  (fixed: IIFE finds most recent run with heartRateAvg + distanceMi≥2)
