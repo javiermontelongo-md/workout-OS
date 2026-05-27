@@ -775,10 +775,6 @@ input[type=range]::-webkit-slider-thumb:hover {
   border: 1px solid rgba(124,131,247,0.3);
   margin-left: 4px;
 }
-.ap-confidence-badge { font-family: var(--mono); font-size: 9px; padding: 2px 9px; border-radius: 4px; }
-.ap-confidence-badge.high { background: rgba(52,201,142,0.1); color: var(--a2); }
-.ap-confidence-badge.medium { background: rgba(124,131,247,0.1); color: var(--a); }
-.ap-confidence-badge.low { background: var(--s3); color: var(--t3); }
 
 /* ── SPARKLINES ── */
 .spark-row {
@@ -1005,14 +1001,26 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
   <div class="g2">
     <div class="card">
-      <div class="lbl">today's workout</div>
-      <div class="ig"><label>Select day</label>
-        <select id="today-day" onchange="ldPrev()">
-          <option value="A">Push — Upper Strength (Mon)</option><option value="B">Pull — Back &amp; Biceps (Wed)</option><option value="C">Legs — Strength &amp; Stability (Fri)</option><option value="run">Run (Tue/Thu/Sat)</option><option value="rest">Rest Day (Sun)</option>
+      <div class="lbl">today's prescription</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <select id="presc-workout-type" style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;flex:1;min-width:160px;">
+          <option value="push">Push — Upper Strength</option>
+          <option value="pull">Pull — Back &amp; Biceps</option>
+          <option value="legs">Legs — Strength &amp; Stability</option>
+          <option value="run">Run</option>
+          <option value="cycling">Cycling</option>
+          <option value="rest">Rest Day</option>
         </select>
+        <select id="presc-duration" style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;">
+          <option value="30">30 min</option>
+          <option value="60" selected>60 min</option>
+          <option value="90">90 min</option>
+        </select>
+        <button class="btn bp" id="presc-gen-btn" onclick="generateDailyPrescription(document.getElementById('presc-workout-type').value,+document.getElementById('presc-duration').value)">Get Prescription</button>
       </div>
-      <div id="day-prev"></div>
-      <button class="btn bp" style="width:100%;margin-top:10px;" onclick="startLoggingSession()">Start logging this session</button>
+      <div id="presc-summary" style="min-height:28px;margin-bottom:4px;"></div>
+      <div id="presc-gen-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);min-height:16px;margin-bottom:6px;"></div>
+      <button class="btn bp" style="width:100%;margin-top:8px;" onclick="startLoggingSession()">Start logging this session</button>
     </div>
     <div class="card">
       <div class="lbl">session checklist</div>
@@ -1071,7 +1079,7 @@ input[type=range]::-webkit-slider-thumb:hover {
         <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;">Run Prescription</div>
         <div id="run-presc-day-label" style="font-size:15px;font-weight:500;color:var(--t);margin-top:4px;"></div>
       </div>
-      <button class="btn bp" id="run-presc-btn" onclick="renderRunPrescriptionCard()" style="font-size:11px;padding:8px 16px;">Refresh Prescription</button>
+      <button class="btn bp" id="run-presc-btn" onclick="renderRunLogCard()" style="font-size:11px;padding:8px 16px;">Refresh Prescription</button>
     </div>
     <div id="run-presc-placeholder" style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">
       Your weekly run prescription will appear here once a plan is generated on the Plan tab.
@@ -1212,69 +1220,10 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-week-summary" id="cal-week-summary"></div>
   </div>
-  <div id="week-schedule-note"
-       style="display:none;padding:8px 12px;margin:8px 0;
-              background:rgba(180,90,0,.08);color:var(--t2);
-              border-left:3px solid var(--aw);border-radius:4px;
-              font-family:var(--mono);font-size:0.82rem;
-              line-height:1.4;"></div>
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;white-space:nowrap;letter-spacing:.06em;">Today's workout</div>
-    <select id="week-day-override"
-      style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:5px 10px;cursor:pointer;flex:1;max-width:260px;">
-      <option value="">— follow schedule —</option>
-      <option value="A">Push — Upper Strength</option>
-      <option value="B">Pull — Back &amp; Biceps</option>
-      <option value="C">Legs — Strength &amp; Stability</option>
-      <option value="run">Run</option>
-      <option value="rest">Rest Day</option>
-    </select>
-    <button class="btn bp" onclick="confirmDayOverride()" style="font-size:11px;padding:8px 14px;white-space:nowrap;">Set &amp; Update Schedule</button>
-    <div id="override-msg" style="font-family:var(--mono);font-size:10px;color:var(--t3);min-height:14px;"></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;white-space:nowrap;">Training Mode</div>
-      <select id="training-mode" onchange="setTrainingMode(this.value)"
-        style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:5px 10px;cursor:pointer;">
-        <option value="normal">NORMAL</option>
-        <option value="performance">PERFORMANCE</option>
-        <option value="recovery">RECOVERY</option>
-        <option value="deload">DELOAD</option>
-      </select>
-    </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--t3);flex:1;" id="training-mode-desc">Standard progressive overload, balanced volume</div>
-    <button class="btn bp" onclick="generateAdaptivePlan()" style="font-size:11px;padding:8px 14px;white-space:nowrap;">Generate AI Plan</button>
-  </div>
-  <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:-10px;margin-bottom:14px;">
-    Sets lift weights, sets/reps, and run prescriptions for the whole week · Cached until you log a session
-  </div>
-  <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div class="lbl" style="margin:0;">adaptive plan</div>
-      <span id="ap-confidence"></span>
-    </div>
-    <div id="ap-recovery-flag" style="display:none;font-family:var(--mono);font-size:11px;background:rgba(255,183,77,.08);border:1px solid rgba(255,183,77,.25);border-radius:6px;padding:8px 12px;margin-bottom:12px;"></div>
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <button class="btn bs" id="wn-prev" onclick="weekNavNav(-1)" style="padding:5px 12px;font-size:15px;line-height:1;">←</button>
-        <div style="text-align:center;">
-          <div id="wn-label" style="font-family:var(--mono);font-size:12px;font-weight:500;color:var(--t);"></div>
-          <div id="wn-sublabel" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;"></div>
-        </div>
-        <button class="btn bs" id="wn-next" onclick="weekNavNav(1)" style="padding:5px 12px;font-size:15px;line-height:1;">→</button>
-      </div>
-      <div id="wn-dots" style="display:flex;justify-content:center;gap:6px;margin-bottom:12px;"></div>
-      <div id="wn-block-badge" style="text-align:center;margin-bottom:14px;"></div>
-    </div>
-    <div id="wn-context-label" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:10px;text-align:center;min-height:14px;"></div>
-    <div id="ap-lifts" style="margin-bottom:16px;"></div>
-    <div id="wk-guid" class="air" style="margin-bottom:12px;">
-      <div class="al">WEEK COACH</div>
-      <div id="wk-guid-text" style="font-size:13px;color:var(--t3);font-style:italic;">Tap "Generate AI Plan" to get your personalized weekly narrative and store your plan.</div>
-    </div>
-    <button class="btn bp" style="width:100%;" id="ap-gen-btn" onclick="generateAdaptivePlan()">Generate AI Plan</button>
-    <div id="ap-gen-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:6px;min-height:16px;"></div>
+  <div class="card" id="week-suggestions-card" style="margin-bottom:14px;">
+    <div class="lbl">7-day suggestions</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · go to Today tab to regenerate</div>
+    <div id="week-suggestions"></div>
   </div>
 </div>
 
@@ -1408,7 +1357,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 <!-- v2026-05-22 -->
 <div id="panel-program" class="panel">
-  <div class="h1">Program <span>structure</span></div>
+  <div class="h1">Today's <span>prescription</span></div>
   <div style="margin-bottom:20px;">
     <div id="prog-date-header" style="font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;"></div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -1417,10 +1366,9 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
   </div>
   <div id="prog-today-card" class="prog-day-card prog-today" style="margin-bottom:12px;"></div>
-  <div id="prog-other-days" style="display:flex;flex-direction:column;gap:8px;"></div>
   <div id="prog-no-plan" style="display:none;padding:20px;text-align:center;">
-    <div style="font-family:var(--mono);font-size:12px;color:var(--t3);margin-bottom:12px;">No adaptive plan generated yet.</div>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Go to This Week tab and tap "Generate AI Plan" to build your personalized program.</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--t3);margin-bottom:12px;">No prescription generated yet.</div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Go to the Today tab, select your workout type and duration, and tap "Get Prescription".</div>
   </div>
 </div>
 
@@ -1658,10 +1606,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 <script>
 var SD={bench:[],ohp:[],squat:[],dl:[],pullup:[],row:[]};
 var DEF={bench:190,ohp:90,squat:160,dl:160,pullup:0,row:115};
-var DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-var DT={0:'rest',1:'Upper Str',2:'Lower Str',3:'Recovery',4:'Upper Hyp',5:'Lower+Cond',6:'rest'};
-var DC={0:'rt',1:'st',2:'st',3:'cd',4:'hy',5:'hy',6:'rt'};
-var DP={'1':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Bench Press -- 5x5 @ 190</div><div>Barbell Row -- 4x6-8</div><div>Overhead Press -- 3x5 @ 90</div><div>Pullups -- 5x3 clean</div><div>Incline DB Press -- 3x8-10</div><div>Zone 2 cardio -- 20-30 min</div></div>','2':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Back Squat -- 5x5 @ 160</div><div>Deadlift -- 3x5 @ 160</div><div>Romanian DL -- 3x8</div><div>Split Squats -- 3x10 each</div><div>Zone 2 cardio -- 20-40 min</div></div>','3':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Easy run -- 20-45 min @ 140-155 HR</div><div>Baseline: 10:30 @ 165 HR</div><div style="margin-top:6px;font-size:11px;color:var(--t3);">Recovery day -- no heavy lifting</div></div>','4':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Incline Machine -- 4x8-12</div><div>Lat Pulldown -- 4x8-12</div><div>DB Shoulder Press -- 3x8-10</div><div>Lateral Raises -- 5x15-20</div><div>Biceps + Triceps -- 3x10-15</div></div>','5':'<div style="font-size:12px;color:var(--t2);line-height:1.9;"><div>Leg Press -- 3x8-10</div><div>RDL -- 3x8-10</div><div>Walking Lunges -- 3x12 each</div><div>Intervals -- 1 min hard / 2 min easy x 6-10</div></div>','rest':'<div style="font-size:13px;color:var(--t3);padding:8px 0;">Rest day -- sleep, eat, recover.</div>'};
 
 // ============================================================
 // STATE -- no data here. All data in data.json on GitHub.
@@ -1816,7 +1760,6 @@ document.getElementById('gh-file').value=CFG.file;
 if(CFG.api){ document.getElementById('api-key').value=CFG.api; document.getElementById('api-st').textContent='Key loaded'; }
 fetchData();
 initSets();
-ldPrev();
 
 function hOv(){ const e=document.getElementById('ov'); if(e){ e.style.opacity='0'; e.style.transition='opacity .4s'; setTimeout(()=>e.remove(),400); } }
 
@@ -1832,8 +1775,6 @@ function onLoad(){
   }
   if(!D.coachingMemory)D.coachingMemory={compressed:null,notes:[]};
   if(!D.dailyPrescriptions)D.dailyPrescriptions={};
-  buildLocalPlan();
-  updateTodayPreview();
   initCheckinTab();
   renderSnapshotCharts();
   rendered.today=true;
@@ -1933,8 +1874,9 @@ function renderSystemLog() {
     }
   }
   // AI run prescriptions
-  if (D.runPrescriptions) {
-    Object.entries(D.runPrescriptions).forEach(([date, presc]) => {
+  const allPrescriptions={...(D.runPrescriptions||{}),...(D.dailyPrescriptions||{})};
+  if (Object.keys(allPrescriptions).length) {
+    Object.entries(allPrescriptions).forEach(([date, presc]) => {
       if (!presc || !presc.generatedAt) return;
       const ts = new Date(presc.generatedAt).getTime();
       if (ts < sevenDaysAgo) return;
@@ -1956,7 +1898,7 @@ function renderSystemLog() {
             icon: '◈',
             color: 'var(--a5)',
             title: 'AI post-run feedback · ' + date,
-            detail: presc.postRunFeedback.slice(0, 80) + '...'
+            detail: typeof presc.postRunFeedback === 'string' ? presc.postRunFeedback.slice(0, 80) + '...' : ''
           });
         }
       }
@@ -1969,6 +1911,7 @@ function renderSystemLog() {
       today_coaching: 'AI today coaching generated',
       week_plan: 'AI weekly plan generated',
       run_prescription: 'AI run prescription generated',
+      daily_prescription: 'Daily prescription generated',
       post_run: 'AI post-run feedback generated'
     };
     events.push({
@@ -2044,9 +1987,9 @@ function showTab(n){
 }
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
-  else if(n==='week'){ renderAdaptivePlan(); renderWeekNav(); }
+  else if(n==='week'){ renderWeekSuggestions(D.dailyPrescriptions?.[localDS(new Date())]?.weekPlan||null); }
   else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart('pace'); renderBodyChart('weight'); renderRacePredictions(); }
-  else if(n==='program'){ renderProgramTab(); }
+  else if(n==='program'){ renderPrescriptionCard(D.dailyPrescriptions?.[localDS(new Date())]||null); }
 }
 
 // ============================================================
@@ -2139,7 +2082,7 @@ async function saveSession(){
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
   if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); D.adaptivePlanCache=null; // D.runPrescriptions intentionally NOT touched
- buildLocalPlan(); renderAdaptivePlan(); renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); }
+ renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); }
   else { D.sessions.pop(); D.adherence.completed--; }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
@@ -2184,7 +2127,6 @@ function updProgressStats(){
 // ACTIVITY CALENDAR
 // ============================================================
 var calOffset=0;
-var weekNavOffset=0;
 const HEIGHT_INCHES = 69.5; // 5'9.5"
 const HEIGHT_CM = 176.53;
 function getWeekStart(offset){
@@ -2212,7 +2154,7 @@ function getActivityBadges(sessions,dateStr){
   return html;
 }
 function getPlannedBadge(dateStr){
-  const sched=window._adaptivePlan?.schedule||window._schedule;
+  const sched=window._adaptivePlan?.schedule;
   if(!sched) return '';
   const entry=sched.find(d=>d.date===dateStr);
   if(!entry||entry.isRest) return '';
@@ -2277,7 +2219,7 @@ function handleDayCardClick(dateStr){
     openSessionDrawer(sessions[0],dateStr);
     return;
   }
-  const sched=window._adaptivePlan?.schedule||window._schedule;
+  const sched=window._adaptivePlan?.schedule;
   const entry=sched?.find(d=>d.date===dateStr);
   if(entry&&!entry.isRest&&dateStr>=today){
     showTab('program');
@@ -2358,11 +2300,6 @@ function buildSessionDrawerContent(session,dateStr){
   html+=`</div>`;
   return html;
 }
-
-// ============================================================
-// DAY PREVIEW
-// ============================================================
-function ldPrev(){ const el=document.getElementById('day-prev');if(el) el.innerHTML=DP[document.getElementById('today-day')?.value||'1']||''; updateTodayPreview(); }
 
 // ============================================================
 // SETTINGS
@@ -2719,21 +2656,9 @@ async function genToday() {
         D.scheduleOverrides[date] = type;
       }
     });
-    buildSchedule();
     renderCalendar();
     if (document.getElementById('panel-week')?.classList.contains('on')) {
-      renderWeekNav();
-    }
-  }
-
-  // Show or hide schedule note banner in THIS WEEK
-  const banner = document.getElementById('week-schedule-note');
-  if (banner) {
-    if (parsed.scheduleNote) {
-      banner.textContent = parsed.scheduleNote;
-      banner.style.display = 'block';
-    } else {
-      banner.style.display = 'none';
+      renderWeekSuggestions(D.dailyPrescriptions?.[localDS(new Date())]?.weekPlan||null);
     }
   }
 
@@ -3510,335 +3435,73 @@ function onDayTypeChange(value){
       runCard.dataset.dayType=value;
       const msg=document.getElementById('run-presc-msg');
       if(msg){msg.textContent='';msg.style.color='';}
-      renderRunPrescriptionCard(); // show existing prescription or placeholder
+      renderRunLogCard(); // show prescription or placeholder
     }
   }
 }
 function startLoggingSession(){
-  const todayDay=document.getElementById('today-day-select')?.value||
-                 document.getElementById('today-day')?.value||
-                 document.querySelector('[data-today-day]')?.dataset.todayDay;
+  const prescType=document.getElementById('presc-workout-type')?.value||'';
+  const typeMap={push:'A',pull:'B',legs:'C',run:'run',cycling:'run',rest:'rest'};
+  const todayDay=typeMap[prescType]||prescType;
   showTab('log');
   const logDaySelect=document.getElementById('log-day');
-  if(logDaySelect&&todayDay){
-    logDaySelect.value=todayDay;
-    onDayTypeChange(todayDay);
-  }
+  if(logDaySelect&&todayDay){logDaySelect.value=todayDay;onDayTypeChange(todayDay);}
 }
-async function buildRunProfile() {
-  // Cache — only regenerate every 5 runs
-  const cacheKey = Math.floor((D.runs?.length || 0) / 5);
-  if (window._runProfileCache?.key === cacheKey &&
-      window._runProfileCache?.profile) {
-    return window._runProfileCache.profile;
-  }
-
-  // Build long history — last 80 runs, compact format
-  const allRuns = (D.runs || []).slice(-80);
-  if (allRuns.length < 3) return null;
-
-  const compactRuns = allRuns.map(r => ({
-    date: r.date,
-    type: r.runType || r.type || 'run',
-    mi: r.distanceMi || r.distance || null,
-    pace: r.paceMinkm || r.pace || null,
-    hrAvg: r.heartRateAvg || r.hrAvg || null,
-    hrMax: r.heartRateMax || r.hrMax || null
-  }));
-
-  const recentRuns = compactRuns.slice(-10);
-  const olderRuns = compactRuns.slice(0, -10);
-
-  const ctx = buildAthleteContext();
-
-  const prompt = [
-    `Analyze this athlete's complete run history and produce a compact profile.`,
-    ``,
-    `ATHLETE:`,
-    `Age: ${ctx.athlete.age}, weight: ${ctx.athlete.weightLbs}lb`,
-    `Goal: ${ctx.athlete.goals.primary} · ${ctx.athlete.goals.secondary}`,
-    `MAF HR ceiling: ${ctx.athlete.mafHR}bpm`,
-    `VO2max estimate: ${ctx.athlete.goals.vo2maxEstimate || 'unknown'}`,
-    ``,
-    `OLDER HISTORY (${olderRuns.length} runs — summarize trends):`,
-    JSON.stringify(olderRuns),
-    ``,
-    `RECENT RUNS (last 10 — evaluate in detail):`,
-    JSON.stringify(recentRuns),
-    ``,
-    `Produce a compact athlete running profile. Respond ONLY with valid JSON, no markdown fencing:`,
-    `{"currentFitnessLevel":"one phrase","typicalEasyPaceMi":"X:XX-X:XX/mi at MAF HR","typicalEasyPaceKm":"X:XX-X:XX/km at MAF HR","bestRecentPace":"fastest recent pace and distance","qualityCapacity":"honest assessment of hard effort tolerance","volumeTrend":"increasing/stable/decreasing with numbers","hrTrend":"improving/stable/worsening","consistencyPattern":"regularity and gaps","watchPatterns":"HR spikes pacing issues etc","sub20Readiness":"honest timeline estimate","recommendedIntensityThisBlock":"easy only|introduce quality cautiously|quality appropriate|push quality","profileSummary":"2-3 sentence coaches note"}`
-  ].join('\n');
-
-  const raw = await ai(prompt, 1500);
-  if (!raw) return null;
-
-  let profile = null;
-  try {
-    const clean = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-    profile = JSON.parse(clean.slice(clean.indexOf('{'), clean.lastIndexOf('}') + 1));
-  } catch(e) {
-    console.warn('buildRunProfile parse failed:', e);
-    return null;
-  }
-
-  window._runProfileCache = { key: cacheKey, profile };
-
-  if (!D.coachingLog) D.coachingLog = [];
-  D.coachingLog.push({
-    ts: Date.now(),
-    type: 'run_profile',
-    label: 'Run profile · ' + localDS(new Date())
-  });
-  D.coachingLog = D.coachingLog.slice(-50);
-  renderSystemLog();
-
-  return profile;
-}
-
-async function generateRunPrescription(targetDate) {
-  if (!targetDate) {
-    const n = new Date();
-    targetDate = localDS(n);
-  }
-
-  const btn = document.getElementById('run-presc-btn');
-  const msg = document.getElementById('run-presc-msg');
-  const placeholder = document.getElementById('run-presc-placeholder');
-  const output = document.getElementById('run-presc-output');
-
-  // Return cached prescription if exists
-  if (D.runPrescriptions?.[targetDate]) {
-    renderRunPrescriptionCard(targetDate);
+function renderRunLogCard(targetDate){
+  if(!targetDate)targetDate=localDS(new Date());
+  const placeholder=document.getElementById('run-presc-placeholder');
+  const output=document.getElementById('run-presc-output');
+  const completeArea=document.getElementById('run-presc-complete-area');
+  const presc=D.dailyPrescriptions?.[targetDate]||D.runPrescriptions?.[targetDate];
+  if(!presc){
+    if(placeholder){placeholder.style.display='';placeholder.textContent='Generate a prescription in the Today tab, then return here to log.';}
+    if(output)output.style.display='none';
+    if(completeArea)completeArea.innerHTML='';
     return;
   }
-
-  if (btn) btn.disabled = true;
-  if (btn) btn.textContent = 'Generating...';
-
-  // Pass 1 — get or build run profile (cached every 5 runs)
-  const profile = await buildRunProfile();
-  const ctx = buildAthleteContext();
-
-  // Recent run pattern
-  const last10Runs = ctx.training.recentRuns.slice(-10);
-  const lastQualityRun = (D.runs || [])
-    .filter(r => ['intervals','tempo','quality'].includes(r.runType))
-    .slice(-1)[0];
-  const daysSinceQuality = lastQualityRun
-    ? Math.floor((new Date(targetDate) - new Date(lastQualityRun.date)) / 86400000)
-    : 99;
-
-  // Lifting load this week
-  const weekStart = new Date(targetDate);
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-  const weekStartStr = localDS(weekStart);
-  const liftThisWeek = (D.sessions || [])
-    .filter(s => s.date >= weekStartStr && s.date <= targetDate)
-    .length;
-
-  const prompt = [
-    `Prescribe a run for ${targetDate}.`,
-    ``,
-    `ATHLETE PROFILE (from full run history analysis):`,
-    profile ? JSON.stringify(profile) : 'No profile available — use biometrics only.',
-    ``,
-    `HARD RULES — non-negotiable:`,
-    `canDoQuality=${ctx.hardRules.canDoQuality}`,
-    `MAF HR ceiling: ${ctx.athlete.mafHR}bpm — hard ceiling for easy runs`,
-    `activeFlags: ${ctx.hardRules.activeFlags.join(', ') || 'none'}`,
-    `volumeModifier: ${ctx.hardRules.volumeModifier}`,
-    ``,
-    `BIOMETRICS TODAY:`,
-    `HRV: ${ctx.biometrics.todayHRV}ms (7d avg: ${ctx.biometrics.sevenDayHRV}ms, baseline: ${ctx.athlete.hrvBaseline}ms)`,
-    `RHR: ${ctx.biometrics.todayRHR}bpm (baseline: ${ctx.athlete.rhrBaseline}bpm)`,
-    `Sleep: ${ctx.biometrics.todaySleep}h`,
-    ``,
-    `TRAINING LOAD:`,
-    `Lifts this week: ${liftThisWeek}`,
-    `Days since last quality run: ${daysSinceQuality}`,
-    `Block: week ${ctx.training.blockWeek.weekNum} of 4`,
-    ``,
-    `RECENT RUNS (last 10 — use profile for longer context):`,
-    JSON.stringify(last10Runs),
-    ``,
-    `14-DAY SCHEDULE:`,
-    ctx.schedule.next14.map(d => d.date + '=' + d.dayType).join(', '),
-    ``,
-    `PRESCRIPTION RULES:`,
-    `- Base ALL pacing on typicalEasyPaceMi from profile, NOT on goal pace`,
-    `- If canDoQuality=false → easy or rest only, no exceptions`,
-    `- If daysSinceQuality >= 21 AND recommendedIntensityThisBlock includes quality → cautious reintroduction only: max 3 reps, RPE 6-7, well below race pace`,
-    `- If daysSinceQuality >= 14 → first quality back is always conservative`,
-    `- If this is 3rd run this week → long run, easy pace, apply volumeModifier to distance`,
-    `- Quality pace targets must be based on CURRENT fitness not goal fitness`,
-    `- For sub-20 5K development: build aerobic base first, quality only when base is solid`,
-    `- Apply volumeModifier=${ctx.hardRules.volumeModifier} to all distances`,
-    ``,
-    `Respond ONLY with valid JSON, no markdown fencing:`,
-    `{"recommendedType":"easy|quality|long","reasoning":"2-3 sentences grounded in profile data and today's biometrics","workout":{"name":"specific descriptive name","description":"full workout instructions","warmup":"warmup or null","mainSet":"main set with specific paces from profile not goals","cooldown":"cooldown or null","totalDistance":"X miles","paceTarget":"based on typicalEasyPaceMi from profile","hrCeiling":0,"effort":"conversational|comfortably hard|hard"},"ifTooHard":"specific fallback based on actual current fitness","watchOutFor":["1-3 specific warnings relevant to this athlete"]}`
-  ].join('\n');
-
-  const raw = await ai(prompt, 1200);
-  if (!raw) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Get Prescription'; }
-    return;
+  if(placeholder)placeholder.style.display='none';
+  if(output)output.style.display='block';
+  const primaryEl=document.getElementById('run-presc-primary');
+  if(primaryEl){
+    const w=presc.mainWork||presc.workout||{};
+    let html='';
+    if(presc.reasoning)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);font-style:italic;margin-bottom:8px;">'+presc.reasoning+'</div>';
+    if(w.mainSet||w.description)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t);margin-bottom:6px;">'+(w.mainSet||w.description)+'</div>';
+    const metrics=[];
+    if(w.totalDistance||w.distance)metrics.push('Dist: '+(w.totalDistance||w.distance));
+    if(w.paceTarget||w.pace)metrics.push('Pace: '+(w.paceTarget||w.pace));
+    if(w.hrCeiling||w.heartRate)metrics.push('HR cap: '+(w.hrCeiling||w.heartRate));
+    if(metrics.length)html+='<div style="font-family:var(--mono);font-size:10px;color:var(--t3);">'+metrics.join(' · ')+'</div>';
+    primaryEl.innerHTML=html||'<div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Prescription loaded — view full details in Program tab.</div>';
   }
-
-  // Parse + validate
-  let parsed = null;
-  try {
-    const clean = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-    parsed = JSON.parse(clean.slice(clean.indexOf('{'), clean.lastIndexOf('}') + 1));
-  } catch(e) {
-    console.warn('Run prescription parse failed:', e);
-    if (btn) { btn.disabled = false; btn.textContent = 'Get Prescription'; }
-    return;
-  }
-
-  // Validate required keys — retry once if missing
-  const required = ['recommendedType','reasoning','workout','watchOutFor'];
-  const missing = required.filter(k => !parsed[k]);
-  if (missing.length) {
-    const retryPrompt = prompt +
-      `\n\nYour previous response was missing: ${missing.join(', ')}. Return ALL required keys.`;
-    const retryRaw = await ai(retryPrompt, 1200);
-    if (retryRaw) {
-      try {
-        const retryClean = retryRaw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-        parsed = JSON.parse(retryClean.slice(retryClean.indexOf('{'), retryClean.lastIndexOf('}') + 1));
-      } catch(e) {
-        if (btn) { btn.disabled = false; btn.textContent = 'Get Prescription'; }
-        return;
-      }
-    }
-  }
-
-  // Store prescription
-  if (!D.runPrescriptions) D.runPrescriptions = {};
-  D.runPrescriptions[targetDate] = parsed;
-
-  // Write to coaching log
-  if (!D.coachingLog) D.coachingLog = [];
-  D.coachingLog.push({
-    ts: Date.now(),
-    type: 'run_prescription',
-    label: (parsed.recommendedType || 'run') + ' · ' + targetDate
-  });
-  D.coachingLog = D.coachingLog.slice(-50);
-
-  if (btn) { btn.disabled = false; btn.textContent = 'Refresh Prescription'; }
-
-  renderRunPrescriptionCard(targetDate);
-  if (typeof pushSilent === 'function') pushSilent();
-  renderSystemLog();
-}
-function renderRunPrescriptionCard(targetDate) {
-  if (!targetDate) targetDate = localDS(new Date());
-
-  const placeholder = document.getElementById('run-presc-placeholder');
-  const output = document.getElementById('run-presc-output');
-  const btn = document.getElementById('run-presc-btn');
-  const completeArea = document.getElementById('run-presc-complete-area');
-
-  const presc = D.runPrescriptions?.[targetDate];
-
-  if (!presc || !presc.workout) {
-    if (placeholder) {
-      placeholder.style.display = '';
-      placeholder.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No prescription yet — <a onclick="generateRunPrescription(\''+targetDate+'\')" style="cursor:pointer;color:var(--a3);">get today\'s run prescription</a></div>';
-    }
-    if (output) output.style.display = 'none';
-    if (btn) btn.textContent = 'Get Today\'s Plan';
-    if (completeArea) completeArea.innerHTML = '';
-    return;
-  }
-
-  if (placeholder) placeholder.style.display = 'none';
-  if (output) output.style.display = 'block';
-  if (btn) btn.textContent = 'Refresh Prescription';
-
-  // Hard rule engine — deterministic, no AI call
-  const ts = evaluateTrainingStatus();
-
-  const w = presc.workout || {};
-  const typeColors = { easy: 'var(--a3)', quality: 'var(--a2)', long: 'var(--a2)' };
-  const typeColor = typeColors[presc.recommendedType] || 'var(--a3)';
-
-  let html = '';
-  // Hard rule flags
-  if (ts.activeFlags && ts.activeFlags.length) {
-    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--a4);background:rgba(220,40,60,.07);border:1px solid rgba(220,40,60,.25);border-radius:6px;padding:8px 10px;margin-bottom:10px;">' + ts.activeFlags.map(f => '&#9888; ' + f).join('<br>') + '</div>';
-  }
-  // Type header
-  html += '<div style="color:' + typeColor + ';font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">' + (presc.recommendedType || 'run').toUpperCase() + ' — AI PRESCRIBED</div>';
-  html += '<div style="color:var(--t);font-size:13px;font-weight:600;margin-bottom:4px;">' + (w.name || 'Run') + '</div>';
-  if (presc.reasoning) html += '<div style="color:var(--t2);margin-bottom:10px;font-size:11px;font-style:italic;">' + presc.reasoning + '</div>';
-  // Workout details
-  if (w.warmup) html += '<div style="font-family:var(--mono);font-size:11px;color:var(--t3);text-transform:uppercase;font-size:9px;margin-bottom:2px;">Warm-up</div><div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:8px;">' + w.warmup + '</div>';
-  if (w.mainSet || w.description) html += '<div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:2px;">Main Set</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);margin-bottom:8px;">' + (w.mainSet || w.description) + '</div>';
-  if (w.cooldown) html += '<div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:2px;">Cool-down</div><div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:8px;">' + w.cooldown + '</div>';
-  // Metrics row
-  const metrics = [];
-  if (w.totalDistance) metrics.push('<div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">Distance</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);">' + w.totalDistance + '</div></div>');
-  if (w.paceTarget) metrics.push('<div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">Pace</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);">' + w.paceTarget + '</div></div>');
-  if (w.hrCeiling) metrics.push('<div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">HR Ceiling</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);">' + w.hrCeiling + ' bpm</div></div>');
-  if (w.effort) metrics.push('<div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">Effort</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);">' + w.effort + '</div></div>');
-  if (metrics.length) html += '<div style="display:flex;gap:16px;margin:10px 0;flex-wrap:wrap;">' + metrics.join('') + '</div>';
-  // Hard rule override notes
-  if (!ts.canTrain) {
-    html += '<div style="margin-top:10px;font-size:12px;color:var(--a4);border-top:1px solid var(--b);padding-top:8px;">Hard rule: rest recommended today.</div>';
-  } else if (!ts.canDoQuality && presc.recommendedType === 'quality') {
-    html += '<div style="margin-top:10px;font-size:12px;color:var(--aw);border-top:1px solid var(--b);padding-top:8px;">Recovery status: downgrade to easy pace today.</div>';
-  }
-  // If too hard
-  if (presc.ifTooHard) html += '<div style="margin-top:8px;padding:8px;background:rgba(180,90,0,.08);border-left:2px solid var(--aw);border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--t2);"><span style="color:var(--t3);">If too hard:</span> ' + presc.ifTooHard + '</div>';
-  // Watch out for
-  if (presc.watchOutFor && presc.watchOutFor.length) {
-    html += '<div style="margin-top:8px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Watch out for</div>' + presc.watchOutFor.map(item => '<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:2px;">· ' + item + '</div>').join('') + '</div>';
-  }
-
-  const primaryEl = document.getElementById('run-presc-primary');
-  if (primaryEl) primaryEl.innerHTML = html;
-
-  // Clear legacy slots
-  const altEl = document.getElementById('run-presc-alternatives');
-  if (altEl) altEl.innerHTML = '';
-  const watchEl = document.getElementById('run-presc-watchout');
-  if (watchEl) watchEl.innerHTML = '';
-  const remEl = document.getElementById('run-presc-reminders');
-  if (remEl) remEl.innerHTML = '';
-
-  if (!completeArea) return;
-
-  // Post-run feedback workflow
-  const stravaRun = (D.runs || []).find(r => r.date === targetDate);
-  const isCompleted = presc?.completed === true;
-  const hasPostRunFeedback = !!presc?.postRunFeedback;
-
-  if (hasPostRunFeedback) {
-    completeArea.innerHTML = '<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:9px;color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:12px;color:var(--t2);line-height:1.7;">' + presc.postRunFeedback + '</div></div>';
-  } else if (isCompleted && stravaRun) {
-    completeArea.innerHTML = '<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\'' + targetDate + '\')" style="font-size:11px;padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
-  } else if (isCompleted) {
-    completeArea.innerHTML = '<div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight. Check back tomorrow for AI feedback.</div>';
-  } else {
-    completeArea.innerHTML = '<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\'' + targetDate + '\')" style="font-size:11px;padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
+  ['run-presc-alternatives','run-presc-watchout','run-presc-reminders'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+  if(!completeArea)return;
+  const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
+  const isCompleted=presc?.completed===true;
+  if(presc.postRunFeedback){
+    completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:9px;color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:12px;color:var(--t2);line-height:1.7;">'+presc.postRunFeedback+'</div></div>';
+  }else if(isCompleted&&stravaRun){
+    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
+  }else if(isCompleted){
+    completeArea.innerHTML='<div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight.</div>';
+  }else{
+    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
   }
 }
 async function markRunComplete(targetDate) {
-  if (!D.runPrescriptions||!D.runPrescriptions[targetDate]) return;
-  D.runPrescriptions[targetDate].completed=true;
-  D.runPrescriptions[targetDate].completedAt=new Date().toISOString();
+  const _store=D.dailyPrescriptions?.[targetDate]?D.dailyPrescriptions:(D.runPrescriptions?.[targetDate]?D.runPrescriptions:null);
+  if(!_store)return;
+  _store[targetDate].completed=true;
+  _store[targetDate].completedAt=new Date().toISOString();
   if(typeof pushSilent==='function') await pushSilent();
-  renderRunPrescriptionCard(targetDate);
+  renderRunLogCard(targetDate);
 }
 async function generatePostRunFeedback(targetDate) {
   const completeArea=document.getElementById('run-presc-complete-area');
   if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;text-align:center;">Generating post-run analysis...</div>';
   try {
     const ctx = buildAthleteContext();
-    const presc=D.runPrescriptions&&D.runPrescriptions[targetDate];
+    const presc=D.dailyPrescriptions?.[targetDate]||D.runPrescriptions?.[targetDate];
     if(!presc) throw new Error('No prescription found');
     const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
     if(!stravaRun) throw new Error('No Strava run found for '+targetDate);
@@ -3863,9 +3526,10 @@ async function generatePostRunFeedback(targetDate) {
 'In 3-4 short paragraphs: (1) How well did Javier execute? (2) What does the data say about fitness vs prescription? (3) What adjustments for the next run? Be specific, data-driven, no fluff.';
     const response=await ai(prompt);
     if(!response) throw new Error('No response');
-    D.runPrescriptions[targetDate].postRunFeedback=response;
+    const _pStore=D.dailyPrescriptions?.[targetDate]?D.dailyPrescriptions:D.runPrescriptions;
+    if(_pStore?.[targetDate])_pStore[targetDate].postRunFeedback=response;
     if(typeof pushSilent==='function') await pushSilent();
-    renderRunPrescriptionCard(targetDate);
+    renderRunLogCard(targetDate);
     if(!D.coachingLog)D.coachingLog=[];
     D.coachingLog.push({ts:Date.now(),type:'post_run',label:targetDate});
     if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
@@ -3874,108 +3538,6 @@ async function generatePostRunFeedback(targetDate) {
     console.error('Post-run feedback failed:',err);
     if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--a4);padding:10px;">Failed: '+err.message+'</div>';
   }
-}
-function buildSchedule(){
-  const today=new Date(); today.setHours(0,0,0,0);
-  const schedule=[];
-  const dowToDayType={0:null,1:'A',2:'run',3:'B',4:'run',5:'C',6:'run'};
-
-  for(let i=0;i<28;i++){
-    const d=new Date(today); d.setDate(today.getDate()+i);
-    const dateStr=localDS(d);
-
-    const override=D?.scheduleOverrides?.[dateStr];
-    if(override!==undefined){
-      schedule.push({date:dateStr,dayType:override==='rest'?'rest':override,isRest:override==='rest',wasShifted:true});
-    }else{
-      const dt=dowToDayType[d.getDay()];
-      const isRest=dt===null;
-      schedule.push({date:dateStr,dayType:isRest?'rest':dt,isRest,wasShifted:false});
-    }
-  }
-
-  window._schedule=schedule;
-  if(window._adaptivePlan) window._adaptivePlan.schedule=schedule;
-  return schedule;
-}
-
-function applyScheduleOverride(date,dayType){
-  if(!D) return;
-  if(!D.scheduleOverrides) D.scheduleOverrides={};
-
-  const dowMap={0:null,1:'A',2:'run',3:'B',4:'run',5:'C',6:'run'};
-  const prevOvr=D.scheduleOverrides[date];
-  const displaced=(prevOvr!==undefined)?prevOvr:(()=>{const d=new Date(date+'T12:00:00');const dt=dowMap[d.getDay()];return dt===null?'rest':dt;})();
-
-  if(dayType!=='rest'&&displaced!==dayType&&displaced!=='rest'){
-    const tDOW=parseInt(Object.entries(dowMap).find(([,v])=>v===dayType)?.[0]);
-    if(!isNaN(tDOW)){
-      const sd=new Date(date+'T12:00:00');
-      for(let i=1;i<=28;i++){
-        const c=new Date(sd);c.setDate(sd.getDate()+i);
-        if(c.getDay()===tDOW){const ns=localDS(c);if(!D.scheduleOverrides[ns])D.scheduleOverrides[ns]=displaced;break;}
-      }
-    }
-  }
-
-  D.scheduleOverrides[date]=dayType;
-
-  const LIFT_SPACING={A:7,B:7,C:7,run:5};
-  const spacing=LIFT_SPACING[dayType];
-  if(spacing&&dayType!=='rest'){
-    const od=new Date(date+'T12:00:00');
-    const nd=new Date(od);nd.setDate(od.getDate()+spacing);
-    const ns=localDS(nd);
-    if(!D.scheduleOverrides[ns])D.scheduleOverrides[ns]=dayType;
-  }
-
-  buildSchedule();
-  renderCalendar();
-  if(document.getElementById('panel-week')?.classList.contains('on')){
-    renderWeekNav();
-  }
-  if(typeof renderSystemLog==='function') renderSystemLog();
-  pushSilent();
-}
-
-function confirmDayOverride(){
-  const sel=document.getElementById('week-day-override');
-  const msg=document.getElementById('override-msg');
-  const val=sel?.value;
-  if(!val){
-    if(msg){msg.textContent='Pick a workout first';msg.style.color='var(--t3)';}
-    return;
-  }
-  const today=localDS(new Date());
-  applyScheduleOverride(today,val);
-
-  const labels={A:'Lift A set for today',B:'Lift B set for today',C:'Lift C set for today',run:'Run set for today',run_easy:'Easy run set for today',run_quality:'Quality run set for today',run_long:'Long run set for today',rest:'Rest day set'};
-  if(msg){
-    msg.textContent=(labels[val]||'Updated')+' · schedule rippled ✓';
-    msg.style.color='var(--a2)';
-    setTimeout(()=>{if(msg) msg.textContent='';},4000);
-  }
-
-  const logDay=document.getElementById('log-day');
-  if(logDay&&val!=='rest'){logDay.value=val;onDayTypeChange(val);}
-
-  const todayDay=document.getElementById('today-day');
-  if(todayDay){todayDay.value=val;ldPrev();}
-}
-
-function buildLocalPlan(){
-  // AI owns all numbers — restore cached plan if available, else minimal skeleton
-  if(D.adaptivePlanCache&&D.adaptivePlanCache.lifts){
-    const plan=Object.assign({},D.adaptivePlanCache);
-    plan.blockWeek=detectBlockWeek();
-    plan.schedule=buildSchedule();
-    window._adaptivePlan=plan;
-    return plan;
-  }
-  const blockWeek=detectBlockWeek();
-  const plan={generatedDate:null,blockWeek,schedule:buildSchedule(),lifts:null,runs:null,narrative:null};
-  window._adaptivePlan=plan;
-  return plan;
 }
 
 function compute7DayMeans(){
@@ -4093,148 +3655,6 @@ function evaluateTrainingStatus(){
     activeFlags:flags,reasons,mafHR:ATHLETE.mafHR,latestHRV,latestRHR,sleepHours,means};
 }
 
-function buildPlanContext(){
-  const sessions=D.sessions||[],runs=D.runs||[],checkins=D.checkins||[];
-  const blockWeek=detectBlockWeek();
-  const recentSessions=sessions.slice(-8).map(s=>({
-    date:s.date,dayType:s.day||s.dayType,rpe:s.rpe,energy:s.energy,sleep:s.sleep,
-    bench:s.bench?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
-    ohp:s.ohp?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
-    squat:s.squat?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
-    dl:s.dl?.sets?.filter(x=>x.w).map(x=>`${x.w}lb×${x.r}@RPE${x.rpe||'?'}`).join(', ')||null,
-    pullups:s.pullups||null
-  }));
-  const recentRuns=runs.slice(-10).map(r=>({
-    date:r.date,type:r.runType,distance:r.distance,
-    pace:r.pace?`${Math.floor(r.pace/60)}:${String(r.pace%60).padStart(2,'0')}/mile`:null,
-    hrAvg:r.heartRateAvg,hrMax:r.heartRateMax,name:r.name
-  }));
-  const hrRuns=runs.filter(r=>r.type==='run'&&r.distance>=2&&r.heartRateAvg);
-  let vo2max=null;
-  if(hrRuns.length>0){const estimates=hrRuns.map(r=>estimateVO2max(r)).filter(v=>v!==null);if(estimates.length>0){estimates.sort((a,b)=>a-b);vo2max=estimates[Math.floor(estimates.length/2)];}}
-  const recentCheckins=checkins.slice(-7);
-  const avgSleep=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.sleep,0)/recentCheckins.length).toFixed(1):null;
-  const avgEnergy=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.energy,0)/recentCheckins.length).toFixed(1):null;
-  const avgFatigue=recentCheckins.length?(recentCheckins.reduce((s,c)=>s+c.fatigueScore,0)/recentCheckins.length).toFixed(1):null;
-  const rpeConfirmations=(D.rpeConfirmations||[]).slice(-20);
-  const trainingMode=document.getElementById('mode-sel')?.value||'normal';
-  const recentHealth=(D.healthLogs||[]).slice(-7);
-  const avgRestingHR=recentHealth.filter(h=>h.restingHR).length?Math.round(recentHealth.filter(h=>h.restingHR).reduce((s,h)=>s+h.restingHR,0)/recentHealth.filter(h=>h.restingHR).length):getRestingHR();
-  const avgHRV=recentHealth.filter(h=>h.hrv).length?Math.round(recentHealth.filter(h=>h.hrv).reduce((s,h)=>s+h.hrv,0)/recentHealth.filter(h=>h.hrv).length):null;
-  const latestHealth=recentHealth.length?recentHealth[recentHealth.length-1]:null;
-  const latestWristTemp=latestHealth?.wristTemp||null;
-  const avgExerciseMins=recentHealth.filter(h=>h.exerciseMinutes).length?Math.round(recentHealth.filter(h=>h.exerciseMinutes).reduce((s,h)=>s+h.exerciseMinutes,0)/recentHealth.filter(h=>h.exerciseMinutes).length):null;
-  const appleVO2max=recentHealth.filter(h=>h.vo2maxApple).length?recentHealth.filter(h=>h.vo2maxApple).slice(-1)[0].vo2maxApple:null;
-  const liftBests={bench:0,ohp:0,squat:0,dl:0};
-  sessions.forEach(s=>{['bench','ohp','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if(set.w&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
-  if(!liftBests.bench)liftBests.bench=255;if(!liftBests.ohp)liftBests.ohp=120;if(!liftBests.squat)liftBests.squat=215;if(!liftBests.dl)liftBests.dl=215;
-  const latestBody=(D.bodyMetrics||[]).slice(-1)[0]||null;
-  const currentWeight=latestBody?.weightLbs||null;
-  const currentWaist=latestBody?.waistInches||null;
-  const currentBMI=latestBody?.bmi||null;
-  return{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,totalSessions:sessions.length,totalRuns:runs.length,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max,currentWeight,currentWaist,currentBMI,latestBody};
-}
-
-function buildPlanPrompt(ctx){
-  const ts=evaluateTrainingStatus();
-  const{blockWeek,recentSessions,recentRuns,vo2max,avgSleep,avgEnergy,avgFatigue,rpeConfirmations,trainingMode,liftBests,avgRestingHR,avgHRV,latestWristTemp,avgExerciseMins,appleVO2max,currentWeight,currentWaist,currentBMI,latestBody}=ctx;
-  const sessLines=recentSessions.map(s=>`${s.date} [${s.dayType}] RPE:${s.rpe||'?'} Energy:${s.energy||'?'} Sleep:${s.sleep||'?'}h\n  Bench:${s.bench||'none'} OHP:${s.ohp||'none'} Squat:${s.squat||'none'} DL:${s.dl||'none'}`).join('\n')||'No sessions yet';
-  const runLines=recentRuns.map(r=>`${r.date} [${r.type||'?'}] ${r.distance}mi @ ${r.pace||'?'} · HR avg ${r.hrAvg||'?'} max ${r.hrMax||'?'} (${r.name||''})`).join('\n')||'No runs logged';
-  const rpeLines=rpeConfirmations.length?rpeConfirmations.map(r=>`${r.lift}: predicted ${r.predictedRPE} actual ${r.actualRPE} @ ${r.weight}lb`).join('\n'):'No RPE confirmations yet';
-  const overrideLines=D.scheduleOverrides&&Object.keys(D.scheduleOverrides).length
-    ?'\nSCHEDULE OVERRIDES (user-declared, treat as highest priority):\n'+
-      Object.entries(D.scheduleOverrides)
-        .filter(([d])=>d>=localDS(new Date()))
-        .sort(([a],[b])=>a.localeCompare(b))
-        .slice(0,7)
-        .map(([d,t])=>`${d}: ${t}`)
-        .join('\n')
-    :'';
-  return`CRITICAL: Your response MUST include all 6 lift keys in lifts{}: pullup, row, bench, ohp, squat, dl. A response missing ANY of these keys will be rejected entirely.
-
-You are Javier's personal strength and running coach. PGY-1 IM resident in Philadelphia.
-
-GOALS: Maximize bench/OHP/row/pullups/squat/deadlift strength. Sub-20 min 5K. VO2max 50+. Long-term injury prevention.
-
-PROGRAM: Mon=Lift A (Bench+OHP+Row+Pullups), Tue=Run (AI prescribes type), Wed=Lift B (Squat+Row), Thu=Run (AI prescribes type), Fri=Lift C (Deadlift+prevention), Sat=Run (AI prescribes type+distance), Sun=Rest.
-
-CURRENT BLOCK: Week ${blockWeek.weekNum}/4 — ${blockWeek.label}
-TRAINING MODE: ${trainingMode}
-TRAINING MODE RULES — enforce these numerically, no softening:
-${trainingMode==='performance'
-  ?'- Increase all lift weights 2.5-5lb above last session\n- Add 1 set to primary compounds\n- Runs at upper end of pace range\n- RPE targets 8-9'
-  :trainingMode==='recovery'
-  ?'- Reduce ALL lift weights 20% from last session\n- Drop all sets by 1, minimum 2 sets per lift\n- ALL runs easy Zone 2 only, no intervals or tempo regardless of day type\n- RPE targets max 6\n- Set recoveryFlag in output'
-  :trainingMode==='deload'
-  ?'- Reduce ALL lift weights 40% from last session\n- Max 3 sets per lift, reps 8-10 technique focus\n- Runs easy only, max 30 min, HR cap 140 bpm\n- RPE targets max 5\n- Set recoveryFlag in output'
-  :'- Standard progressive overload\n- Increase weight when last session RPE was under 8 at full prescribed sets/reps\n- Maintain current volume'}
-
-LIFT BESTS (e1RM): Bench ${liftBests.bench}lb · OHP ${liftBests.ohp}lb · Squat ${liftBests.squat}lb · DL ${liftBests.dl}lb
-
-RECENT SESSIONS (last 8):
-${sessLines}
-${overrideLines}
-RECENT RUNS (last 10):
-${runLines}
-
-RECOVERY & BIOMETRICS (last 7 days, Apple Watch Series 10):
-- Resting HR: ${avgRestingHR} bpm (baseline 52 — >57 = under-recovered)
-- HRV: ${avgHRV||'no data'} ms (drops >20% from baseline = reduce intensity)
-- Wrist temp deviation: ${latestWristTemp!==null?(latestWristTemp>0?'+':'')+latestWristTemp+'°C':'no data'} (>+0.5°C = elevated stress or illness)
-- Avg sleep: ${avgSleep||'?'}h total
-- Avg energy: ${avgEnergy||'?'}/10
-- Avg fatigue: ${avgFatigue||'?'}/10
-- Avg exercise minutes/day: ${avgExerciseMins||'?'} min (includes non-logged activity)
-- Apple Watch VO2max: ${appleVO2max||'not available'} ml/kg/min
-- Calculated VO2max: ${vo2max||'?'} ml/kg/min (HR reserve + elevation corrected, resting HR ${avgRestingHR})
-
-BODY COMPOSITION:
-- Weight: ${currentWeight?currentWeight+' lbs':'not logged'}
-- Waist: ${currentWaist?currentWaist+'"':'not logged'}
-- BMI: ${currentBMI||'not calculated'} (height 5'9.5")
-- Waist-to-height ratio: ${latestBody?.waistHeightRatio||'not calculated'}
-
-HARD RULE ENGINE OUTPUT (these are non-negotiable — enforce exactly):
-canTrain: ${ts.canTrain}
-canDoQuality: ${ts.canDoQuality}
-canDoHeavyLifts: ${ts.canDoHeavyLifts}
-liftRPECap: ${ts.liftRPECap} (never prescribe RPE above this)
-volumeModifier: ${ts.volumeModifier} (multiply all sets by this — round down to nearest whole set)
-stressScore: ${ts.stressScore}/3
-activeFlags: ${ts.activeFlags.join(', ')||'none'}
-mafHR: ${ts.mafHR} bpm (hard ceiling for ALL easy runs — never exceed)
-reasons: ${ts.reasons.join(' | ')||'all clear'}
-
-ATHLETE PROFILE:
-Age: ${ATHLETE.age} | Weight: ${ATHLETE.weightLbs}lb | Height: 70in | Waist: ${ATHLETE.waistInches}in
-HRV baseline (95d): ${ATHLETE.hrvBaseline}ms | RHR baseline (95d): ${ATHLETE.rhrBaseline}bpm
-MAF HR ceiling: ${ATHLETE.mafHR} bpm
-
-RPE CALIBRATION:
-${rpeLines}
-
-IMPORTANT: Recent easy runs show HR 165-171 bpm — that is threshold, NOT Zone 2. Zone 2 for Javier is HR 130-145. Easy run prescriptions must reflect this.
-
-Output ONLY a valid JSON object. No markdown, no explanation, no text outside the JSON.
-
-Schema (use exact field names):
-{"narrative":"2-3 sentence overview","weeklyFocus":"single most important thing this week","autoRegulationRule":"one concrete rule based on data","lifts":{"pullup":{"weight":0,"sets":5,"reps":5,"targetRPE":8,"variation":"Weighted Pull-ups","trend":"up","confidence":"medium","coachNote":"0 = bodyweight, positive = added weight in lb"},"row":{"weight":135,"sets":4,"reps":6,"targetRPE":8,"variation":"Barbell Row","trend":"flat","confidence":"medium","coachNote":""},"bench":{"weight":192.5,"sets":4,"reps":4,"targetRPE":8,"variation":"Barbell Bench Press","trend":"up","confidence":"medium","coachNote":"specific instruction"},"ohp":{"weight":90,"sets":3,"reps":5,"targetRPE":8,"variation":"Barbell OHP","trend":"flat","confidence":"low","coachNote":""},"squat":{"weight":160,"sets":4,"reps":4,"targetRPE":8,"variation":"Back Squat","trend":"flat","confidence":"low","coachNote":""},"dl":{"weight":160,"sets":3,"reps":4,"targetRPE":8,"variation":"Conventional Deadlift","trend":"flat","confidence":"low","coachNote":""}},"runs":{"tuesday":{"type":"easy","targetHR":"130-145","targetPace":"11:30-12:30/mile","duration":35,"coachNote":"specific instruction"},"thursday":{"type":"intervals","workout":"8 × 400m with 90s rest","targetPace":"6:30-7:00/mile per rep","warmup":"10 min easy","cooldown":"10 min easy","coachNote":"specific instruction"},"saturday":{"type":"long","distance":5.5,"targetHR":"140-155","targetPace":"11:00-12:00/mile","coachNote":"specific instruction"}},"accessories":{"dayA":["Face Pulls 3×15","Tricep Pushdown 3×10","Hammer Curls 3×10"],"dayB":["Bulgarian Split Squat 3×8 each","Leg Curl 3×10","Calf Raises 3×15","Pallof Press 3×10 each"],"dayC":["Romanian DL 3×8","Step-ups 3×10 each","Copenhagen Plank 3×20s each","Dead Bug 3×8 each","Hip Flexor Protocol 2min each"]},"vo2maxEstimate":31.7,"estimated5KTime":"31:20","recoveryFlag":null}
-
-Rules: weights in lb rounded to nearest 2.5 · pace strings MM:SS/mile · duration in minutes · trend must be up/flat/down · confidence must be high/medium/low · recoveryFlag null if fine or a warning string · if blockWeek 4 reduce all weights 35-40% and all runs easy · if fewer than 3 sessions use baseline values with confidence low · Thursday type→easy if last squat RPE>8 OR avgFatigue>7 OR mode is high_stress/minimum`;
-}
-
-function parsePlanResponse(response){
-  try{
-    const clean=response.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-    const start=clean.indexOf('{'),end=clean.lastIndexOf('}');
-    if(start===-1||end===-1)return null;
-    const plan=JSON.parse(clean.slice(start,end+1));
-    if(!plan.lifts||!plan.runs||!plan.narrative)return null;
-    if(!plan.lifts.pullup||!plan.lifts.row)return null;
-    return plan;
-  }catch(e){console.error('Plan parse error:',e.message,response.slice(0,200));return null;}
-}
-
 async function pushSilent(){
   if(!CFG.tok)return;
   try{
@@ -4245,48 +3665,6 @@ async function pushSilent(){
     const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));
     await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'AI plan cache update',content:enc,sha:info.sha})});
   }catch(e){console.warn('Silent push failed:',e.message);}
-}
-
-async function generateAdaptivePlan(){
-  const btn=document.getElementById('ap-gen-btn'),msgEl=document.getElementById('ap-gen-msg');
-  if(btn){btn.disabled=true;btn.textContent='Generating...';}
-  if(msgEl){msgEl.textContent='Analyzing your training data...';msgEl.style.color='var(--t3)';}
-  try{
-    const ctx=buildPlanContext();
-    const prompt=buildPlanPrompt(ctx);
-    if(msgEl)msgEl.textContent='Generating your personalized plan...';
-    // Call API directly with higher token limit for JSON response
-    const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
-    if(!apiKey)throw new Error('No API key — add it in Settings');
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2000,system:'You are a strength and running coach. Output only valid JSON. No prose outside the JSON object.',messages:[{role:'user',content:prompt}]})});
-    const d=await r.json();
-    if(d.error)throw new Error('API error: '+d.error.message);
-    const response=d.content?.[0]?.text||'';
-    const plan=parsePlanResponse(response);
-    if(!plan)throw new Error('Could not parse AI response as JSON. Raw: '+response.slice(0,300));
-    plan.generatedDate=new Date().toISOString().split('T')[0];
-    plan.blockWeek=ctx.blockWeek;
-    plan.schedule=buildSchedule();
-    window._adaptivePlan=plan;
-    D.adaptivePlanCache=plan;
-    await pushSilent();
-    renderAdaptivePlan();
-    renderWeekNav();
-    renderProgramTab();
-    renderCalendar();
-    renderRunMetricsSummary();
-    updateLogTabPlanned();
-    if(!D.coachingLog)D.coachingLog=[];
-    D.coachingLog.push({ts:Date.now(),type:'week_plan',label:'Weekly AI plan'});
-    if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
-    renderSystemLog();
-    if(msgEl){msgEl.textContent='Plan updated ✓';msgEl.style.color='var(--a3)';setTimeout(()=>{msgEl.textContent='';},3000);}
-  }catch(err){
-    console.error('Plan generation failed:',err);
-    if(msgEl){msgEl.textContent='Failed: '+err.message;msgEl.style.color='var(--a4)';}
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent='Generate AI Plan';}
-  }
 }
 
 // ============================================================
@@ -4570,32 +3948,6 @@ async function confirmRPE(lift,actualRPE){
       const ir=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
       if(ir.ok){const info=await ir.json();D.lastUpdated=new Date().toISOString().split('T')[0];const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'RPE confirmation',content:enc,sha:info.sha})});}
     }catch(e){}
-  }
-}
-
-function renderAdaptivePlan(){
-  const plan=window._adaptivePlan;
-  if(!plan) return;
-  const{lifts}=plan;
-  // Confidence badge
-  const confEl=document.getElementById('ap-confidence');
-  if(confEl&&lifts?.bench){const c=lifts.bench.confidence||'low';confEl.innerHTML=`<span class="ap-confidence-badge ${c}">${c.toUpperCase()}</span>`;}
-  // Recovery flag banner (shown at top of adaptive plan card if AI flagged something)
-  const flagEl=document.getElementById('ap-recovery-flag');
-  if(flagEl){
-    if(plan.recoveryFlag){flagEl.style.display='block';flagEl.innerHTML=`<span style="color:var(--a);">⚠ ${plan.recoveryFlag}</span>`;}
-    else{flagEl.style.display='none';}
-  }
-  // Week Coach narrative — structured output
-  const guidText=document.getElementById('wk-guid-text');
-  if(guidText){
-    if(plan.narrative){
-      let html=`<p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:10px;">${plan.narrative}</p>`;
-      if(plan.weeklyFocus) html+=`<p style="font-size:12px;color:var(--t2);margin-bottom:6px;"><span style="font-family:var(--mono);font-size:10px;color:var(--a);letter-spacing:.06em;">THIS WEEK:</span> ${plan.weeklyFocus}</p>`;
-      if(plan.autoRegulationRule) html+=`<p style="font-size:12px;color:var(--t2);margin-bottom:6px;"><span style="font-family:var(--mono);font-size:10px;color:var(--a2);letter-spacing:.06em;">AUTO-REGULATION:</span> ${plan.autoRegulationRule}</p>`;
-      if(plan.recoveryFlag) html+=`<p style="font-size:12px;color:var(--a);margin-bottom:0;"><span style="font-family:var(--mono);font-size:10px;letter-spacing:.06em;">⚠ FLAG:</span> ${plan.recoveryFlag}</p>`;
-      guidText.innerHTML=html;guidText.style.fontStyle='normal';guidText.style.color='var(--t2)';
-    }else{guidText.textContent='Tap "Generate AI Plan" to get your personalized weekly plan.';guidText.style.fontStyle='italic';guidText.style.color='var(--t3)';}
   }
 }
 
@@ -5006,371 +4358,6 @@ function initCheckinTab(){
   if(todayBody)updateBodyCalcs();
 }
 
-function updateTodayPreview(){
-  const plan=window._adaptivePlan;if(!plan?.lifts)return;
-  const day=document.getElementById('today-day')?.value;
-  if(!['A','B','C'].includes(day))return;
-  const el=document.getElementById('day-prev');if(!el)return;
-  const {bench,ohp,squat,dl}=plan.lifts;
-  let targets='';
-  if(day==='A'){targets=`Bench ${bench?.weight||'?'}lb · ${bench?.sets||'?'}×${bench?.reps||'?'} · RPE ~${bench?.targetRPE||'?'}`;if(ohp)targets+=` &nbsp;|&nbsp; OHP ${ohp.weight}lb · ${ohp.sets}×${ohp.reps}`;}
-  else if(day==='B'){targets=`Squat ${squat?.weight||'?'}lb · ${squat?.sets||'?'}×${squat?.reps||'?'} · RPE ~${squat?.targetRPE||'?'}`;}
-  else{targets=`Deadlift ${dl?.weight||'?'}lb · ${dl?.sets||'?'}×${dl?.reps||'?'} · RPE ~${dl?.targetRPE||'?'}`;}
-  const banner=`<div style="background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.2);border-radius:8px;padding:9px 12px;margin-bottom:10px;font-family:var(--mono);font-size:11px;color:var(--a);">Adaptive targets: ${targets}</div>`;
-  const cur=el.innerHTML;
-  if(cur.startsWith('<div style="background:rgba(255,183,77')){el.innerHTML=banner+cur.replace(/^<div style="background:rgba\(255,183,77[^>]*>[^<]*<\/div>/,'');}
-  else{el.innerHTML=banner+cur;}
-}
-
-// ============================================================
-// PROGRAM TAB
-// ============================================================
-function getTodayDayType(){
-  const today=localDS(new Date());
-  const plan=window._adaptivePlan;
-  if(plan?.schedule){
-    const entry=plan.schedule.find(d=>d.date===today);
-    if(entry) return {dayType:entry.isRest?null:entry.dayType,isRest:!!entry.isRest};
-  }
-  const dow=new Date().getDay();
-  const dowMap={0:null,1:'A',2:'run',3:'B',4:'run',5:'C',6:'run'};
-  const dayType=dowMap[dow];
-  return {dayType,isRest:dayType===null};
-}
-function buildPrescriptionString(lift){
-  if(!lift) return '—';
-  return `${lift.sets}×${lift.reps} @ ${lift.weight} lb · RPE ~${lift.targetRPE} target`;
-}
-function getDayProgram(dayType){
-  const plan=window._adaptivePlan;
-  const exs=[];
-  const legacyMap={1:'A',2:'B',3:'C',4:'A',5:'B'};
-  const effectiveDT=(typeof dayType==='number')?legacyMap[dayType]||null:dayType;
-  if(effectiveDT===null||effectiveDT==='rest'){
-    return [{name:'Rest & Recovery',prescription:'No training today',note:'Sleep, eat, and recover',isPrimary:false,trend:null,confidence:null,isRun:false}];
-  }
-  if(effectiveDT==='A'){
-    const b=plan?.lifts?.bench;
-    exs.push({name:'Bench Press',prescription:b?buildPrescriptionString(b):'See This Week tab for targets',note:null,isPrimary:true,trend:b?.trend||null,confidence:b?.confidence||null,isRun:false});
-    const o=plan?.lifts?.ohp;
-    exs.push({name:'Overhead Press',prescription:o?buildPrescriptionString(o):'See This Week tab for targets',note:null,isPrimary:true,trend:o?.trend||null,confidence:o?.confidence||null,isRun:false});
-    exs.push({name:'Barbell Row',prescription:'4×6-8 · 115-145 lb · RPE ~7',note:'Match bench volume',isPrimary:true,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Pullups',prescription:'5 sets × max clean reps · no kipping',note:null,isPrimary:true,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Face Pulls',prescription:'3×15 · light',note:'Shoulder health — never skip',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Tricep Pushdown',prescription:'3×10',note:'Elbow protection',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Hammer Curls',prescription:'3×10',note:'Bicep/elbow balance',isPrimary:false,trend:null,confidence:null,isRun:false});
-  } else if(effectiveDT==='B'){
-    const s=plan?.lifts?.squat;
-    exs.push({name:'Back Squat',prescription:s?buildPrescriptionString(s):'See This Week tab for targets',note:null,isPrimary:true,trend:s?.trend||null,confidence:s?.confidence||null,isRun:false});
-    exs.push({name:'Bulgarian Split Squat',prescription:'3×8 each leg · bodyweight or light DB',note:'Running transfer — control the descent',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Leg Curl',prescription:'3×10',note:'Hamstring balance',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Calf Raises',prescription:'3×15 · slow eccentric',note:'Running resilience',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Pallof Press',prescription:'3×10 each side',note:'Core anti-rotation',isPrimary:false,trend:null,confidence:null,isRun:false});
-  } else if(effectiveDT==='C'){
-    const d=plan?.lifts?.dl;
-    exs.push({name:'Conventional Deadlift',prescription:d?buildPrescriptionString(d):'See This Week tab for targets',note:null,isPrimary:true,trend:d?.trend||null,confidence:d?.confidence||null,isRun:false});
-    exs.push({name:'Romanian Deadlift',prescription:'3×8 · ~60% of DL weight',note:'Posterior chain — feel the stretch',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Step-ups',prescription:'3×10 each leg · bodyweight',note:'Running stability',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Copenhagen Plank',prescription:'3×20s each side',note:'Groin/adductor protection',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Dead Bug',prescription:'3×8 each side · slow',note:'Core stability for running posture',isPrimary:false,trend:null,confidence:null,isRun:false});
-    exs.push({name:'Hip Flexor Protocol',prescription:'2min each side · hold + contract',note:'Running posture — do this every Friday',isPrimary:false,trend:null,confidence:null,isRun:false});
-  } else if(effectiveDT==='run'){
-    const _todayStr = localDS(new Date());
-    const _presc = D.runPrescriptions?.[_todayStr];
-    if (_presc?.workout) {
-      exs.push({name:'Warm-up',prescription:_presc.workout.warmup||'10 min easy walk/jog',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-      exs.push({name:_presc.workout.name||'AI Prescribed Run',prescription:(_presc.workout.mainSet||'See prescription')+(_presc.workout.totalDistance?' · '+_presc.workout.totalDistance:''),note:_presc.reasoning||null,isPrimary:true,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Cool-down',prescription:_presc.workout.cooldown||'5 min walk',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-    } else {
-      exs.push({name:'Run — AI Prescribed',prescription:'Tap "Get Prescription" to generate today\'s run',note:'AI will determine easy/quality/long based on your biometrics and goals',isPrimary:true,trend:null,confidence:null,isRun:true});
-    }
-  } else if(effectiveDT==='run_easy'){
-    const pr=plan?.runs?.tuesday;
-    if(pr){
-      exs.push({name:'Warm-up Walk',prescription:'5 min · let HR settle',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Zone 2 Run',prescription:`${pr.duration||35} min · HR ${pr.targetHR||'130-145'} · ${pr.targetPace||'conversational pace'}`,note:pr.coachNote||'If HR drifts above target, slow down or walk',isPrimary:true,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Cool-down',prescription:'5 min walk + calf stretch',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-    } else {
-      exs.push({name:'Warm-up Walk',prescription:'5 min · let HR settle',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Zone 2 Run',prescription:'30-45 min · HR 130-145 · conversational pace',note:'Generate AI Plan for personalized prescription',isPrimary:true,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Cool-down',prescription:'5 min walk + calf stretch',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-    }
-  } else if(effectiveDT==='run_quality'){
-    const pr=plan?.runs?.thursday;
-    if(pr){
-      if(pr.type==='easy'){
-        exs.push({name:'Easy Zone 2 Run',prescription:`${pr.workout||'30-40 min Zone 2 only'} · HR ${pr.targetHR||'130-145'}`,note:pr.coachNote||'Recovery day — protect Thursday',isPrimary:true,trend:null,confidence:null,isRun:true});
-      } else if(pr.type==='intervals'){
-        exs.push({name:'Warm-up',prescription:pr.warmup||'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-        exs.push({name:'Intervals',prescription:`${pr.workout||'8 × 400m · 90s rest'} · ${pr.targetPace||'current pace'}`,note:pr.coachNote||null,isPrimary:true,trend:null,confidence:null,isRun:true});
-        exs.push({name:'Cool-down',prescription:pr.cooldown||'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-      } else {
-        exs.push({name:'Warm-up',prescription:pr.warmup||'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-        exs.push({name:'Tempo Run',prescription:`${pr.workout||'20-25 min threshold'} · ${pr.targetPace||'comfortably hard'}`,note:pr.coachNote||null,isPrimary:true,trend:null,confidence:null,isRun:true});
-        exs.push({name:'Cool-down',prescription:pr.cooldown||'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-      }
-    } else {
-      exs.push({name:'Warm-up',prescription:'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Quality Run',prescription:'Generate AI Plan for this week\'s prescription',note:null,isPrimary:true,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Cool-down',prescription:'10 min easy',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-    }
-  } else if(effectiveDT==='run_long'){
-    const pr=plan?.runs?.saturday;
-    if(pr){
-      exs.push({name:'Long Run',prescription:`${pr.distance||5} miles · HR ${pr.targetHR||'140-155'} · ${pr.targetPace||'easy pace'}`,note:pr.coachNote||'Run by feel and HR — no ego pacing',isPrimary:true,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Post-run',prescription:'5 min walk + full stretch protocol',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-    } else {
-      const recentLongRuns=(D.runs||[]).filter(r=>r.runType==='long').slice(-4);
-      const lastLongDistance=recentLongRuns.length?recentLongRuns[recentLongRuns.length-1].distance:4;
-      const bw=plan?.blockWeek||detectBlockWeek();
-      const targetDistance=bw.weekNum===4?Math.round(lastLongDistance*0.5*2)/2:Math.round((lastLongDistance+0.5)*2)/2;
-      exs.push({name:'Long Run',prescription:`${targetDistance} miles · easy pace · HR under 155`,note:'Generate AI Plan for personalized prescription',isPrimary:true,trend:null,confidence:null,isRun:true});
-      exs.push({name:'Post-run',prescription:'5 min walk + full stretch protocol',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
-    }
-  }
-  return exs;
-}
-function renderDayCard(dayType,isToday,isExpanded){
-  const legacyMap={1:'A',2:'B',3:'C',4:'A',5:'B'};
-  const effectiveDT=(typeof dayType==='number')?legacyMap[dayType]||null:dayType;
-  const DAY_NAMES={'A':'Lift A — Upper Strength','B':'Lift B — Squat','C':'Lift C — Deadlift & Resilience','run':'Run — AI Prescribed','run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals/Tempo','run_long':'Long Run'};
-  const DAY_TYPE_LABELS={'A':'LIFT A','B':'LIFT B','C':'LIFT C','run':'RUN','run_easy':'EASY RUN','run_quality':'QUALITY RUN','run_long':'LONG RUN'};
-  const DAY_COLORS={'A':'var(--a)','B':'var(--a)','C':'var(--a)','run':'var(--a3)','run_easy':'var(--a3)','run_quality':'var(--a2)','run_long':'var(--a2)'};
-  const DOW_NAMES={'A':'Monday','B':'Wednesday','C':'Friday','run':'Tue/Thu/Sat','run_easy':'Tuesday','run_quality':'Thursday','run_long':'Saturday'};
-  const TREND_ICON={up:'↑',flat:'→',down:'↓'};
-  const TREND_TEXT={up:'progressing',flat:'holding',down:'regressing'};
-
-  const exs=getDayProgram(effectiveDT);
-  const isRunDay=['run','run_easy','run_quality','run_long'].includes(effectiveDT);
-  const exHtml=exs.map(ex=>{
-    const cls='prog-exercise '+(ex.isPrimary?'primary':'accessory')+(ex.isRun?' run':'');
-    let h=`<div class="${cls}"><div class="prog-ex-name">${ex.name}</div><div class="prog-ex-presc">${ex.prescription}</div>`;
-    if(ex.note) h+=`<div class="prog-ex-note">${ex.note}</div>`;
-    if(ex.trend&&ex.trend!=='flat') h+=`<div class="ap-trend ${ex.trend}">${TREND_ICON[ex.trend]||''} ${TREND_TEXT[ex.trend]||''}</div>`;
-    return h+'</div>';
-  }).join('');
-
-  if(effectiveDT===null||effectiveDT==='rest'){
-    return `<div class="prog-day-card prog-today"><div class="prog-day-header"><div class="prog-day-tag" style="color:var(--t3);">REST</div><div class="prog-day-title">Rest &amp; Recovery</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div></div><div class="prog-exercises">${exHtml}</div></div>`;
-  }
-
-  const name=DAY_NAMES[effectiveDT]||'Training Day';
-  const typeLabel=DAY_TYPE_LABELS[effectiveDT]||'TRAINING';
-  const color=DAY_COLORS[effectiveDT]||'var(--a)';
-
-  if(isToday){
-    const todayStr=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    return `<div class="prog-day-card prog-today" style="border-color:${color};"><div class="prog-day-header" style="${isRunDay?'border-bottom-color:rgba(127,255,110,.2);':''}"><div class="prog-day-tag" style="color:${color};">${typeLabel}</div><div class="prog-day-title">${name}</div><div class="prog-day-sub">Today · ${todayStr}</div></div><div class="prog-exercises">${exHtml}</div></div>`;
-  }
-
-  const dowStr=DOW_NAMES[effectiveDT]||'';
-  const bdgStyle=`font-family:var(--mono);font-size:8px;padding:2px 8px;border-radius:3px;background:transparent;color:${color};border:1px solid ${color};`;
-  return `<div class="prog-day-card prog-collapsed" onclick="toggleProgDay(this,'${effectiveDT}')"><div style="display:flex;align-items:center;justify-content:space-between;"><div><div class="prog-day-title" style="font-size:12px;">${name}</div><div class="prog-day-sub">${dowStr}</div></div><div style="display:flex;align-items:center;gap:8px;"><span style="${bdgStyle}">${typeLabel}</span><div class="prog-chevron">›</div></div></div><div class="prog-collapsed-body" style="display:none;"><div class="prog-exercises" style="padding:0;">${exHtml}</div></div></div>`;
-}
-function toggleProgDay(el,dayType){
-  const body=el.querySelector('.prog-collapsed-body');
-  const chevron=el.querySelector('.prog-chevron');
-  if(!body) return;
-  const isOpen=body.style.display!=='none';
-  body.style.display=isOpen?'none':'block';
-  if(chevron) chevron.classList.toggle('open',!isOpen);
-}
-function renderProgramTab(){
-  const plan=window._adaptivePlan;
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  const hdr=document.getElementById('prog-date-header');
-  if(hdr) hdr.textContent=dateStr;
-  if(!plan){
-    const noPlan=document.getElementById('prog-no-plan');
-    const todayCard=document.getElementById('prog-today-card');
-    const otherDays=document.getElementById('prog-other-days');
-    if(noPlan) noPlan.style.display='block';
-    if(todayCard) todayCard.style.display='none';
-    if(otherDays) otherDays.style.display='none';
-    return;
-  }
-  const noPlan=document.getElementById('prog-no-plan');
-  if(noPlan) noPlan.style.display='none';
-  const blockColors={1:'var(--a2)',2:'var(--a)',3:'var(--a4)',4:'var(--a3)'};
-  const blockLabels={1:'W1 · Volume',2:'W2 · Strength',3:'W3 · Peak',4:'W4 · Deload'};
-  const bw=plan.blockWeek;
-  const bbEl=document.getElementById('prog-block-badge');
-  const bdEl=document.getElementById('prog-block-desc');
-  if(bbEl) bbEl.innerHTML=`<span style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:4px;background:rgba(255,183,77,.1);color:${blockColors[bw.weekNum]};border:1px solid ${blockColors[bw.weekNum]}40;">${blockLabels[bw.weekNum]}</span>`;
-  if(bdEl) bdEl.textContent=bw.label+' — 4-week block periodization';
-  const todayInfo=getTodayDayType();
-  const todayCard=document.getElementById('prog-today-card');
-  if(todayCard){
-    todayCard.style.display='';
-    const tmp=document.createElement('div');
-    tmp.innerHTML=renderDayCard(todayInfo.dayType,true,true);
-    const rendered=tmp.firstChild;
-    if(rendered){ todayCard.className=rendered.className; todayCard.innerHTML=rendered.innerHTML; }
-  }
-  const otherDays=document.getElementById('prog-other-days');
-  if(otherDays){
-    otherDays.style.display='';
-    otherDays.innerHTML='';
-    ['A','run_easy','B','run_quality','C','run_long'].filter(d=>d!==todayInfo.dayType).forEach(d=>{
-      const tmp=document.createElement('div');
-      tmp.innerHTML=renderDayCard(d,false,false);
-      if(tmp.firstChild) otherDays.appendChild(tmp.firstChild);
-    });
-  }
-}
-
-// ============================================================
-// WEEK NAVIGATOR
-// ============================================================
-function weekNavNav(dir){
-  const next=weekNavOffset+dir;
-  if(next<-4||next>3) return;
-  weekNavOffset=next;
-  renderWeekNav();
-}
-function getWeekLabel(offset){
-  const m={'-4':'4 Weeks Ago','-3':'3 Weeks Ago','-2':'2 Weeks Ago','-1':'Last Week','0':'This Week','1':'Next Week','2':'In 2 Weeks','3':'In 3 Weeks'};
-  return m[String(offset)]||'';
-}
-function getWeekDateRange(offset){
-  const ws=getWeekStart(offset);
-  const we=new Date(ws); we.setDate(ws.getDate()+6);
-  const fmt=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  return fmt(ws)+' – '+fmt(we);
-}
-function getBlockPhaseForOffset(offset){
-  const shortLabels=['Volume','Strength','Peak','Deload'];
-  const blockColors={1:'var(--a2)',2:'var(--a)',3:'var(--a4)',4:'var(--a3)'};
-  let weekNum;
-  if(offset>=0){
-    const currentWN=(window._adaptivePlan?.blockWeek?.weekNum)||1;
-    weekNum=((currentWN+offset-1+400)%4)+1;
-  } else {
-    const ws=getWeekStart(offset);
-    const we=new Date(ws); we.setDate(ws.getDate()+6);
-    const weStr=localDS(we);
-    const wkSet=new Set();
-    (D?.sessions||[]).forEach(s=>{
-      if(s.date<=weStr){
-        const d=new Date(s.date+'T12:00:00');
-        const mon=new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7));
-        wkSet.add(localDS(mon));
-      }
-    });
-    weekNum=wkSet.size?((wkSet.size-1)%4)+1:1;
-  }
-  return {weekNum,label:shortLabels[weekNum-1],color:blockColors[weekNum]};
-}
-function getActualLiftsForWeek(offset){
-  const ws=getWeekStart(offset);
-  const we=new Date(ws); we.setDate(ws.getDate()+6);
-  const wsStr=localDS(ws),weStr=localDS(we);
-  const weekSessions=(D?.sessions||[]).filter(s=>s.date>=wsStr&&s.date<=weStr);
-  if(!weekSessions.length) return {isActual:true,empty:true};
-  const result={isActual:true};
-  ['bench','ohp','squat','dl'].forEach(lift=>{
-    const allSets=[];
-    weekSessions.forEach(s=>{ const ld=s[lift]; if(ld?.sets) allSets.push(...ld.sets.filter(x=>x.w&&x.r)); });
-    if(allSets.length){
-      const best=allSets.reduce((b,x)=>calcE1RM(x.w,x.r)>calcE1RM(b.w,b.r)?x:b);
-      const sessWithLift=weekSessions.find(s=>s[lift]?.sets?.some(x=>x.w&&x.r));
-      result[lift]={weight:best.w,reps:best.r,rpe:best.rpe||null,e1rm:calcE1RM(best.w,best.r),sets:sessWithLift?sessWithLift[lift].sets.filter(x=>x.w).length:null};
-    } else { result[lift]=null; }
-  });
-  return result;
-}
-function getPlannedLiftsForWeek(offset){
-  const plan=window._adaptivePlan;
-  if(!plan) return {isActual:false};
-  const currentWN=plan.blockWeek.weekNum;
-  const targetWN=((currentWN+offset-1+400)%4)+1;
-  const mods={1:{setsAdj:+1,wMult:.95,rpe:7},2:{setsAdj:0,wMult:1,rpe:8},3:{setsAdj:-1,wMult:1.05,rpe:9},4:{setsAdj:-2,wMult:.65,rpe:5}};
-  const mod=mods[targetWN];
-  const result={isActual:false};
-  ['bench','ohp','squat','dl'].forEach(lift=>{
-    const base=plan.lifts[lift];
-    if(base) result[lift]={weight:Math.round(base.weight*mod.wMult/2.5)*2.5,sets:Math.max(1,base.sets+mod.setsAdj),reps:base.reps,targetRPE:mod.rpe};
-  });
-  return result;
-}
-function renderWeekNavLifts(offset){
-  const liftsEl=document.getElementById('ap-lifts');
-  const ctxEl=document.getElementById('wn-context-label');
-  if(!liftsEl) return;
-  const plan=window._adaptivePlan;
-  if(!plan){
-    liftsEl.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--t3);text-align:center;padding:16px 0;">Generate AI Plan to see prescriptions</div>';
-    if(ctxEl) ctxEl.textContent='';
-    return;
-  }
-  const lds=[{key:'bench',name:'BENCH PRESS'},{key:'ohp',name:'OVERHEAD PRESS'},{key:'pullup',name:'WEIGHTED PULL-UPS'},{key:'row',name:'BARBELL ROW'},{key:'squat',name:'BACK SQUAT'},{key:'dl',name:'DEADLIFT'}];
-  if(ctxEl){
-    if(offset===0){ctxEl.textContent='';ctxEl.style.color='var(--t3)';}
-    else if(offset<0){ctxEl.textContent='Actual logged data for this week';ctxEl.style.color='var(--a3)';}
-    else{ctxEl.textContent='AI prescription — predicted, not logged';ctxEl.style.color='var(--t3)';}
-  }
-  if(offset<0){
-    const actual=getActualLiftsForWeek(offset);
-    if(actual.empty){
-      liftsEl.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--t3);text-align:center;padding:16px 0;">No sessions logged this week</div>';
-      return;
-    }
-    liftsEl.innerHTML=lds.map(ld=>{
-      const l=actual[ld.key];
-      if(!l) return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div></div><div class="ap-lift-right"><div style="font-family:var(--mono);font-size:12px;color:var(--t3);">not logged</div></div></div>`;
-      return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">e1RM ${l.e1rm} lb</div></div><div class="ap-lift-right"><div class="ap-lift-weight" style="color:var(--t);">${l.weight} lb</div><div class="ap-lift-detail">${l.sets||'?'}×${l.reps} · RPE ${l.rpe||'?'}</div><div class="ap-trend up">✓ logged</div></div></div>`;
-    }).join('');
-  } else if(offset===0){
-    if(!plan.lifts){
-      liftsEl.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--t3);text-align:center;padding:16px 0;">Generate AI Plan to see this week\'s prescriptions</div>';
-      return;
-    }
-    const{lifts}=plan;
-    liftsEl.innerHTML=lds.map(ld=>{
-      const l=lifts[ld.key];
-      if(!l) return '';
-      const ta=l.trend==='up'?'↑ progressing':l.trend==='down'?'↓ declining':'→ steady';
-      const note=l.coachNote?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:4px;font-style:italic;">${l.coachNote}</div>`:'';
-      return `<div class="ap-lift-row"><div style="flex:1;"><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var">${l.variation||ld.name}</div>${note}</div><div class="ap-lift-right"><div class="ap-lift-weight">${l.weight} lb</div><div class="ap-lift-detail">${l.sets}×${l.reps} · RPE ~${l.targetRPE}</div><div class="ap-trend ${l.trend}">${ta}</div></div></div>`;
-    }).join('');
-  } else {
-    if(!plan.lifts){
-      liftsEl.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--t3);text-align:center;padding:16px 0;">Generate AI Plan to see projections</div>';
-      return;
-    }
-    const proj=getPlannedLiftsForWeek(offset);
-    liftsEl.innerHTML=lds.map(ld=>{
-      const l=proj[ld.key];
-      if(!l) return '';
-      return `<div class="ap-lift-row"><div><div class="ap-lift-name">${ld.name}</div><div class="ap-lift-var" style="color:var(--t3);">projected</div></div><div class="ap-lift-right"><div class="ap-lift-weight">${l.weight} lb</div><div class="ap-lift-detail">${l.sets}×${l.reps} · RPE ~${l.targetRPE} target</div></div></div>`;
-    }).join('');
-  }
-}
-function renderWeekNav(){
-  const offset=weekNavOffset;
-  const prevBtn=document.getElementById('wn-prev');
-  const nextBtn=document.getElementById('wn-next');
-  if(!prevBtn) return;
-  prevBtn.style.opacity=offset<=-4?'0.3':'1';
-  nextBtn.style.opacity=offset>=3?'0.3':'1';
-  document.getElementById('wn-label').textContent=getWeekLabel(offset);
-  document.getElementById('wn-sublabel').textContent=getWeekDateRange(offset);
-  const dotsEl=document.getElementById('wn-dots');
-  if(dotsEl){
-    dotsEl.innerHTML='';
-    for(let i=-4;i<=3;i++){
-      const dot=document.createElement('div');
-      dot.className='wn-dot';
-      dot.style.cssText=`width:${i===offset?'20px':'6px'};height:6px;background:${i===offset?'var(--a)':i===0?'var(--b2)':'var(--b)'};`;
-      dotsEl.appendChild(dot);
-    }
-  }
-  const phase=getBlockPhaseForOffset(offset);
-  const bbEl=document.getElementById('wn-block-badge');
-  if(bbEl) bbEl.innerHTML=`<span style="font-family:var(--mono);font-size:10px;padding:3px 12px;border-radius:4px;background:${phase.color}18;color:${phase.color};border:1px solid ${phase.color}40;">W${phase.weekNum} · ${phase.label}</span>`;
-  renderWeekNavLifts(offset);
-}
 function formatSleepInput(input){
   let val=input.value.replace(/[^0-9]/g,'');
   if(val.length>4)val=val.substring(0,4);
