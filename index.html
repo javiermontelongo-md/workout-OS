@@ -1682,6 +1682,14 @@ const ATHLETE = {
   rhrBaseline:    57.2,
   sleepBaseline:  7.1,
 
+  // Performance goals
+  goals: {
+    primary:         'sub-20 5K',
+    secondary:       'increase VO2max',
+    approach:        'polarized training — 80% easy zone 2, 20% quality work',
+    currentEstimate5K: null
+  },
+
   // Hard rule thresholds
   HRV_CRASH:      0.80,
   HRV_WARNING:    0.90,
@@ -1920,13 +1928,15 @@ function renderSystemLog() {
       if (!presc || !presc.generatedAt) return;
       const ts = new Date(presc.generatedAt).getTime();
       if (ts < sevenDaysAgo) return;
-      const dt = presc.primaryRecommendation?.type || 'run';
+      const dt = presc.recommendedType || presc.primaryRecommendation?.type || 'run';
+      const dist = presc.workout?.totalDistance || presc.primaryRecommendation?.distance || '';
+      const pace = presc.workout?.paceTarget || presc.primaryRecommendation?.pace || '';
       events.push({
         ts,
         icon: '◈',
         color: 'var(--a)',
         title: 'AI run prescription · ' + date,
-        detail: dt + ' · ' + (presc.primaryRecommendation?.distance || '') + ' ' + (presc.primaryRecommendation?.pace || '')
+        detail: dt + (dist ? ' · ' + dist : '') + (pace ? ' · ' + pace : '')
       });
       if (presc.postRunFeedback && presc.completedAt) {
         const fts = new Date(presc.completedAt).getTime();
@@ -2515,7 +2525,13 @@ function buildAthleteContext() {
       hrvBaseline: ATHLETE.hrvBaseline,
       rhrBaseline: ATHLETE.rhrBaseline,
       location:    'Kaiser SF',
-      schedule:    'Lift A Mon · Run Tue · Lift B Wed · Run Thu · Lift C Fri · Run Sat · Rest Sun'
+      schedule:    'Lift A Mon · Run Tue · Lift B Wed · Run Thu · Lift C Fri · Run Sat · Rest Sun',
+      goals: {
+        primary:       ATHLETE.goals.primary,
+        secondary:     ATHLETE.goals.secondary,
+        approach:      ATHLETE.goals.approach,
+        vo2maxEstimate: estimateVO2max()
+      }
     },
     hardRules: {
       canTrain:        ts.canTrain,
@@ -2591,6 +2607,9 @@ async function ai(prompt, maxTokens = 800) {
       `Athlete: ${ctx.athlete.age}yo male, ${ctx.athlete.weightLbs}lb, ${ctx.athlete.heightIn}in, waist ${ctx.athlete.waistIn}in. Location: ${ctx.athlete.location}.`,
       `Schedule: ${ctx.athlete.schedule}.`,
       `MAF HR ceiling: ${ctx.athlete.mafHR}bpm — hard ceiling for all easy runs, never exceed.`,
+      `Goals: ${ctx.athlete.goals.primary} · ${ctx.athlete.goals.secondary}.`,
+      `Training approach: ${ctx.athlete.goals.approach}.`,
+      `Current VO2max estimate: ${ctx.athlete.goals.vo2maxEstimate}.`,
       `HRV baseline: ${ctx.athlete.hrvBaseline}ms. RHR baseline: ${ctx.athlete.rhrBaseline}bpm.`,
       `HARD RULES — non-negotiable, never override:`,
       `  canTrain=${ctx.hardRules.canTrain} | canDoQuality=${ctx.hardRules.canDoQuality} | canDoHeavyLifts=${ctx.hardRules.canDoHeavyLifts}`,
@@ -3494,178 +3513,228 @@ function startLoggingSession(){
 async function generateRunPrescription(targetDate) {
   if (!targetDate) {
     const n = new Date();
-    targetDate = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+    targetDate = localDS(n);
   }
-  const todayD = new Date();
-  const today = todayD.getFullYear()+'-'+String(todayD.getMonth()+1).padStart(2,'0')+'-'+String(todayD.getDate()).padStart(2,'0');
-  const isFuture = targetDate > today;
 
   const btn = document.getElementById('run-presc-btn');
   const msg = document.getElementById('run-presc-msg');
   const placeholder = document.getElementById('run-presc-placeholder');
   const output = document.getElementById('run-presc-output');
 
-  if (D.runPrescriptions && D.runPrescriptions[targetDate]) {
-    const label = targetDate === today ? 'today' : targetDate;
-    if (!confirm('Regenerate run plan for '+label+'? This will replace the current prescription.')) return;
-  }
-
-  if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
-  if (msg) { msg.textContent = 'Analyzing your run history...'; msg.style.color = 'var(--t3)'; }
-
-  try {
-    const dayType = document.getElementById('log-day')?.value || document.getElementById('run-prescription-card')?.dataset.dayType;
-    const runTypeLabel = {'run_easy':'Easy Run — Zone 2','run_quality':'Quality Run — Intervals or Tempo','run_long':'Long Run'}[dayType] || 'Run';
-
-    const ctx = buildAthleteContext();
-    const prompt = [
-      `Generate a run prescription for ${targetDate} (${runTypeLabel}).`,
-      `MAF HR ceiling: ${ctx.athlete.mafHR}bpm — never exceed for easy runs.`,
-      `HARD RULES: canDoQuality=${ctx.hardRules.canDoQuality}, activeFlags=${ctx.hardRules.activeFlags.join(',') || 'none'}.`,
-      `Last 10 runs: ${JSON.stringify(ctx.training.recentRuns)}.`,
-      `Biometrics: HRV ${ctx.biometrics.todayHRV}ms (7d avg ${ctx.biometrics.sevenDayHRV}ms), RHR ${ctx.biometrics.todayRHR}bpm, sleep ${ctx.biometrics.todaySleep}h.`,
-      `VO2max estimate: ${ctx.biometrics.vo2max}.`,
-      `Upcoming 14 days: ${JSON.stringify(ctx.schedule.next14)}.`,
-      `Respond ONLY with valid JSON, no markdown fencing:`,
-      `{"primaryRecommendation":{"distance":0,"pace":"","hrCap":0,"effort":"","notes":""},"alternatives":[{"description":"","distance":0,"pace":""}],"watchOutFor":[]}`
-    ].join('\n');
-
-    if (msg) msg.textContent = 'Generating prescription...';
-    const raw = await ai(prompt, 1200);
-    if (!raw) throw new Error('No response');
-    const clean = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-    let presc = JSON.parse(clean.slice(clean.indexOf('{'),clean.lastIndexOf('}')+1));
-
-    const required = ['primaryRecommendation','alternatives','watchOutFor'];
-    const missing = required.filter(k => !presc[k]);
-    if (missing.length) {
-      console.warn('Run prescription missing keys:', missing);
-      const retryPrompt = prompt +
-        `\n\nYour previous response was missing: ${missing.join(', ')}. Return ALL required keys.`;
-      const retryRaw = await ai(retryPrompt, 1200);
-      if (retryRaw) {
-        const retryClean = retryRaw.slice(
-          retryRaw.indexOf('{'), retryRaw.lastIndexOf('}') + 1
-        );
-        presc = JSON.parse(retryClean);
-      }
-    }
-
-    if (!D.runPrescriptions) D.runPrescriptions = {};
-    D.runPrescriptions[targetDate] = {...presc, generatedAt:new Date().toISOString(), completed:false, postRunFeedback:null};
-    if (typeof pushSilent==='function') await pushSilent();
-
+  // Return cached prescription if exists
+  if (D.runPrescriptions?.[targetDate]) {
     renderRunPrescriptionCard(targetDate);
-    if(!D.coachingLog)D.coachingLog=[];
-    const _runTypeLabel={'run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run'}[dayType]||dayType||'Run';
-    D.coachingLog.push({ts:Date.now(),type:'run_prescription',label:_runTypeLabel+' · '+targetDate});
-    if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
-    renderSystemLog();
-    if (msg) { msg.textContent='Plan saved ✓'; msg.style.color='var(--a3)'; setTimeout(()=>{if(msg)msg.textContent='';},3000); }
-  } catch(err) {
-    console.error('Run prescription failed:',err);
-    if (msg) { msg.textContent='Failed — check API key in Settings'; msg.style.color='var(--a4)'; }
-  } finally {
-    if (btn) { btn.disabled=false; btn.textContent=(D.runPrescriptions&&D.runPrescriptions[targetDate])?'Regenerate Plan':'Get Today\'s Plan'; }
-  }
-}
-function renderRunPrescriptionCard(targetDate) {
-  if (!targetDate) {
-    const n=new Date();
-    targetDate=localDS(n);
-  }
-
-  const placeholder=document.getElementById('run-presc-placeholder');
-  const output=document.getElementById('run-presc-output');
-  const btn=document.getElementById('run-presc-btn');
-  const completeArea=document.getElementById('run-presc-complete-area');
-
-  // Determine which day of the weekly plan to surface
-  const card=document.getElementById('run-prescription-card');
-  const dayType=card?.dataset?.dayType||'run_easy';
-  const runDayMap={run_easy:'tuesday',run_quality:'thursday',run_long:'saturday'};
-  const planKey=runDayMap[dayType]||'tuesday';
-  const plan=window._adaptivePlan;
-
-  // No weekly plan yet — prompt user to generate one
-  if(!plan||!plan.runs||!plan.runs[planKey]){
-    if(placeholder){
-      placeholder.style.display='';
-      placeholder.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No weekly plan found — <a onclick="showTab(\'plan\')" style="cursor:pointer;color:var(--a3);">go to Plan tab</a> to generate one.</div>';
-    }
-    if(output)output.style.display='none';
-    if(btn)btn.textContent='Refresh Prescription';
-    if(completeArea)completeArea.innerHTML='';
     return;
   }
 
-  if(placeholder)placeholder.style.display='none';
-  if(output)output.style.display='block';
-  if(btn)btn.textContent='Refresh Prescription';
+  if (btn) btn.disabled = true;
+  if (btn) btn.textContent = 'Generating...';
 
-  const run=plan.runs[planKey];
-  const planAge=plan.generatedDate?Math.floor((Date.now()-new Date(plan.generatedDate).getTime())/86400000):null;
-  const isStale=planAge!==null&&planAge>7;
+  const ctx = buildAthleteContext();
 
-  // Hard rule engine — deterministic, no AI call
-  const ts=evaluateTrainingStatus();
+  // Recent run pattern analysis
+  const last5Runs = ctx.training.recentRuns.slice(-5);
+  const lastQualityRun = (D.runs || [])
+    .filter(r => r.runType === 'intervals' || r.runType === 'tempo' || r.runType === 'quality')
+    .slice(-1)[0];
+  const daysSinceQuality = lastQualityRun
+    ? Math.floor((new Date(targetDate) - new Date(lastQualityRun.date)) / 86400000)
+    : 99;
 
-  const primaryEl=document.getElementById('run-presc-primary');
-  if(primaryEl){
-    let html='';
-    // Stale plan banner
-    if(isStale){
-      html+='<div style="font-family:var(--mono);font-size:10px;color:var(--aw);background:rgba(180,90,0,.1);border:1px solid var(--aw);border-radius:6px;padding:6px 10px;margin-bottom:10px;">&#9888; Plan is '+planAge+' days old — regenerate on the Plan tab.</div>';
-    }
-    // Hard rule flags
-    if(ts.activeFlags&&ts.activeFlags.length){
-      html+='<div style="font-family:var(--mono);font-size:10px;color:var(--a4);background:rgba(220,40,60,.07);border:1px solid rgba(220,40,60,.25);border-radius:6px;padding:8px 10px;margin-bottom:10px;">'+ts.activeFlags.map(f=>'&#9888; '+f).join('<br>')+'</div>';
-    }
-    // Run type header
-    const typeLabel={'easy':'EASY RUN — ZONE 2','intervals':'QUALITY — INTERVALS','tempo':'QUALITY — TEMPO','long':'LONG RUN'}[run.type]||((run.type||'run').toUpperCase());
-    html+='<div style="font-size:15px;font-weight:500;color:var(--a);margin-bottom:8px;">'+typeLabel+'</div>';
-    // Prescription rows
-    if(run.duration)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Duration: '+run.duration+' min</div>';
-    if(run.distance)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Distance: '+run.distance+' miles</div>';
-    if(run.targetHR)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Target HR: '+run.targetHR+' bpm</div>';
-    if(run.targetPace)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Pace: '+run.targetPace+'</div>';
-    if(run.workout)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Workout: '+run.workout+'</div>';
-    if(run.warmup)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Warm-up: '+run.warmup+'</div>';
-    if(run.cooldown)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:4px;">Cool-down: '+run.cooldown+'</div>';
-    // Hard rule override notes
-    if(!ts.canTrain){
-      html+='<div style="margin-top:10px;font-size:12px;color:var(--a4);border-top:1px solid var(--b);padding-top:8px;">Hard rule: rest recommended today.</div>';
-    }else if(!ts.canDoQuality&&run.type!=='easy'&&run.type!=='long'){
-      html+='<div style="margin-top:10px;font-size:12px;color:var(--aw);border-top:1px solid var(--b);padding-top:8px;">Recovery status: downgrade to easy pace today.</div>';
-    }
-    if(run.coachNote)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;font-style:italic;">'+run.coachNote+'</div>';
-    primaryEl.innerHTML=html;
+  // Recent lifting load for this week
+  const weekStart = new Date(targetDate);
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+  const weekStartStr = localDS(weekStart);
+  const liftThisWeek = (D.sessions || [])
+    .filter(s => s.date >= weekStartStr && s.date <= targetDate)
+    .length;
+
+  const prompt = [
+    `Prescribe a run for ${targetDate}.`,
+    ``,
+    `ATHLETE GOALS:`,
+    `Primary: ${ctx.athlete.goals.primary}`,
+    `Secondary: ${ctx.athlete.goals.secondary}`,
+    `Approach: ${ctx.athlete.goals.approach}`,
+    `Current VO2max estimate: ${ctx.athlete.goals.vo2maxEstimate}`,
+    ``,
+    `HARD RULES:`,
+    `canDoQuality=${ctx.hardRules.canDoQuality}`,
+    `MAF HR ceiling: ${ctx.athlete.mafHR}bpm (never exceed for easy running)`,
+    `activeFlags: ${ctx.hardRules.activeFlags.join(', ') || 'none'}`,
+    `volumeModifier: ${ctx.hardRules.volumeModifier}`,
+    ``,
+    `BIOMETRICS TODAY:`,
+    `HRV: ${ctx.biometrics.todayHRV}ms (7d avg: ${ctx.biometrics.sevenDayHRV}ms, baseline: ${ctx.athlete.hrvBaseline}ms)`,
+    `RHR: ${ctx.biometrics.todayRHR}bpm (baseline: ${ctx.athlete.rhrBaseline}bpm)`,
+    `Sleep: ${ctx.biometrics.todaySleep}h`,
+    ``,
+    `TRAINING LOAD:`,
+    `Lifts logged this week so far: ${liftThisWeek}`,
+    `Last 5 runs: ${JSON.stringify(last5Runs)}`,
+    `Days since last quality run: ${daysSinceQuality}`,
+    `Block: week ${ctx.training.blockWeek.weekNum} of 4`,
+    ``,
+    `14-DAY SCHEDULE (for context):`,
+    `${ctx.schedule.next14.map(d => d.date + '=' + d.dayType).join(', ')}`,
+    ``,
+    `DECISION RULES:`,
+    `- If canDoQuality=false → prescribe easy or rest only`,
+    `- If daysSinceQuality >= 5 AND HRV >= baseline*0.9 AND no heavy legs in last 48h → consider quality`,
+    `- If this is the 3rd run this week → prescribe long run (8+ miles easy pace)`,
+    `- Otherwise default to easy zone 2`,
+    `- Apply volumeModifier to all distances`,
+    `- For sub-20 5K: athlete needs ~20% of weekly runs as quality (intervals or tempo)`,
+    ``,
+    `Respond ONLY with valid JSON, no markdown fencing:`,
+    `{"recommendedType":"easy|quality|long","reasoning":"2-3 sentences explaining why this run type today","workout":{"name":"descriptive name","description":"specific workout instructions","warmup":"warmup instructions","mainSet":"main set instructions","cooldown":"cooldown instructions","totalDistance":"X miles","paceTarget":"X:XX-X:XX/mi","hrCeiling":0,"effort":"conversational|comfortably hard|hard"},"ifTooHard":"one sentence fallback","watchOutFor":["array of 1-3 specific warnings"]}`
+  ].join('\n');
+
+  const raw = await ai(prompt, 1200);
+  if (!raw) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Get Prescription'; }
+    return;
   }
 
-  // Clear legacy AI-generated fields (prescription now comes from weekly plan)
-  const altEl=document.getElementById('run-presc-alternatives');
-  if(altEl)altEl.innerHTML='';
-  const watchEl=document.getElementById('run-presc-watchout');
-  if(watchEl)watchEl.innerHTML='';
-  const remEl=document.getElementById('run-presc-reminders');
-  if(remEl)remEl.innerHTML='';
+  // Parse + validate
+  let parsed = null;
+  try {
+    const clean = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    parsed = JSON.parse(clean.slice(clean.indexOf('{'), clean.lastIndexOf('}') + 1));
+  } catch(e) {
+    console.warn('Run prescription parse failed:', e);
+    if (btn) { btn.disabled = false; btn.textContent = 'Get Prescription'; }
+    return;
+  }
 
-  if(!completeArea)return;
+  // Validate required keys — retry once if missing
+  const required = ['recommendedType','reasoning','workout','watchOutFor'];
+  const missing = required.filter(k => !parsed[k]);
+  if (missing.length) {
+    const retryPrompt = prompt +
+      `\n\nYour previous response was missing: ${missing.join(', ')}. Return ALL required keys.`;
+    const retryRaw = await ai(retryPrompt, 1200);
+    if (retryRaw) {
+      try {
+        const retryClean = retryRaw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+        parsed = JSON.parse(retryClean.slice(retryClean.indexOf('{'), retryClean.lastIndexOf('}') + 1));
+      } catch(e) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Get Prescription'; }
+        return;
+      }
+    }
+  }
 
-  // Post-run feedback workflow — reads completion state from D.runPrescriptions
-  const presc=D.runPrescriptions&&D.runPrescriptions[targetDate];
-  const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
-  const isCompleted=presc?.completed===true;
-  const hasPostRunFeedback=!!presc?.postRunFeedback;
+  // Store prescription
+  if (!D.runPrescriptions) D.runPrescriptions = {};
+  D.runPrescriptions[targetDate] = parsed;
 
-  if(hasPostRunFeedback){
-    completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:9px;color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:12px;color:var(--t2);line-height:1.7;">'+presc.postRunFeedback+'</div></div>';
-  }else if(isCompleted&&stravaRun){
-    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
-  }else if(isCompleted){
-    completeArea.innerHTML='<div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight. Check back tomorrow for AI feedback.</div>';
-  }else{
-    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
+  // Write to coaching log
+  if (!D.coachingLog) D.coachingLog = [];
+  D.coachingLog.push({
+    ts: Date.now(),
+    type: 'run_prescription',
+    label: (parsed.recommendedType || 'run') + ' · ' + targetDate
+  });
+  D.coachingLog = D.coachingLog.slice(-50);
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Refresh Prescription'; }
+
+  renderRunPrescriptionCard(targetDate);
+  if (typeof pushSilent === 'function') pushSilent();
+  renderSystemLog();
+}
+function renderRunPrescriptionCard(targetDate) {
+  if (!targetDate) targetDate = localDS(new Date());
+
+  const placeholder = document.getElementById('run-presc-placeholder');
+  const output = document.getElementById('run-presc-output');
+  const btn = document.getElementById('run-presc-btn');
+  const completeArea = document.getElementById('run-presc-complete-area');
+
+  const presc = D.runPrescriptions?.[targetDate];
+
+  if (!presc || !presc.workout) {
+    if (placeholder) {
+      placeholder.style.display = '';
+      placeholder.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No prescription yet — <a onclick="generateRunPrescription(\''+targetDate+'\')" style="cursor:pointer;color:var(--a3);">get today\'s run prescription</a></div>';
+    }
+    if (output) output.style.display = 'none';
+    if (btn) btn.textContent = 'Get Today\'s Plan';
+    if (completeArea) completeArea.innerHTML = '';
+    return;
+  }
+
+  if (placeholder) placeholder.style.display = 'none';
+  if (output) output.style.display = 'block';
+  if (btn) btn.textContent = 'Refresh Prescription';
+
+  // Hard rule engine — deterministic, no AI call
+  const ts = evaluateTrainingStatus();
+
+  const w = presc.workout || {};
+  const typeColors = { easy: 'var(--a3)', quality: 'var(--a2)', long: 'var(--a2)' };
+  const typeColor = typeColors[presc.recommendedType] || 'var(--a3)';
+
+  let html = '';
+  // Hard rule flags
+  if (ts.activeFlags && ts.activeFlags.length) {
+    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--a4);background:rgba(220,40,60,.07);border:1px solid rgba(220,40,60,.25);border-radius:6px;padding:8px 10px;margin-bottom:10px;">' + ts.activeFlags.map(f => '&#9888; ' + f).join('<br>') + '</div>';
+  }
+  // Type header
+  html += '<div style="color:' + typeColor + ';font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">' + (presc.recommendedType || 'run').toUpperCase() + ' — AI PRESCRIBED</div>';
+  html += '<div style="color:var(--t);font-size:13px;font-weight:600;margin-bottom:4px;">' + (w.name || 'Run') + '</div>';
+  if (presc.reasoning) html += '<div style="color:var(--t2);margin-bottom:10px;font-size:11px;font-style:italic;">' + presc.reasoning + '</div>';
+  // Workout details
+  if (w.warmup) html += '<div style="font-family:var(--mono);font-size:11px;color:var(--t3);text-transform:uppercase;font-size:9px;margin-bottom:2px;">Warm-up</div><div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:8px;">' + w.warmup + '</div>';
+  if (w.mainSet || w.description) html += '<div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:2px;">Main Set</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);margin-bottom:8px;">' + (w.mainSet || w.description) + '</div>';
+  if (w.cooldown) html += '<div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:2px;">Cool-down</div><div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:8px;">' + w.cooldown + '</div>';
+  // Metrics row
+  const metrics = [];
+  if (w.totalDistance) metrics.push('<div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">Distance</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);">' + w.totalDistance + '</div></div>');
+  if (w.paceTarget) metrics.push('<div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">Pace</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);">' + w.paceTarget + '</div></div>');
+  if (w.hrCeiling) metrics.push('<div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">HR Ceiling</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);">' + w.hrCeiling + ' bpm</div></div>');
+  if (w.effort) metrics.push('<div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">Effort</div><div style="font-family:var(--mono);font-size:11px;color:var(--t);">' + w.effort + '</div></div>');
+  if (metrics.length) html += '<div style="display:flex;gap:16px;margin:10px 0;flex-wrap:wrap;">' + metrics.join('') + '</div>';
+  // Hard rule override notes
+  if (!ts.canTrain) {
+    html += '<div style="margin-top:10px;font-size:12px;color:var(--a4);border-top:1px solid var(--b);padding-top:8px;">Hard rule: rest recommended today.</div>';
+  } else if (!ts.canDoQuality && presc.recommendedType === 'quality') {
+    html += '<div style="margin-top:10px;font-size:12px;color:var(--aw);border-top:1px solid var(--b);padding-top:8px;">Recovery status: downgrade to easy pace today.</div>';
+  }
+  // If too hard
+  if (presc.ifTooHard) html += '<div style="margin-top:8px;padding:8px;background:rgba(180,90,0,.08);border-left:2px solid var(--aw);border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--t2);"><span style="color:var(--t3);">If too hard:</span> ' + presc.ifTooHard + '</div>';
+  // Watch out for
+  if (presc.watchOutFor && presc.watchOutFor.length) {
+    html += '<div style="margin-top:8px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Watch out for</div>' + presc.watchOutFor.map(item => '<div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:2px;">· ' + item + '</div>').join('') + '</div>';
+  }
+
+  const primaryEl = document.getElementById('run-presc-primary');
+  if (primaryEl) primaryEl.innerHTML = html;
+
+  // Clear legacy slots
+  const altEl = document.getElementById('run-presc-alternatives');
+  if (altEl) altEl.innerHTML = '';
+  const watchEl = document.getElementById('run-presc-watchout');
+  if (watchEl) watchEl.innerHTML = '';
+  const remEl = document.getElementById('run-presc-reminders');
+  if (remEl) remEl.innerHTML = '';
+
+  if (!completeArea) return;
+
+  // Post-run feedback workflow
+  const stravaRun = (D.runs || []).find(r => r.date === targetDate);
+  const isCompleted = presc?.completed === true;
+  const hasPostRunFeedback = !!presc?.postRunFeedback;
+
+  if (hasPostRunFeedback) {
+    completeArea.innerHTML = '<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:9px;color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:12px;color:var(--t2);line-height:1.7;">' + presc.postRunFeedback + '</div></div>';
+  } else if (isCompleted && stravaRun) {
+    completeArea.innerHTML = '<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\'' + targetDate + '\')" style="font-size:11px;padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
+  } else if (isCompleted) {
+    completeArea.innerHTML = '<div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight. Check back tomorrow for AI feedback.</div>';
+  } else {
+    completeArea.innerHTML = '<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\'' + targetDate + '\')" style="font-size:11px;padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
   }
 }
 async function markRunComplete(targetDate) {
@@ -3684,11 +3753,16 @@ async function generatePostRunFeedback(targetDate) {
     if(!presc) throw new Error('No prescription found');
     const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
     if(!stravaRun) throw new Error('No Strava run found for '+targetDate);
-    const p=presc.primaryRecommendation;
+    const p=presc.workout||presc.primaryRecommendation||{};
+    const prescType=presc.recommendedType||p.type||'run';
+    const prescDist=p.totalDistance||p.distance||'';
+    const prescPace=p.paceTarget||p.pace||'';
+    const prescHR=p.hrCeiling||p.heartRate||'';
+    const prescMainSet=p.mainSet||p.keyInstruction||p.description||'';
     const prompt='You are an expert running coach analyzing how well Javier executed his prescribed run.\n\n'+
 'PRESCRIBED RUN ('+targetDate+'):\n'+
-'- Type: '+p.type+'\n- Distance: '+p.distance+'\n- Pace: '+p.pace+'\n- HR: '+p.heartRate+'\n'+
-'- Key instruction: '+p.keyInstruction+'\n'+(presc.coachNote?'- Coach note: '+presc.coachNote+'\n':'')+
+'- Type: '+prescType+'\n- Distance: '+prescDist+'\n- Pace: '+prescPace+'\n- HR ceiling: '+prescHR+'\n'+
+'- Workout: '+prescMainSet+'\n'+(presc.reasoning?'- Reasoning: '+presc.reasoning+'\n':'')+
 '\nACTUAL RUN (Strava):\n'+
 '- Distance: '+stravaRun.distance+' miles\n'+
 '- Duration: '+Math.floor(stravaRun.duration/60)+' min '+(stravaRun.duration%60)+' sec\n'+
@@ -4624,15 +4698,15 @@ function getDayProgram(dayType){
     exs.push({name:'Dead Bug',prescription:'3×8 each side · slow',note:'Core stability for running posture',isPrimary:false,trend:null,confidence:null,isRun:false});
     exs.push({name:'Hip Flexor Protocol',prescription:'2min each side · hold + contract',note:'Running posture — do this every Friday',isPrimary:false,trend:null,confidence:null,isRun:false});
   } else if(effectiveDT==='run'){
-    exs.push({
-      name:'Run — AI Prescribed',
-      prescription:'Generate AI Plan for today\'s run prescription',
-      note:'The AI will determine run type, pace, and distance based on your biometrics and goals',
-      isPrimary:true,
-      trend:null,
-      confidence:null,
-      isRun:true
-    });
+    const _todayStr = localDS(new Date());
+    const _presc = D.runPrescriptions?.[_todayStr];
+    if (_presc?.workout) {
+      exs.push({name:'Warm-up',prescription:_presc.workout.warmup||'10 min easy walk/jog',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+      exs.push({name:_presc.workout.name||'AI Prescribed Run',prescription:(_presc.workout.mainSet||'See prescription')+(_presc.workout.totalDistance?' · '+_presc.workout.totalDistance:''),note:_presc.reasoning||null,isPrimary:true,trend:null,confidence:null,isRun:true});
+      exs.push({name:'Cool-down',prescription:_presc.workout.cooldown||'5 min walk',note:null,isPrimary:false,trend:null,confidence:null,isRun:true});
+    } else {
+      exs.push({name:'Run — AI Prescribed',prescription:'Tap "Get Prescription" to generate today\'s run',note:'AI will determine easy/quality/long based on your biometrics and goals',isPrimary:true,trend:null,confidence:null,isRun:true});
+    }
   } else if(effectiveDT==='run_easy'){
     const pr=plan?.runs?.tuesday;
     if(pr){
