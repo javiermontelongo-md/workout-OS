@@ -4289,6 +4289,273 @@ async function generateAdaptivePlan(){
   }
 }
 
+// ============================================================
+// UNIFIED DAILY PRESCRIPTION SYSTEM
+// ============================================================
+async function generateDailyPrescription(workoutType,durationMins){
+  durationMins=durationMins||60;
+  const today=localDS(new Date());
+  const genBtn=document.getElementById('presc-gen-btn');
+  const genMsg=document.getElementById('presc-gen-msg');
+  if(genBtn){genBtn.disabled=true;genBtn.textContent='Generating...';}
+  if(genMsg){genMsg.textContent='Analyzing your training data...';genMsg.style.color='var(--t3)';}
+  try{
+    // Return cached if same workout type and duration
+    if(D.dailyPrescriptions?.[today]?.workoutType===workoutType&&D.dailyPrescriptions?.[today]?.durationMins===durationMins){
+      renderPrescriptionCard(D.dailyPrescriptions[today]);
+      if(D.dailyPrescriptions[today].weekPlan)renderWeekSuggestions(D.dailyPrescriptions[today].weekPlan);
+      const sumEl=document.getElementById('presc-summary');
+      if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:12px;color:var(--a);margin-bottom:4px;">${D.dailyPrescriptions[today].summary||''}</div><div style="font-size:12px;color:var(--t2);">${D.dailyPrescriptions[today].mainWork?.summary||''}</div>`;
+      if(genMsg){genMsg.textContent='Using cached prescription ✓';genMsg.style.color='var(--a3)';setTimeout(()=>{if(genMsg)genMsg.textContent='';},3000);}
+      return;
+    }
+    await maybeCompressCoachingMemory();
+    const ts=evaluateTrainingStatus();
+    const means=compute7DayMeans();
+    const recentSessions=(D.sessions||[]).slice(-8).map(s=>({
+      date:s.date,type:s.day||s.dayType,rpe:s.rpe,energy:s.energy,
+      bench:s.bench?.sets?.filter(x=>x.w).map(x=>`${x.w}×${x.r}@${x.rpe||'?'}`).join(',')||null,
+      ohp:s.ohp?.sets?.filter(x=>x.w).map(x=>`${x.w}×${x.r}@${x.rpe||'?'}`).join(',')||null,
+      squat:s.squat?.sets?.filter(x=>x.w).map(x=>`${x.w}×${x.r}@${x.rpe||'?'}`).join(',')||null,
+      dl:s.dl?.sets?.filter(x=>x.w).map(x=>`${x.w}×${x.r}@${x.rpe||'?'}`).join(',')||null,
+      pullups:s.pullups||null
+    }));
+    const recentRuns=(D.runs||[]).slice(-15).map(r=>({
+      date:r.date,type:r.runType,
+      dist:parseFloat((r.distanceMi||r.distance||0).toFixed(1)),
+      pace:r.pace?`${Math.floor(r.pace/60)}:${String(r.pace%60).padStart(2,'0')}`:null,
+      hrAvg:r.heartRateAvg,name:r.name
+    }));
+    const liftBests={bench:0,ohp:0,squat:0,dl:0};
+    (D.sessions||[]).forEach(s=>{['bench','ohp','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if(set.w&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
+    if(!liftBests.bench)liftBests.bench=255;if(!liftBests.ohp)liftBests.ohp=120;if(!liftBests.squat)liftBests.squat=215;if(!liftBests.dl)liftBests.dl=215;
+    const memCtx=D.coachingMemory||{compressed:null,notes:[]};
+    const memStr=memCtx.compressed?`\nCOACHING PROFILE (compressed):\n${JSON.stringify(memCtx.compressed)}`:'';
+    const recentNotes=memCtx.notes.slice(-5);
+    const notesStr=recentNotes.length?`\nRECENT COACHING NOTES:\n${JSON.stringify(recentNotes)}`:'';
+    const workScope=durationMins===30?'CONDENSED (30min): 2-3 primary compound lifts only. No accessories.'
+      :durationMins===90?'FULL (90min): Primary compounds + full accessory protocol.'
+      :'STANDARD (60min): Primary compounds + key accessories (3-4 exercises total).';
+    const dowNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const todayDOW=new Date().getDay();
+    const next7Days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()+i+1);return{date:localDS(d),dow:dowNames[d.getDay()]};});
+    const workoutLabel={push:'Push — Upper Strength',pull:'Pull — Back & Biceps',legs:'Legs — Strength & Stability',run:'Run',cycling:'Cycling (Zone 2 equivalent)',rest:'Rest Day'};
+    if(genMsg)genMsg.textContent='Generating prescription...';
+    const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
+    if(!apiKey)throw new Error('No API key — add it in Settings tab');
+    const prompt=`You are Javier's personal strength and running coach. PGY-1 IM resident in Philadelphia. Generate today's complete workout prescription AND 7-day suggestions in one JSON response.
+
+TODAY: ${today} (${dowNames[todayDOW]})
+REQUESTED WORKOUT: ${workoutLabel[workoutType]||workoutType}
+DURATION: ${durationMins}min — ${workScope}
+
+ATHLETE: Age ${ATHLETE.age} · Weight ${ATHLETE.weightLbs}lb · MAF HR ${ts.mafHR}bpm
+Goals: ${ATHLETE.goals.primary} · ${ATHLETE.goals.secondary}
+Approach: ${ATHLETE.goals.approach}
+
+LIFT e1RM BESTS: Bench ${liftBests.bench}lb · OHP ${liftBests.ohp}lb · Squat ${liftBests.squat}lb · DL ${liftBests.dl}lb
+
+HARD RULES (non-negotiable, engine-enforced):
+canTrain: ${ts.canTrain}
+canDoQuality: ${ts.canDoQuality}
+canDoHeavyLifts: ${ts.canDoHeavyLifts}
+liftRPECap: ${ts.liftRPECap} — never prescribe above this
+volumeModifier: ${ts.volumeModifier} — multiply all set counts by this (round down, min 2)
+mafHR: ${ts.mafHR}bpm — hard ceiling for all easy runs
+activeFlags: ${ts.activeFlags.join(', ')||'none'}
+reasons: ${ts.reasons.join(' | ')||'all clear'}
+
+RECENT SESSIONS (last 8):
+${JSON.stringify(recentSessions)}
+
+RECENT RUNS (last 15):
+${JSON.stringify(recentRuns)}
+
+BIOMETRICS (7-day means):
+Resting HR: ${means.rhr||'?'}bpm · HRV: ${means.hrv||'?'}ms · 7-day health entries: ${means.count}
+${memStr}${notesStr}
+
+CRITICAL RUNNING NOTE: Zone 2 for Javier is HR 130-145bpm. Recent easy runs show HR 165-171 — that is threshold pace, NOT Zone 2. Easy run prescriptions MUST cap HR at 145bpm. Prescribe slow enough pace to keep HR under ${ts.mafHR}bpm.
+
+NEXT 7 DAYS FOR SUGGESTIONS: ${next7Days.map(d=>d.date+'('+d.dow+')').join(', ')}
+
+Output ONLY valid JSON. No markdown fences. No text outside the JSON object.
+
+{
+  "todayPrescription": {
+    "type": "${workoutType}",
+    "duration": ${durationMins},
+    "summary": "one-line title e.g. Push — Upper Strength",
+    "reasoning": "2-3 sentences explaining this prescription based on current data",
+    "warmup": "warmup description",
+    "mainWork": {
+      "summary": "one-line summary of total main work",
+      "lifts": {
+        "bench": {"sets":4,"reps":5,"weight":190,"targetRPE":8,"variation":"Barbell Bench Press","coachNote":"specific tip"},
+        "ohp": {"sets":3,"reps":5,"weight":90,"targetRPE":8,"variation":"Barbell OHP","coachNote":""},
+        "row": {"sets":4,"reps":6,"weight":135,"targetRPE":7,"variation":"Barbell Row","coachNote":""},
+        "pullup": {"sets":5,"reps":"max","weight":0,"targetRPE":8,"variation":"Pull-ups","coachNote":"0=BW, positive=added lb"},
+        "squat": {"sets":4,"reps":5,"weight":160,"targetRPE":8,"variation":"Back Squat","coachNote":""},
+        "dl": {"sets":3,"reps":5,"weight":160,"targetRPE":8,"variation":"Conventional Deadlift","coachNote":""}
+      },
+      "accessories": ["Face Pulls 3x15","Tricep Pushdown 3x10","Hammer Curls 3x10"],
+      "runType": "easy",
+      "totalDistance": "4-5 miles",
+      "paceTarget": "11:30-12:30/mile",
+      "hrCeiling": 145,
+      "effort": "conversational — can speak full sentences",
+      "mainSet": "full description of the main set for runs"
+    },
+    "cooldown": "cooldown description",
+    "coachNote": "specific actionable note based on data patterns",
+    "ifTooHard": "specific modification if this is too hard today",
+    "watchOutFor": ["specific concern 1","specific concern 2"]
+  },
+  "weekPlan": [
+    {"date":"YYYY-MM-DD","dow":"Mon","suggestion":"Push","confidence":"high","reason":"one line"}
+  ]
+}
+
+RULES:
+- Include only lifts relevant to the workout type: push→bench,ohp,row,pullup; pull→row,pullup and OHP as accessory; legs→squat,dl; run/cycling→no lifts object
+- For run/cycling workouts: include runType, totalDistance, paceTarget, hrCeiling, effort, mainSet — omit lifts and accessories
+- Weights in lb, nearest 2.5lb
+- Apply volumeModifier ${ts.volumeModifier} to all set counts (multiply, round down, min 2)
+- RPE cap: never exceed ${ts.liftRPECap} for any lift
+- If canTrain=false: type must be "rest", explain in reasoning
+- weekPlan must have exactly 7 entries for the exact dates provided above
+- confidence: high=data clearly supports this, medium=reasonable given patterns, low=depends on recovery day-of`;
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2500,system:'You are a strength and running coach. Output only valid JSON. No text outside the JSON object.',messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    if(d.error)throw new Error('API error: '+d.error.message);
+    const responseText=d.content?.[0]?.text||'';
+    const clean=responseText.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const start=clean.indexOf('{'),end=clean.lastIndexOf('}');
+    if(start===-1||end===-1)throw new Error('No JSON found in response. Raw: '+responseText.slice(0,200));
+    const parsed=JSON.parse(clean.slice(start,end+1));
+    if(!parsed.todayPrescription||!parsed.weekPlan)throw new Error('Response missing required fields. Got: '+Object.keys(parsed).join(', '));
+    if(!D.dailyPrescriptions)D.dailyPrescriptions={};
+    D.dailyPrescriptions[today]={...parsed.todayPrescription,workoutType,durationMins,generatedAt:new Date().toISOString(),weekPlan:parsed.weekPlan};
+    if(!D.coachingMemory)D.coachingMemory={compressed:null,notes:[]};
+    D.coachingMemory.notes.push({date:today,workoutType,durationMins,mainWorkSummary:parsed.todayPrescription.mainWork?.summary||'',coachNote:parsed.todayPrescription.coachNote||'',flags:ts.activeFlags});
+    if(D.coachingMemory.notes.length>30)D.coachingMemory.notes=D.coachingMemory.notes.slice(-30);
+    await pushSilent();
+    renderPrescriptionCard(D.dailyPrescriptions[today]);
+    renderWeekSuggestions(D.dailyPrescriptions[today].weekPlan);
+    updateLogTabPlanned();
+    renderSystemLog();
+    const sumEl=document.getElementById('presc-summary');
+    if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:12px;color:var(--a);margin-bottom:4px;">${parsed.todayPrescription.summary||workoutLabel[workoutType]||workoutType}</div><div style="font-size:12px;color:var(--t2);">${parsed.todayPrescription.mainWork?.summary||''}</div>`;
+    if(!D.coachingLog)D.coachingLog=[];
+    D.coachingLog.push({ts:Date.now(),type:'daily_prescription',label:`${workoutType} ${durationMins}min · ${today}`});
+    if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
+    if(genMsg){genMsg.textContent='Prescription generated ✓';genMsg.style.color='var(--a3)';setTimeout(()=>{if(genMsg)genMsg.textContent='';},3000);}
+  }catch(err){
+    console.error('generateDailyPrescription failed:',err);
+    if(genMsg){genMsg.textContent='Failed: '+err.message;genMsg.style.color='var(--a4)';}
+  }finally{
+    if(genBtn){genBtn.disabled=false;genBtn.textContent='Get Prescription';}
+  }
+}
+
+async function maybeCompressCoachingMemory(){
+  if(!D.coachingMemory){D.coachingMemory={compressed:null,notes:[]};return;}
+  if(D.coachingMemory.notes.length<15)return;
+  const toCompress=D.coachingMemory.notes.slice(0,15);
+  const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
+  if(!apiKey)return;
+  const prompt=`Compress these 15 training coaching notes into a structured athlete profile. Preserve ONLY factual observations — no narrative.
+
+Notes to compress:
+${JSON.stringify(toCompress,null,2)}
+
+Existing profile (null if first compression):
+${D.coachingMemory.compressed?JSON.stringify(D.coachingMemory.compressed):'null'}
+
+Return ONLY a JSON object:
+{
+  "liftTrends": {"bench":"up/flat/down + key fact","ohp":"...","squat":"...","dl":"...","row":"..."},
+  "runFitnessPattern": "factual 1-2 sentence summary",
+  "recoveryPattern": "factual note on sleep/HRV/energy patterns",
+  "injuryFlags": [],
+  "respondsBestTo": "factual note on prescription types with good compliance",
+  "compressedThrough": "${localDS(new Date())}"
+}`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:600,system:'Output only valid JSON.',messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    if(d.error)return;
+    const text=d.content?.[0]?.text||'';
+    const clean=text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const s=clean.indexOf('{'),e=clean.lastIndexOf('}');
+    if(s===-1||e===-1)return;
+    D.coachingMemory.compressed=JSON.parse(clean.slice(s,e+1));
+    D.coachingMemory.notes=D.coachingMemory.notes.slice(15);
+    await pushSilent();
+  }catch(e){console.warn('Memory compression failed:',e.message);}
+}
+
+function renderPrescriptionCard(prescription){
+  const el=document.getElementById('prog-today-card');
+  const noplan=document.getElementById('prog-no-plan');
+  const hdr=document.getElementById('prog-date-header');
+  if(hdr)hdr.textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  if(!prescription){
+    if(el)el.style.display='none';
+    if(noplan)noplan.style.display='block';
+    return;
+  }
+  if(noplan)noplan.style.display='none';
+  if(!el)return;
+  el.style.display='';
+  const type=prescription.type||prescription.workoutType||'unknown';
+  const TYPE_COLORS={push:'var(--a)',pull:'var(--a)',legs:'var(--a)',run:'var(--a3)',cycling:'var(--a2)',rest:'var(--t3)'};
+  const TYPE_LABELS={push:'LIFT — PUSH',pull:'LIFT — PULL',legs:'LIFT — LEGS',run:'RUN',cycling:'CYCLING',rest:'REST'};
+  const color=TYPE_COLORS[type]||'var(--a)';
+  const label=TYPE_LABELS[type]||type.toUpperCase();
+  const dur=prescription.durationMins||prescription.duration||'';
+  const isRun=type==='run'||type==='cycling';
+  const mw=prescription.mainWork||{};
+  let mainHtml='';
+  if(isRun){
+    mainHtml=`<div style="background:var(--s3);border-radius:8px;padding:14px;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:8px;">MAIN SET</div><div style="font-size:13px;color:var(--t);line-height:1.6;">${mw.mainSet||mw.summary||''}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">${mw.totalDistance?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">DISTANCE</div><div style="font-size:13px;color:var(--t);margin-top:2px;">${mw.totalDistance}</div></div>`:''}${mw.paceTarget?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">PACE</div><div style="font-size:13px;color:var(--t);margin-top:2px;">${mw.paceTarget}</div></div>`:''}${mw.hrCeiling?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">HR CAP</div><div style="font-size:13px;color:var(--t);margin-top:2px;">${mw.hrCeiling} bpm</div></div>`:''}${mw.effort?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:2;min-width:120px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">EFFORT</div><div style="font-size:12px;color:var(--t2);margin-top:2px;">${mw.effort}</div></div>`:''}</div>`;
+  }else{
+    const lifts=mw.lifts||{};
+    const liftOrder=type==='push'?['bench','ohp','row','pullup']:type==='pull'?['row','pullup']:['squat','dl'];
+    const liftNames={bench:'Bench Press',ohp:'Overhead Press',row:'Barbell Row',pullup:'Pull-ups',squat:'Back Squat',dl:'Conventional Deadlift'};
+    const liftRows=liftOrder.filter(k=>lifts[k]).map(k=>{
+      const l=lifts[k];
+      const w=l.weight>0?l.weight+' lb':'Bodyweight';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);"><div><div style="font-size:13px;color:var(--t);">${l.variation||liftNames[k]||k}</div>${l.coachNote?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${l.coachNote}</div>`:''}</div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:13px;color:${color};">${l.sets}×${l.reps} @ ${w}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);">RPE ${l.targetRPE}</div></div></div>`;
+    }).join('');
+    const accessories=(mw.accessories||[]);
+    const accessHtml=accessories.length?`<div style="margin-top:10px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;margin-bottom:6px;">ACCESSORIES</div>${accessories.map(a=>`<div style="font-size:12px;color:var(--t2);padding:3px 0;">· ${a}</div>`).join('')}</div>`:'';
+    mainHtml=`<div style="background:var(--s3);border-radius:8px;padding:14px;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:8px;">MAIN WORK</div>${liftRows}${accessHtml}</div>`;
+  }
+  const watchHtml=(prescription.watchOutFor||[]).length?`<div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--a4);">WATCH: ${prescription.watchOutFor.join(' · ')}</div>`:'';
+  const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:10px;padding:10px 12px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:6px;font-size:12px;color:var(--a);"><span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;">IF TOO HARD: </span>${prescription.ifTooHard}</div>`:'';
+  el.className='prog-day-card prog-today';
+  el.style.borderColor=color;
+  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${label}</div><div class="prog-day-title">${prescription.summary||''}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:14px 0;">${prescription.reasoning?`<div style="font-size:13px;color:var(--t2);font-style:italic;line-height:1.6;margin-bottom:14px;">${prescription.reasoning}</div>`:''}${prescription.warmup?`<div style="margin-bottom:10px;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;">WARMUP </span><span style="font-size:12px;color:var(--t2);">${prescription.warmup}</span></div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:10px;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;">COOLDOWN </span><span style="font-size:12px;color:var(--t2);">${prescription.cooldown}</span></div>`:''}${prescription.coachNote?`<div style="margin-top:10px;padding:10px 12px;background:var(--s3);border-left:3px solid ${color};border-radius:0 6px 6px 0;font-size:12px;color:var(--t2);line-height:1.5;">${prescription.coachNote}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
+}
+
+function renderWeekSuggestions(weekPlan){
+  const el=document.getElementById('week-suggestions');
+  if(!el)return;
+  if(!weekPlan||!weekPlan.length){
+    el.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">Tap "Get Prescription" on the Today tab to generate week suggestions.</div>`;
+    return;
+  }
+  const CONF_COLORS={high:'var(--a3)',medium:'var(--a)',low:'var(--t3)'};
+  const CONF_BG={high:'rgba(127,255,110,.1)',medium:'rgba(255,183,77,.1)',low:'rgba(255,255,255,.04)'};
+  const TYPE_COLORS={Push:'var(--a)',Pull:'var(--a)',Legs:'var(--a)',Run:'var(--a3)',Cycling:'var(--a2)',Rest:'var(--t3)',rest:'var(--t3)'};
+  el.innerHTML=weekPlan.map(day=>{
+    const conf=day.confidence||'low';
+    const typeColor=TYPE_COLORS[day.suggestion]||'var(--t2)';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b);"><div style="min-width:72px;"><div style="font-family:var(--mono);font-size:11px;color:var(--t);">${(day.date||'').slice(5)||''}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);">${day.dow||''}</div></div><div style="flex:1;"><div style="font-size:13px;color:${typeColor};font-weight:500;">${day.suggestion||''}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${day.reason||''}</div></div><div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid ${CONF_COLORS[conf]}40;white-space:nowrap;">${conf.toUpperCase()}</div></div>`;
+  }).join('');
+}
+
 async function confirmRPE(lift,actualRPE){
   const plan=window._adaptivePlan;
   const ld=plan?.lifts[lift];
@@ -4376,11 +4643,32 @@ function setChartLift(lift){
 }
 
 function updateLogTabPlanned(){
-  const plan=window._adaptivePlan;if(!plan?.lifts)return;
-  const {bench,ohp,squat,dl}=plan.lifts;
-  const upd=(id,l)=>{if(!l)return;const el=document.getElementById(id);if(el)el.textContent=`Planned: ${l.sets}x${l.reps} @ ${l.weight}`;};
-  upd('planned-bench',bench);upd('planned-ohp',ohp);upd('planned-squat',squat);upd('planned-dl',dl);
-  upd('planned-pullup',plan.lifts.pullup);upd('planned-row',plan.lifts.row);
+  const today=localDS(new Date());
+  const presc=D.dailyPrescriptions?.[today];
+  if(!presc?.mainWork?.lifts){
+    const plan=window._adaptivePlan;
+    if(!plan?.lifts)return;
+    const{bench,ohp,squat,dl}=plan.lifts;
+    const upd=(id,l)=>{if(!l)return;const el=document.getElementById(id);if(el)el.textContent=`Planned: ${l.sets}×${l.reps} @ ${l.weight}lb`;};
+    upd('planned-bench',bench);upd('planned-ohp',ohp);upd('planned-squat',squat);upd('planned-dl',dl);
+    upd('planned-pullup',plan.lifts.pullup);upd('planned-row',plan.lifts.row);
+    return;
+  }
+  const lifts=presc.mainWork.lifts;
+  const upd=(id,lift)=>{
+    const l=lifts[lift];if(!l)return;
+    const el=document.getElementById(id);if(!el)return;
+    const w=l.weight>0?l.weight+'lb':'BW';
+    el.textContent=`Planned: ${l.sets}×${l.reps} @ ${w}`;
+  };
+  upd('planned-bench','bench');upd('planned-ohp','ohp');upd('planned-squat','squat');
+  upd('planned-dl','dl');upd('planned-pullup','pullup');upd('planned-row','row');
+  ['bench','ohp','squat','dl','pullup','row'].forEach(lift=>{
+    const l=lifts[lift];if(!l)return;
+    const container=document.getElementById(lift+'-sets');if(!container)return;
+    container.querySelectorAll('input.wt').forEach(inp=>{if(!inp.value)inp.placeholder=l.weight>0?String(l.weight):'BW';});
+    container.querySelectorAll('input.rp').forEach(inp=>{if(!inp.value)inp.placeholder=typeof l.reps==='number'?String(l.reps):String(l.reps);});
+  });
 }
 
 function showRPEConfirm(lift){
