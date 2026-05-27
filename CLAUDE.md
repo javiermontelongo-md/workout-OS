@@ -90,6 +90,73 @@ TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · RULES 
 
 ---
 
+## CSS Design Tokens
+
+### Color Palette (`:root`)
+```
+/* Backgrounds */
+--bg: #080a10        base page background
+--s1: #0f1219        card surface (level 1)
+--s2: #141824        inner surface (level 2)
+--s3: #1a1f2e        elevated surface (level 3)
+--s4: #1f2538        top surface (level 4)
+
+/* Borders */
+--b:  rgba(104,110,210,0.25)   card outlines
+--b2: rgba(104,110,210,0.42)   inner dividers
+--b3: rgba(104,110,210,0.58)   emphasis borders
+
+/* Accent */
+--a:  #6870c8   indigo   (primary CTA, active nav)
+--a2: #2aa070   jade     (positive / run)
+--a3: #3d88d4   blue     (info)
+--a4: #c24d72   rose     (alert)
+--a5: #a066d4   violet   (secondary accent)
+--aw: #b86035   amber    (warning / if-too-hard)
+--red: #e85d8a
+
+/* Text */
+--t:  #e2eaf8   primary body text
+--t2: #a8b4cc   secondary labels, subtext
+--t3: #6a7490   tertiary hints, timestamps
+```
+
+### Typography
+```
+body font-size: 19px   (base — all rem/em values scale from here)
+line-height:    1.6
+--mono: 'DM Mono', monospace
+--serif: 'Fraunces', serif
+--sans: 'DM Sans', sans-serif
+```
+
+### Layout
+```css
+/* Desktop */
+.main {
+  flex: 1;
+  padding: 24px 32px;
+  width: 100%;
+  max-width: 50%;      /* center column = 50% of viewport */
+  margin: 0 auto;
+}
+
+/* Mobile override (~line 816) */
+.main { padding: 0; max-width: 100%; flex: 1; overflow: hidden; position: relative; }
+```
+
+### Grid & Card Utilities
+```css
+.g2  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.g3  { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.card { background: var(--s1); border: 1px solid var(--b);
+        border-radius: var(--rl); padding: 18px 20px; margin-bottom: 16px; }
+--r:  12px   (standard border-radius)
+--rl: 18px   (large border-radius, cards)
+```
+
+---
+
 ## Function Index
 All line numbers are from origin/main. Verify before editing:
   git show origin/main:index.html | grep -n "function functionName"
