@@ -760,15 +760,15 @@
     "schedule": [
       {
         "date": "2026-05-26",
-        "dayType": "run_easy",
+        "dayType": "B",
         "isRest": false,
-        "wasShifted": false
+        "wasShifted": true
       },
       {
         "date": "2026-05-27",
-        "dayType": "B",
+        "dayType": "run_easy",
         "isRest": false,
-        "wasShifted": false
+        "wasShifted": true
       },
       {
         "date": "2026-05-28",
@@ -802,9 +802,9 @@
       },
       {
         "date": "2026-06-02",
-        "dayType": "run_easy",
+        "dayType": "B",
         "isRest": false,
-        "wasShifted": false
+        "wasShifted": true
       },
       {
         "date": "2026-06-03",
@@ -2588,7 +2588,10 @@
     "2026-05-31": "rest",
     "2026-05-25": "B",
     "2026-06-01": "run_easy",
-    "2026-05-28": "run_easy"
+    "2026-05-28": "run_easy",
+    "2026-05-27": "run_easy",
+    "2026-05-26": "B",
+    "2026-06-02": "B"
   },
   "racePredictions": {
     "generatedAt": "2026-05-27T00:09:35.932Z",
@@ -2676,6 +2679,11 @@
       "date": "2026-05-26",
       "type": "today_coaching",
       "response": "Your HRV jumped to 44ms today—up 16% from your 7-day average and much closer to your baseline. Run easy for 30–35 minutes at strict MAF cap (147bpm ceiling), starting conservatively and allowing HR to settle naturally. If you feel strong in the second half and HR stays comfortably under 145bpm, you can extend to 40 minutes, but walk immediately if you approach 147bpm. Prioritize sleep tonight to consolidate this HRV recovery before tomorrow's Lift B session."
+    },
+    {
+      "ts": 1779841026549,
+      "type": "week_plan",
+      "label": "Weekly AI plan"
     }
   ]
 }
