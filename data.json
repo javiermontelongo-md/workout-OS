@@ -2684,6 +2684,34 @@
       "ts": 1779841026549,
       "type": "week_plan",
       "label": "Weekly AI plan"
+    },
+    {
+      "ts": 1779854879756,
+      "type": "run_prescription",
+      "label": "quality · 2026-05-26"
     }
-  ]
+  ],
+  "runPrescriptions": {
+    "2026-05-26": {
+      "recommendedType": "quality",
+      "reasoning": "HRV is low (43.9ms vs 53.5ms baseline), but 7-day trend shows recovery improving (37.9→43.9ms). With 34 days since last quality work and canDoQuality=true, it's time to reintroduce structured speed work cautiously. Starting with moderate intervals rather than aggressive threshold work given the HRV suppression.",
+      "workout": {
+        "name": "Reintroduction VO2max Intervals",
+        "description": "4x800m at 5K goal pace (6:26/mi) with 400m easy jog recovery. This reintroduces quality stimulus after 5+ weeks off while managing current recovery status.",
+        "warmup": "2 miles easy at MAF-10 heart rate (~137bpm), conversational pace. Include 4x100m strides at the end.",
+        "mainSet": "4x800m at 6:26/mi pace (3:13 per 800m). Effort should feel comfortably hard (RPE 7-8). Jog 400m easy recovery between intervals (3-4 minutes). If HR exceeds 175bpm or form deteriorates, extend recovery or cut session to 3 reps.",
+        "cooldown": "1.5 miles easy, fully conversational pace",
+        "totalDistance": "6 miles",
+        "paceTarget": "6:26/mi for intervals, 9:30-10:30/mi easy portions",
+        "hrCeiling": 180,
+        "effort": "comfortably hard"
+      },
+      "ifTooHard": "Cut to 3x800m or shift to 6x400m at same pace with 200m recovery if intervals feel too aggressive.",
+      "watchOutFor": [
+        "Sharp fatigue after rep 2-3 may indicate inadequate recovery despite HRV improvement - be ready to cut volume",
+        "Form breakdown or HR spiking above 180bpm - extend recoveries to full 4 minutes or abort workout",
+        "Any muscular tightness from yesterday's Lift B - prioritize form quality over hitting exact pace targets"
+      ]
+    }
+  }
 }
