@@ -1518,6 +1518,41 @@ input[type=range]::-webkit-slider-thumb:hover {
 </div>
 <div id="panel-settings" class="panel">
   <div class="h1">Settings &amp; <span>sync</span></div>
+
+  <!-- APPEARANCE -->
+  <div class="card" style="margin-bottom:18px;">
+    <div class="lbl">appearance</div>
+
+    <div class="ig" style="margin-bottom:18px;">
+      <label>Color theme</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+        <button data-theme="dark" onclick="setTheme('dark')" style="font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🌑 Dark</button>
+        <button data-theme="light" onclick="setTheme('light')" style="font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">☀️ Light</button>
+        <button data-theme="midnight" onclick="setTheme('midnight')" style="font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🌌 Midnight</button>
+        <button data-theme="warm" onclick="setTheme('warm')" style="font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🍂 Warm</button>
+      </div>
+    </div>
+
+    <div class="ig" style="margin-bottom:18px;">
+      <label>Font style</label>
+      <select id="font-pair-select" onchange="setFontPair(this.value)" style="margin-top:6px;">
+        <option value="dm">DM Sans + DM Mono + Fraunces (default)</option>
+        <option value="system">System UI — no loading, fastest</option>
+        <option value="inter">Inter + JetBrains Mono + Lora</option>
+        <option value="roboto">Roboto + Roboto Mono + Merriweather</option>
+      </select>
+    </div>
+
+    <div class="ig">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <label style="margin:0;">Base font size</label>
+        <span style="font-family:var(--mono);color:var(--a);"><span id="font-size-lbl">19</span>px</span>
+      </div>
+      <input type="range" id="font-size-range" min="14" max="30" value="19" oninput="setFontSize(this.value)">
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:5px;"><span>14 compact</span><span>30 large</span></div>
+    </div>
+  </div>
+
   <div class="g2">
     <div class="card">
       <div class="abox">
@@ -1589,6 +1624,82 @@ var DEF={bench:190,ohp:90,squat:160,dl:160,pullup:0,row:115};
 // ============================================================
 let D = null;
 let CFG = { tok:'', usr:'javiermontelongo-md', repo:'workout-OS', file:'data.json', api:'' };
+
+// ============================================================
+// APPEARANCE — theme / font / font-size (localStorage)
+// ============================================================
+const THEMES={
+  dark:{
+    '--bg':'#080a10','--s1':'#0f1219','--s2':'#141824','--s3':'#1a1f2e','--s4':'#1f2538',
+    '--b':'rgba(104,110,210,0.25)','--b2':'rgba(104,110,210,0.42)','--b3':'rgba(104,110,210,0.58)',
+    '--a':'#6870c8','--a2':'#2aa070','--a3':'#3d88d4','--a4':'#c24d72','--a5':'#a066d4',
+    '--aw':'#b86035','--t':'#e2eaf8','--t2':'#a8b4cc','--t3':'#7e8caa','--red':'#e85d8a',
+    '--glow-a':'rgba(124,131,247,0.15)','--glow-g':'rgba(52,201,142,0.12)'
+  },
+  light:{
+    '--bg':'#f2f4fc','--s1':'#ffffff','--s2':'#f6f8ff','--s3':'#ebeef8','--s4':'#e0e4f2',
+    '--b':'rgba(60,70,180,0.15)','--b2':'rgba(60,70,180,0.28)','--b3':'rgba(60,70,180,0.45)',
+    '--a':'#4a52c8','--a2':'#1a9068','--a3':'#2878c8','--a4':'#b83868','--a5':'#8048c8',
+    '--aw':'#a85828','--t':'#0c1220','--t2':'#384068','--t3':'#6070a0','--red':'#c83870',
+    '--glow-a':'rgba(74,82,200,0.10)','--glow-g':'rgba(26,144,104,0.10)'
+  },
+  midnight:{
+    '--bg':'#000000','--s1':'#0a0b0f','--s2':'#0e1018','--s3':'#141620','--s4':'#1a1d28',
+    '--b':'rgba(120,130,255,0.20)','--b2':'rgba(120,130,255,0.35)','--b3':'rgba(120,130,255,0.55)',
+    '--a':'#7880e8','--a2':'#30b880','--a3':'#4898e8','--a4':'#e05580','--a5':'#b078e0',
+    '--aw':'#c87040','--t':'#eef2ff','--t2':'#b8c4e0','--t3':'#8898c0','--red':'#f06090',
+    '--glow-a':'rgba(120,130,255,0.18)','--glow-g':'rgba(48,184,128,0.14)'
+  },
+  warm:{
+    '--bg':'#0d0a07','--s1':'#161210','--s2':'#1e1a16','--s3':'#26211c','--s4':'#2e2820',
+    '--b':'rgba(200,150,60,0.20)','--b2':'rgba(200,150,60,0.35)','--b3':'rgba(200,150,60,0.52)',
+    '--a':'#c89050','--a2':'#5aaa70','--a3':'#5088c0','--a4':'#c05868','--a5':'#9068c8',
+    '--aw':'#d07838','--t':'#f0e6d4','--t2':'#c0a888','--t3':'#8a7a68','--red':'#e05870',
+    '--glow-a':'rgba(200,150,60,0.12)','--glow-g':'rgba(90,170,112,0.12)'
+  }
+};
+const FONT_PAIRS={
+  dm:{sans:"'DM Sans',sans-serif",mono:"'DM Mono',monospace",serif:"'Fraunces',serif",url:null},
+  system:{sans:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",mono:"ui-monospace,'SF Mono',Consolas,monospace",serif:"Georgia,'Times New Roman',serif",url:null},
+  inter:{sans:"'Inter',sans-serif",mono:"'JetBrains Mono',monospace",serif:"'Lora',serif",url:"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,300;0,400;1,400&display=swap"},
+  roboto:{sans:"'Roboto',sans-serif",mono:"'Roboto+Mono',monospace",serif:"'Merriweather',serif",url:"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Roboto+Mono:wght@400;500&family=Merriweather:ital,wght@0,300;0,400;1,400&display=swap"}
+};
+function applyAppearance(){
+  _applyTheme(localStorage.getItem('wos-theme')||'dark');
+  _applyFont(localStorage.getItem('wos-font')||'dm');
+  _applyFontSize(localStorage.getItem('wos-fontsize')||'19');
+}
+function _applyTheme(name){
+  const t=THEMES[name]||THEMES.dark;
+  Object.entries(t).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+}
+function _applyFont(name){
+  const fp=FONT_PAIRS[name]||FONT_PAIRS.dm;
+  if(fp.url&&!document.getElementById('gfont-'+name)){
+    const l=document.createElement('link');l.rel='stylesheet';l.href=fp.url;l.id='gfont-'+name;document.head.appendChild(l);
+  }
+  document.documentElement.style.setProperty('--sans',fp.sans);
+  document.documentElement.style.setProperty('--mono',fp.mono);
+  document.documentElement.style.setProperty('--serif',fp.serif);
+}
+function _applyFontSize(px){document.body.style.fontSize=px+'px';}
+function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
+function setFontPair(name){localStorage.setItem('wos-font',name);_applyFont(name);_syncAppearanceUI();}
+function setFontSize(px){localStorage.setItem('wos-fontsize',px);_applyFontSize(px);const e=document.getElementById('font-size-lbl');if(e)e.textContent=px;}
+function _syncAppearanceUI(){
+  const theme=localStorage.getItem('wos-theme')||'dark';
+  const font=localStorage.getItem('wos-font')||'dm';
+  const size=localStorage.getItem('wos-fontsize')||'19';
+  document.querySelectorAll('[data-theme]').forEach(b=>{
+    const on=b.dataset.theme===theme;
+    b.style.borderColor=on?'var(--a)':'var(--b2)';
+    b.style.color=on?'var(--a)':'var(--t2)';
+    b.style.background=on?'var(--s3)':'var(--s2)';
+  });
+  const fs=document.getElementById('font-pair-select');if(fs)fs.value=font;
+  const fr=document.getElementById('font-size-range');if(fr)fr.value=size;
+  const fl=document.getElementById('font-size-lbl');if(fl)fl.textContent=size;
+}
 
 const ATHLETE = {
   age:            28,
@@ -1725,6 +1836,7 @@ function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().spl
 // ============================================================
 // INIT
 // ============================================================
+applyAppearance(); // apply saved theme/font/size before anything renders
 const now=new Date();
 if(document.getElementById('dd')) document.getElementById('dd').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 if(document.getElementById('md')) document.getElementById('md').textContent=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
@@ -1959,6 +2071,7 @@ function showTab(n){
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='week') renderCalendar();
   if(n==='rules') renderRulesTab();
+  if(n==='settings') _syncAppearanceUI();
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
