@@ -993,7 +993,7 @@
       "sleepHours": 8.12,
       "steps": 21370,
       "exerciseMinutes": 20,
-      "walkingHR": 96.5,
+      "walkingHR": 96,
       "respiratoryRate": 15.29,
       "vo2maxApple": null
     },
@@ -1061,7 +1061,7 @@
       "sleepHours": 5.73,
       "steps": 22529,
       "exerciseMinutes": 50,
-      "walkingHR": 101.5,
+      "walkingHR": 102,
       "respiratoryRate": 17.13,
       "vo2maxApple": 43.26
     },
@@ -1248,7 +1248,7 @@
       "sleepHours": 7.29,
       "steps": 30753,
       "exerciseMinutes": 90,
-      "walkingHR": 115.5,
+      "walkingHR": 116,
       "respiratoryRate": 18.16,
       "vo2maxApple": 45.37
     },
@@ -1265,7 +1265,7 @@
       "sleepHours": 9.17,
       "steps": 35860,
       "exerciseMinutes": 91,
-      "walkingHR": 82.5,
+      "walkingHR": 82,
       "respiratoryRate": 17.58,
       "vo2maxApple": 45.78
     },
@@ -1299,7 +1299,7 @@
       "sleepHours": 6.28,
       "steps": 13455,
       "exerciseMinutes": 36,
-      "walkingHR": 102.5,
+      "walkingHR": 102,
       "respiratoryRate": 17.85,
       "vo2maxApple": null
     },
@@ -1367,7 +1367,7 @@
       "sleepHours": 6.45,
       "steps": 25957,
       "exerciseMinutes": 69,
-      "walkingHR": 87.5,
+      "walkingHR": 88,
       "respiratoryRate": 17.12,
       "vo2maxApple": 47.59
     },
@@ -1401,7 +1401,7 @@
       "sleepHours": 7.11,
       "steps": 44238,
       "exerciseMinutes": 136,
-      "walkingHR": 93.5,
+      "walkingHR": 94,
       "respiratoryRate": 17.79,
       "vo2maxApple": 48.27
     },
@@ -1452,7 +1452,7 @@
       "sleepHours": 6.96,
       "steps": 30874,
       "exerciseMinutes": 72,
-      "walkingHR": 94.5,
+      "walkingHR": 94,
       "respiratoryRate": 16.72,
       "vo2maxApple": null
     },
@@ -1656,7 +1656,7 @@
       "sleepHours": 6.43,
       "steps": 20467,
       "exerciseMinutes": 43,
-      "walkingHR": 91.5,
+      "walkingHR": 92,
       "respiratoryRate": 16.97,
       "vo2maxApple": 48.24
     },
@@ -1775,7 +1775,7 @@
       "sleepHours": 7.23,
       "steps": 28699,
       "exerciseMinutes": 81,
-      "walkingHR": 67.5,
+      "walkingHR": 68,
       "respiratoryRate": 16.72,
       "vo2maxApple": 48
     },
@@ -1792,7 +1792,7 @@
       "sleepHours": 7.34,
       "steps": 45284,
       "exerciseMinutes": 140,
-      "walkingHR": 88.5,
+      "walkingHR": 88,
       "respiratoryRate": 17.3,
       "vo2maxApple": 47.86
     },
@@ -1877,7 +1877,7 @@
       "sleepHours": 7.17,
       "steps": 6761,
       "exerciseMinutes": 16,
-      "walkingHR": 72.5,
+      "walkingHR": 72,
       "respiratoryRate": 18.11,
       "vo2maxApple": null
     },
@@ -2013,7 +2013,7 @@
       "sleepHours": null,
       "steps": 24632,
       "exerciseMinutes": 73,
-      "walkingHR": 119.5,
+      "walkingHR": 120,
       "respiratoryRate": null,
       "vo2maxApple": 45.51
     },
@@ -2081,7 +2081,7 @@
       "sleepHours": 8.72,
       "steps": 26605,
       "exerciseMinutes": 89,
-      "walkingHR": 85.5,
+      "walkingHR": 86,
       "respiratoryRate": 16.78,
       "vo2maxApple": 45.73
     },
@@ -2115,7 +2115,7 @@
       "sleepHours": 6.82,
       "steps": 19568,
       "exerciseMinutes": 35,
-      "walkingHR": 87.5,
+      "walkingHR": 88,
       "respiratoryRate": 16.72,
       "vo2maxApple": null
     },
@@ -2132,7 +2132,7 @@
       "sleepHours": 7.12,
       "steps": 14746,
       "exerciseMinutes": 40,
-      "walkingHR": 98.5,
+      "walkingHR": 98,
       "respiratoryRate": 17.01,
       "vo2maxApple": null
     },
@@ -2454,7 +2454,7 @@
       "sleepAwake": null,
       "steps": 9185,
       "exerciseMinutes": 43,
-      "walkingHR": 94.5,
+      "walkingHR": 94,
       "respiratoryRate": 16.65277777777778,
       "vo2maxApple": null,
       "source": "apple_health"
@@ -2486,9 +2486,9 @@
       "sleepREM": 1.2862657702962557,
       "sleepLight": 3.7250592114196883,
       "sleepAwake": null,
-      "steps": 11091.17423951689,
+      "steps": 11091,
       "exerciseMinutes": 18,
-      "walkingHR": 95.50000000000001,
+      "walkingHR": 96,
       "respiratoryRate": 19.25,
       "vo2maxApple": null,
       "source": "apple_health"
@@ -2503,7 +2503,7 @@
       "sleepREM": 1.8204975081814658,
       "sleepLight": 3.6410857862896386,
       "sleepAwake": null,
-      "steps": 9188.365855961896,
+      "steps": 9188,
       "exerciseMinutes": 21,
       "walkingHR": 99,
       "respiratoryRate": 17.093023255813954,
@@ -2520,7 +2520,7 @@
       "sleepREM": 1.6621717679169443,
       "sleepLight": 3.5999146794610555,
       "sleepAwake": null,
-      "steps": 9422.741826865331,
+      "steps": 9423,
       "exerciseMinutes": 32,
       "walkingHR": 88,
       "respiratoryRate": 16.539473684210527,
