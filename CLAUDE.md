@@ -76,8 +76,8 @@ TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · RULES 
 ## Tab Roles (post-refactor)
 - **TODAY**: workout-type dropdown (Push/Pull/Legs/Run/Cycling/Rest) + duration (30/60/90 min) + "Get Prescription" button + brief summary
 - **PROGRAM**: today's full prescription from `D.dailyPrescriptions[today]` only — no other days
-- **THIS WEEK**: activity calendar + 7-day AI suggestions from last prescription's weekPlan
-- **LOG SESSION**: planned values pre-filled from `D.dailyPrescriptions[today]`
+- **THIS WEEK**: monthly calendar (May 2026 floor, current month ceiling, ← → arrows) with indigo lift dots + jade run dots, clickable to open session drawer; session history list (paginated 10 at a time, newest-first, ← Older / Newer →); 7-day AI suggestions from last prescription's weekPlan
+- **LOG SESSION**: planned values pre-filled from `D.dailyPrescriptions[today]`; weight input placeholders always match the recommended weights (via DEF[] mutation + renderSets re-render in updateLogTabPlanned)
 
 ## Key data.json fields
 `sessions[]` · `runs[]` · `checkins[]` · `healthLogs[]` ·
@@ -173,6 +173,25 @@ Key desktop sizes (current):
 --rl: 18px   (large border-radius, cards)
 ```
 
+### Calendar Dot Classes (THIS WEEK month grid)
+```css
+.cal-dot          { display:inline-block; width:8px; height:8px; border-radius:50%; margin:0 2px; }
+.cal-dot.lift     { background:var(--a); }   /* indigo — strength sessions */
+.cal-dot.run      { background:var(--a2); }  /* jade — runs (Strava or logged) */
+.cal-dots         { text-align:center; margin-top:3px; }
+.cal-cell.cal-empty { background:transparent; border-color:transparent; pointer-events:none; }
+```
+
+### New DOM IDs (THIS WEEK panel)
+| ID | Element | Purpose |
+|----|---------|---------|
+| `cal-prev-btn` | button | ← month nav; disabled at May 2026 floor |
+| `cal-next-btn` | button | → month nav; disabled at current month |
+| `session-list-card` | div.card | Container for session history list |
+| `sess-list-rows` | div | Paginated session rows rendered by renderSessionList() |
+| `sess-list-nav` | div | ← Older / Newer → pagination buttons |
+| `sess-list-count` | span | "X of Y sessions" label |
+
 ---
 
 ## Function Index
@@ -263,16 +282,21 @@ All line numbers are from origin/main. Verify before editing:
 ### Calendar & Week View
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2132 | getWeekStart(offset) | Returns week start date for offset |
 | 2138 | getSessionsForDate(dateStr) | Filter sessions for a date |
 | 2142 | getActivityBadges(sessions, dateStr) | Activity badge HTML for calendar |
 | 2156 | getPlannedBadge(dateStr) | Planned workout badge for calendar |
-| 2165 | calNav(dir) | Calendar navigation |
-| 2169 | renderCalendar() | Full calendar render |
-| 2215 | handleDayCardClick(dateStr) | Day card click — past→drawer, future→program tab, rest→no-op |
+| 2165 | calNav(dir) | Month calendar navigation — clamps to May 2026 floor and current month ceiling |
+| 2169 | renderCalendar() | Full month grid render — blank leading cells, lift/run dots per day, disables nav buttons at limits, summary shows "X strength · Y runs" |
+| 2215 | handleDayCardClick(dateStr) | Day card click — past lift session→drawer, past Strava-only run→fake-session drawer, future→program tab |
 | 2229 | openSessionDrawer(session, dateStr) | Slide-in session detail drawer |
 | 2252 | closeSessionDrawer() | Dismiss session drawer |
-| 2261 | buildSessionDrawerContent(session, dateStr) | Full session detail HTML |
+| 2261 | buildSessionDrawerContent(session, dateStr) | Full session detail HTML; includes Edit button for real logged sessions (session.ts present in D.sessions[]) |
+| ~2310 | openSessionDrawerByTs(ts) | Look up session in D.sessions[] by ts, open drawer |
+| ~2320 | renderSessionList() | Render paginated session history list (10/page, newest-first) into #sess-list-rows and #sess-list-nav; all sessions including runs and lifts |
+| ~2350 | editSession(ts) | Find session by ts, replace drawer content with buildEditForm output |
+| ~2370 | buildEditForm(session) | Full edit form HTML — session-type select, lift blocks (weight/reps/RPE per set + per-lift notes), cardio fields (dist/dur/HR/RPE/notes), session notes textarea, Save/Cancel |
+| ~2430 | saveEditedSession(ts) | Collect form values, update D.sessions[idx], call recalcE1RMs(), gitPush, refresh calendar + session list, reopen drawer |
+| ~2480 | recalcE1RMs() | Reset D.currentLifts to hardcoded defaults then replay all sessions to recompute e1RMs from scratch |
 
 ### Prescription & Program
 | Line | Function | Purpose |
@@ -439,9 +463,17 @@ duration:     seconds
 elevationGain: feet
 ```
 
+## State Variables (global JS)
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `calMonthOffset` | `0` | Months relative to current month for the THIS WEEK calendar (0 = now, -1 = last month). Replaces old `calOffset` (week offset). |
+| `sessionListPage` | `0` | Current page index for the session history list (0 = most recent 10). |
+
 ## What Has Been Removed
 - var DP, DAYS, DT, DC objects (dead vars — deleted)
 - var weekNavOffset (dead — week nav system removed)
+- var calOffset (dead — replaced by calMonthOffset for month-based navigation)
+- getWeekStart(offset) — returns week start date; removed when calendar switched from 7-day week view to full month grid
 - .ap-confidence-badge CSS rules (dead — renderAdaptivePlan deleted)
 - Hardcoded cardio struct in saveSession()
 - Legacy pullups:{sets,reps} aggregate in saveSession()
