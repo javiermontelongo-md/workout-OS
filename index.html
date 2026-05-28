@@ -1570,55 +1570,157 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
 
     <div style="margin-bottom:8px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);">
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.06em;margin-bottom:12px;">COMPONENT FONT SIZES</div>
-      <div class="ig" style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <label style="margin:0;font-size:13px;">Nav tabs</label>
-          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-nav">25</span>px</span>
-        </div>
-        <input type="range" id="fs-rng-nav" min="10" max="36" value="25" oninput="setComponentFontSize('nav',+this.value)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.06em;flex:1;">COMPONENT FONT SIZES</div>
+        <button id="fs-tab-desktop" onclick="showFsTab('desktop')" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--a);background:var(--a);color:var(--bg);cursor:pointer;transition:all .15s;">Desktop</button>
+        <button id="fs-tab-mobile" onclick="showFsTab('mobile')" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;">Mobile</button>
       </div>
-      <div class="ig" style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <label style="margin:0;font-size:13px;">Page headings</label>
-          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-heading">29</span>px</span>
+
+      <div id="fs-pane-desktop">
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Logo / wordmark</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-logo">28</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-logo" min="14" max="42" value="28" oninput="setComponentFontSize('logo',+this.value)">
         </div>
-        <input type="range" id="fs-rng-heading" min="16" max="52" value="29" oninput="setComponentFontSize('heading',+this.value)">
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Nav tabs</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-nav">25</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-nav" min="10" max="36" value="25" oninput="setComponentFontSize('nav',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Page headings</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-heading">29</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-heading" min="16" max="52" value="29" oninput="setComponentFontSize('heading',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Section labels</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-sublabel">20</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-sublabel" min="10" max="28" value="20" oninput="setComponentFontSize('sublabel',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Badges &amp; tags</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-badge">24</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-badge" min="10" max="28" value="24" oninput="setComponentFontSize('badge',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Form inputs</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-input">23</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-input" min="12" max="34" value="23" oninput="setComponentFontSize('input',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Buttons</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-btn">25</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-btn" min="10" max="34" value="25" oninput="setComponentFontSize('btn',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Card body text</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-cardtext">23</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-cardtext" min="12" max="34" value="23" oninput="setComponentFontSize('cardtext',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Exercise &amp; program</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-exercise">23</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-exercise" min="12" max="34" value="23" oninput="setComponentFontSize('exercise',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Stat numbers</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-dataval">32</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-dataval" min="16" max="52" value="32" oninput="setComponentFontSize('dataval',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Calendar text</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-caltext">22</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-caltext" min="10" max="28" value="22" oninput="setComponentFontSize('caltext',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:2px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Timestamps &amp; meta</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-mono">24</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-mono" min="10" max="28" value="24" oninput="setComponentFontSize('mono',+this.value)">
+        </div>
       </div>
-      <div class="ig" style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <label style="margin:0;font-size:13px;">Labels &amp; badges</label>
-          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-label">20</span>px</span>
+
+      <div id="fs-pane-mobile" style="display:none;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:12px;line-height:1.6;">These override sizes only on screens ≤768px (phones).</div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Mobile logo</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_mlogo">20</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-m_mlogo" min="12" max="28" value="20" oninput="setMobileComponentFontSize('m_mlogo',+this.value)">
         </div>
-        <input type="range" id="fs-rng-label" min="10" max="32" value="20" oninput="setComponentFontSize('label',+this.value)">
-      </div>
-      <div class="ig" style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <label style="margin:0;font-size:13px;">Form inputs</label>
-          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-input">23</span>px</span>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Nav icons</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_nav">14</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-m_nav" min="8" max="20" value="14" oninput="setMobileComponentFontSize('m_nav',+this.value)">
         </div>
-        <input type="range" id="fs-rng-input" min="12" max="34" value="23" oninput="setComponentFontSize('input',+this.value)">
-      </div>
-      <div class="ig" style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <label style="margin:0;font-size:13px;">Buttons</label>
-          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-btn">25</span>px</span>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Nav labels</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_navlbl">8</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-m_navlbl" min="6" max="12" value="8" oninput="setMobileComponentFontSize('m_navlbl',+this.value)">
         </div>
-        <input type="range" id="fs-rng-btn" min="10" max="34" value="25" oninput="setComponentFontSize('btn',+this.value)">
-      </div>
-      <div class="ig" style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <label style="margin:0;font-size:13px;">Card text</label>
-          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-cardtext">23</span>px</span>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Page headings</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_heading">22</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-m_heading" min="14" max="32" value="22" oninput="setMobileComponentFontSize('m_heading',+this.value)">
         </div>
-        <input type="range" id="fs-rng-cardtext" min="12" max="34" value="23" oninput="setComponentFontSize('cardtext',+this.value)">
-      </div>
-      <div class="ig" style="margin-bottom:2px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <label style="margin:0;font-size:13px;">Data numbers</label>
-          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-dataval">32</span>px</span>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Labels</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_label">13</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-m_label" min="9" max="20" value="13" oninput="setMobileComponentFontSize('m_label',+this.value)">
         </div>
-        <input type="range" id="fs-rng-dataval" min="16" max="52" value="32" oninput="setComponentFontSize('dataval',+this.value)">
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Form inputs</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_input">16</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-m_input" min="12" max="22" value="16" oninput="setMobileComponentFontSize('m_input',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Buttons</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_btn">12</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-m_btn" min="10" max="22" value="12" oninput="setMobileComponentFontSize('m_btn',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:2px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Card text</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_cardtext">14</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-m_cardtext" min="11" max="20" value="14" oninput="setMobileComponentFontSize('m_cardtext',+this.value)">
+        </div>
       </div>
     </div>
 
@@ -1746,13 +1848,28 @@ const FONT_PAIRS={
   urbanist:{sans:"'Urbanist',sans-serif",          mono:"'Fira Code',monospace",        serif:"'Playfair Display',serif",      url:"https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500&family=Fira+Code:wght@400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap"}
 };
 const FS_COMPONENTS={
-  nav:     {label:'Nav tabs',        sel:'.tab',                                                                min:10,max:36,def:25},
-  heading: {label:'Page headings',   sel:'.h1',                                                                min:16,max:52,def:29},
-  label:   {label:'Labels & badges', sel:'.lbl,.bdg,.ptag,.spill',                                            min:10,max:32,def:20},
-  input:   {label:'Form inputs',     sel:'input:not([type=range]):not([type=checkbox]),select,textarea',       min:12,max:34,def:23},
-  btn:     {label:'Buttons',         sel:'.btn',                                                               min:10,max:34,def:25},
-  cardtext:{label:'Card text',       sel:'.air p,.abox p,.tli-t,.tli-s,.lt,.prog-day-title,.card .lbl+p',     min:12,max:34,def:23},
-  dataval: {label:'Data numbers',    sel:'.sv,.ap-lift-weight,.dd',                                           min:16,max:52,def:32}
+  logo:     {label:'Logo / wordmark',    sel:'.logo',                                                            min:14,max:42,def:28},
+  nav:      {label:'Nav tabs',           sel:'.tab',                                                             min:10,max:36,def:25},
+  heading:  {label:'Page headings',      sel:'.h1',                                                              min:16,max:52,def:29},
+  sublabel: {label:'Section labels',     sel:'.lbl',                                                             min:10,max:28,def:20},
+  badge:    {label:'Badges & tags',      sel:'.bdg,.ptag,.spill',                                               min:10,max:28,def:24},
+  input:    {label:'Form inputs',        sel:'input:not([type=range]):not([type=checkbox]),select,textarea',     min:12,max:34,def:23},
+  btn:      {label:'Buttons',            sel:'.btn',                                                             min:10,max:34,def:25},
+  cardtext: {label:'Card body text',     sel:'.air p,.abox p,.lt,.tli-t',                                       min:12,max:34,def:23},
+  exercise: {label:'Exercise & program', sel:'.ex-name,.prog-day-title,.prog-ex-name',                          min:12,max:34,def:23},
+  dataval:  {label:'Stat numbers',       sel:'.sv,.ap-lift-weight,.dd',                                         min:16,max:52,def:32},
+  caltext:  {label:'Calendar text',      sel:'.cal-date,.cal-hdr',                                              min:10,max:28,def:22},
+  mono:     {label:'Timestamps & meta',  sel:'.ld,.tli-d,.dn,.tli-s,.info-row-label',                          min:10,max:28,def:24}
+};
+const FS_MOBILE={
+  m_mlogo:   {label:'Mobile logo',       sel:'.mlogo',                                                           min:12,max:28,def:20},
+  m_nav:     {label:'Nav icons',         sel:'.nicon',                                                           min:8, max:20,def:14},
+  m_navlbl:  {label:'Nav labels',        sel:'.nlbl',                                                            min:6, max:12,def:8},
+  m_heading: {label:'Page headings',     sel:'.h1',                                                              min:14,max:32,def:22},
+  m_label:   {label:'Labels',            sel:'.lbl,.bdg',                                                        min:9, max:20,def:13},
+  m_input:   {label:'Form inputs',       sel:'input:not([type=range]):not([type=checkbox]),select,textarea',     min:12,max:22,def:16},
+  m_btn:     {label:'Buttons',           sel:'.btn',                                                             min:10,max:22,def:12},
+  m_cardtext:{label:'Card text',         sel:'.air p,.abox p,.lt,.tli-t',                                       min:11,max:20,def:14}
 };
 function _applyComponentFontSizes(){
   const rules=Object.entries(FS_COMPONENTS).map(([key,cfg])=>{
@@ -1764,16 +1881,40 @@ function _applyComponentFontSizes(){
   if(!el){el=document.createElement('style');el.id='wos-fs-overrides';document.head.appendChild(el);}
   el.textContent=css;
 }
+function _applyMobileComponentFontSizes(){
+  const rules=Object.entries(FS_MOBILE).map(([key,cfg])=>{
+    const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
+    return `${cfg.sel}{font-size:${px}px}`;
+  }).join('\n');
+  const css=`@media(max-width:768px){\n${rules}\n}`;
+  let el=document.getElementById('wos-fs-mobile-overrides');
+  if(!el){el=document.createElement('style');el.id='wos-fs-mobile-overrides';document.head.appendChild(el);}
+  el.textContent=css;
+}
 function setComponentFontSize(key,px){
   localStorage.setItem('wos-fs-'+key,px);
   _applyComponentFontSizes();
   const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
+}
+function setMobileComponentFontSize(key,px){
+  localStorage.setItem('wos-fs-'+key,px);
+  _applyMobileComponentFontSizes();
+  const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
+}
+function showFsTab(pane){
+  document.getElementById('fs-pane-desktop').style.display=pane==='desktop'?'block':'none';
+  document.getElementById('fs-pane-mobile').style.display=pane==='mobile'?'block':'none';
+  const db=document.getElementById('fs-tab-desktop');
+  const mb=document.getElementById('fs-tab-mobile');
+  if(db){db.style.background=pane==='desktop'?'var(--a)':'transparent';db.style.color=pane==='desktop'?'var(--bg)':'var(--t3)';db.style.borderColor=pane==='desktop'?'var(--a)':'var(--b2)';}
+  if(mb){mb.style.background=pane==='mobile'?'var(--a)':'transparent';mb.style.color=pane==='mobile'?'var(--bg)':'var(--t3)';mb.style.borderColor=pane==='mobile'?'var(--a)':'var(--b2)';}
 }
 function applyAppearance(){
   _applyTheme(localStorage.getItem('wos-theme')||'dark');
   _applyFont(localStorage.getItem('wos-font')||'dm');
   _applyFontSize(localStorage.getItem('wos-fontsize')||'19');
   _applyComponentFontSizes();
+  _applyMobileComponentFontSizes();
 }
 function _applyTheme(name){
   const t=THEMES[name]||THEMES.dark;
@@ -1803,6 +1944,10 @@ function applyAppearanceChanges(){
     const el=document.getElementById('fs-rng-'+key);
     if(el) setComponentFontSize(key,+el.value);
   });
+  Object.keys(FS_MOBILE).forEach(key=>{
+    const el=document.getElementById('fs-rng-'+key);
+    if(el) setMobileComponentFontSize(key,+el.value);
+  });
   _syncAppearanceUI();
   const btn=document.getElementById('appearance-apply-btn');
   if(btn){
@@ -1828,6 +1973,11 @@ function _syncAppearanceUI(){
   const fr=document.getElementById('font-size-range');if(fr)fr.value=size;
   const fl=document.getElementById('font-size-lbl');if(fl)fl.textContent=size;
   Object.entries(FS_COMPONENTS).forEach(([key,cfg])=>{
+    const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
+    const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=px;
+    const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
+  });
+  Object.entries(FS_MOBILE).forEach(([key,cfg])=>{
     const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
     const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=px;
     const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
