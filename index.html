@@ -42,6 +42,9 @@
   --safe: env(safe-area-inset-bottom, 0px);
   --glow-a: rgba(124,131,247,0.15);
   --glow-g: rgba(52,201,142,0.12);
+  /* Prescription card font sizes — overridden by component sliders via @media */
+  --fs-presc-text: 13px;
+  --fs-presc-lift: 13px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -1028,15 +1031,15 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div id="run-presc-output" style="display:none;">
       <div style="background:var(--s2);border:1px solid var(--a);border-radius:8px;padding:14px;margin-bottom:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--a);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Primary Recommendation</div>
-        <div id="run-presc-primary" style="font-size:13px;color:var(--t);line-height:1.6;"></div>
+        <div id="run-presc-primary" style="font-size:var(--fs-presc-text);color:var(--t);line-height:1.6;"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Alternatives Based on How You Feel</div>
-        <div id="run-presc-alternatives" style="font-size:12px;color:var(--t2);line-height:1.7;"></div>
+        <div id="run-presc-alternatives" style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:12px;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Watch Out For</div>
-        <div id="run-presc-watchout" style="font-size:12px;color:var(--t2);line-height:1.7;"></div>
+        <div id="run-presc-watchout" style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;"></div>
       </div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;" id="run-presc-reminders"></div>
     </div>
@@ -1639,12 +1642,19 @@ input[type=range]::-webkit-slider-thumb:hover {
           </div>
           <input type="range" id="fs-rng-caltext" min="10" max="28" value="22" oninput="setComponentFontSize('caltext',+this.value)">
         </div>
-        <div class="ig" style="margin-bottom:2px;">
+        <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
             <label style="margin:0;font-size:13px;">Timestamps &amp; meta</label>
             <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-mono">24</span>px</span>
           </div>
           <input type="range" id="fs-rng-mono" min="10" max="28" value="24" oninput="setComponentFontSize('mono',+this.value)">
+        </div>
+        <div class="ig" style="margin-bottom:2px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:13px;">Prescription text</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-presctext">13</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-presctext" min="10" max="24" value="13" oninput="setComponentFontSize('presctext',+this.value)">
         </div>
       </div>
 
@@ -1844,7 +1854,8 @@ const FS_COMPONENTS={
   exercise: {label:'Exercise & program', sel:'.ex-name,.prog-day-title,.prog-ex-name',                          min:12,max:34,def:23},
   dataval:  {label:'Stat numbers',       sel:'.sv,.ap-lift-weight,.dd',                                         min:16,max:52,def:32},
   caltext:  {label:'Calendar text',      sel:'.cal-date,.cal-hdr',                                              min:10,max:28,def:22},
-  mono:     {label:'Timestamps & meta',  sel:'.ld,.tli-d,.dn,.tli-s,.info-row-label',                          min:10,max:28,def:24}
+  mono:     {label:'Timestamps & meta',  sel:'.ld,.tli-d,.dn,.tli-s,.info-row-label',                          min:10,max:28,def:24},
+  presctext:{label:'Prescription text',  vars:['--fs-presc-text','--fs-presc-lift'],                            min:10,max:24,def:13}
 };
 const FS_MOBILE={
   m_mlogo:   {label:'Mobile logo',       sel:'.mlogo',                                                           min:12,max:28,def:20},
@@ -1857,11 +1868,15 @@ const FS_MOBILE={
   m_cardtext:{label:'Card text',         sel:'.air p,.abox p,.lt,.tli-t',                                       min:11,max:20,def:14}
 };
 function _applyComponentFontSizes(){
-  const rules=Object.entries(FS_COMPONENTS).map(([key,cfg])=>{
+  const classRules=[];
+  const varRules=[];
+  Object.entries(FS_COMPONENTS).forEach(([key,cfg])=>{
     const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
-    return `${cfg.sel}{font-size:${px}px}`;
-  }).join('\n');
-  const css=`@media(min-width:769px){\n${rules}\n}`;
+    if(cfg.sel) classRules.push(`${cfg.sel}{font-size:${px}px}`);
+    if(cfg.vars) cfg.vars.forEach(v=>varRules.push(`${v}:${px}px`));
+  });
+  const varBlock=varRules.length?`:root{${varRules.join(';')}}`:'' ;
+  const css=`@media(min-width:769px){\n${classRules.join('\n')}\n${varBlock}\n}`;
   let el=document.getElementById('wos-fs-overrides');
   if(!el){el=document.createElement('style');el.id='wos-fs-overrides';document.head.appendChild(el);}
   el.textContent=css;
@@ -4162,25 +4177,25 @@ function renderPrescriptionCard(prescription){
   const mw=prescription.mainWork||{};
   let mainHtml='';
   if(isRun){
-    mainHtml=`<div style="background:var(--s3);border-radius:8px;padding:14px;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:8px;">MAIN SET</div><div style="font-size:13px;color:var(--t);line-height:1.6;">${mw.mainSet||mw.summary||''}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">${mw.totalDistance?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">DISTANCE</div><div style="font-size:13px;color:var(--t);margin-top:2px;">${mw.totalDistance}</div></div>`:''}${mw.paceTarget?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">PACE</div><div style="font-size:13px;color:var(--t);margin-top:2px;">${mw.paceTarget}</div></div>`:''}${mw.hrCeiling?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">HR CAP</div><div style="font-size:13px;color:var(--t);margin-top:2px;">${mw.hrCeiling} bpm</div></div>`:''}${mw.effort?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:2;min-width:120px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">EFFORT</div><div style="font-size:12px;color:var(--t2);margin-top:2px;">${mw.effort}</div></div>`:''}</div>`;
+    mainHtml=`<div style="background:var(--s3);border-radius:8px;padding:14px;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:8px;">MAIN SET</div><div style="font-size:var(--fs-presc-text);color:var(--t);line-height:1.6;">${mw.mainSet||mw.summary||''}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">${mw.totalDistance?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">DISTANCE</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.totalDistance}</div></div>`:''}${mw.paceTarget?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">PACE</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.paceTarget}</div></div>`:''}${mw.hrCeiling?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">HR CAP</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.hrCeiling} bpm</div></div>`:''}${mw.effort?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:2;min-width:120px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">EFFORT</div><div style="font-size:var(--fs-presc-text);color:var(--t2);margin-top:2px;">${mw.effort}</div></div>`:''}</div>`;
   }else{
     const lifts=mw.lifts||{};
-    const liftOrder=type==='push'?['bench','ohp','row','pullup']:type==='pull'?['row','pullup']:['squat','dl'];
+    const liftOrder=type==='push'?['bench','ohp']:type==='pull'?['row','pullup']:['squat','dl'];
     const liftNames={bench:'Bench Press',ohp:'Overhead Press',row:'Barbell Row',pullup:'Pull-ups',squat:'Back Squat',dl:'Conventional Deadlift'};
     const liftRows=liftOrder.filter(k=>lifts[k]).map(k=>{
       const l=lifts[k];
       const w=l.weight>0?l.weight+' lb':'Bodyweight';
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);"><div><div style="font-size:13px;color:var(--t);">${l.variation||liftNames[k]||k}</div>${l.coachNote?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${l.coachNote}</div>`:''}</div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:13px;color:${color};">${l.sets}×${l.reps} @ ${w}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);">RPE ${l.targetRPE}</div></div></div>`;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);"><div><div style="font-size:var(--fs-presc-lift);color:var(--t);">${l.variation||liftNames[k]||k}</div>${l.coachNote?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${l.coachNote}</div>`:''}</div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:var(--fs-presc-lift);color:${color};">${l.sets}×${l.reps} @ ${w}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);">RPE ${l.targetRPE}</div></div></div>`;
     }).join('');
     const accessories=(mw.accessories||[]);
-    const accessHtml=accessories.length?`<div style="margin-top:10px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;margin-bottom:6px;">ACCESSORIES</div>${accessories.map(a=>`<div style="font-size:12px;color:var(--t2);padding:3px 0;">· ${a}</div>`).join('')}</div>`:'';
+    const accessHtml=accessories.length?`<div style="margin-top:10px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;margin-bottom:6px;">ACCESSORIES</div>${accessories.map(a=>`<div style="font-size:var(--fs-presc-text);color:var(--t2);padding:3px 0;">· ${a}</div>`).join('')}</div>`:'';
     mainHtml=`<div style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:16px;margin-bottom:2px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:10px;text-transform:uppercase;">Main Work</div>${liftRows}${accessHtml}</div>`;
   }
   const watchHtml=(prescription.watchOutFor||[]).length?`<div style="margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;">WATCH: ${prescription.watchOutFor.join(' · ')}</div>`:'';
-  const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:12px;padding:10px 14px;background:rgba(184,96,53,.07);border:1px solid rgba(184,96,53,.2);border-radius:8px;font-size:12px;color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--aw);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">If too hard</span>${prescription.ifTooHard}</div>`:'';
+  const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:12px;padding:10px 14px;background:rgba(184,96,53,.07);border:1px solid rgba(184,96,53,.2);border-radius:8px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--aw);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">If too hard</span>${prescription.ifTooHard}</div>`:'';
   el.className='prog-day-card prog-today';
   el.style.borderColor=color;
-  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${label}</div><div class="prog-day-title">${prescription.summary||''}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:16px 18px;">${prescription.reasoning?`<div style="font-size:13px;color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:var(--s2);border-radius:8px;">${prescription.reasoning}</div>`:''}${prescription.warmup?`<div style="margin-bottom:12px;font-size:12px;color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Warmup</span>${prescription.warmup}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:12px;color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Cooldown</span>${prescription.cooldown}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:var(--s2);border-left:2px solid ${color}80;border-radius:0 8px 8px 0;font-size:12px;color:var(--t2);line-height:1.6;">${prescription.coachNote}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
+  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${label}</div><div class="prog-day-title">${prescription.summary||''}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:16px 18px;">${prescription.reasoning?`<div style="font-size:var(--fs-presc-text);color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:var(--s2);border-radius:8px;">${prescription.reasoning}</div>`:''}${prescription.warmup?`<div style="margin-bottom:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Warmup</span>${prescription.warmup}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Cooldown</span>${prescription.cooldown}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:var(--s2);border-left:2px solid ${color}80;border-radius:0 8px 8px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">${prescription.coachNote}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
 }
 
 function renderWeekSuggestions(weekPlan){
@@ -4196,7 +4211,7 @@ function renderWeekSuggestions(weekPlan){
   el.innerHTML=weekPlan.map(day=>{
     const conf=day.confidence||'low';
     const typeColor=TYPE_COLORS[day.suggestion]||'var(--t2)';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b);"><div style="min-width:72px;"><div style="font-family:var(--mono);font-size:11px;color:var(--t);">${(day.date||'').slice(5)||''}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);">${day.dow||''}</div></div><div style="flex:1;"><div style="font-size:13px;color:${typeColor};font-weight:500;">${day.suggestion||''}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${day.reason||''}</div></div><div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid ${CONF_COLORS[conf]}40;white-space:nowrap;">${conf.toUpperCase()}</div></div>`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b);"><div style="min-width:72px;"><div style="font-family:var(--mono);font-size:11px;color:var(--t);">${(day.date||'').slice(5)||''}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);">${day.dow||''}</div></div><div style="flex:1;"><div style="font-size:var(--fs-presc-lift);color:${typeColor};font-weight:500;">${day.suggestion||''}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${day.reason||''}</div></div><div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid ${CONF_COLORS[conf]}40;white-space:nowrap;">${conf.toUpperCase()}</div></div>`;
   }).join('');
 }
 
