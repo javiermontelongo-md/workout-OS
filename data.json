@@ -49,7 +49,7 @@
     },
     {
       "date": "2026-05-20",
-      "day": "A",
+      "day": "push",
       "rpe": null,
       "duration": null,
       "energy": null,
@@ -79,7 +79,7 @@
       "ohp": {
         "sets": [
           {
-            "w": 100,
+            "w": null,
             "r": null,
             "rpe": null
           },
@@ -119,7 +119,8 @@
         "dist": null,
         "hr": null,
         "pace": "",
-        "notes": ""
+        "notes": "",
+        "rpe": null
       },
       "ts": 1779309550700
     }
@@ -140,7 +141,9 @@
     "squatE1RM": 215,
     "deadliftE1RM": 215,
     "ohpE1RM": 123,
-    "pullups": 5
+    "pullups": 5,
+    "pullupE1RM": 0,
+    "rowE1RM": 135
   },
   "cardioBaseline": {
     "pace": "10:30",
