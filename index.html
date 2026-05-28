@@ -2774,6 +2774,9 @@ function buildSessionDrawerContent(session,dateStr){
   if(session.notes){
     html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Notes</div><div style="font-size:14px;color:var(--t2);line-height:1.5;">${session.notes}</div></div>`;
   }
+  if(session.ts){
+    html+=`<div style="margin-top:8px;padding-top:16px;border-top:1px solid var(--b);"><button onclick="editSession(${session.ts})" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:8px;padding:10px;cursor:pointer;letter-spacing:.04em;">Edit session</button></div>`;
+  }
   html+=`</div>`;
   return html;
 }
