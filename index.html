@@ -1558,6 +1558,13 @@ input[type=range]::-webkit-slider-thumb:hover {
         <label style="margin:0;">Base font size</label>
         <span style="font-family:var(--mono);color:var(--a);"><span id="font-size-lbl">19</span>px</span>
       </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button id="fsp-xs" onclick="applyFontPreset(14)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XS<div style="font-size:9px;color:var(--t3);margin-top:2px;">compact</div></button>
+        <button id="fsp-s" onclick="applyFontPreset(17)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">S<div style="font-size:9px;color:var(--t3);margin-top:2px;">small</div></button>
+        <button id="fsp-m" onclick="applyFontPreset(19)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">M<div style="font-size:9px;color:var(--t3);margin-top:2px;">default</div></button>
+        <button id="fsp-l" onclick="applyFontPreset(22)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">L<div style="font-size:9px;color:var(--t3);margin-top:2px;">readable</div></button>
+        <button id="fsp-xl" onclick="applyFontPreset(26)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XL<div style="font-size:9px;color:var(--t3);margin-top:2px;">large</div></button>
+      </div>
       <input type="range" id="font-size-range" min="14" max="30" value="19" oninput="setFontSize(this.value)">
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:5px;"><span>14 compact</span><span>30 large</span></div>
     </div>
@@ -1917,7 +1924,9 @@ function showFsTab(pane){
 function applyAppearance(){
   _applyTheme(localStorage.getItem('wos-theme')||'dark');
   _applyFont(localStorage.getItem('wos-font')||'dm');
-  _applyFontSize(localStorage.getItem('wos-fontsize')||'19');
+  const savedSize=localStorage.getItem('wos-fontsize')||'19';
+  _applyFontSize(savedSize);
+  _syncFontPresetBtns(+savedSize);
   _applyComponentFontSizes();
   _applyMobileComponentFontSizes();
 }
@@ -1937,7 +1946,18 @@ function _applyFont(name){
 function _applyFontSize(px){document.body.style.fontSize=px+'px';}
 function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
 function setFontPair(name){localStorage.setItem('wos-font',name);_applyFont(name);_syncAppearanceUI();}
-function setFontSize(px){localStorage.setItem('wos-fontsize',px);_applyFontSize(px);const e=document.getElementById('font-size-lbl');if(e)e.textContent=px;}
+function setFontSize(px){localStorage.setItem('wos-fontsize',px);_applyFontSize(px);const e=document.getElementById('font-size-lbl');if(e)e.textContent=px;_syncFontPresetBtns(+px);}
+function applyFontPreset(px){setFontSize(px);const r=document.getElementById('font-size-range');if(r){r.value=px;}}
+function _syncFontPresetBtns(px){
+  const map={14:'fsp-xs',17:'fsp-s',19:'fsp-m',22:'fsp-l',26:'fsp-xl'};
+  Object.entries(map).forEach(([size,id])=>{
+    const btn=document.getElementById(id);if(!btn)return;
+    const active=+size===+px;
+    btn.style.background=active?'var(--a)':'var(--s3)';
+    btn.style.color=active?'var(--bg)':'var(--t2)';
+    btn.style.borderColor=active?'var(--a)':'var(--b2)';
+  });
+}
 function applyAppearanceChanges(){
   const font=document.getElementById('font-pair-select')?.value||localStorage.getItem('wos-font')||'dm';
   const size=document.getElementById('font-size-range')?.value||localStorage.getItem('wos-fontsize')||'19';
