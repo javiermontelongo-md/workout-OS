@@ -1569,6 +1569,59 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:5px;"><span>14 compact</span><span>30 large</span></div>
     </div>
 
+    <div style="margin-bottom:8px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.06em;margin-bottom:12px;">COMPONENT FONT SIZES</div>
+      <div class="ig" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <label style="margin:0;font-size:13px;">Nav tabs</label>
+          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-nav">25</span>px</span>
+        </div>
+        <input type="range" id="fs-rng-nav" min="10" max="36" value="25" oninput="setComponentFontSize('nav',+this.value)">
+      </div>
+      <div class="ig" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <label style="margin:0;font-size:13px;">Page headings</label>
+          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-heading">29</span>px</span>
+        </div>
+        <input type="range" id="fs-rng-heading" min="16" max="52" value="29" oninput="setComponentFontSize('heading',+this.value)">
+      </div>
+      <div class="ig" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <label style="margin:0;font-size:13px;">Labels &amp; badges</label>
+          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-label">20</span>px</span>
+        </div>
+        <input type="range" id="fs-rng-label" min="10" max="32" value="20" oninput="setComponentFontSize('label',+this.value)">
+      </div>
+      <div class="ig" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <label style="margin:0;font-size:13px;">Form inputs</label>
+          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-input">23</span>px</span>
+        </div>
+        <input type="range" id="fs-rng-input" min="12" max="34" value="23" oninput="setComponentFontSize('input',+this.value)">
+      </div>
+      <div class="ig" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <label style="margin:0;font-size:13px;">Buttons</label>
+          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-btn">25</span>px</span>
+        </div>
+        <input type="range" id="fs-rng-btn" min="10" max="34" value="25" oninput="setComponentFontSize('btn',+this.value)">
+      </div>
+      <div class="ig" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <label style="margin:0;font-size:13px;">Card text</label>
+          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-cardtext">23</span>px</span>
+        </div>
+        <input type="range" id="fs-rng-cardtext" min="12" max="34" value="23" oninput="setComponentFontSize('cardtext',+this.value)">
+      </div>
+      <div class="ig" style="margin-bottom:2px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <label style="margin:0;font-size:13px;">Data numbers</label>
+          <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-dataval">32</span>px</span>
+        </div>
+        <input type="range" id="fs-rng-dataval" min="16" max="52" value="32" oninput="setComponentFontSize('dataval',+this.value)">
+      </div>
+    </div>
+
     <button id="appearance-apply-btn" class="btn bp" style="width:100%;transition:all .2s;" onclick="applyAppearanceChanges()">Apply Changes</button>
   </div>
 
@@ -1692,10 +1745,35 @@ const FONT_PAIRS={
   exo:     {sans:"'Exo 2',sans-serif",             mono:"'Anonymous Pro',monospace",   serif:"'Abril Fatface',serif",          url:"https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500&family=Anonymous+Pro:ital,wght@0,400;0,700&family=Abril+Fatface&display=swap"},
   urbanist:{sans:"'Urbanist',sans-serif",          mono:"'Fira Code',monospace",        serif:"'Playfair Display',serif",      url:"https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500&family=Fira+Code:wght@400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap"}
 };
+const FS_COMPONENTS={
+  nav:     {label:'Nav tabs',        sel:'.tab',                                                                min:10,max:36,def:25},
+  heading: {label:'Page headings',   sel:'.h1',                                                                min:16,max:52,def:29},
+  label:   {label:'Labels & badges', sel:'.lbl,.bdg,.ptag,.spill',                                            min:10,max:32,def:20},
+  input:   {label:'Form inputs',     sel:'input:not([type=range]):not([type=checkbox]),select,textarea',       min:12,max:34,def:23},
+  btn:     {label:'Buttons',         sel:'.btn',                                                               min:10,max:34,def:25},
+  cardtext:{label:'Card text',       sel:'.air p,.abox p,.tli-t,.tli-s,.lt,.prog-day-title,.card .lbl+p',     min:12,max:34,def:23},
+  dataval: {label:'Data numbers',    sel:'.sv,.ap-lift-weight,.dd',                                           min:16,max:52,def:32}
+};
+function _applyComponentFontSizes(){
+  const rules=Object.entries(FS_COMPONENTS).map(([key,cfg])=>{
+    const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
+    return `${cfg.sel}{font-size:${px}px}`;
+  }).join('\n');
+  const css=`@media(min-width:769px){\n${rules}\n}`;
+  let el=document.getElementById('wos-fs-overrides');
+  if(!el){el=document.createElement('style');el.id='wos-fs-overrides';document.head.appendChild(el);}
+  el.textContent=css;
+}
+function setComponentFontSize(key,px){
+  localStorage.setItem('wos-fs-'+key,px);
+  _applyComponentFontSizes();
+  const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
+}
 function applyAppearance(){
   _applyTheme(localStorage.getItem('wos-theme')||'dark');
   _applyFont(localStorage.getItem('wos-font')||'dm');
   _applyFontSize(localStorage.getItem('wos-fontsize')||'19');
+  _applyComponentFontSizes();
 }
 function _applyTheme(name){
   const t=THEMES[name]||THEMES.dark;
@@ -1721,6 +1799,10 @@ function applyAppearanceChanges(){
   localStorage.setItem('wos-fontsize',size);
   _applyFont(font);
   _applyFontSize(size);
+  Object.keys(FS_COMPONENTS).forEach(key=>{
+    const el=document.getElementById('fs-rng-'+key);
+    if(el) setComponentFontSize(key,+el.value);
+  });
   _syncAppearanceUI();
   const btn=document.getElementById('appearance-apply-btn');
   if(btn){
@@ -1745,6 +1827,11 @@ function _syncAppearanceUI(){
   const fs=document.getElementById('font-pair-select');if(fs)fs.value=font;
   const fr=document.getElementById('font-size-range');if(fr)fr.value=size;
   const fl=document.getElementById('font-size-lbl');if(fl)fl.textContent=size;
+  Object.entries(FS_COMPONENTS).forEach(([key,cfg])=>{
+    const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
+    const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=px;
+    const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
+  });
 }
 
 const ATHLETE = {
