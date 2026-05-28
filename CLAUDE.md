@@ -359,20 +359,14 @@ generateDailyPrescription(workoutType, durationMins)  ← direct fetch
 1. buildAthleteContext() — feeds all ai() calls
 2. renderRulesTab() — live status display in RULES tab
 
-### coachingLog Write Sites (3)
+### coachingLog Write Sites (2)
 All use identical pattern: push → slice(-50) → renderSystemLog()
-- genToday() → type: 'today_coaching'
 - generateDailyPrescription() → type: 'daily_prescription'
 - generatePostRunFeedback() → type: 'post_run'
 
 ### coachingMemory Write Sites (2)
 - generateDailyPrescription() → pushes structured note to D.coachingMemory.notes[]
 - maybeCompressCoachingMemory() → compresses oldest 15 notes to D.coachingMemory.compressed
-
-### genToday() Cache
-Keyed on: `${date}|${energy}|${sleep}|${hrv}`
-Stored in: window._genTodayCache = { key, response }
-Invalidated: automatically on next day or checkin change
 
 ---
 
@@ -456,11 +450,9 @@ elevationGain: feet
 - Old BIOMETRIC RULES hardcoded prose in buildPlanPrompt()
 - Hardcoded "Kaiser SF" string in ai() system prompt
   (now lives in buildAthleteContext().athlete.location)
-- Duplicate evaluateTrainingStatus() calls in genToday()
-  (now single call in buildAthleteContext())
-- Dead top-level statements after genToday() closing brace
-  (coachingLog.push, pushSilent, renderSystemLog were
-  executing at page load — moved inside function body)
+- Duplicate evaluateTrainingStatus() calls — now single call in buildAthleteContext()
+- Dead top-level coachingLog.push/pushSilent/renderSystemLog statements (were executing at page load — moved inside function body)
+- **genToday() + fai() + modeChg() (removed):** AI coaching narrative on TODAY tab removed as redundant — prescription already contains coachNote, ifTooHard, watchOutFor. Also removed: today_coaching coachingLog label, recentCoaching field from buildAthleteContext() training return, today-out DOM element and all references.
 - runDayMap — removed, card reads D.runPrescriptions[targetDate] directly
 - Old run prescription JSON shape: primaryRecommendation{distance,pace,hrCap,effort,notes}
   (replaced by: recommendedType, reasoning, workout{...}, ifTooHard, watchOutFor[])

@@ -2052,8 +2052,6 @@ async function fetchData(){
     sync('err','No token');
     D=defD();
     onLoad();
-    const wo=document.getElementById('today-out');
-    if(wo) wo.innerHTML='<div class="air"><div class="al">ACTION REQUIRED</div><p>No GitHub token found. Go to <strong>Settings tab</strong>, paste your token, click <strong>Save settings</strong>, then click <strong>Reload data</strong>.</p></div>';
     return;
   }
   sync('saving','Loading...');
@@ -2069,9 +2067,6 @@ async function fetchData(){
     hOv();
     D=defD();
     onLoad();
-    // Show settings warning on today tab
-    const wo=document.getElementById('today-out');
-    if(wo) wo.innerHTML='<div class="air"><div class="al">ACTION REQUIRED</div><p>Could not load your data from GitHub. Go to <strong>Settings tab</strong> -- make sure your GitHub token is entered and click <strong>Test connection</strong>. Then click <strong>Reload data</strong>.</p></div>';
   }
 }
 
@@ -2359,11 +2354,7 @@ function sync(state,label){
 }
 function msg(id,html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
 
-function modeChg(){
-  const m=document.getElementById('mode-sel')?.value||'normal';
-  const t={normal:'<p><strong>Normal:</strong> Follow prescribed volume. Compound lifts first, accessories second.</p>',stress:'<p><strong>High stress:</strong> Reduce volume 20-30%. Keep compound weight, cut sets. Drop accessories.</p>',maintenance:'<p><strong>Maintenance:</strong> One heavy set per lift. Preserve, do not accumulate fatigue.</p>',deload:'<p><strong>Deload:</strong> Reduce load 30-50%. Maintain movement patterns. Sleep and eat. No grinders.</p>',recovery:'<p><strong>Recovery:</strong> Zone 2 cardio and mobility only. No heavy loading.</p>',minimum:'<p><strong>Minimum viable:</strong> Main lift only OR cardio only. Getting there is the win.</p>'};
-  const out=document.getElementById('today-out');if(out)out.innerHTML='<div class="air"><div class="al">MODE</div>'+t[m]+'</div>';
-}
+
 function setTrainingMode(val){
   const descs={normal:'Standard progressive overload, balanced volume',performance:'Push intensity, prioritize PRs, reduce accessories',recovery:'Reduce volume 20–30%, keep frequency, no new PRs',deload:'50% volume, easy runs only, active recovery week'};
   const el=document.getElementById('training-mode-desc');
