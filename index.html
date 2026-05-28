@@ -1752,7 +1752,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div id="api-st" style="margin-top:8px;font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
       <div class="dvdr"></div>
       <div class="lbl">field migration tool</div>
-      <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.6;">If you rename a data field, use this to safely move your data to the new field name.</div>
+      <div style="font-size:var(--fs-presc-text);color:var(--t2);margin-bottom:10px;line-height:1.6;">If you rename a data field, use this to safely move your data to the new field name.</div>
       <div class="g2 k2" style="gap:8px;margin-bottom:8px;">
         <div class="ig"><label>Old field name</label><input type="text" id="mig-old" placeholder="e.g. sessions"></div>
         <div class="ig"><label>New field name</label><input type="text" id="mig-new" placeholder="e.g. workoutSessions"></div>
@@ -3951,7 +3951,7 @@ async function generateDailyPrescription(workoutType,durationMins){
       renderPrescriptionCard(D.dailyPrescriptions[today]);
       if(D.dailyPrescriptions[today].weekPlan)renderWeekSuggestions(D.dailyPrescriptions[today].weekPlan);
       const sumEl=document.getElementById('presc-summary');
-      if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${D.dailyPrescriptions[today].summary||''}</div><div style="font-size:12px;color:var(--t2);">${D.dailyPrescriptions[today].mainWork?.summary||''}</div>`;
+      if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${D.dailyPrescriptions[today].summary||''}</div><div style="font-size:var(--fs-presc-text);color:var(--t2);">${D.dailyPrescriptions[today].mainWork?.summary||''}</div>`;
       if(genMsg){genMsg.textContent='Using cached prescription ✓';genMsg.style.color='var(--a3)';setTimeout(()=>{if(genMsg)genMsg.textContent='';},3000);}
       return;
     }
@@ -4105,7 +4105,7 @@ RULES:
     updateLogTabPlanned();
     renderSystemLog();
     const sumEl=document.getElementById('presc-summary');
-    if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${parsed.todayPrescription.summary||workoutLabel[workoutType]||workoutType}</div><div style="font-size:12px;color:var(--t2);">${parsed.todayPrescription.mainWork?.summary||''}</div>`;
+    if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${parsed.todayPrescription.summary||workoutLabel[workoutType]||workoutType}</div><div style="font-size:var(--fs-presc-text);color:var(--t2);">${parsed.todayPrescription.mainWork?.summary||''}</div>`;
     if(!D.coachingLog)D.coachingLog=[];
     D.coachingLog.push({ts:Date.now(),type:'daily_prescription',label:`${workoutType} ${durationMins}min · ${today}`});
     if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
