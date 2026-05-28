@@ -3957,25 +3957,31 @@ async function generateDailyPrescription(workoutType,durationMins){
     const isLiftDay=['push','pull','legs'].includes(workoutType);
     const isRunDay=['run','cycling'].includes(workoutType);
     // Build lift schema example specific to workout type — never show run fields to lift days
+    // Push = chest/shoulders/triceps ONLY. Pull = back/biceps ONLY. Never mix.
     const liftSchemaByType={
       push:`"lifts": {
         "bench": {"sets":4,"reps":5,"weight":190,"targetRPE":8,"variation":"Barbell Bench Press","coachNote":"specific tip"},
-        "ohp":   {"sets":3,"reps":5,"weight":90, "targetRPE":8,"variation":"Barbell Strict OHP","coachNote":""},
-        "row":   {"sets":4,"reps":6,"weight":115,"targetRPE":7,"variation":"Barbell Bent-Over Row","coachNote":""},
-        "pullup":{"sets":4,"reps":"max","weight":0,"targetRPE":8,"variation":"Pull-ups","coachNote":"0=BW"}
+        "ohp":   {"sets":3,"reps":5,"weight":90, "targetRPE":8,"variation":"Barbell Strict OHP","coachNote":""}
       },
-      "accessories": ["Face Pulls 3×15","Overhead Tricep Extension 3×10","Hammer Curls 3×10"]`,
+      "accessories": ["Incline DB Press 3×10 (chest volume)","Cable Tricep Pushdown 3×12","DB Lateral Raise 3×15","Face Pulls 3×15 (shoulder prehab)"]`,
       pull:`"lifts": {
         "row":   {"sets":4,"reps":6,"weight":135,"targetRPE":7,"variation":"Barbell Bent-Over Row","coachNote":""},
         "pullup":{"sets":5,"reps":"max","weight":0,"targetRPE":8,"variation":"Pull-ups","coachNote":"0=BW"}
       },
-      "accessories": ["Face Pulls 3×15","Lat Pulldown 3×10","Incline DB Curl 3×12"]`,
+      "accessories": ["Lat Pulldown 3×10","Face Pulls 3×15","Incline DB Curl 3×12","Rear Delt Fly 3×15"]`,
       legs:`"lifts": {
         "squat": {"sets":4,"reps":5,"weight":160,"targetRPE":8,"variation":"Back Squat","coachNote":""},
         "dl":    {"sets":3,"reps":5,"weight":160,"targetRPE":8,"variation":"Conventional Deadlift","coachNote":""}
       },
       "accessories": ["Bulgarian Split Squat 3×8ea","Leg Curl 3×10","Copenhagen Plank 3×20s"]`
     };
+    const workoutTypeRule={
+      push:'PUSH DAY — chest/shoulders/triceps ONLY. mainWork.lifts must contain ONLY bench and ohp. Accessories must be push/tricep/delt movements. ZERO row, pullup, or any pull exercises. ZERO run/Zone 2/HR/pace content in ANY field including coachNote, reasoning, or watchOutFor.',
+      pull:'PULL DAY — back/biceps ONLY. mainWork.lifts must contain ONLY row and pullup. Accessories must be back/bicep movements. ZERO bench, ohp, or any push exercises. ZERO run/Zone 2/HR/pace content in ANY field.',
+      legs:'LEGS DAY — quads/hamstrings/glutes ONLY. mainWork.lifts must contain ONLY squat and dl. ZERO upper body lifts. ZERO run/Zone 2/HR/pace content in ANY field.',
+      run:'RUN DAY — mainWork must contain ONLY the run fields. Absolutely NO lifts object, NO bench/ohp/squat/dl references.',
+      cycling:'CYCLING DAY — mainWork must contain ONLY the run fields (use runType="cycling"). Absolutely NO lifts object.'
+    }[workoutType]||'';
     const runSchema=`"runType": "easy",
       "mainSet": "full description of the run",
       "totalDistance": "4-5 miles",
@@ -4037,7 +4043,7 @@ Output ONLY valid JSON. No markdown. No text outside the JSON.
 }
 
 RULES:
-- This is a ${isLiftDay?'LIFT':'RUN/REST'} day. ${isLiftDay?'Do NOT mention running in reasoning, coachNote, summary, or watchOutFor. Focus 100% on the lift session.':'Do NOT include lifts object. Focus entirely on the run/rest.'}
+- ${workoutTypeRule}
 - Weights in lb, nearest 2.5lb
 - Apply volumeModifier ${ts.volumeModifier} to all set counts (multiply, round down, min 2)
 - RPE cap: never exceed ${ts.liftRPECap}
