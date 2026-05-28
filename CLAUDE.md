@@ -201,154 +201,162 @@ All line numbers are from origin/main. Verify before editing:
 ### Config & Data
 | Line | Function | Purpose |
 |------|----------|---------|
-| 1683 | lCFG() | Load config from localStorage |
-| 1687 | sCFG() | Save config to localStorage |
-| 1693 | fetchData() | GET data.json from GitHub API |
-| 1722 | push(btnId, msgId) | PUT data.json to GitHub API |
-| 1746 | defD() | Default data structure — all data.json fields |
-| 3658 | pushSilent() | Silent PUT data.json — no UI feedback |
+| 2054 | lCFG() | Load config from localStorage |
+| 2058 | sCFG() | Save config to localStorage |
+| 2064 | fetchData() | GET data.json from GitHub API |
+| 2088 | mergeRemoteD(remoteD) | Merge remote data.json with local defaults on load |
+| 2103 | gitPush(commitMsg) | 3-retry GitHub PUT helper — handles 409 SHA conflicts; called by push() and pushSilent() |
+| 2121 | push(btnId, msgId) | PUT data.json to GitHub API with UI feedback |
+| 2139 | defD() | Default data structure — all data.json fields |
+| 4042 | pushSilent() | Silent PUT data.json — no UI feedback |
 
 ### Boot & Navigation
 | Line | Function | Purpose |
 |------|----------|---------|
-| 1764 | hOv() | Hover handlers |
-| 1766 | onLoad() | App boot — fetches data, migrates runPrescriptions→dailyPrescriptions, renders tabs |
-| 1979 | showTab(n) | Single nav function — all tab switching goes here |
-| 1988 | renderTab(n) | Renders content for a given tab |
-| 1998 | sync(state, label) | Sync status indicator |
-| 2004 | msg(id, html) | Inline message renderer |
+| 2157 | hOv() | Hover handlers |
+| 2159 | onLoad() | App boot — fetches data, migrates runPrescriptions→dailyPrescriptions, renders tabs |
+| 2179 | renderSystemLog() | System activity feed — merges runPrescriptions + dailyPrescriptions for display |
+| 2342 | renderRulesTab() | RULES tab render with live hard rule status |
+| 2371 | showTab(n) | Single nav function — all tab switching goes here; calls renderCalendar()+renderSessionList() for 'week' |
+| 2381 | renderTab(n) | Renders content for a given tab |
+| 2391 | sync(state, label) | Sync status indicator |
+| 2397 | msg(id, html) | Inline message renderer |
+
+### Appearance & Theme
+| Line | Function | Purpose |
+|------|----------|---------|
+| 1904 | showFsTab(pane) | Switch between font size panes in Settings |
+| 1912 | applyAppearance() | Apply all saved appearance settings on boot |
+| 1933 | setTheme(name) | Apply and persist theme |
+| 1934 | setFontPair(name) | Apply and persist font pair |
+| 1935 | setFontSize(px) | Apply and persist font size |
+| 1936 | applyAppearanceChanges() | Save all appearance changes from Settings form |
 
 ### Settings & Config UI
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2011 | setTrainingMode(val) | Sets D.trainingMode |
-| 2307 | saveCFG() | Save settings |
-| 2314 | testCon() | Test GitHub connection |
-| 2322 | saveAPI() | Save Anthropic API key |
-| 2323 | clearAPI() | Clear API key |
-| 2324 | debugAPI() | Debug API key state |
-| 2335 | runMig() | Run data migrations |
-| 2350 | exportData() | Export data.json |
-| 2351 | clrCFG() | Clear all config |
+| 2400 | setTrainingMode(val) | Sets D.trainingMode |
+| 2803 | saveCFG() | Save settings |
+| 2810 | testCon() | Test GitHub connection |
+| 2818 | saveAPI() | Save Anthropic API key |
+| 2819 | clearAPI() | Clear API key |
+| 2820 | debugAPI() | Debug API key state |
+| 2831 | runMig() | Run data migrations |
+| 2846 | exportData() | Export data.json |
+| 2847 | clrCFG() | Clear all config |
 
 ### AI Layer
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2357 | liftTrend(key, sessions, weeks=4) | Computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
-| 2375 | buildAthleteContext() | Single shared context object for all AI calls. Returns athlete (with goals + vo2maxEstimate), hardRules, biometrics, training, checkin, body. Calls evaluateTrainingStatus() once. |
-| 2551 | ai(prompt, maxTokens=800) | Shared Anthropic fetch wrapper — system prompt built from buildAthleteContext(). All AI calls route here. |
-| 3673 | generateDailyPrescription(workoutType, durationMins) | **Primary prescription entry point.** Single direct API call (claude-sonnet-4-5, 2500 tokens). Produces todayPrescription (warmup/mainWork/cooldown/coachNote/ifTooHard/watchOutFor) + weekPlan (7-day suggestions with confidence). Stores to D.dailyPrescriptions[today]. Calls renderPrescriptionCard, renderWeekSuggestions, updateLogTabPlanned, pushSilent. |
-| 3839 | maybeCompressCoachingMemory() | Compresses oldest 15 coaching notes to structured profile if ≥15 notes. Stores to D.coachingMemory.compressed. Anti-drift: only structured observations, never prose fed back as AI input. |
-| 3499 | generatePostRunFeedback(targetDate) | Post-run feedback — requires D.dailyPrescriptions[targetDate] (fallback to runPrescriptions) AND matching Strava run. Compares prescribed vs actual. Calls renderRunLogCard(). |
+| 2852 | spin(id) | Spinner toggle helper |
+| 2853 | liftTrend(key, sessions, weeks=4) | Computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
+| 2871 | buildAthleteContext() | Single shared context object for all AI calls. Returns athlete (with goals + vo2maxEstimate), hardRules, biometrics, training, checkin, body. Calls evaluateTrainingStatus() once. |
+| 3030 | ai(prompt, maxTokens=800) | Shared Anthropic fetch wrapper — system prompt built from buildAthleteContext(). All AI calls route here. |
+| 3883 | generatePostRunFeedback(targetDate) | Post-run feedback — requires D.dailyPrescriptions[targetDate] (fallback to runPrescriptions) AND matching Strava run. Compares prescribed vs actual. Calls renderRunLogCard(). |
+| 4050 | generateDailyPrescription(workoutType, durationMins) | **Primary prescription entry point.** Single direct API call (claude-sonnet-4-5, 2500 tokens). Produces todayPrescription + weekPlan (7-day suggestions). Stores to D.dailyPrescriptions[today]. Calls renderPrescriptionCard, renderWeekSuggestions, updateLogTabPlanned, pushSilent. |
+| 4230 | maybeCompressCoachingMemory() | Compresses oldest 15 coaching notes to structured profile if ≥15 notes. Stores to D.coachingMemory.compressed. Anti-drift: only structured observations, never prose fed back as AI input. |
 
 ### Hard Rule Engine
 | Line | Function | Purpose |
 |------|----------|---------|
-| 3543 | compute7DayMeans() | Rolling 7-day HRV/RHR averages with fallback to ATHLETE baselines |
-| 3558 | evaluateTrainingStatus() | 28-rule deterministic engine. Called in buildAthleteContext() and renderRulesTab(). Returns TrainingStatus: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR |
+| 3927 | compute7DayMeans() | Rolling 7-day HRV/RHR averages with fallback to ATHLETE baselines |
+| 3942 | evaluateTrainingStatus() | 28-rule deterministic engine. Called in buildAthleteContext() and renderRulesTab(). Returns TrainingStatus: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR |
 
 ### Session Logging
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2021 | chk(id) | Checkbox toggle + D.checks persistence — used by Milestones tab only |
-| 2028 | restChk() | Restore checkbox state from D.checks on load — used by Milestones tab only |
-| 2040 | initSets() | Initialize set tracking state |
-| 2041 | addSet(lift) | Add a set to a lift block |
-| 2046 | removeSet(lift, i) | Remove a set from a lift block |
-| 2047 | renderSets(lift) | Render set inputs for a lift |
-| 2055 | saveSession() | Save session to D.sessions[] |
-| 2089 | resetLogForm() | Reset log form to defaults |
-| 2093 | renderSessHist() | Render session history list |
-| 3398 | toggleRunLogSection() | Show/hide run inputs |
-| 3403 | onDayTypeChange(value) | Shows correct lift blocks per day type; calls renderRunLogCard() for run types |
-| 3442 | startLoggingSession() | Navigate to LOG tab and set day type from presc-workout-type dropdown |
-| 3450 | renderRunLogCard(targetDate) | Renders run prescription summary in LOG tab run card. Reads dailyPrescriptions first, falls back to runPrescriptions. Manages markRunComplete/postRunFeedback complete area. |
-| 3491 | markRunComplete(targetDate) | Mark run complete in dailyPrescriptions (fallback runPrescriptions). Calls renderRunLogCard(). |
-| 3997 | updateLogTabPlanned() | Pre-fill planned values in LOG tab from D.dailyPrescriptions[today]. Falls back to window._adaptivePlan for backward compat. |
-| 4026 | showRPEConfirm(lift) | RPE confirmation UI |
-| 3937 | confirmRPE(lift, actualRPE) | RPE confirmation after session |
+| 2410 | chk(id) | Checkbox toggle + D.checks persistence — used by Milestones tab only |
+| 2417 | restChk() | Restore checkbox state from D.checks on load — used by Milestones tab only |
+| 2429 | initSets() | Initialize set tracking state |
+| 2430 | addSet(lift) | Add a set to a lift block |
+| 2435 | removeSet(lift, i) | Remove a set from a lift block |
+| 2436 | renderSets(lift) | Render set inputs for a lift |
+| 2444 | saveSession() | Save session to D.sessions[] |
+| 2478 | resetLogForm() | Reset log form to defaults |
+| 2482 | renderSessHist() | Render session history list (LOG tab legacy view) |
+| 3782 | toggleRunLogSection() | Show/hide run inputs |
+| 3787 | onDayTypeChange(value) | Shows correct lift blocks per day type; calls renderRunLogCard() for run types |
+| 3826 | startLoggingSession() | Navigate to LOG tab and set day type from presc-workout-type dropdown |
+| 3834 | renderRunLogCard(targetDate) | Renders run prescription summary in LOG tab run card. Reads dailyPrescriptions first, falls back to runPrescriptions. Manages markRunComplete/postRunFeedback complete area. |
+| 3875 | markRunComplete(targetDate) | Mark run complete in dailyPrescriptions (fallback runPrescriptions). Calls renderRunLogCard(). |
+| 4267 | renderPrescriptionCard(prescription) | Renders full prescription in #prog-today-card. Handles push/pull/legs (lift table + accessories) and run/cycling (mainSet/pace/HR). Shows reasoning, warmup, cooldown, coachNote, ifTooHard, watchOutFor. |
+| 4311 | renderWeekSuggestions(weekPlan) | Renders 7-day confidence grid in #week-suggestions. Shows date/dow + suggestion + confidence badge (HIGH/MED/LOW) + reason. |
+| 4328 | confirmRPE(lift, actualRPE) | RPE confirmation after session |
+| 4388 | updateLogTabPlanned() | Pre-fill planned values in LOG tab from D.dailyPrescriptions[today]. Mutates DEF[] and re-renders sets so weight placeholders always match prescription. Falls back to window._adaptivePlan. |
+| 4420 | showRPEConfirm(lift) | RPE confirmation UI |
 
 ### Check-in
 | Line | Function | Purpose |
 |------|----------|---------|
-| 4039 | calcFatigue(energy,sleep,soreness,motivation,stress) | Computes fatigueScore 0-10 |
-| 4044 | updateFatiguePreview() | Live fatigue preview in check-in UI |
-| 4056 | togglePostCall() | POST_CALL flag toggle — blocks all quality/heavy |
-| 4066 | saveCheckin() | Save check-in to D.checkins[] |
-| 4111 | _buildSparkRows(checkins30, larger) | Sparkline row builder for snapshot |
-| 4146 | renderSnapshotCharts() | Render check-in snapshot charts |
-| 4335 | initCheckinTab() | Initialize check-in tab |
+| 4433 | calcFatigue(energy,sleep,soreness,motivation,stress) | Computes fatigueScore 0-10 |
+| 4438 | updateFatiguePreview() | Live fatigue preview in check-in UI |
+| 4450 | togglePostCall() | POST_CALL flag toggle — blocks all quality/heavy |
+| 4460 | saveCheckin() | Save check-in to D.checkins[] |
+| 4505 | _buildSparkRows(checkins30, larger) | Sparkline row builder for snapshot |
+| 4540 | renderSnapshotCharts() | Render check-in snapshot charts |
+| 4729 | initCheckinTab() | Initialize check-in tab |
 
-### Calendar & Week View
+### Calendar & Week View (THIS WEEK tab)
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2138 | getSessionsForDate(dateStr) | Filter sessions for a date |
-| 2142 | getActivityBadges(sessions, dateStr) | Activity badge HTML for calendar |
-| 2156 | getPlannedBadge(dateStr) | Planned workout badge for calendar |
-| 2165 | calNav(dir) | Month calendar navigation — clamps to May 2026 floor and current month ceiling |
-| 2169 | renderCalendar() | Full month grid render — blank leading cells, lift/run dots per day, disables nav buttons at limits, summary shows "X strength · Y runs" |
-| 2215 | handleDayCardClick(dateStr) | Day card click — past lift session→drawer, past Strava-only run→fake-session drawer, future→program tab |
-| 2229 | openSessionDrawer(session, dateStr) | Slide-in session detail drawer |
-| 2252 | closeSessionDrawer() | Dismiss session drawer |
-| 2261 | buildSessionDrawerContent(session, dateStr) | Full session detail HTML; includes Edit button for real logged sessions (session.ts present in D.sessions[]) |
-| ~2310 | openSessionDrawerByTs(ts) | Look up session in D.sessions[] by ts, open drawer |
-| ~2320 | renderSessionList() | Render paginated session history list (10/page, newest-first) into #sess-list-rows and #sess-list-nav; all sessions including runs and lifts |
-| ~2350 | editSession(ts) | Find session by ts, replace drawer content with buildEditForm output |
-| ~2370 | buildEditForm(session) | Full edit form HTML — session-type select, lift blocks (weight/reps/RPE per set + per-lift notes), cardio fields (dist/dur/HR/RPE/notes), session notes textarea, Save/Cancel |
-| ~2430 | saveEditedSession(ts) | Collect form values, update D.sessions[idx], call recalcE1RMs(), gitPush, refresh calendar + session list, reopen drawer |
-| ~2480 | recalcE1RMs() | Reset D.currentLifts to hardcoded defaults then replay all sessions to recompute e1RMs from scratch |
+| 2499 | updProgressStats() | Update progress tab stats |
+| 2522 | getSessionsForDate(dateStr) | Filter D.sessions[] for a given date string |
+| 2526 | getActivityBadges(sessions, dateStr) | Activity badge HTML for calendar cells |
+| 2540 | getPlannedBadge(dateStr) | Planned workout badge for calendar cells |
+| 2549 | calNav(dir) | Month calendar navigation — clamps to May 2026 floor and current month ceiling |
+| 2556 | renderCalendar() | Full month grid render — blank leading cells, lift/run dots per day, disables nav at limits, summary "X strength · Y runs" |
+| 2609 | handleDayCardClick(dateStr) | Day card click — past lift→drawer, past Strava-only run→fake-session drawer, future→program tab |
+| 2621 | openSessionDrawer(session, dateStr) | Slide-in session detail drawer |
+| 2644 | closeSessionDrawer() | Dismiss session drawer |
+| 2653 | buildSessionDrawerContent(session, dateStr) | Full session detail HTML; includes Edit button for real logged sessions (session.ts present in D.sessions[]) |
+| 2695 | openSessionDrawerByTs(ts) | Look up session in D.sessions[] by ts, open drawer |
+| 2699 | renderSessionList() | Render paginated session history (10/page, newest-first) into #sess-list-rows + #sess-list-nav; covers all activity types |
+| 2731 | editSession(ts) | Find session by ts, replace drawer content with buildEditForm output |
+| 2738 | buildEditForm(session) | Full edit form HTML — session-type select, lift blocks (weight/reps/RPE per set + per-lift notes), cardio fields (dist/dur/HR/RPE/notes), session notes textarea, Save/Cancel |
+| 2760 | saveEditedSession(ts) | Collect form values, update D.sessions[idx], call recalcE1RMs(), gitPush, refresh calendar + session list, reopen drawer |
+| 2792 | recalcE1RMs() | Reset D.currentLifts to hardcoded defaults then replay all sessions to recompute e1RMs from scratch |
 
 ### Prescription & Program
 | Line | Function | Purpose |
 |------|----------|---------|
-| 3876 | renderPrescriptionCard(prescription) | Renders full prescription in #prog-today-card. Handles push/pull/legs (lift table + accessories) and run/cycling (mainSet/pace/HR). Shows reasoning, warmup, cooldown, coachNote, ifTooHard, watchOutFor. |
-| 3920 | renderWeekSuggestions(weekPlan) | Renders 7-day confidence grid in #week-suggestions. Shows date/dow + suggestion + confidence badge (HIGH/MED/LOW) + reason. Reads weekPlan from last prescription. |
-| 2700 | detectBlockWeek() | Block week 1-4, resets on <3 sessions in 14 days |
-| 2733 | getBlockParams(blockWeek) | Sets/reps/targetRPE per block week |
-| 2738 | buildPredictions(currentE1RM, slope) | 4-week e1RM projections |
-| 2749 | predictLift(liftKey, blockWeek) | Predicted e1RM for a lift |
-| 2776 | getAccessoryVariation(liftKey) | Accessory exercise variation string |
-| 1786 | renderSystemLog() | System activity feed — merges runPrescriptions + dailyPrescriptions for display |
-| 1950 | renderRulesTab() | RULES tab render with live hard rule status |
+| 3084 | detectBlockWeek() | Block week 1-4, resets on <3 sessions in 14 days |
+| 3117 | getBlockParams(blockWeek) | Sets/reps/targetRPE per block week |
+| 3122 | buildPredictions(currentE1RM, slope) | 4-week e1RM projections |
+| 3133 | predictLift(liftKey, blockWeek) | Predicted e1RM for a lift |
+| 3160 | getAccessoryVariation(liftKey) | Accessory exercise variation string |
+| 4345 | renderPredictionChart(lift) | e1RM prediction chart |
+| 4382 | setChartLift(lift) | Set active lift for prediction chart |
 
 ### Run Metrics
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2785 | getRestingHR() | Latest RHR from healthLogs |
-| 2791 | estimateVO2max(run) | VO2max estimate from single run w/ HR. Requires run.heartRateAvg + distanceMi≥2. Returns null if called with no arg. |
-| 2818 | vdotPredict(vo2max) | VDOT pace predictions |
-| 2842 | riegelPredict(runs) | Riegel race prediction |
-| 2867 | hrRegressionPredict(runs) | HR regression pace prediction |
-| 2900 | calcRacePredictions() | Full race prediction calculation |
-| 3006 | secsToRaceTime(s) | Format seconds as race time |
-| 3015 | secsToPace(totalSecs, miles) | Format seconds as pace |
-| 3023 | renderRacePredictions() | Render race prediction cards |
-| 3103 | setRacePredChart(dist) | Set active race pred chart distance |
-| 3112 | renderRacePredChart(dist) | Render race prediction chart |
-| 3306 | calcRunMetrics() | Compute run metrics from D.runs |
-| 3325 | renderRunMetricsSummary() | Render run metrics summary |
-| 3348 | renderRunChart(type) | Render run chart (pace/HR/distance) |
-| 3397 | setRunChart(type) | Set active run chart type |
+| 3065 | calcE1RM(weight, reps) | Epley e1RM formula, rounded to 2.5lb |
+| 3067 | getLiftHistory(liftKey, daysBack=60) | Filter sessions, compute e1RM with recency weights |
+| 3168 | localDS(d) | Date → YYYY-MM-DD string in local timezone |
+| 3169 | getRestingHR() | Latest RHR from healthLogs |
+| 3175 | estimateVO2max(run) | VO2max estimate from single run w/ HR. Requires run.heartRateAvg + distanceMi≥2. Returns null if no arg. |
+| 3202 | vdotPredict(vo2max) | VDOT pace predictions |
+| 3226 | riegelPredict(runs) | Riegel race prediction |
+| 3251 | hrRegressionPredict(runs) | HR regression pace prediction |
+| 3284 | calcRacePredictions() | Full race prediction calculation |
+| 3390 | secsToRaceTime(s) | Format seconds as race time |
+| 3399 | secsToPace(totalSecs, miles) | Format seconds as pace |
+| 3407 | renderRacePredictions() | Render race prediction cards |
+| 3487 | setRacePredChart(dist) | Set active race pred chart distance |
+| 3496 | renderRacePredChart(dist) | Render race prediction chart |
+| 3690 | calcRunMetrics() | Compute run metrics from D.runs |
+| 3709 | renderRunMetricsSummary() | Render run metrics summary |
+| 3732 | renderRunChart(type) | Render run chart (pace/HR/distance) |
+| 3781 | setRunChart(type) | Set active run chart type |
 
 ### Body Metrics
 | Line | Function | Purpose |
 |------|----------|---------|
-| 4361 | formatSleepInput(input) | Format sleep input string |
-| 4372 | parseSleepHHMM(str) | Parse HH:MM sleep string to hours |
-| 4380 | updateBodyCalcs() | Update BMI + body calc display |
-| 4394 | renderBodyChart(type) | Render body metrics chart |
-| 4438 | setBodyChart(type) | Set active body chart type |
-
-### Utilities
-| Line | Function | Purpose |
-|------|----------|---------|
-| 2681 | calcE1RM(weight, reps) | Epley e1RM formula, rounded to 2.5lb |
-| 2683 | getLiftHistory(liftKey, daysBack=60) | Filter sessions, compute e1RM with recency weights |
-| 2784 | localDS(d) | Date → YYYY-MM-DD string in local timezone |
-| 2110 | updProgressStats() | Update progress tab stats |
-| 3954 | renderPredictionChart(lift) | e1RM prediction chart |
-| 3991 | setChartLift(lift) | Set active lift for prediction chart |
-| 2356 | spin(id) | Spinner toggle helper |
+| 4755 | formatSleepInput(input) | Format sleep input string |
+| 4766 | parseSleepHHMM(str) | Parse HH:MM sleep string to hours |
+| 4774 | updateBodyCalcs() | Update BMI + body calc display |
+| 4788 | renderBodyChart(type) | Render body metrics chart |
+| 4832 | setBodyChart(type) | Set active body chart type |
 
 ---
 
