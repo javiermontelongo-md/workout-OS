@@ -1131,6 +1131,9 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
   </div>
 
+  <!-- Accessories block — populated dynamically by updateLogTabPlanned() -->
+  <div id="accessories-block" class="card" style="display:none;"></div>
+
   <div id="run-log-section" style="display:none;">
     <div class="card">
       <div class="lbl">run log</div>
@@ -2482,7 +2485,18 @@ async function saveSession(){
   const cardioTypeMap={run:'Run',run_easy:'Easy Run',run_quality:'Quality Run',run_long:'Long Run'};
   const hasCardioData=isRunDay&&(runDur||runDist||runHr||runNotes);
   const cardioObj=hasCardioData?{type:cardioTypeMap[day]||'Run',dur:runDur,dist:runDist,hr:runHr,rpe:runRpe,pace:(runDist&&runDur)?`${Math.floor(runDur/runDist)}:${String(Math.round((runDur/runDist%1)*60)).padStart(2,'0')}`:'',notes:runNotes}:null;
-  const session={date,day,notes:document.getElementById('log-notes')?.value||'',bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),ts:Date.now()};
+  // Collect accessories
+  const accData=(window._logAccessories||[]).map((acc,i)=>{
+    const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+\((.+)\))?$/);
+    const name=m?m[1].trim():String(acc);
+    const prescribed=m?`${m[2]}×${m[3]}${m[4]?' ('+m[4]+')':''}`:String(acc);
+    const wt=+document.getElementById('acc-wt-'+i)?.value||null;
+    const sets=+document.getElementById('acc-sets-'+i)?.value||null;
+    const reps=+document.getElementById('acc-reps-'+i)?.value||null;
+    const note=document.getElementById('acc-note-'+i)?.value||'';
+    return(wt||sets||reps||note)?{name,prescribed,weight:wt,sets,reps,notes:note}:null;
+  }).filter(Boolean);
+  const session={date,day,notes:document.getElementById('log-notes')?.value||'',bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
   D.adherence=(D.adherence||{});D.adherence.completed=(D.adherence.completed||0)+1;
@@ -2504,6 +2518,11 @@ async function saveSession(){
 function resetLogForm(){
   ['log-notes','pullup-notes','row-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   initSets();
+  // Clear accessories inputs without hiding the block (updateLogTabPlanned will re-render)
+  (window._logAccessories||[]).forEach((_,i)=>{
+    ['acc-wt-','acc-sets-','acc-reps-'].forEach(p=>{const el=document.getElementById(p+i);if(el)el.value='';});
+    const n=document.getElementById('acc-note-'+i);if(n)n.value='';
+  });
 }
 function renderSessHist(){
   const legacyDayMap={1:'A',2:'B',3:'C',4:'A',5:'B'};
@@ -2745,6 +2764,13 @@ function buildSessionDrawerContent(session,dateStr){
     const cardioMeta=[c.type,c.dur?`${c.dur} min`:null,c.dist?`${c.dist} mi`:null,c.pace?`${c.pace}/mi`:null,c.hr?`HR ${c.hr} bpm`:null,c.rpe?`RPE ${c.rpe}`:null].filter(Boolean).join(' · ');
     html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Cardio</div><div style="font-family:var(--mono);font-size:13px;color:var(--t);">${cardioMeta}</div>${c.notes?`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;">${c.notes}</div>`:''}</div>`;
   }
+  if((session.accessories||[]).length){
+    const accRows=session.accessories.map(a=>{
+      const parts=[a.prescribed,a.weight?`${a.weight} lb`:null,a.sets&&a.reps?`${a.sets}×${a.reps}`:null].filter(Boolean).join(' · ');
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b);"><div style="font-family:var(--mono);font-size:12px;color:var(--t);">${a.name}</div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:11px;color:var(--a5);">${parts}</div>${a.notes?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${a.notes}</div>`:''}</div></div>`;
+    }).join('');
+    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Accessories</div>${accRows}</div>`;
+  }
   if(session.notes){
     html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Notes</div><div style="font-size:14px;color:var(--t2);line-height:1.5;">${session.notes}</div></div>`;
   }
@@ -2969,14 +2995,16 @@ function buildAthleteContext() {
   const recentSessions = (D.sessions || []).slice(-8).map(s => {
     const fmt = sets => (sets || [])
       .map(x => `${x.weight}×${x.reps}@${x.rpe}`).join(',');
+    const fmtAcc=a=>(a||[]).filter(x=>x.sets||x.reps||x.weight).map(x=>`${x.name}:${x.sets||'?'}×${x.reps||'?'}${x.weight?'@'+x.weight+'lb':''}`).join(', ');
     return {
-      date: s.date, type: s.type,
+      date: s.date, type: s.day||s.type,
       bench:  fmt(s.bench?.sets),
       ohp:    fmt(s.ohp?.sets),
       pullup: fmt(s.pullup?.sets),
       row:    fmt(s.row?.sets),
       squat:  fmt(s.squat?.sets),
-      dl:     fmt(s.dl?.sets)
+      dl:     fmt(s.dl?.sets),
+      ...(s.accessories?.length?{accessories:fmtAcc(s.accessories)}:{})
     };
   });
 
@@ -4504,6 +4532,42 @@ function updateLogTabPlanned(){
     if(l.weight>0)DEF[lift]=l.weight;
     renderSets(lift);
   });
+  // Render accessories from prescription
+  const accBlock=document.getElementById('accessories-block');
+  const accessories=presc.mainWork.accessories||[];
+  window._logAccessories=accessories;
+  if(accBlock){
+    if(accessories.length){
+      let aHtml=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="bdg" style="background:rgba(160,102,212,0.12);color:var(--a5);border:1px solid rgba(160,102,212,0.25);">ACCESSORIES</span><span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${accessories.length} prescribed</span></div>`;
+      accessories.forEach((acc,i)=>{
+        const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+\((.+)\))?$/);
+        const name=m?m[1].trim():String(acc);
+        const pSets=m?m[2]:'';
+        const pReps=m?m[3]:'';
+        const pNote=m?m[4]:'';
+        const prescLabel=pSets?`Planned: ${pSets}×${pReps}${pNote?' · '+pNote:''}`:String(acc);
+        aHtml+=`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--b);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-family:var(--mono);font-size:11px;color:var(--a5);font-weight:600;text-transform:uppercase;">${name}</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${prescLabel}</span>
+          </div>
+          <div class="srh"><span>WEIGHT (lb)</span><span>SETS</span><span>REPS</span><span></span></div>
+          <div class="srow">
+            <input type="number" id="acc-wt-${i}" placeholder="lb (opt.)" style="text-align:center;">
+            <input type="number" id="acc-sets-${i}" placeholder="${pSets||'3'}" style="text-align:center;">
+            <input type="number" id="acc-reps-${i}" placeholder="${pReps||'10'}" style="text-align:center;">
+            <span></span>
+          </div>
+          <div class="ig" style="margin-top:8px;margin-bottom:0;"><input type="text" id="acc-note-${i}" placeholder="Notes..."></div>
+        </div>`;
+      });
+      accBlock.innerHTML=aHtml;
+      accBlock.style.display='';
+    } else {
+      accBlock.style.display='none';
+      window._logAccessories=[];
+    }
+  }
 }
 
 function showRPEConfirm(lift){
