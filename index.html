@@ -1536,14 +1536,31 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="ig" style="margin-bottom:18px;">
       <label>Font style</label>
       <select id="font-pair-select" onchange="setFontPair(this.value)" style="margin-top:6px;">
-        <option value="dm">DM Sans + DM Mono + Fraunces (default)</option>
-        <option value="system">System UI — no loading, fastest</option>
-        <option value="inter">Inter + JetBrains Mono + Lora</option>
-        <option value="roboto">Roboto + Roboto Mono + Merriweather</option>
+        <optgroup label="── Clean &amp; Modern ──">
+          <option value="dm">DM Sans + DM Mono + Fraunces (default)</option>
+          <option value="system">System UI — no loading, fastest</option>
+          <option value="inter">Inter + JetBrains Mono + Lora</option>
+          <option value="urbanist">Urbanist + Fira Code + Playfair Display</option>
+          <option value="manrope">Manrope + Fira Mono + Cormorant Garamond</option>
+        </optgroup>
+        <optgroup label="── Friendly &amp; Rounded ──">
+          <option value="nunito">Nunito + Source Code Pro + Spectral</option>
+          <option value="outfit">Outfit + Inconsolata + Libre Baskerville</option>
+          <option value="jakarta">Plus Jakarta Sans + Fira Code + Cormorant Garamond</option>
+        </optgroup>
+        <optgroup label="── Technical &amp; Sporty ──">
+          <option value="space">Space Grotesk + Space Mono + Playfair Display</option>
+          <option value="sora">Sora + IBM Plex Mono + EB Garamond</option>
+          <option value="exo">Exo 2 + Anonymous Pro + Abril Fatface</option>
+          <option value="worksans">Work Sans + Overpass Mono + Vollkorn</option>
+        </optgroup>
+        <optgroup label="── Classic ──">
+          <option value="roboto">Roboto + Roboto Mono + Merriweather</option>
+        </optgroup>
       </select>
     </div>
 
-    <div class="ig">
+    <div class="ig" style="margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <label style="margin:0;">Base font size</label>
         <span style="font-family:var(--mono);color:var(--a);"><span id="font-size-lbl">19</span>px</span>
@@ -1551,6 +1568,8 @@ input[type=range]::-webkit-slider-thumb:hover {
       <input type="range" id="font-size-range" min="14" max="30" value="19" oninput="setFontSize(this.value)">
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:5px;"><span>14 compact</span><span>30 large</span></div>
     </div>
+
+    <button id="appearance-apply-btn" class="btn bp" style="width:100%;transition:all .2s;" onclick="applyAppearanceChanges()">Apply Changes</button>
   </div>
 
   <div class="g2">
@@ -1659,10 +1678,19 @@ const THEMES={
   }
 };
 const FONT_PAIRS={
-  dm:{sans:"'DM Sans',sans-serif",mono:"'DM Mono',monospace",serif:"'Fraunces',serif",url:null},
-  system:{sans:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",mono:"ui-monospace,'SF Mono',Consolas,monospace",serif:"Georgia,'Times New Roman',serif",url:null},
-  inter:{sans:"'Inter',sans-serif",mono:"'JetBrains Mono',monospace",serif:"'Lora',serif",url:"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,300;0,400;1,400&display=swap"},
-  roboto:{sans:"'Roboto',sans-serif",mono:"'Roboto+Mono',monospace",serif:"'Merriweather',serif",url:"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Roboto+Mono:wght@400;500&family=Merriweather:ital,wght@0,300;0,400;1,400&display=swap"}
+  dm:      {sans:"'DM Sans',sans-serif",          mono:"'DM Mono',monospace",          serif:"'Fraunces',serif",             url:null},
+  system:  {sans:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif", mono:"ui-monospace,'SF Mono',Consolas,monospace", serif:"Georgia,'Times New Roman',serif", url:null},
+  inter:   {sans:"'Inter',sans-serif",             mono:"'JetBrains Mono',monospace",   serif:"'Lora',serif",                 url:"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,300;0,400;1,400&display=swap"},
+  roboto:  {sans:"'Roboto',sans-serif",            mono:"'Roboto Mono',monospace",      serif:"'Merriweather',serif",          url:"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Roboto+Mono:wght@400;500&family=Merriweather:ital,wght@0,300;0,400;1,400&display=swap"},
+  jakarta: {sans:"'Plus Jakarta Sans',sans-serif", mono:"'Fira Code',monospace",        serif:"'Cormorant Garamond',serif",    url:"https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500&family=Fira+Code:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap"},
+  space:   {sans:"'Space Grotesk',sans-serif",     mono:"'Space Mono',monospace",       serif:"'Playfair Display',serif",      url:"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400&family=Playfair+Display:ital,wght@0,400;1,400&display=swap"},
+  outfit:  {sans:"'Outfit',sans-serif",            mono:"'Inconsolata',monospace",      serif:"'Libre Baskerville',serif",     url:"https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Inconsolata:wght@400;500&family=Libre+Baskerville:ital,wght@0,400;1,400&display=swap"},
+  nunito:  {sans:"'Nunito',sans-serif",            mono:"'Source Code Pro',monospace",  serif:"'Spectral',serif",              url:"https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500&family=Source+Code+Pro:wght@400;500&family=Spectral:ital,wght@0,300;0,400;1,400&display=swap"},
+  sora:    {sans:"'Sora',sans-serif",              mono:"'IBM Plex Mono',monospace",    serif:"'EB Garamond',serif",           url:"https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&family=EB+Garamond:ital,wght@0,400;1,400&display=swap"},
+  manrope: {sans:"'Manrope',sans-serif",           mono:"'Fira Mono',monospace",        serif:"'Cormorant Garamond',serif",    url:"https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500&family=Fira+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap"},
+  worksans:{sans:"'Work Sans',sans-serif",         mono:"'Overpass Mono',monospace",    serif:"'Vollkorn',serif",              url:"https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&family=Overpass+Mono:wght@400;500&family=Vollkorn:ital,wght@0,400;1,400&display=swap"},
+  exo:     {sans:"'Exo 2',sans-serif",             mono:"'Anonymous Pro',monospace",   serif:"'Abril Fatface',serif",          url:"https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500&family=Anonymous+Pro:ital,wght@0,400;0,700&family=Abril+Fatface&display=swap"},
+  urbanist:{sans:"'Urbanist',sans-serif",          mono:"'Fira Code',monospace",        serif:"'Playfair Display',serif",      url:"https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500&family=Fira+Code:wght@400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap"}
 };
 function applyAppearance(){
   _applyTheme(localStorage.getItem('wos-theme')||'dark');
@@ -1686,6 +1714,24 @@ function _applyFontSize(px){document.body.style.fontSize=px+'px';}
 function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
 function setFontPair(name){localStorage.setItem('wos-font',name);_applyFont(name);_syncAppearanceUI();}
 function setFontSize(px){localStorage.setItem('wos-fontsize',px);_applyFontSize(px);const e=document.getElementById('font-size-lbl');if(e)e.textContent=px;}
+function applyAppearanceChanges(){
+  const font=document.getElementById('font-pair-select')?.value||localStorage.getItem('wos-font')||'dm';
+  const size=document.getElementById('font-size-range')?.value||localStorage.getItem('wos-fontsize')||'19';
+  localStorage.setItem('wos-font',font);
+  localStorage.setItem('wos-fontsize',size);
+  _applyFont(font);
+  _applyFontSize(size);
+  _syncAppearanceUI();
+  const btn=document.getElementById('appearance-apply-btn');
+  if(btn){
+    const orig=btn.textContent;
+    btn.textContent='✓ Applied!';
+    btn.style.background='var(--a2)';
+    btn.style.color='#06080f';
+    btn.style.transform='scale(1.04)';
+    setTimeout(()=>{btn.textContent=orig;btn.style.background='';btn.style.color='';btn.style.transform='';},2000);
+  }
+}
 function _syncAppearanceUI(){
   const theme=localStorage.getItem('wos-theme')||'dark';
   const font=localStorage.getItem('wos-font')||'dm';
