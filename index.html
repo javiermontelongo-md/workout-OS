@@ -2070,6 +2070,21 @@ async function fetchData(){
   }
 }
 
+function mergeRemoteD(remoteD){
+  // Prevent a stale browser D from overwriting strava/health bot sync commits
+  const localRunIds=new Set((D.runs||[]).map(r=>r.stravaId).filter(Boolean));
+  const newRuns=(remoteD.runs||[]).filter(r=>r.stravaId&&!localRunIds.has(r.stravaId));
+  if(newRuns.length){
+    D.runs=[...(D.runs||[]),...newRuns].sort((a,b)=>a.date.localeCompare(b.date));
+    if((remoteD.stravaLastSync||'')>(D.stravaLastSync||'')) D.stravaLastSync=remoteD.stravaLastSync;
+  }
+  const localLogDates=new Set((D.healthLogs||[]).map(h=>h.date));
+  const newLogs=(remoteD.healthLogs||[]).filter(h=>!localLogDates.has(h.date));
+  if(newLogs.length){
+    D.healthLogs=[...(D.healthLogs||[]),...newLogs].sort((a,b)=>a.date.localeCompare(b.date));
+    if((remoteD.healthLastSync||'')>(D.healthLastSync||'')) D.healthLastSync=remoteD.healthLastSync;
+  }
+}
 async function push(btnId,msgId){
   if(!CFG.tok){ msg(msgId,'Add GitHub token in Settings first'); return false; }
   const btn=document.getElementById(btnId);
@@ -2079,6 +2094,8 @@ async function push(btnId,msgId){
     const ir=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
     if(!ir.ok) throw new Error('Cannot read '+CFG.file+' -- check token and repo in Settings');
     const info=await ir.json();
+    const remoteBytes=Uint8Array.from(atob(info.content.replace(/\n/g,'')),c=>c.charCodeAt(0));
+    mergeRemoteD(JSON.parse(new TextDecoder('utf-8').decode(remoteBytes)));
     D.lastUpdated=new Date().toISOString().split('T')[0];
     const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));
     const pr=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'Data update',content:enc,sha:info.sha})});
@@ -3894,6 +3911,8 @@ async function pushSilent(){
     const ir=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
     if(!ir.ok)return;
     const info=await ir.json();
+    const remoteBytes=Uint8Array.from(atob(info.content.replace(/\n/g,'')),c=>c.charCodeAt(0));
+    mergeRemoteD(JSON.parse(new TextDecoder('utf-8').decode(remoteBytes)));
     D.lastUpdated=new Date().toISOString().split('T')[0];
     const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));
     await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'AI plan cache update',content:enc,sha:info.sha})});
