@@ -2905,6 +2905,102 @@
           "reason": "7-day push cycle; progress bench to 195lb 4×5 if today's session feels RPE ≤7"
         }
       ]
+    },
+    "2026-05-28": {
+      "type": "push",
+      "duration": 90,
+      "summary": "Push — Upper Strength (Bench + OHP)",
+      "reasoning": "Your May 20 session showed bench at 205×3-4 @ RPE 9-10 and OHP 100×7 @ RPE 7-8. Today we're backing off to sustainable volume: bench at 190lb for clean sets of 5 (same as May 10 where you hit RPE 7), and OHP at 95lb to lock in form without the grind. This respects the RPE 8 cap while building quality volume. Your e1RM supports heavier loads, but residency fatigue demands we prioritize bar speed and recovery.",
+      "warmup": "5min row or bike easy, then: 10 band pull-aparts, 10 scap push-ups, 5 empty bar bench press, 5 empty bar OHP. Ramp bench: 95×5, 135×5, 165×3. Ramp OHP: 45×5, 65×3, 80×2.",
+      "mainWork": {
+        "summary": "2 main lifts · 4 accessories",
+        "lifts": {
+          "bench": {
+            "sets": 4,
+            "reps": 5,
+            "weight": 190,
+            "targetRPE": 7.5,
+            "variation": "Barbell Bench Press",
+            "coachNote": "Same load as May 10. Focus on bar path—straight vertical line over mid-chest to lockout. Every rep should move identically. If rep 4 slows noticeably, rack it and call the set."
+          },
+          "ohp": {
+            "sets": 3,
+            "reps": 5,
+            "weight": 95,
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "coachNote": "Slight deload from 100lb. Squeeze glutes, brace core hard, press bar in straight line. Zero leg drive. If you have to lean back excessively to clear your chin, drop to 90lb."
+          }
+        },
+        "accessories": [
+          "Incline DB Press 3×10 @ 50lb per hand (chest volume, control eccentric)",
+          "Cable Tricep Pushdown 3×12 @ moderate weight (pump, not failure)",
+          "DB Lateral Raise 3×15 @ 15-20lb (strict form, shoulders stay down)",
+          "Cable Face Pulls 3×15 @ light weight (rear delt health, external rotation focus)"
+        ]
+      },
+      "cooldown": "Prone chest stretch on foam roller 2×30sec each side, doorway pec stretch 2×30sec, tricep overhead stretch 2×20sec each arm. Light dynamic shaking of arms.",
+      "coachNote": "Your bench e1RM is 232.5lb, so 190×5 should feel controlled—if you're grinding, you're going too heavy for a Thursday mid-residency week. Accessory work is time under tension, not PRs. Save your CNS for the main lifts. Sleep and nutrition are your limiters right now, not training stimulus.",
+      "ifTooHard": "Drop bench to 185lb and OHP to 90lb. Cut accessory work to 2 sets each. Skip face pulls if shoulder fatigue is high.",
+      "watchOutFor": [
+        "Shoulder impingement on OHP—if you feel pinching at top lockout, widen grip 1 inch",
+        "Elbow flare on bench—keep elbows 45° from torso, not 90°",
+        "Rushing rest periods—take full 3min between main lift sets"
+      ],
+      "workoutType": "push",
+      "durationMins": 90,
+      "generatedAt": "2026-05-28T19:19:00.426Z",
+      "weekPlan": [
+        {
+          "date": "2026-05-29",
+          "dow": "Fri",
+          "suggestion": "Zone 2 Run (40min easy)",
+          "confidence": "high",
+          "reason": "Active recovery day after push volume; strict MAF HR ≤147bpm to rebuild aerobic base"
+        },
+        {
+          "date": "2026-05-30",
+          "dow": "Sat",
+          "suggestion": "Pull — Back & Biceps",
+          "confidence": "high",
+          "reason": "Barbell row progression to 135lb, weighted pull-ups, rear delt work; fresh legs after Friday easy run"
+        },
+        {
+          "date": "2026-05-31",
+          "dow": "Sun",
+          "suggestion": "Long Zone 2 Run (60-75min)",
+          "confidence": "high",
+          "reason": "Aerobic base builder at ≤147bpm; weekend allows focus on HR discipline without time pressure"
+        },
+        {
+          "date": "2026-06-01",
+          "dow": "Mon",
+          "suggestion": "Legs — Squat Focus",
+          "confidence": "medium",
+          "reason": "Squat 4×5 @ 175lb, RDL 3×8, single-leg work; fresh from Sunday Zone 2"
+        },
+        {
+          "date": "2026-06-02",
+          "dow": "Tue",
+          "suggestion": "Intervals (6×800m @ 5K pace)",
+          "confidence": "medium",
+          "reason": "Quality session with full recovery; fits 20% high-intensity protocol for VO2max development"
+        },
+        {
+          "date": "2026-06-03",
+          "dow": "Wed",
+          "suggestion": "Push — Volume Day",
+          "confidence": "high",
+          "reason": "Bench 4×6 @ 175lb, OHP 3×8 @ 85lb; hypertrophy rep ranges after Tuesday intervals"
+        },
+        {
+          "date": "2026-06-04",
+          "dow": "Thu",
+          "suggestion": "Zone 2 Run (45min) + Core",
+          "confidence": "high",
+          "reason": "Easy aerobic work at ≤147bpm; 15min core circuit for trunk stability"
+        }
+      ]
     }
   },
   "coachingMemory": {
@@ -2932,6 +3028,14 @@
         "durationMins": 90,
         "mainWorkSummary": "2 main lifts · 4 accessories",
         "coachNote": "Your bench e1RM is 232.5lb, so today's 190lb for sets of 5 should feel controlled and crisp. The goal is pristine bar path and zero grind reps—every rep should look identical. If your lockout speed slows noticeably, rack it. Accessory work is about time under tension, not chasing weight. Residency stress is cumulative; this volume will stimulate growth without burying you for tomorrow.",
+        "flags": []
+      },
+      {
+        "date": "2026-05-28",
+        "workoutType": "push",
+        "durationMins": 90,
+        "mainWorkSummary": "2 main lifts · 4 accessories",
+        "coachNote": "Your bench e1RM is 232.5lb, so 190×5 should feel controlled—if you're grinding, you're going too heavy for a Thursday mid-residency week. Accessory work is time under tension, not PRs. Save your CNS for the main lifts. Sleep and nutrition are your limiters right now, not training stimulus.",
         "flags": []
       }
     ]
