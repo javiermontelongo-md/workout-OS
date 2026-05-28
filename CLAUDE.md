@@ -449,6 +449,43 @@ compressed: null | {
 notes: [{date, workoutType, observations, coachingPoints}, ...]
 ```
 
+## D.healthLogs[] Entry Shape
+Written by `.github/scripts/health-sync.js` via the `health-sync` GitHub Actions workflow.
+Triggered by Health Auto Export (HAE) REST API webhook. One entry per day, upserted by date.
+
+```
+date:            'YYYY-MM-DD'
+source:          'apple_health'
+restingHR:       bpm (integer) — Apple Watch
+hrv:             ms (float) — Apple Watch overnight SDNN
+wristTemp:       delta°C from 98.6°F baseline — ALWAYS delta°C, never absolute°F
+                 negative = below baseline (normal range: −2 to −0.5)
+                 ⚠ 56 Shortcut-era entries were stored as absolute°F; corrected May 2026
+sleepHours:      hours, 1 decimal — time ASLEEP (not time in bed); ~20–45 min less than
+                 the "Time in Bed" value shown in Apple Health
+sleepDeep:       hours (float) — HAE only, available from ~May 21 2026
+sleepREM:        hours (float) — HAE only, available from ~May 21 2026
+sleepLight:      hours (float, Apple 'core' stage) — HAE only
+sleepAwake:      hours (float) — HAE only, populated from sleepEntry.awake field
+                 (NOT computed from inBed−totalSleep; inBed is always 0 in HAE)
+steps:           integer — Apple Watch + iPhone combined (HAE deduplicates)
+exerciseMinutes: integer — Apple Watch Exercise ring minutes
+walkingHR:       bpm (integer) — Apple Watch average walking HR
+respiratoryRate: breaths/min (float) — Apple Watch overnight
+vo2maxApple:     ml/kg/min (float) — Apple Watch estimate, updates ~weekly; null most days
+```
+
+### Health Sync Infrastructure
+- Workflow: `.github/workflows/health-sync.yml` — triggered by HAE `repository_dispatch`
+- Script:   `.github/scripts/health-sync.js` — parses HAE JSON, upserts healthLogs by date
+- Concurrency: `group: health-sync, cancel-in-progress: false` prevents race condition
+  when HAE fires duplicate webhooks (queues runs instead of racing to push)
+- Push safety: `git pull --rebase` before `git push` in the workflow commit step
+- HAE sends `step_count` as a float (merged Watch+iPhone samples) — script rounds to int
+- HAE sends `walking_heart_rate_average` as a float — script rounds to int
+- HAE sends `apple_sleeping_wrist_temperature` with multiple date entries — script uses
+  `getMetricForDate()` to match the target date, not just `data[0]`
+
 ## D.runs[] Entry Shape
 ```
 date:         'YYYY-MM-DD'
@@ -508,3 +545,19 @@ elevationGain: feet
 - scheduleOverrides — D.scheduleOverrides field (defD), override dot (calendar),
   overrides context block (buildAthleteContext) — nothing ever wrote to it after
   the schedule system was removed; was always passing {} to the AI
+- **Health sync data quality fixes (May 2026):**
+  - Removed 3 bad Shortcut-era healthLog entries: May 7 (51k steps), May 16 (47k steps /
+    166 min exercise — the day Shortcut was removed), May 23 (exact duplicate of May 21)
+  - Rounded 21 float steps+walkingHR values in existing entries to integers
+  - Converted 56 wristTemp entries from absolute°F → delta°C (Shortcut stored raw °F;
+    HAE stores °F but health-sync.js converts to delta°C on ingest)
+- **health-sync.js fixes (May 2026):**
+  - steps: Math.round() — HAE sends float (merged Watch+iPhone samples)
+  - walkingHR: Math.round() — HAE sends float
+  - wristTemp: getMetricForDate() — was taking data[0] which could be prior day's reading
+  - sleepAwake: reads sleepEntry.awake directly — was computing from inBed which HAE
+    always sends as 0, so sleepAwake was always null
+- **health-sync.yml fixes (May 2026):**
+  - concurrency group added — HAE fires duplicate webhooks; without this, parallel runs
+    raced to push and 3 of 4 would fail with "failed to push some refs"
+  - git pull --rebase added before git push
