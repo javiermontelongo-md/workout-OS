@@ -45,6 +45,9 @@
   /* Prescription card font sizes — overridden by component sliders via @media */
   --fs-presc-text: 13px;
   --fs-presc-lift: 13px;
+  /* Small UI text — controls all inline tiny text; overridden by small-text slider */
+  --fs-xs: 10px;
+  --fs-sm: 12px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -893,8 +896,8 @@ input[type=range]::-webkit-slider-thumb:hover {
 <div class="mbar">
   <div class="mlogo">Workout <span>OS</span></div>
   <div style="display:flex;gap:8px;align-items:center;">
-    <div id="ms" style="font-family:var(--mono);font-size:10px;color:var(--t3);">Loading...</div>
-    <div id="md" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
+    <div id="ms" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Loading...</div>
+    <div id="md" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></div>
   </div>
 </div>
 
@@ -907,7 +910,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="sdot" id="sd"></div>
       <span id="sl2">Loading...</span>
     </div>
-    <div id="dd" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-left:8px;"></div>
+    <div id="dd" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-left:8px;"></div>
   </div>
   <div class="tabs">
     <button class="tab on" onclick="showTab('today')">TODAY</button>
@@ -934,84 +937,84 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div class="lbl" style="margin:0;">daily check-in</div>
-      <div id="checkin-date-label" style="font-family:var(--mono);font-size:10px;color:var(--t3);"></div>
+      <div id="checkin-date-label" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></div>
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">ENERGY</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-energy-val">7</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">ENERGY</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);" id="ci-energy-val">7</div>
       </div>
       <input type="range" id="ci-energy" min="1" max="10" value="7" oninput="document.getElementById('ci-energy-val').textContent=this.value;updateFatiguePreview()">
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SORENESS</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--a4);" id="ci-soreness-val">3</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">SORENESS</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);" id="ci-soreness-val">3</div>
       </div>
       <input type="range" id="ci-soreness" min="1" max="10" value="3" oninput="document.getElementById('ci-soreness-val').textContent=this.value;updateFatiguePreview()">
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">MOTIVATION</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--a);" id="ci-motivation-val">7</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">MOTIVATION</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);" id="ci-motivation-val">7</div>
       </div>
       <input type="range" id="ci-motivation" min="1" max="10" value="7" oninput="document.getElementById('ci-motivation-val').textContent=this.value;updateFatiguePreview()">
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">STRESS</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--a4);" id="ci-stress-val">5</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">STRESS</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);" id="ci-stress-val">5</div>
       </div>
       <input type="range" id="ci-stress" min="1" max="10" value="5"
         oninput="document.getElementById('ci-stress-val').textContent=this.value;updateFatiguePreview()">
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">SLEEP</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">HH:MM format</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">SLEEP</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">HH:MM format</div>
       </div>
       <input type="text" id="ci-sleep-input" placeholder="7:30" style="font-family:var(--mono);font-size:14px;text-align:center;letter-spacing:2px;" maxlength="5" oninput="formatSleepInput(this)">
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">WEIGHT</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">lbs</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">WEIGHT</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">lbs</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <input type="number" id="ci-weight" placeholder="225" step="0.5" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;">BMI: <span id="ci-bmi-display" style="color:var(--t2);">--</span></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);white-space:nowrap;">BMI: <span id="ci-bmi-display" style="color:var(--t2);">--</span></div>
       </div>
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);">WAIST</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">inches</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">WAIST</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">inches</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <input type="number" id="ci-waist" placeholder="34.0" step="0.25" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;">W/H: <span id="ci-whr-display" style="color:var(--t2);">--</span></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);white-space:nowrap;">W/H: <span id="ci-whr-display" style="color:var(--t2);">--</span></div>
       </div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px;">
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">FATIGUE SCORE</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">FATIGUE SCORE</div>
       <div style="font-family:var(--mono);font-size:15px;font-weight:500;" id="ci-fatigue-preview">--</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:10px;margin-bottom:4px;">
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Post-call / no sleep</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Post-call / no sleep</div>
       <button id="ci-postcall-btn"
         onclick="togglePostCall()"
-        style="font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:6px;background:var(--s3);color:var(--t2);border:1px solid var(--b2);cursor:pointer;">
+        style="font-family:var(--mono);font-size:var(--fs-sm);padding:5px 14px;border-radius:6px;background:var(--s3);color:var(--t2);border:1px solid var(--b2);cursor:pointer;">
         No
       </button>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);">Was last night a call shift or total sleep loss?</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Was last night a call shift or total sleep loss?</div>
     </div>
     <button class="btn bp" style="width:100%;" onclick="saveCheckin()">Save Check-in to GitHub</button>
-    <div id="checkin-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
+    <div id="checkin-save-msg" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
   </div>
   <div class="card" id="system-log-card">
     <div class="lbl">system log · last 7 days</div>
     <div id="system-log-feed">
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:8px 0;">
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:8px 0;">
         Loading...
       </div>
     </div>
@@ -1026,115 +1029,115 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div id="log-no-plan" class="card" style="text-align:center;padding:48px 24px;">
     <div style="font-size:32px;margin-bottom:16px;">📋</div>
     <div style="font-size:17px;font-weight:600;color:var(--t);margin-bottom:10px;">No plan for today</div>
-    <div style="font-family:var(--mono);font-size:12px;color:var(--t3);line-height:1.7;margin-bottom:20px;">Go to the <strong style="color:var(--t2);">Program</strong> tab, select a workout type and duration,<br>then tap <strong style="color:var(--t2);">"Get Prescription"</strong> to generate today's plan.</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);line-height:1.7;margin-bottom:20px;">Go to the <strong style="color:var(--t2);">Program</strong> tab, select a workout type and duration,<br>then tap <strong style="color:var(--t2);">"Get Prescription"</strong> to generate today's plan.</div>
     <button class="btn bp" onclick="showTab('program')" style="margin:0 auto;">Go to Program →</button>
   </div>
 
   <div id="run-prescription-card" style="display:none;" class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;">Run Prescription</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.1em;">Run Prescription</div>
         <div id="run-presc-day-label" style="font-size:15px;font-weight:500;color:var(--t);margin-top:4px;"></div>
       </div>
-      <button class="btn bp" id="run-presc-btn" onclick="renderRunLogCard()" style="font-size:11px;padding:8px 16px;">Refresh Prescription</button>
+      <button class="btn bp" id="run-presc-btn" onclick="renderRunLogCard()" style="font-size:var(--fs-sm);padding:8px 16px;">Refresh Prescription</button>
     </div>
-    <div id="run-presc-placeholder" style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">
+    <div id="run-presc-placeholder" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">
       Your weekly run prescription will appear here once a plan is generated on the Plan tab.
     </div>
     <div id="run-presc-output" style="display:none;">
       <div style="background:var(--s2);border:1px solid var(--a);border-radius:8px;padding:14px;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--a);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Primary Recommendation</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Primary Recommendation</div>
         <div id="run-presc-primary" style="font-size:var(--fs-presc-text);color:var(--t);line-height:1.6;"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Alternatives Based on How You Feel</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Alternatives Based on How You Feel</div>
         <div id="run-presc-alternatives" style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Watch Out For</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Watch Out For</div>
         <div id="run-presc-watchout" style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;"></div>
       </div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;" id="run-presc-reminders"></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;" id="run-presc-reminders"></div>
     </div>
     <div id="run-presc-complete-area"></div>
-    <div id="run-presc-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;min-height:16px;"></div>
+    <div id="run-presc-msg" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;min-height:16px;"></div>
   </div>
 
   <!-- v2026-05-22 -->
   <div class="card" id="bench-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BENCH PRESS</span><span id="planned-bench" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 190</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BENCH PRESS</span><span id="planned-bench" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ 190</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="bench-sets"></div>
     <button class="addbtn" onclick="addSet('bench')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="bench-notes" placeholder="Bar speed, form, anything to flag..."></div>
     <div id="rpe-confirm-bench" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID BENCH ACTUALLY FEEL? <span id="rpe-pred-bench" style="color:var(--a);"></span></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;">HOW DID BENCH ACTUALLY FEEL? <span id="rpe-pred-bench" style="color:var(--a);"></span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-bench"></div>
     </div>
   </div>
 
   <!-- v2026-05-22 -->
   <div class="card" id="ohp-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">OVERHEAD PRESS</span><span id="planned-ohp" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 90</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">OVERHEAD PRESS</span><span id="planned-ohp" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 3x5 @ 90</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="ohp-sets"></div>
     <button class="addbtn" onclick="addSet('ohp')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="ohp-notes" placeholder="Notes..."></div>
     <div id="rpe-confirm-ohp" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID OHP ACTUALLY FEEL? <span id="rpe-pred-ohp" style="color:var(--a);"></span></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;">HOW DID OHP ACTUALLY FEEL? <span id="rpe-pred-ohp" style="color:var(--a);"></span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-ohp"></div>
     </div>
   </div>
 
   <!-- v2026-05-22 -->
   <div class="card" id="squat-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BACK SQUAT</span><span id="planned-squat" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ 160</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BACK SQUAT</span><span id="planned-squat" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="squat-sets"></div>
     <button class="addbtn" onclick="addSet('squat')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="squat-notes" placeholder="Notes..."></div>
     <div id="rpe-confirm-squat" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID SQUAT ACTUALLY FEEL? <span id="rpe-pred-squat" style="color:var(--a);"></span></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;">HOW DID SQUAT ACTUALLY FEEL? <span id="rpe-pred-squat" style="color:var(--a);"></span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-squat"></div>
     </div>
   </div>
 
   <!-- v2026-05-22 -->
   <div class="card" id="deadlift-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">DEADLIFT</span><span id="planned-dl" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 3x5 @ 160</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">DEADLIFT</span><span id="planned-dl" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 3x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="dl-sets"></div>
     <button class="addbtn" onclick="addSet('dl')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="dl-notes" placeholder="Notes..."></div>
     <div id="rpe-confirm-dl" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID DEADLIFT ACTUALLY FEEL? <span id="rpe-pred-dl" style="color:var(--a);"></span></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;">HOW DID DEADLIFT ACTUALLY FEEL? <span id="rpe-pred-dl" style="color:var(--a);"></span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-dl"></div>
     </div>
   </div>
 
   <!-- v2026-05-22 -->
   <div class="card" id="pullup-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">WEIGHTED PULL-UPS</span><span id="planned-pullup" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 5x5 @ BW</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">WEIGHTED PULL-UPS</span><span id="planned-pullup" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ BW</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:-6px;margin-bottom:6px;">lb added to harness (0 = bodyweight)</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:-6px;margin-bottom:6px;">lb added to harness (0 = bodyweight)</div>
     <div id="pullup-sets"></div>
     <button class="addbtn" onclick="addSet('pullup')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="pullup-notes" placeholder="Notes..."></div>
     <div id="rpe-confirm-pullup" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID PULL-UPS ACTUALLY FEEL? <span id="rpe-pred-pullup" style="color:var(--a);"></span></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;">HOW DID PULL-UPS ACTUALLY FEEL? <span id="rpe-pred-pullup" style="color:var(--a);"></span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-pullup"></div>
     </div>
   </div>
 
   <!-- v2026-05-22 -->
   <div class="card" id="row-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BARBELL ROW</span><span id="planned-row" style="font-family:var(--mono);font-size:11px;color:var(--a);">Planned: 4x8 @ 115</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BARBELL ROW</span><span id="planned-row" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 4x8 @ 115</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="row-sets"></div>
     <button class="addbtn" onclick="addSet('row')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="row-notes" placeholder="Notes..."></div>
     <div id="rpe-confirm-row" style="display:none;margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:8px;">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:8px;">HOW DID ROW ACTUALLY FEEL? <span id="rpe-pred-row" style="color:var(--a);"></span></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;">HOW DID ROW ACTUALLY FEEL? <span id="rpe-pred-row" style="color:var(--a);"></span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;" id="rpe-pills-row"></div>
     </div>
   </div>
@@ -1145,7 +1148,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div id="run-log-section" style="display:none;">
     <div class="card">
       <div class="lbl">run log</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:12px;">Strava syncs automatically overnight — only log here if you want to add notes or if Strava didn't capture it.</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-bottom:12px;">Strava syncs automatically overnight — only log here if you want to add notes or if Strava didn't capture it.</div>
       <div class="g2 k2" style="margin-bottom:10px;">
         <div class="ig"><label>Distance (miles)</label><input type="number" id="run-distance" step="0.1" placeholder="3.0"></div>
         <div class="ig"><label>Duration (min)</label><input type="number" id="run-duration" placeholder="30"></div>
@@ -1182,7 +1185,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
   <div class="card" id="week-suggestions-card" style="margin-bottom:14px;">
     <div class="lbl">7-day suggestions</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · go to Program tab to regenerate</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · go to Program tab to regenerate</div>
     <div id="week-suggestions"></div>
   </div>
 </div>
@@ -1206,16 +1209,16 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">strength trajectory</div>
       <div style="display:flex;gap:6px;">
-        <button class="btn bs bi chart-lift-btn" id="chart-bench" onclick="setChartLift('bench')" style="font-size:10px;padding:5px 10px;">BENCH</button>
-        <button class="btn bs bi chart-lift-btn" id="chart-squat" onclick="setChartLift('squat')" style="font-size:10px;padding:5px 10px;">SQUAT</button>
-        <button class="btn bs bi chart-lift-btn" id="chart-dl" onclick="setChartLift('dl')" style="font-size:10px;padding:5px 10px;">DL</button>
-        <button class="btn bs bi chart-lift-btn" id="chart-ohp" onclick="setChartLift('ohp')" style="font-size:10px;padding:5px 10px;">OHP</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-bench" onclick="setChartLift('bench')" style="font-size:var(--fs-xs);padding:5px 10px;">BENCH</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-squat" onclick="setChartLift('squat')" style="font-size:var(--fs-xs);padding:5px 10px;">SQUAT</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-dl" onclick="setChartLift('dl')" style="font-size:var(--fs-xs);padding:5px 10px;">DL</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-ohp" onclick="setChartLift('ohp')" style="font-size:var(--fs-xs);padding:5px 10px;">OHP</button>
       </div>
     </div>
     <div style="position:relative;height:220px;">
       <canvas id="e1rm-chart"></canvas>
     </div>
-    <div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--t3);">
+    <div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">
       <span>── Actual e1RM</span>
       <span style="color:rgba(255,183,77,.6);">── Optimistic</span>
       <span style="color:rgba(79,195,247,.6);">── Conservative</span>
@@ -1226,24 +1229,24 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">running trajectory</div>
       <div style="display:flex;gap:6px;">
-        <button class="btn bs bi" onclick="setRunChart('pace')" id="run-chart-pace" style="font-size:10px;padding:5px 10px;">PACE</button>
-        <button class="btn bs bi" onclick="setRunChart('distance')" id="run-chart-distance" style="font-size:10px;padding:5px 10px;">DISTANCE</button>
-        <button class="btn bs bi" onclick="setRunChart('vo2')" id="run-chart-vo2" style="font-size:10px;padding:5px 10px;">VO2</button>
+        <button class="btn bs bi" onclick="setRunChart('pace')" id="run-chart-pace" style="font-size:var(--fs-xs);padding:5px 10px;">PACE</button>
+        <button class="btn bs bi" onclick="setRunChart('distance')" id="run-chart-distance" style="font-size:var(--fs-xs);padding:5px 10px;">DISTANCE</button>
+        <button class="btn bs bi" onclick="setRunChart('vo2')" id="run-chart-vo2" style="font-size:var(--fs-xs);padding:5px 10px;">VO2</button>
       </div>
     </div>
     <div id="run-metrics-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
     <div style="position:relative;height:200px;"><canvas id="run-chart"></canvas></div>
     <div id="run-chart-legend"></div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
   </div>
 <div class="card" id="race-predictions-card" style="margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">race predictions</div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--t3);" id="race-pred-meta"></div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);" id="race-pred-meta"></div>
   </div>
 
   <!-- No data state -->
-  <div id="race-pred-nodata" style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px 0;display:none;">
+  <div id="race-pred-nodata" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;display:none;">
     Not enough data yet — log some runs to generate predictions
   </div>
 
@@ -1251,68 +1254,68 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div id="race-pred-grid" style="display:none;">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">5K</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">5K</div>
         <div style="font-size:20px;font-weight:600;color:var(--a);" id="pred-5k-time">--:--</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-5k-pace"></div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-5k-ci"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-5k-pace"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-5k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">10K</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">10K</div>
         <div style="font-size:20px;font-weight:600;color:var(--a);" id="pred-10k-time">--:--</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-10k-pace"></div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-10k-ci"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-10k-pace"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-10k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Half Marathon</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Half Marathon</div>
         <div style="font-size:20px;font-weight:600;color:var(--a2);" id="pred-half-time">--:--</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-half-pace"></div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-half-ci"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-half-pace"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-half-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Marathon</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Marathon</div>
         <div style="font-size:20px;font-weight:600;color:var(--t2);" id="pred-full-time">--:--</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;" id="pred-full-pace"></div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;" id="pred-full-ci"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-full-pace"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-full-ci"></div>
       </div>
     </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-bottom:14px;" id="race-pred-method"></div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:14px;" id="race-pred-method"></div>
 
     <details style="margin-bottom:14px;" id="race-pred-details">
-      <summary style="font-family:var(--mono);font-size:10px;color:var(--t3);cursor:pointer;user-select:none;list-style:none;padding:6px 0;">
+      <summary style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);cursor:pointer;user-select:none;list-style:none;padding:6px 0;">
         How this is calculated ▾
       </summary>
-      <div id="race-pred-formula" style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;padding:10px;background:var(--s2);border-radius:6px;margin-top:6px;white-space:pre-wrap;"></div>
+      <div id="race-pred-formula" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;padding:10px;background:var(--s2);border-radius:6px;margin-top:6px;white-space:pre-wrap;"></div>
     </details>
 
     <!-- Trajectory chart -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;">Predicted finish time trend</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;">Predicted finish time trend</div>
       <div style="display:flex;gap:4px;">
-        <button class="btn bs bi" id="rpbtn-5k" onclick="setRacePredChart('5k')" style="font-size:9px;padding:3px 8px;">5K</button>
-        <button class="btn bs bi" id="rpbtn-10k" onclick="setRacePredChart('10k')" style="font-size:9px;padding:3px 8px;">10K</button>
-        <button class="btn bs bi" id="rpbtn-half" onclick="setRacePredChart('half')" style="font-size:9px;padding:3px 8px;">HALF</button>
-        <button class="btn bs bi" id="rpbtn-full" onclick="setRacePredChart('full')" style="font-size:9px;padding:3px 8px;">FULL</button>
+        <button class="btn bs bi" id="rpbtn-5k" onclick="setRacePredChart('5k')" style="font-size:var(--fs-xs);padding:3px 8px;">5K</button>
+        <button class="btn bs bi" id="rpbtn-10k" onclick="setRacePredChart('10k')" style="font-size:var(--fs-xs);padding:3px 8px;">10K</button>
+        <button class="btn bs bi" id="rpbtn-half" onclick="setRacePredChart('half')" style="font-size:var(--fs-xs);padding:3px 8px;">HALF</button>
+        <button class="btn bs bi" id="rpbtn-full" onclick="setRacePredChart('full')" style="font-size:var(--fs-xs);padding:3px 8px;">FULL</button>
       </div>
     </div>
     <div style="position:relative;height:180px;">
       <canvas id="race-pred-chart"></canvas>
     </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;" id="race-pred-chart-legend"></div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;" id="race-pred-chart-legend"></div>
   </div>
 </div>
 <div class="card" id="body-metrics-card" style="display:none;margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">body composition</div>
     <div style="display:flex;gap:6px;">
-      <button class="btn bs bi" onclick="setBodyChart('weight')" id="body-btn-weight" style="font-size:10px;padding:5px 10px;">WEIGHT</button>
-      <button class="btn bs bi" onclick="setBodyChart('waist')" id="body-btn-waist" style="font-size:10px;padding:5px 10px;">WAIST</button>
-      <button class="btn bs bi" onclick="setBodyChart('bmi')" id="body-btn-bmi" style="font-size:10px;padding:5px 10px;">BMI</button>
+      <button class="btn bs bi" onclick="setBodyChart('weight')" id="body-btn-weight" style="font-size:var(--fs-xs);padding:5px 10px;">WEIGHT</button>
+      <button class="btn bs bi" onclick="setBodyChart('waist')" id="body-btn-waist" style="font-size:var(--fs-xs);padding:5px 10px;">WAIST</button>
+      <button class="btn bs bi" onclick="setBodyChart('bmi')" id="body-btn-bmi" style="font-size:var(--fs-xs);padding:5px 10px;">BMI</button>
     </div>
   </div>
   <div style="position:relative;height:180px;"><canvas id="body-chart"></canvas></div>
-  <div id="body-chart-legend" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px;"></div>
+  <div id="body-chart-legend" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;"></div>
 </div>
-  <div class="card"><div class="lbl">session history</div><div id="prog-sess-rows"><div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No sessions logged yet.</div></div><div id="prog-sess-nav"></div></div>
+  <div class="card"><div class="lbl">session history</div><div id="prog-sess-rows"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">No sessions logged yet.</div></div><div id="prog-sess-nav"></div></div>
 </div>
 
 <!-- v2026-05-22 -->
@@ -1321,7 +1324,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div class="card" style="margin-bottom:18px;">
     <div class="lbl">generate prescription</div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-      <select id="presc-workout-type" style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;flex:1;min-width:160px;">
+      <select id="presc-workout-type" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;flex:1;min-width:160px;">
         <option value="push">Push — Upper Strength</option>
         <option value="pull">Pull — Back &amp; Biceps</option>
         <option value="legs">Legs — Strength &amp; Stability</option>
@@ -1329,7 +1332,7 @@ input[type=range]::-webkit-slider-thumb:hover {
         <option value="cycling">Cycling</option>
         <option value="rest">Rest Day</option>
       </select>
-      <select id="presc-duration" style="font-family:var(--mono);font-size:11px;background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;">
+      <select id="presc-duration" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;">
         <option value="30">30 min</option>
         <option value="60" selected>60 min</option>
         <option value="90">90 min</option>
@@ -1337,19 +1340,19 @@ input[type=range]::-webkit-slider-thumb:hover {
       <button class="btn bp" id="presc-gen-btn" onclick="generateDailyPrescription(document.getElementById('presc-workout-type').value,+document.getElementById('presc-duration').value)">Get Prescription</button>
     </div>
     <div id="presc-summary" style="min-height:28px;margin-bottom:4px;"></div>
-    <div id="presc-gen-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);min-height:16px;margin-bottom:6px;"></div>
+    <div id="presc-gen-msg" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);min-height:16px;margin-bottom:6px;"></div>
     <button class="btn bp" style="width:100%;margin-top:8px;" onclick="startLoggingSession()">Start logging this session</button>
   </div>
   <div style="margin-bottom:20px;">
-    <div id="prog-date-header" style="font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;"></div>
+    <div id="prog-date-header" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;"></div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
       <div id="prog-block-badge"></div>
-      <div id="prog-block-desc" style="font-family:var(--mono);font-size:11px;color:var(--t3);"></div>
+      <div id="prog-block-desc" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);"></div>
     </div>
   </div>
   <div id="prog-today-card" class="prog-day-card prog-today" style="margin-bottom:12px;"></div>
   <div id="prog-no-plan" style="display:none;padding:20px;text-align:center;">
-    <div style="font-family:var(--mono);font-size:12px;color:var(--t3);">Select workout type and duration above, then tap "Get Prescription".</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">Select workout type and duration above, then tap "Get Prescription".</div>
   </div>
 </div>
 
@@ -1393,58 +1396,58 @@ input[type=range]::-webkit-slider-thumb:hover {
 <!-- v2026-05-22 -->
 <div id="panel-rules" class="panel">
   <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Training <span style="color:var(--a);">rules</span></h2>
-  <p style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:24px;">How the app decides what to prescribe — and what it won't let you do.</p>
+  <p style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-bottom:24px;">How the app decides what to prescribe — and what it won't let you do.</p>
 
   <!-- HARD RULES -->
   <div class="card" style="margin-bottom:16px;">
     <div class="lbl">Hard rules — enforced in code</div>
-    <p style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:16px;line-height:1.6;">These run before every AI call. The AI cannot override them. They protect against injury, overreaching, and training in a physiologically unsafe state.</p>
+    <p style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-bottom:16px;line-height:1.6;">These run before every AI call. The AI cannot override them. They protect against injury, overreaching, and training in a physiologically unsafe state.</p>
     <div id="rules-hard-list"></div>
   </div>
 
   <!-- SOFT RULES -->
   <div class="card" style="margin-bottom:16px;">
     <div class="lbl">Soft rules — AI judgment within bounds</div>
-    <p style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:16px;line-height:1.6;">These are evidence-based guidelines the AI follows when prescribing. They can be adjusted by context — your history, block phase, and recovery state all influence how the AI applies them.</p>
+    <p style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-bottom:16px;line-height:1.6;">These are evidence-based guidelines the AI follows when prescribing. They can be adjusted by context — your history, block phase, and recovery state all influence how the AI applies them.</p>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Progressive overload</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Progressive overload</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Double progression: reps first, then load. Add weight only when all sets reach the top of the rep range at RPE ≤8.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Rep ranges</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Rep ranges</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Deadlift 3–5 · Squat 4–6 · Bench/OHP 5–8 · Row/Pullup 6–10. Weighted pullups 4–6.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Load increments</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Load increments</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Lower body: +5lb when earned. Upper body: +2.5lb. Pullup belt: +5lb.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Stall detection</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Stall detection</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">2 consecutive sessions below rep range minimum → auto-deload to 90% of working weight.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Zone 2 pacing</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Zone 2 pacing</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">All easy runs at HR ≤147 bpm (MAF formula: 180 − 28 − 5). Current easy runs at 165–174 are threshold, not aerobic.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">80/20 polarization</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">80/20 polarization</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">~80% of weekly run volume at easy/Zone 2 pace. ~20% at quality intensity. Source: Seiler (2009).</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">4-week block structure</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">4-week block structure</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Week 1: accumulate (baseline volume). Week 2: build (+33% sets). Week 3: peak (+67% sets). Week 4: deload (−40% volume, no quality).</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Volume ceilings</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Volume ceilings</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Resident-adjusted maximum recoverable volume: Squat 16 sets/wk · Deadlift 10 · Bench 18 · OHP 14 · Row 16 · Pullup 16.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Run volume</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Run volume</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Maximum 10% weekly mileage increase. Long run ≤35% of weekly total. Deload week: 50% of peak mileage.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:4px;">Recovery windows</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Recovery windows</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Quality → quality: 48h min. Long run → quality: 72h. Legs → quality run: 24h. Legs → long run: 48h.</div>
       </div>
     </div>
@@ -1455,27 +1458,27 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="lbl">What AI contributes</div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Weekly prescription</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);margin-bottom:4px;">Weekly prescription</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Sets exact weights, sets, reps, and RPE targets for all 6 lifts based on your session history and biometric state.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Run prescription</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);margin-bottom:4px;">Run prescription</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Prescribes target HR, pace, duration, and structure for each of your 3 weekly runs based on fitness trend.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Accessory selection</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);margin-bottom:4px;">Accessory selection</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Chooses hypertrophy and stability accessories for each day based on block phase and your weak points.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Coaching narrative</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);margin-bottom:4px;">Coaching narrative</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Explains its reasoning — what it noticed in your data, what to watch for, and why it prescribed what it did.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Auto-regulation</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);margin-bottom:4px;">Auto-regulation</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Provides a specific rule for how to adjust the session in real time based on how it feels (e.g. stop set if RPE hits 9 early).</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--a2);margin-bottom:4px;">Recovery flag</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);margin-bottom:4px;">Recovery flag</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Raises a warning when biometrics indicate significant under-recovery, even if no single hard rule fires.</div>
       </div>
     </div>
@@ -1486,27 +1489,27 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="lbl">When to do what</div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Generate AI Plan</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);margin-bottom:4px;">Generate AI Plan</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">After logging a session. Monday morning. After any rest period of 5+ days. When biometrics spike (resting HR +10 bpm or HRV drops 30%+). Not more than once per day.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Log a session</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);margin-bottom:4px;">Log a session</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Immediately after training while details are fresh. Log RPE honestly — it's the primary signal the AI uses for progressive overload. One session per day type.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Daily check-in</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);margin-bottom:4px;">Daily check-in</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Every morning before training. Takes 30 seconds. Energy, sleep, and post-call status are the most important inputs — they directly control what the hard rule engine allows today.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Mark post-call</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);margin-bottom:4px;">Mark post-call</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Any morning after a call shift or night of total sleep loss. This is a hard block — the app will prevent quality and heavy training regardless of how you feel (catecholamine false readiness).</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Override schedule</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);margin-bottom:4px;">Override schedule</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">When life forces you to do a different workout than scheduled. Use the Today's Workout dropdown in Activity tab. The schedule ripples forward automatically.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">When to rest</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);margin-bottom:4px;">When to rest</div>
         <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">When the hard rule engine flags POST_CALL, FEVER_SIGNAL, or SLEEP_BLOCK. When HRV drops >20% below your 7-day mean. When you've had 3+ stalled lifts in 14 days (systemic overreaching signal).</div>
       </div>
     </div>
@@ -1515,7 +1518,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <!-- SOURCES -->
   <div class="card">
     <div class="lbl">Evidence base</div>
-    <p style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;">
+    <p style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;">
       Maffetone (2010) · Seiler &amp; Tønnessen (2009) · Daniels (2013) · NSCA Essentials 4th ed. · Zourdos et al. (2016) · Israetel/Renaissance Periodization · Milewski et al. (2014) · Dawson &amp; Reid (1997) · Leveritt &amp; Abernethy (1999) · Schumann et al. (2014) · Plews et al. (2013) · Foster et al. (2001) · Besedovsky et al. (2019) · Blumert et al. (2007)
     </p>
   </div>
@@ -1530,10 +1533,10 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="ig" style="margin-bottom:18px;">
       <label>Color theme</label>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-        <button data-theme="dark" onclick="setTheme('dark')" style="font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🌑 Dark</button>
-        <button data-theme="light" onclick="setTheme('light')" style="font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">☀️ Light</button>
-        <button data-theme="midnight" onclick="setTheme('midnight')" style="font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🌌 Midnight</button>
-        <button data-theme="warm" onclick="setTheme('warm')" style="font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🍂 Warm</button>
+        <button data-theme="dark" onclick="setTheme('dark')" style="font-family:var(--mono);font-size:var(--fs-sm);padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🌑 Dark</button>
+        <button data-theme="light" onclick="setTheme('light')" style="font-family:var(--mono);font-size:var(--fs-sm);padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">☀️ Light</button>
+        <button data-theme="midnight" onclick="setTheme('midnight')" style="font-family:var(--mono);font-size:var(--fs-sm);padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🌌 Midnight</button>
+        <button data-theme="warm" onclick="setTheme('warm')" style="font-family:var(--mono);font-size:var(--fs-sm);padding:10px 20px;border-radius:8px;border:2px solid var(--b2);background:var(--s2);color:var(--t2);cursor:pointer;transition:all .15s;">🍂 Warm</button>
       </div>
     </div>
 
@@ -1570,172 +1573,181 @@ input[type=range]::-webkit-slider-thumb:hover {
         <span style="font-family:var(--mono);color:var(--a);"><span id="font-size-lbl">19</span>px</span>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:10px;">
-        <button id="fsp-xs" onclick="applyFontPreset(14)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XS<div style="font-size:9px;color:var(--t3);margin-top:2px;">compact</div></button>
-        <button id="fsp-s" onclick="applyFontPreset(17)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">S<div style="font-size:9px;color:var(--t3);margin-top:2px;">small</div></button>
-        <button id="fsp-m" onclick="applyFontPreset(19)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">M<div style="font-size:9px;color:var(--t3);margin-top:2px;">default</div></button>
-        <button id="fsp-l" onclick="applyFontPreset(22)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">L<div style="font-size:9px;color:var(--t3);margin-top:2px;">readable</div></button>
-        <button id="fsp-xl" onclick="applyFontPreset(26)" style="flex:1;font-family:var(--mono);font-size:11px;padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XL<div style="font-size:9px;color:var(--t3);margin-top:2px;">large</div></button>
+        <button id="fsp-xs" onclick="applyFontPreset(14)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XS<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">compact</div></button>
+        <button id="fsp-s" onclick="applyFontPreset(17)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">S<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">small</div></button>
+        <button id="fsp-m" onclick="applyFontPreset(19)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">M<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">default</div></button>
+        <button id="fsp-l" onclick="applyFontPreset(22)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">L<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">readable</div></button>
+        <button id="fsp-xl" onclick="applyFontPreset(26)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XL<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">large</div></button>
       </div>
       <input type="range" id="font-size-range" min="14" max="30" value="19" oninput="setFontSize(this.value)">
-      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:5px;"><span>14 compact</span><span>30 large</span></div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:5px;"><span>14 compact</span><span>30 large</span></div>
+    </div>
+
+    <div class="ig" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <label style="margin:0;">Small text size</label>
+        <span style="font-family:var(--mono);color:var(--a);"><span id="small-text-lbl">12</span>px</span>
+      </div>
+      <input type="range" id="small-text-range" min="9" max="22" value="12" oninput="setSmallTextSize(this.value)">
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:5px;"><span>9 tiny</span><span>22 large</span></div>
     </div>
 
     <div style="margin-bottom:8px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.06em;flex:1;">COMPONENT FONT SIZES</div>
-        <button id="fs-tab-desktop" onclick="showFsTab('desktop')" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--a);background:var(--a);color:var(--bg);cursor:pointer;transition:all .15s;">Desktop</button>
-        <button id="fs-tab-mobile" onclick="showFsTab('mobile')" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;">Mobile</button>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);letter-spacing:.06em;flex:1;">COMPONENT FONT SIZES</div>
+        <button id="fs-tab-desktop" onclick="showFsTab('desktop')" style="font-family:var(--mono);font-size:var(--fs-xs);padding:3px 10px;border-radius:5px;border:1px solid var(--a);background:var(--a);color:var(--bg);cursor:pointer;transition:all .15s;">Desktop</button>
+        <button id="fs-tab-mobile" onclick="showFsTab('mobile')" style="font-family:var(--mono);font-size:var(--fs-xs);padding:3px 10px;border-radius:5px;border:1px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;">Mobile</button>
       </div>
 
       <div id="fs-pane-desktop">
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Logo / wordmark</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-logo">28</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Logo / wordmark</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-logo">28</span>px</span>
           </div>
           <input type="range" id="fs-rng-logo" min="14" max="42" value="28" oninput="setComponentFontSize('logo',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Nav tabs</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-nav">25</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Nav tabs</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-nav">25</span>px</span>
           </div>
           <input type="range" id="fs-rng-nav" min="10" max="36" value="25" oninput="setComponentFontSize('nav',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Page headings</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-heading">29</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Page headings</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-heading">29</span>px</span>
           </div>
           <input type="range" id="fs-rng-heading" min="16" max="52" value="29" oninput="setComponentFontSize('heading',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Section labels</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-sublabel">20</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Section labels</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-sublabel">20</span>px</span>
           </div>
           <input type="range" id="fs-rng-sublabel" min="10" max="28" value="20" oninput="setComponentFontSize('sublabel',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Badges &amp; tags</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-badge">24</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Badges &amp; tags</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-badge">24</span>px</span>
           </div>
           <input type="range" id="fs-rng-badge" min="10" max="28" value="24" oninput="setComponentFontSize('badge',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Form inputs</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-input">23</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Form inputs</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-input">23</span>px</span>
           </div>
           <input type="range" id="fs-rng-input" min="12" max="34" value="23" oninput="setComponentFontSize('input',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Buttons</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-btn">25</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Buttons</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-btn">25</span>px</span>
           </div>
           <input type="range" id="fs-rng-btn" min="10" max="34" value="25" oninput="setComponentFontSize('btn',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Card body text</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-cardtext">23</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Card body text</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-cardtext">23</span>px</span>
           </div>
           <input type="range" id="fs-rng-cardtext" min="12" max="34" value="23" oninput="setComponentFontSize('cardtext',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Exercise &amp; program</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-exercise">23</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Exercise &amp; program</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-exercise">23</span>px</span>
           </div>
           <input type="range" id="fs-rng-exercise" min="12" max="34" value="23" oninput="setComponentFontSize('exercise',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Stat numbers</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-dataval">32</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Stat numbers</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-dataval">32</span>px</span>
           </div>
           <input type="range" id="fs-rng-dataval" min="16" max="52" value="32" oninput="setComponentFontSize('dataval',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Calendar text</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-caltext">22</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Calendar text</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-caltext">22</span>px</span>
           </div>
           <input type="range" id="fs-rng-caltext" min="10" max="28" value="22" oninput="setComponentFontSize('caltext',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Timestamps &amp; meta</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-mono">24</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Timestamps &amp; meta</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-mono">24</span>px</span>
           </div>
           <input type="range" id="fs-rng-mono" min="10" max="28" value="24" oninput="setComponentFontSize('mono',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:2px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Prescription text</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-presctext">13</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Prescription text</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-presctext">13</span>px</span>
           </div>
           <input type="range" id="fs-rng-presctext" min="10" max="24" value="13" oninput="setComponentFontSize('presctext',+this.value)">
         </div>
       </div>
 
       <div id="fs-pane-mobile" style="display:none;">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:12px;line-height:1.6;">These override sizes only on screens ≤768px (phones).</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;line-height:1.6;">These override sizes only on screens ≤768px (phones).</div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Mobile logo</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_mlogo">20</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Mobile logo</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_mlogo">20</span>px</span>
           </div>
           <input type="range" id="fs-rng-m_mlogo" min="12" max="28" value="20" oninput="setMobileComponentFontSize('m_mlogo',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Nav icons</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_nav">14</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Nav icons</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_nav">14</span>px</span>
           </div>
           <input type="range" id="fs-rng-m_nav" min="8" max="20" value="14" oninput="setMobileComponentFontSize('m_nav',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Nav labels</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_navlbl">8</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Nav labels</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_navlbl">8</span>px</span>
           </div>
           <input type="range" id="fs-rng-m_navlbl" min="6" max="12" value="8" oninput="setMobileComponentFontSize('m_navlbl',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Page headings</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_heading">22</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Page headings</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_heading">22</span>px</span>
           </div>
           <input type="range" id="fs-rng-m_heading" min="14" max="32" value="22" oninput="setMobileComponentFontSize('m_heading',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Labels</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_label">13</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Labels</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_label">13</span>px</span>
           </div>
           <input type="range" id="fs-rng-m_label" min="9" max="20" value="13" oninput="setMobileComponentFontSize('m_label',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Form inputs</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_input">16</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Form inputs</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_input">16</span>px</span>
           </div>
           <input type="range" id="fs-rng-m_input" min="12" max="22" value="16" oninput="setMobileComponentFontSize('m_input',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Buttons</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_btn">12</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Buttons</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_btn">12</span>px</span>
           </div>
           <input type="range" id="fs-rng-m_btn" min="10" max="22" value="12" oninput="setMobileComponentFontSize('m_btn',+this.value)">
         </div>
         <div class="ig" style="margin-bottom:2px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:13px;">Card text</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:13px;"><span id="fs-lbl-m_cardtext">14</span>px</span>
+            <label style="margin:0;font-size:var(--fs-sm);">Card text</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_cardtext">14</span>px</span>
           </div>
           <input type="range" id="fs-rng-m_cardtext" min="11" max="20" value="14" oninput="setMobileComponentFontSize('m_cardtext',+this.value)">
         </div>
@@ -1762,7 +1774,7 @@ input[type=range]::-webkit-slider-thumb:hover {
         <button class="btn bs bi" onclick="testCon()">Test connection</button>
         <button class="btn bs bi" onclick="fetchData()">Reload data</button>
       </div>
-      <div id="gh-st" style="margin-top:8px;font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
+      <div id="gh-st" style="margin-top:8px;font-size:var(--fs-sm);color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
     </div>
     <div class="card">
       <div class="abox">
@@ -1772,7 +1784,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       </div>
       <div class="ig"><label>Anthropic API Key (sk-ant-...)</label><input type="password" id="api-key" placeholder="sk-ant-api03-..."></div>
       <div class="brow"><button class="btn bp bi" onclick="saveAPI()">Save key</button><button class="btn bd bi" onclick="clearAPI()">Clear</button><button class="btn bs bi" onclick="debugAPI()">Test API key</button></div>
-      <div id="api-st" style="margin-top:8px;font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
+      <div id="api-st" style="margin-top:8px;font-size:var(--fs-sm);color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
       <div class="dvdr"></div>
       <div class="lbl">field migration tool</div>
       <div style="font-size:var(--fs-presc-text);color:var(--t2);margin-bottom:10px;line-height:1.6;">If you rename a data field, use this to safely move your data to the new field name.</div>
@@ -1781,11 +1793,11 @@ input[type=range]::-webkit-slider-thumb:hover {
         <div class="ig"><label>New field name</label><input type="text" id="mig-new" placeholder="e.g. workoutSessions"></div>
       </div>
       <button class="btn bs bi" onclick="runMig()">Run migration</button>
-      <div id="mig-st" style="margin-top:8px;font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
+      <div id="mig-st" style="margin-top:8px;font-size:var(--fs-sm);color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
       <div class="dvdr"></div>
       <div class="lbl">data</div>
       <div class="brow"><button class="btn bs bi" onclick="exportData()">Export data.json</button><button class="btn bd bi" onclick="clrCFG()">Clear local settings</button></div>
-      <div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:var(--r);font-size:11px;color:var(--t3);line-height:1.6;">Your data lives in <strong style="color:var(--t);">data.json</strong> on GitHub -- separate from this UI file. Update index.html freely. Your logged data is always safe.</div>
+      <div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:var(--r);font-size:var(--fs-sm);color:var(--t3);line-height:1.6;">Your data lives in <strong style="color:var(--t);">data.json</strong> on GitHub -- separate from this UI file. Update index.html freely. Your logged data is always safe.</div>
     </div>
   </div>
 </div>
@@ -1938,6 +1950,7 @@ function applyAppearance(){
   const savedSize=localStorage.getItem('wos-fontsize')||'19';
   _applyFontSize(savedSize);
   _syncFontPresetBtns(+savedSize);
+  _applySmallTextSize(localStorage.getItem('wos-smalltext')||'12');
   _applyComponentFontSizes();
   _applyMobileComponentFontSizes();
 }
@@ -1958,6 +1971,17 @@ function _applyFontSize(px){document.body.style.fontSize=px+'px';}
 function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
 function setFontPair(name){localStorage.setItem('wos-font',name);_applyFont(name);_syncAppearanceUI();}
 function setFontSize(px){localStorage.setItem('wos-fontsize',px);_applyFontSize(px);const e=document.getElementById('font-size-lbl');if(e)e.textContent=px;_syncFontPresetBtns(+px);}
+function setSmallTextSize(px){
+  localStorage.setItem('wos-smalltext',px);
+  _applySmallTextSize(px);
+  const lbl=document.getElementById('small-text-lbl');if(lbl)lbl.textContent=px;
+  const rng=document.getElementById('small-text-range');if(rng)rng.value=px;
+}
+function _applySmallTextSize(px){
+  const xs=Math.max(9,Math.round(+px*0.85));
+  document.documentElement.style.setProperty('--fs-xs',xs+'px');
+  document.documentElement.style.setProperty('--fs-sm',px+'px');
+}
 const FONT_PRESETS={
   14:{base:14,logo:21,nav:18,heading:21,sublabel:15,badge:18,input:17,btn:18,cardtext:17,exercise:17,dataval:24,caltext:16,mono:18,presctext:10,m_mlogo:15,m_nav:10,m_navlbl:6,m_heading:16,m_label:10,m_input:12,m_btn:9,m_cardtext:10},
   17:{base:17,logo:25,nav:22,heading:26,sublabel:18,badge:21,input:21,btn:22,cardtext:21,exercise:21,dataval:29,caltext:20,mono:21,presctext:12,m_mlogo:18,m_nav:13,m_navlbl:7,m_heading:20,m_label:12,m_input:14,m_btn:11,m_cardtext:13},
@@ -1980,6 +2004,9 @@ function applyFontPreset(px){
       const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=val;
     }
   });
+  // scale small text proportionally with the preset
+  const smallPx=Math.round(12*(+px/19));
+  setSmallTextSize(Math.max(9,Math.min(22,smallPx)));
   _applyComponentFontSizes();
   _applyMobileComponentFontSizes();
   _syncFontPresetBtns(px);
@@ -2033,6 +2060,10 @@ function _syncAppearanceUI(){
   const fs=document.getElementById('font-pair-select');if(fs)fs.value=font;
   const fr=document.getElementById('font-size-range');if(fr)fr.value=size;
   const fl=document.getElementById('font-size-lbl');if(fl)fl.textContent=size;
+  const smallPx=localStorage.getItem('wos-smalltext')||'12';
+  const sr=document.getElementById('small-text-range');if(sr)sr.value=smallPx;
+  const sl=document.getElementById('small-text-lbl');if(sl)sl.textContent=smallPx;
+  _syncFontPresetBtns(+size);
   Object.entries(FS_COMPONENTS).forEach(([key,cfg])=>{
     const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
     const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=px;
@@ -2390,10 +2421,10 @@ function renderSystemLog() {
   // Sort reverse chronological
   events.sort((a, b) => b.ts - a.ts);
   if (!events.length) {
-    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px 0;">No activity in the last 7 days.</div>';
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;">No activity in the last 7 days.</div>';
     return;
   }
-  el.innerHTML = events.map(e => `<div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--b);align-items:flex-start;"><div style="font-size:16px;color:${e.color};flex-shrink:0;width:20px;text-align:center;margin-top:1px;">${e.icon}</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><div style="font-size:12px;color:var(--t);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.title}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);flex-shrink:0;">${fmtTs(e.ts)}</div></div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.detail}</div></div></div>`).join('');
+  el.innerHTML = events.map(e => `<div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--b);align-items:flex-start;"><div style="font-size:16px;color:${e.color};flex-shrink:0;width:20px;text-align:center;margin-top:1px;">${e.icon}</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><div style="font-size:var(--fs-sm);color:var(--t);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.title}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);flex-shrink:0;">${fmtTs(e.ts)}</div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.detail}</div></div></div>`).join('');
 }
 
 // ============================================================
@@ -2421,11 +2452,11 @@ function renderRulesTab(){
     const status=active?'⚠ ACTIVE':'✓ clear';
     return '<div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid '+(active?'rgba(220,40,60,.25)':'var(--b)')+';margin-bottom:8px;">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">'+
-      '<div style="font-family:var(--mono);font-size:11px;color:'+color+';">'+rule.title+'</div>'+
-      '<div style="font-family:var(--mono);font-size:10px;color:'+color+';white-space:nowrap;margin-left:12px;">'+status+'</div>'+
+      '<div style="font-family:var(--mono);font-size:var(--fs-sm);color:'+color+';">'+rule.title+'</div>'+
+      '<div style="font-family:var(--mono);font-size:var(--fs-xs);color:'+color+';white-space:nowrap;margin-left:12px;">'+status+'</div>'+
       '</div>'+
       '<div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;margin-bottom:6px;">'+rule.desc+'</div>'+
-      '<div style="font-family:var(--mono);font-size:10px;color:var(--t3);">'+rule.threshold+'</div>'+
+      '<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">'+rule.threshold+'</div>'+
       '</div>';
   }).join('');
 }
@@ -2562,7 +2593,7 @@ function renderSessHist(){
   const dayNames={'A':'Lift A — Upper','B':'Lift B — Squat','C':'Lift C — Deadlift','run':'Run','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run','1':'Upper Strength','2':'Lower Strength','3':'Recovery/Cardio','4':'Upper Hypertrophy','5':'Lower+Conditioning'};
   const render=(id,limit)=>{
     const el=document.getElementById(id);if(!el) return;
-    if(!D||!D.sessions||!D.sessions.length){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div>';return;}
+    if(!D||!D.sessions||!D.sessions.length){el.innerHTML='<div style="font-size:var(--fs-sm);color:var(--t3);font-style:italic;">No sessions logged yet.</div>';return;}
     el.innerHTML=[...D.sessions].reverse().slice(0,limit).map(s=>{
       const pts=[];
       if(s.bench?.sets?.length){const b=s.bench.sets.filter(x=>x.w).sort((a,c)=>c.w-a.w)[0];if(b)pts.push('Bench '+b.w+'x'+b.r);}
@@ -2748,7 +2779,7 @@ function buildSessionDrawerContent(session,dateStr){
   const dateObj=new Date(dateStr+'T12:00:00');
   const dateDisplay=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const dayLabel=dayLabels[String(session.day)]||session.day||'Workout';
-  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;z-index:1;"><div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div><div style="font-size:17px;font-weight:600;color:var(--t);">${dayLabel}</div></div><button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">×</button></div><div style="padding:20px;">`;
+  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;z-index:1;"><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div><div style="font-size:17px;font-weight:600;color:var(--t);">${dayLabel}</div></div><button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">×</button></div><div style="padding:20px;">`;
   const meta=[];
   if(session.duration) meta.push(`${session.duration} min`);
   if(session.rpe)      meta.push(`RPE ${session.rpe}`);
@@ -2756,7 +2787,7 @@ function buildSessionDrawerContent(session,dateStr){
   if(session.sleep)    meta.push(`Sleep ${session.sleep}h`);
   if(session.bw)       meta.push(`${session.bw} lb`);
   if(meta.length){
-    html+=`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">${meta.map(m=>`<span style="font-family:var(--mono);font-size:11px;background:var(--s3);color:var(--t2);padding:4px 10px;border-radius:6px;border:1px solid var(--b);">${m}</span>`).join('')}</div>`;
+    html+=`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">${meta.map(m=>`<span style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t2);padding:4px 10px;border-radius:6px;border:1px solid var(--b);">${m}</span>`).join('')}</div>`;
   }
   const liftKeys=[{key:'bench',label:'Bench Press'},{key:'ohp',label:'Overhead Press'},{key:'pullup',label:'Weighted Pull-ups'},{key:'row',label:'Barbell Row'},{key:'squat',label:'Back Squat'},{key:'dl',label:'Deadlift'}];
   const liftSections=liftKeys.filter(l=>session[l.key]?.sets?.length>0).map(l=>{
@@ -2765,14 +2796,14 @@ function buildSessionDrawerContent(session,dateStr){
       const w=s.w?`${s.w} lb`:'BW';
       const r=s.r?`× ${s.r}`:'';
       const rpe=s.rpe?`@ RPE ${s.rpe}`:'';
-      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b);"><span style="font-family:var(--mono);font-size:10px;color:var(--t3);width:20px;">S${i+1}</span><span style="font-family:var(--mono);font-size:13px;color:var(--t);flex:1;">${w} ${r}</span><span style="font-family:var(--mono);font-size:11px;color:var(--t3);">${rpe}</span></div>`;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b);"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);width:20px;">S${i+1}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);flex:1;">${w} ${r}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">${rpe}</span></div>`;
     }).join('');
-    const notes=session[l.key].notes?`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;padding:8px;background:var(--s3);border-radius:6px;">${session[l.key].notes}</div>`:'';
-    return `<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">${l.label}</div>${rows}${notes}</div>`;
+    const notes=session[l.key].notes?`<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;padding:8px;background:var(--s3);border-radius:6px;">${session[l.key].notes}</div>`:'';
+    return `<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">${l.label}</div>${rows}${notes}</div>`;
   }).join('');
-  const legacyPullups=!session.pullup?.sets?.length&&session.pullups?`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Pull-ups</div><div style="font-family:var(--mono);font-size:13px;color:var(--t);">${session.pullups.sets||'—'} sets × ${session.pullups.reps||'—'} reps</div></div>`:'';
+  const legacyPullups=!session.pullup?.sets?.length&&session.pullups?`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Pull-ups</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);">${session.pullups.sets||'—'} sets × ${session.pullups.reps||'—'} reps</div></div>`:'';
   if(liftSections||legacyPullups){
-    html+=`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Lifts</div>${liftSections}${legacyPullups}`;
+    html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Lifts</div>${liftSections}${legacyPullups}`;
   }
   const _runTypes=['run','run_easy','run_quality','run_long','easy','long','intervals','tempo','moderate'];
   const _isRunDay=_runTypes.includes(String(session.day||'').toLowerCase());
@@ -2787,28 +2818,28 @@ function buildSessionDrawerContent(session,dateStr){
       c.hrMax?{lbl:'Max HR',val:`${c.hrMax} bpm`}:null,
       c.elev?{lbl:'Elevation',val:`${Math.round(c.elev)} ft`}:null,
     ].filter(Boolean);
-    const statBoxes=stats.map(s=>`<div style="background:var(--s3);border:1px solid var(--b);border-radius:10px;padding:10px 14px;text-align:center;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:14px;color:var(--t);font-weight:500;">${s.val}</div></div>`).join('');
-    const runTypeBadge=c.runType?`<span style="font-family:var(--mono);font-size:9px;background:rgba(42,160,112,0.15);color:var(--a2);padding:3px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.06em;margin-right:6px;">${c.runType}</span>`:'';
-    const stravaBadge=session.isStrava?`<span style="font-family:var(--mono);font-size:9px;background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">Strava</span>`:'';
+    const statBoxes=stats.map(s=>`<div style="background:var(--s3);border:1px solid var(--b);border-radius:10px;padding:10px 14px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:14px;color:var(--t);font-weight:500;">${s.val}</div></div>`).join('');
+    const runTypeBadge=c.runType?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(42,160,112,0.15);color:var(--a2);padding:3px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.06em;margin-right:6px;">${c.runType}</span>`:'';
+    const stravaBadge=session.isStrava?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">Strava</span>`:'';
     const actName=(c.type&&c.type!=='Run')?`<div style="font-size:15px;color:var(--t);font-weight:500;margin-bottom:10px;">${c.type}</div>`:'';
-    html+=`<div style="margin-bottom:20px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Run</div>${actName}<div style="margin-bottom:10px;">${runTypeBadge}${stravaBadge}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">${statBoxes}</div></div>`;
+    html+=`<div style="margin-bottom:20px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Run</div>${actName}<div style="margin-bottom:10px;">${runTypeBadge}${stravaBadge}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">${statBoxes}</div></div>`;
   } else if(session.cardio&&(session.cardio.dur>0||session.cardio.dist>0)){
     const c=session.cardio;
     const cardioMeta=[c.type,c.dur?`${c.dur} min`:null,c.dist?`${c.dist} mi`:null,c.pace?`${c.pace}/mi`:null,c.hr?`HR ${c.hr} bpm`:null,c.rpe?`RPE ${c.rpe}`:null].filter(Boolean).join(' · ');
-    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Cardio</div><div style="font-family:var(--mono);font-size:13px;color:var(--t);">${cardioMeta}</div>${c.notes?`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;">${c.notes}</div>`:''}</div>`;
+    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Cardio</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);">${cardioMeta}</div>${c.notes?`<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;">${c.notes}</div>`:''}</div>`;
   }
   if((session.accessories||[]).length){
     const accRows=session.accessories.map(a=>{
       const parts=[a.prescribed,a.weight?`${a.weight} lb`:null,a.sets&&a.reps?`${a.sets}×${a.reps}`:null].filter(Boolean).join(' · ');
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b);"><div style="font-family:var(--mono);font-size:12px;color:var(--t);">${a.name}</div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:11px;color:var(--a5);">${parts}</div>${a.notes?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${a.notes}</div>`:''}</div></div>`;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);">${a.name}</div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);">${parts}</div>${a.notes?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">${a.notes}</div>`:''}</div></div>`;
     }).join('');
-    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Accessories</div>${accRows}</div>`;
+    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Accessories</div>${accRows}</div>`;
   }
   if(session.notes){
-    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Notes</div><div style="font-size:14px;color:var(--t2);line-height:1.5;">${session.notes}</div></div>`;
+    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Notes</div><div style="font-size:14px;color:var(--t2);line-height:1.5;">${session.notes}</div></div>`;
   }
   if(session.ts){
-    html+=`<div style="margin-top:8px;padding-top:16px;border-top:1px solid var(--b);"><button onclick="editSession(${session.ts})" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:8px;padding:10px;cursor:pointer;letter-spacing:.04em;">Edit session</button></div>`;
+    html+=`<div style="margin-top:8px;padding-top:16px;border-top:1px solid var(--b);"><button onclick="editSession(${session.ts})" style="width:100%;font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:8px;padding:10px;cursor:pointer;letter-spacing:.04em;">Edit session</button></div>`;
   }
   html+=`</div>`;
   return html;
@@ -2830,7 +2861,7 @@ function renderSessionList(){
   const start=sessionListPage*10;
   const slice=acts.slice(start,start+10);
   if(!total){
-    el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No sessions logged yet.</div>';
+    el.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">No sessions logged yet.</div>';
     if(navEl) navEl.innerHTML='';
     return;
   }
@@ -2842,11 +2873,11 @@ function renderSessionList(){
     ['bench','ohp','squat','dl'].forEach(k=>{if(s[k]?.sets?.length){const b=s[k].sets.filter(x=>x.w).sort((a,b)=>b.w-a.w)[0];if(b)pts.push(k.toUpperCase()+' '+b.w+'\xd7'+b.r);}});
     if(s.cardio?.dist) pts.push(s.cardio.dist+'mi');
     const dotClr=isRunType(s.day)?'var(--a2)':'var(--a)';
-    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:9px;height:9px;border-radius:50%;background:${dotClr};flex-shrink:0;display:inline-block;margin-top:1px;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:var(--mono);font-size:11px;color:var(--t3);">${ds}</span><span style="font-family:var(--mono);font-size:11px;color:var(--t);font-weight:500;">${label}</span></div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
+    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:9px;height:9px;border-radius:50%;background:${dotClr};flex-shrink:0;display:inline-block;margin-top:1px;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">${ds}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
   }).join('');
   if(navEl){
     const hasPrev=start>0,hasNext=start+10<total;
-    navEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);"><button onclick="sessionListPage--;renderSessionList()" ${hasPrev?'':'disabled'} style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasPrev?'':'opacity:0.35;'}">&#8592; Older</button><span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${start+1}–${Math.min(start+10,total)} of ${total}</span><button onclick="sessionListPage++;renderSessionList()" ${hasNext?'':'disabled'} style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasNext?'':'opacity:0.35;'}">Newer &#8594;</button></div>`;
+    navEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);"><button onclick="sessionListPage--;renderSessionList()" ${hasPrev?'':'disabled'} style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasPrev?'':'opacity:0.35;'}">&#8592; Older</button><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${start+1}–${Math.min(start+10,total)} of ${total}</span><button onclick="sessionListPage++;renderSessionList()" ${hasNext?'':'disabled'} style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasNext?'':'opacity:0.35;'}">Newer &#8594;</button></div>`;
   }
 }
 function renderProgressSessions(){
@@ -2860,7 +2891,7 @@ function renderProgressSessions(){
   const start=progressSessionPage*10;
   const slice=acts.slice(start,start+10);
   if(!total){
-    el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No sessions logged yet.</div>';
+    el.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">No sessions logged yet.</div>';
     if(navEl) navEl.innerHTML='';
     return;
   }
@@ -2872,11 +2903,11 @@ function renderProgressSessions(){
     ['bench','ohp','squat','dl'].forEach(k=>{if(s[k]?.sets?.length){const b=s[k].sets.filter(x=>x.w).sort((a,b)=>b.w-a.w)[0];if(b)pts.push(k.toUpperCase()+' '+b.w+'\xd7'+b.r);}});
     if(s.cardio?.dist) pts.push(s.cardio.dist+'mi');
     const dotClr=isRunType(s.day)?'var(--a2)':'var(--a)';
-    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:9px;height:9px;border-radius:50%;background:${dotClr};flex-shrink:0;display:inline-block;margin-top:1px;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:var(--mono);font-size:11px;color:var(--t3);">${ds}</span><span style="font-family:var(--mono);font-size:11px;color:var(--t);font-weight:500;">${label}</span></div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
+    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:9px;height:9px;border-radius:50%;background:${dotClr};flex-shrink:0;display:inline-block;margin-top:1px;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">${ds}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
   }).join('');
   if(navEl){
     const hasPrev=start>0,hasNext=start+10<total;
-    navEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);"><button onclick="progressSessionPage--;renderProgressSessions()" ${hasPrev?'':'disabled'} style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasPrev?'':'opacity:0.35;'}">&#8592; Older</button><span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${start+1}–${Math.min(start+10,total)} of ${total}</span><button onclick="progressSessionPage++;renderProgressSessions()" ${hasNext?'':'disabled'} style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasNext?'':'opacity:0.35;'}">Newer &#8594;</button></div>`;
+    navEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);"><button onclick="progressSessionPage--;renderProgressSessions()" ${hasPrev?'':'disabled'} style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasPrev?'':'opacity:0.35;'}">&#8592; Older</button><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${start+1}–${Math.min(start+10,total)} of ${total}</span><button onclick="progressSessionPage++;renderProgressSessions()" ${hasNext?'':'disabled'} style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasNext?'':'opacity:0.35;'}">Newer &#8594;</button></div>`;
   }
 }
 function editSession(ts){
@@ -2891,24 +2922,24 @@ function buildEditForm(session){
   const liftKeys=[{key:'bench',label:'Bench Press'},{key:'ohp',label:'OHP'},{key:'pullup',label:'Pull-ups'},{key:'row',label:'Barbell Row'},{key:'squat',label:'Back Squat'},{key:'dl',label:'Deadlift'}];
   const dayOpts=['push','pull','legs','run','run_easy','run_quality','run_long','rest'];
   const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
-  const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
-  const colHdr=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:4px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">WEIGHT</div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">REPS</div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">RPE</div><div></div></div>`;
+  const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
+  const colHdr=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">WEIGHT</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">REPS</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">RPE</div><div></div></div>`;
   const rmBtn=(key,i)=>`<button onclick="removeEditSet('${key}',${i},${session.ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button>`;
-  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:1;"><div style="font-family:var(--mono);font-size:11px;color:var(--a);text-transform:uppercase;letter-spacing:.08em;">Edit &middot; ${session.date}</div><button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;">&#215;</button></div><div style="padding:20px;">`;
-  html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Session type</div><select id="edit-day" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;">${dayOpts.map(o=>`<option value="${o}"${session.day===o?' selected':''}>${o}</option>`).join('')}</select></div>`;
+  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:1;"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);text-transform:uppercase;letter-spacing:.08em;">Edit &middot; ${session.date}</div><button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;">&#215;</button></div><div style="padding:20px;">`;
+  html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Session type</div><select id="edit-day" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;">${dayOpts.map(o=>`<option value="${o}"${session.day===o?' selected':''}>${o}</option>`).join('')}</select></div>`;
   liftKeys.forEach(({key,label})=>{
     const lift=session[key]; if(!lift?.sets?.length) return;
     window._EF[key]=lift.sets.map(s=>({...s}));
     const rowsHtml=lift.sets.map((s,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${i}`,s.w,'lb')}${numInp(`edit-${key}-r-${i}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${i}`,s.rpe,'RPE')}${rmBtn(key,i)}</div>`).join('');
-    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}<div id="edit-sets-${key}">${rowsHtml}</div>`;
-    html+=`<input id="edit-${key}-notes" type="text" value="${esc(lift.notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;margin-top:2px;"></div>`;
+    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}<div id="edit-sets-${key}">${rowsHtml}</div>`;
+    html+=`<input id="edit-${key}-notes" type="text" value="${esc(lift.notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;margin-top:2px;"></div>`;
   });
   if(session.cardio){
     const c=session.cardio;
-    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Cardio</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">${numInp('edit-cardio-dist',c.dist,'Dist (mi)')}${numInp('edit-cardio-dur',c.dur,'Dur (min)')}${numInp('edit-cardio-hr',c.hr,'Avg HR')}${numInp('edit-cardio-rpe',c.rpe,'RPE')}</div><input id="edit-cardio-notes" type="text" value="${esc(c.notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;"></div>`;
+    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Cardio</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">${numInp('edit-cardio-dist',c.dist,'Dist (mi)')}${numInp('edit-cardio-dur',c.dur,'Dur (min)')}${numInp('edit-cardio-hr',c.hr,'Avg HR')}${numInp('edit-cardio-rpe',c.rpe,'RPE')}</div><input id="edit-cardio-notes" type="text" value="${esc(c.notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;"></div>`;
   }
-  html+=`<div style="margin-bottom:20px;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Session notes</div><textarea id="edit-session-notes" rows="3" placeholder="Notes..." style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:8px;width:100%;box-sizing:border-box;resize:vertical;">${esc(session.notes)}</textarea></div>`;
-  html+=`<div style="display:flex;gap:8px;"><button id="edit-save-btn" onclick="saveEditedSession(${session.ts})" style="flex:1;font-family:var(--mono);font-size:12px;background:var(--a);color:#fff;border:none;border-radius:8px;padding:10px;cursor:pointer;">Save changes</button><button onclick="openSessionDrawerByTs(${session.ts})" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:8px;padding:10px 16px;cursor:pointer;">Cancel</button></div><div id="edit-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;text-align:center;"></div></div>`;
+  html+=`<div style="margin-bottom:20px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Session notes</div><textarea id="edit-session-notes" rows="3" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:8px;width:100%;box-sizing:border-box;resize:vertical;">${esc(session.notes)}</textarea></div>`;
+  html+=`<div style="display:flex;gap:8px;"><button id="edit-save-btn" onclick="saveEditedSession(${session.ts})" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);background:var(--a);color:#fff;border:none;border-radius:8px;padding:10px;cursor:pointer;">Save changes</button><button onclick="openSessionDrawerByTs(${session.ts})" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:8px;padding:10px 16px;cursor:pointer;">Cancel</button></div><div id="edit-save-msg" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;text-align:center;"></div></div>`;
   return html;
 }
 function removeEditSet(key,i,ts){
@@ -2919,7 +2950,7 @@ function removeEditSet(key,i,ts){
   const cont=document.getElementById('edit-sets-'+key);
   if(!cont) return;
   const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
-  const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
+  const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
   cont.innerHTML=window._EF[key].map((s,j)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${j}`,s.w,'lb')}${numInp(`edit-${key}-r-${j}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${j}`,s.rpe,'RPE')}<button onclick="removeEditSet('${key}',${j},${ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button></div>`).join('');
 }
 async function saveEditedSession(ts){
@@ -3885,7 +3916,7 @@ function renderRunMetricsSummary(){
   const estimated5KTime=plan?.estimated5KTime||localMetrics?.estimated5KTime||null;
   const vo2maxEstimate=plan?.vo2maxEstimate||localMetrics?.vo2maxEstimate||null;
   if(!estimated5KTime&&!vo2maxEstimate&&!totalRuns){
-    el.innerHTML='<div style="grid-column:1/-1;font-family:var(--mono);font-size:11px;color:var(--t3);padding:8px 0;">No run data yet — Strava syncs automatically overnight once configured.</div>';
+    el.innerHTML='<div style="grid-column:1/-1;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:8px 0;">No run data yet — Strava syncs automatically overnight once configured.</div>';
     return;
   }
   const parseTime=t=>{if(!t)return Infinity;const p=String(t).split(':');return p.length===2?+p[0]*60+ +p[1]:Infinity;};
@@ -3895,7 +3926,7 @@ function renderRunMetricsSummary(){
   const vo2Pct=vo2maxEstimate?Math.min(100,Math.round((vo2maxEstimate/55)*100)):0;
   const vo2BarColor=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
   const appleVO2=(D.healthLogs||[]).filter(h=>h.vo2maxApple).slice(-1)[0]?.vo2maxApple;
-  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div><div class="sl">Est. VO2max (HR reserve)</div>${appleVO2?`<div style="font-family:var(--mono);font-size:10px;color:rgba(200,255,0,0.9);margin-top:4px;">Apple Watch: ${appleVO2} ml/kg/min</div>`:''}<div class="pbw" style="margin-top:8px;"><div class="pbl"><span>Target 55</span><span>${vo2Pct}%</span></div><div class="pbb"><div class="pbf" style="width:${vo2Pct}%;background:${vo2BarColor};"></div></div></div></div><div class="stat"><div class="sv g" style="font-size:18px;">${totalRuns}</div><div class="sl">Total runs</div></div>`;
+  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div><div class="sl">Est. VO2max (HR reserve)</div>${appleVO2?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:rgba(200,255,0,0.9);margin-top:4px;">Apple Watch: ${appleVO2} ml/kg/min</div>`:''}<div class="pbw" style="margin-top:8px;"><div class="pbl"><span>Target 55</span><span>${vo2Pct}%</span></div><div class="pbb"><div class="pbf" style="width:${vo2Pct}%;background:${vo2BarColor};"></div></div></div></div><div class="stat"><div class="sv g" style="font-size:18px;">${totalRuns}</div><div class="sl">Total runs</div></div>`;
 }
 function renderRunChart(type='pace'){
   const canvas=document.getElementById('run-chart');
@@ -3921,7 +3952,7 @@ function renderRunChart(type='pace'){
       const bgColors=runs.map(r=>typeColors[r.runType]||'rgba(255,183,77,0.6)');
       window._runChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'Distance (mi)',data:runs.map(r=>r.distance),backgroundColor:bgColors,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
       const legendEl=document.getElementById('run-chart-legend');
-      if(legendEl)legendEl.innerHTML='<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--t3);"><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Easy / Zone 2</span> — avg HR &lt;148 bpm · conversational pace · no keywords</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(0,212,255,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Long Run</span> — distance ≥6 miles (overrides HR classification)</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,183,77,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Intervals / Tempo</span> — avg HR ≥165 bpm · or name contains "400m", "interval", "tempo", "track"</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(168,85,247,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Moderate</span> — avg HR 148–164 bpm · harder than easy, not quite threshold</span></div><div style="margin-top:2px;color:var(--t3);font-size:9px;">Classification uses avg HR from Apple Watch. Name keywords override HR when present.</div></div>';
+      if(legendEl)legendEl.innerHTML='<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Easy / Zone 2</span> — avg HR &lt;148 bpm · conversational pace · no keywords</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(0,212,255,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Long Run</span> — distance ≥6 miles (overrides HR classification)</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,183,77,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Intervals / Tempo</span> — avg HR ≥165 bpm · or name contains "400m", "interval", "tempo", "track"</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(168,85,247,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Moderate</span> — avg HR 148–164 bpm · harder than easy, not quite threshold</span></div><div style="margin-top:2px;color:var(--t3);font-size:var(--fs-xs);">Classification uses avg HR from Apple Watch. Name keywords override HR when present.</div></div>';
     } else {
       const vo2RunMap={};
       (D.runs||[]).filter(r=>r.type==='run'&&r.heartRateAvg&&r.distance>=1).forEach(r=>{
@@ -3933,7 +3964,7 @@ function renderRunChart(type='pace'){
       const calcData=allDates.map(d=>vo2RunMap[d]?Math.round(vo2RunMap[d].reduce((a,b)=>a+b,0)/vo2RunMap[d].length*10)/10:null);
       const appleData=allDates.map(d=>appleMap[d]||null);
       const legendEl=document.getElementById('run-chart-legend');
-      if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--t3);"><span style="color:rgba(0,212,255,0.8);">── Calculated (runs)</span><span style="color:rgba(200,255,0,0.8);">- - Apple Watch</span><span style="border-left:2px dashed var(--t3);padding-left:6px;">│ Target 55</span></div>';
+      if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"><span style="color:rgba(0,212,255,0.8);">── Calculated (runs)</span><span style="color:rgba(200,255,0,0.8);">- - Apple Watch</span><span style="border-left:2px dashed var(--t3);padding-left:6px;">│ Target 55</span></div>';
       window._runChart=new Chart(canvas,{type:'line',data:{labels:allDates,datasets:[
         {label:'Calculated (HR reserve)',data:calcData,borderColor:'rgba(0,212,255,0.8)',backgroundColor:'rgba(0,212,255,0.06)',borderWidth:2,pointRadius:4,spanGaps:false,tension:0.3},
         {label:'Apple Watch',data:appleData,borderColor:'rgba(200,255,0,0.8)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,5],pointRadius:3,spanGaps:true,tension:0.3},
@@ -4017,27 +4048,27 @@ function renderRunLogCard(targetDate){
   if(primaryEl){
     const w=presc.mainWork||presc.workout||{};
     let html='';
-    if(presc.reasoning)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t2);font-style:italic;margin-bottom:8px;">'+presc.reasoning+'</div>';
-    if(w.mainSet||w.description)html+='<div style="font-family:var(--mono);font-size:11px;color:var(--t);margin-bottom:6px;">'+(w.mainSet||w.description)+'</div>';
+    if(presc.reasoning)html+='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);font-style:italic;margin-bottom:8px;">'+presc.reasoning+'</div>';
+    if(w.mainSet||w.description)html+='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);margin-bottom:6px;">'+(w.mainSet||w.description)+'</div>';
     const metrics=[];
     if(w.totalDistance||w.distance)metrics.push('Dist: '+(w.totalDistance||w.distance));
     if(w.paceTarget||w.pace)metrics.push('Pace: '+(w.paceTarget||w.pace));
     if(w.hrCeiling||w.heartRate)metrics.push('HR cap: '+(w.hrCeiling||w.heartRate));
-    if(metrics.length)html+='<div style="font-family:var(--mono);font-size:10px;color:var(--t3);">'+metrics.join(' · ')+'</div>';
-    primaryEl.innerHTML=html||'<div style="font-family:var(--mono);font-size:11px;color:var(--t3);">Prescription loaded — view full details in Program tab.</div>';
+    if(metrics.length)html+='<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">'+metrics.join(' · ')+'</div>';
+    primaryEl.innerHTML=html||'<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">Prescription loaded — view full details in Program tab.</div>';
   }
   ['run-presc-alternatives','run-presc-watchout','run-presc-reminders'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
   if(!completeArea)return;
   const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
   const isCompleted=presc?.completed===true;
   if(presc.postRunFeedback){
-    completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:9px;color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;">'+presc.postRunFeedback+'</div></div>';
+    completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;">'+presc.postRunFeedback+'</div></div>';
   }else if(isCompleted&&stravaRun){
-    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
+    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\''+targetDate+'\')" style="font-size:var(--fs-sm);padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
   }else if(isCompleted){
-    completeArea.innerHTML='<div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight.</div>';
+    completeArea.innerHTML='<div style="margin-top:12px;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight.</div>';
   }else{
-    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\''+targetDate+'\')" style="font-size:11px;padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
+    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\''+targetDate+'\')" style="font-size:var(--fs-sm);padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
   }
 }
 async function markRunComplete(targetDate) {
@@ -4050,7 +4081,7 @@ async function markRunComplete(targetDate) {
 }
 async function generatePostRunFeedback(targetDate) {
   const completeArea=document.getElementById('run-presc-complete-area');
-  if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px;text-align:center;">Generating post-run analysis...</div>';
+  if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px;text-align:center;">Generating post-run analysis...</div>';
   try {
     const ctx = buildAthleteContext();
     const presc=D.dailyPrescriptions?.[targetDate]||D.runPrescriptions?.[targetDate];
@@ -4088,7 +4119,7 @@ async function generatePostRunFeedback(targetDate) {
     renderSystemLog();
   } catch(err) {
     console.error('Post-run feedback failed:',err);
-    if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--a4);padding:10px;">Failed: '+err.message+'</div>';
+    if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);padding:10px;">Failed: '+err.message+'</div>';
   }
 }
 
@@ -4455,7 +4486,7 @@ function renderPrescriptionCard(prescription){
   const mw=prescription.mainWork||{};
   let mainHtml='';
   if(isRun){
-    mainHtml=`<div style="background:var(--s3);border-radius:8px;padding:14px;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:8px;">MAIN SET</div><div style="font-size:var(--fs-presc-text);color:var(--t);line-height:1.6;">${mw.mainSet||mw.summary||''}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">${mw.totalDistance?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">DISTANCE</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.totalDistance}</div></div>`:''}${mw.paceTarget?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">PACE</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.paceTarget}</div></div>`:''}${mw.hrCeiling?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">HR CAP</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.hrCeiling} bpm</div></div>`:''}${mw.effort?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:2;min-width:120px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);">EFFORT</div><div style="font-size:var(--fs-presc-text);color:var(--t2);margin-top:2px;">${mw.effort}</div></div>`:''}</div>`;
+    mainHtml=`<div style="background:var(--s3);border-radius:8px;padding:14px;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:${color};letter-spacing:.15em;margin-bottom:8px;">MAIN SET</div><div style="font-size:var(--fs-presc-text);color:var(--t);line-height:1.6;">${mw.mainSet||mw.summary||''}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">${mw.totalDistance?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">DISTANCE</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.totalDistance}</div></div>`:''}${mw.paceTarget?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">PACE</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.paceTarget}</div></div>`:''}${mw.hrCeiling?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:1;min-width:80px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">HR CAP</div><div style="font-size:var(--fs-presc-lift);color:var(--t);margin-top:2px;">${mw.hrCeiling} bpm</div></div>`:''}${mw.effort?`<div style="background:var(--s3);border-radius:6px;padding:8px 12px;flex:2;min-width:120px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">EFFORT</div><div style="font-size:var(--fs-presc-text);color:var(--t2);margin-top:2px;">${mw.effort}</div></div>`:''}</div>`;
   }else{
     const lifts=mw.lifts||{};
     const liftOrder=type==='push'?['bench','ohp']:type==='pull'?['row','pullup']:['squat','dl'];
@@ -4463,24 +4494,24 @@ function renderPrescriptionCard(prescription){
     const liftRows=liftOrder.filter(k=>lifts[k]).map(k=>{
       const l=lifts[k];
       const w=l.weight>0?l.weight+' lb':'Bodyweight';
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);"><div><div style="font-size:var(--fs-presc-lift);color:var(--t);">${l.variation||liftNames[k]||k}</div>${l.coachNote?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${l.coachNote}</div>`:''}</div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:var(--fs-presc-lift);color:${color};">${l.sets}×${l.reps} @ ${w}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);">RPE ${l.targetRPE}</div></div></div>`;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);"><div><div style="font-size:var(--fs-presc-lift);color:var(--t);">${l.variation||liftNames[k]||k}</div>${l.coachNote?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">${l.coachNote}</div>`:''}</div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:var(--fs-presc-lift);color:${color};">${l.sets}×${l.reps} @ ${w}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">RPE ${l.targetRPE}</div></div></div>`;
     }).join('');
     const accessories=(mw.accessories||[]);
-    const accessHtml=accessories.length?`<div style="margin-top:10px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.15em;margin-bottom:6px;">ACCESSORIES</div>${accessories.map(a=>`<div style="font-size:var(--fs-presc-text);color:var(--t2);padding:3px 0;">· ${a}</div>`).join('')}</div>`:'';
-    mainHtml=`<div style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:16px;margin-bottom:2px;"><div style="font-family:var(--mono);font-size:9px;color:${color};letter-spacing:.15em;margin-bottom:10px;text-transform:uppercase;">Main Work</div>${liftRows}${accessHtml}</div>`;
+    const accessHtml=accessories.length?`<div style="margin-top:10px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.15em;margin-bottom:6px;">ACCESSORIES</div>${accessories.map(a=>`<div style="font-size:var(--fs-presc-text);color:var(--t2);padding:3px 0;">· ${a}</div>`).join('')}</div>`:'';
+    mainHtml=`<div style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:16px;margin-bottom:2px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:${color};letter-spacing:.15em;margin-bottom:10px;text-transform:uppercase;">Main Work</div>${liftRows}${accessHtml}</div>`;
   }
-  const watchHtml=(prescription.watchOutFor||[]).length?`<div style="margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.8;">WATCH: ${prescription.watchOutFor.join(' · ')}</div>`:'';
-  const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:12px;padding:10px 14px;background:rgba(184,96,53,.07);border:1px solid rgba(184,96,53,.2);border-radius:8px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--aw);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">If too hard</span>${prescription.ifTooHard}</div>`:'';
+  const watchHtml=(prescription.watchOutFor||[]).length?`<div style="margin-top:14px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;">WATCH: ${prescription.watchOutFor.join(' · ')}</div>`:'';
+  const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:12px;padding:10px 14px;background:rgba(184,96,53,.07);border:1px solid rgba(184,96,53,.2);border-radius:8px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">If too hard</span>${prescription.ifTooHard}</div>`:'';
   el.className='prog-day-card prog-today';
   el.style.borderColor=color;
-  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${label}</div><div class="prog-day-title">${prescription.summary||''}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:16px 18px;">${prescription.reasoning?`<div style="font-size:var(--fs-presc-text);color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:var(--s2);border-radius:8px;">${prescription.reasoning}</div>`:''}${prescription.warmup?`<div style="margin-bottom:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Warmup</span>${prescription.warmup}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Cooldown</span>${prescription.cooldown}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:var(--s2);border-left:2px solid ${color}80;border-radius:0 8px 8px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">${prescription.coachNote}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
+  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${label}</div><div class="prog-day-title">${prescription.summary||''}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:16px 18px;">${prescription.reasoning?`<div style="font-size:var(--fs-presc-text);color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:var(--s2);border-radius:8px;">${prescription.reasoning}</div>`:''}${prescription.warmup?`<div style="margin-bottom:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Warmup</span>${prescription.warmup}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Cooldown</span>${prescription.cooldown}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:var(--s2);border-left:2px solid ${color}80;border-radius:0 8px 8px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">${prescription.coachNote}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
 }
 
 function renderWeekSuggestions(weekPlan){
   const el=document.getElementById('week-suggestions');
   if(!el)return;
   if(!weekPlan||!weekPlan.length){
-    el.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">Tap "Get Prescription" on the Program tab to generate week suggestions.</div>`;
+    el.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">Tap "Get Prescription" on the Program tab to generate week suggestions.</div>`;
     return;
   }
   const CONF_COLORS={high:'var(--a3)',medium:'var(--a)',low:'var(--t3)'};
@@ -4489,7 +4520,7 @@ function renderWeekSuggestions(weekPlan){
   el.innerHTML=weekPlan.map(day=>{
     const conf=day.confidence||'low';
     const typeColor=TYPE_COLORS[day.suggestion]||'var(--t2)';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b);"><div style="min-width:72px;"><div style="font-family:var(--mono);font-size:11px;color:var(--t);">${(day.date||'').slice(5)||''}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);">${day.dow||''}</div></div><div style="flex:1;"><div style="font-size:var(--fs-presc-lift);color:${typeColor};font-weight:500;">${day.suggestion||''}</div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px;">${day.reason||''}</div></div><div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid ${CONF_COLORS[conf]}40;white-space:nowrap;">${conf.toUpperCase()}</div></div>`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b);"><div style="min-width:72px;"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);">${(day.date||'').slice(5)||''}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${day.dow||''}</div></div><div style="flex:1;"><div style="font-size:var(--fs-presc-lift);color:${typeColor};font-weight:500;">${day.suggestion||''}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">${day.reason||''}</div></div><div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:var(--fs-xs);padding:3px 8px;border-radius:4px;border:1px solid ${CONF_COLORS[conf]}40;white-space:nowrap;">${conf.toUpperCase()}</div></div>`;
   }).join('');
 }
 
@@ -4608,7 +4639,7 @@ function updateLogTabPlanned(){
   window._logAccessories=accessories;
   if(accBlock){
     if(accessories.length){
-      let aHtml=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="bdg" style="background:rgba(160,102,212,0.12);color:var(--a5);border:1px solid rgba(160,102,212,0.25);">ACCESSORIES</span><span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${accessories.length} prescribed</span></div>`;
+      let aHtml=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="bdg" style="background:rgba(160,102,212,0.12);color:var(--a5);border:1px solid rgba(160,102,212,0.25);">ACCESSORIES</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${accessories.length} prescribed</span></div>`;
       accessories.forEach((acc,i)=>{
         // Parse "Name 3×10 @ weight (note)" or "Name 3×10 (note)"
         const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+@[^(]+)?(?:\s+\((.+)\))?$/);
@@ -4620,8 +4651,8 @@ function updateLogTabPlanned(){
         const prescLabel=`Planned: ${String(acc).replace(/^.+?\s+(\d+[×x]\d+)/,'$1')}`;
         aHtml+=`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--b);">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <span style="font-family:var(--mono);font-size:11px;color:var(--a5);font-weight:600;text-transform:uppercase;">${name}</span>
-            <span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${prescLabel}</span>
+            <span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);font-weight:600;text-transform:uppercase;">${name}</span>
+            <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${prescLabel}</span>
           </div>
           <div class="srh"><span>WEIGHT (lb)</span><span>SETS</span><span>REPS</span><span></span></div>
           <div class="srow">
@@ -4784,18 +4815,18 @@ function renderSnapshotCharts(){
 
   const hasData=Object.keys(hlMap).length>0||Object.keys(ciMap).length>0;
   if(!hasData){
-    container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:10px 0;">No health data yet — sync via Shortcut or export</div>';
+    container.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;">No health data yet — sync via Shortcut or export</div>';
     return;
   }
 
   container.innerHTML=`
     <div style="margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;">Sleep · 30 days</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);" id="snap-sleep-avg"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;">Sleep · 30 days</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);" id="snap-sleep-avg"></div>
       </div>
       <div style="position:relative;height:120px;"><canvas id="snap-sleep-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:4px;">
         <span style="color:rgba(34,197,94,0.8);">── Actual sleep</span>
         <span style="margin-left:10px;">- - Optimal 7h – 7h30m</span>
         <span style="margin-left:10px;color:rgba(255,183,77,0.6);">- - 30d avg</span>
@@ -4803,11 +4834,11 @@ function renderSnapshotCharts(){
     </div>
     <div style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;">Steps + Exercise · 30 days</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);" id="snap-activity-avg"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;">Steps + Exercise · 30 days</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);" id="snap-activity-avg"></div>
       </div>
       <div style="position:relative;height:140px;"><canvas id="snap-activity-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:4px;">
         <span style="color:rgba(0,212,255,0.8);">── Steps (L)</span>
         <span style="margin-left:8px;color:rgba(168,85,247,0.8);">── Exercise min (R)</span>
         <span style="margin-left:8px;">- - Avg</span>
@@ -4815,11 +4846,11 @@ function renderSnapshotCharts(){
     </div>
     <div style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;">Heart Rate · 30 days</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);" id="snap-hr-avg"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;">Heart Rate · 30 days</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);" id="snap-hr-avg"></div>
       </div>
       <div style="position:relative;height:140px;"><canvas id="snap-hr-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:4px;">
         <span style="color:rgba(255,99,71,0.8);">── Resting HR (L, bpm)</span>
         <span style="margin-left:8px;color:rgba(255,183,77,0.8);">── Walking HR (R, bpm)</span>
         <span style="margin-left:8px;">- - Avg</span>
