@@ -81,8 +81,10 @@ async function main() {
     const sleepDeep = sleepEntry ? (sleepEntry.deep || null) : null;
     const sleepREM = sleepEntry ? (sleepEntry.rem || null) : null;
     const sleepLight = sleepEntry ? (sleepEntry.core || null) : null;
-    const sleepAwake = sleepEntry
-      ? (sleepEntry.inBed && sleepHoursRaw ? Math.max(0, Math.round((sleepEntry.inBed - sleepHoursRaw) * 10) / 10) : null)
+    // HAE sends awake time directly; inBed is often 0 so don't compute from it
+    const sleepAwakeRaw = sleepEntry ? (sleepEntry.awake || null) : null;
+    const sleepAwake = sleepAwakeRaw !== null
+      ? Math.round(sleepAwakeRaw * 10) / 10
       : null;
 
     // Wrist temp: match target date, then convert °F → delta °C
