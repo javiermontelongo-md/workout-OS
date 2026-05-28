@@ -4251,6 +4251,10 @@ function updateLogTabPlanned(){
     const upd=(id,l)=>{if(!l)return;const el=document.getElementById(id);if(el)el.textContent=`Planned: ${l.sets}×${l.reps} @ ${l.weight}lb`;};
     upd('planned-bench',bench);upd('planned-ohp',ohp);upd('planned-squat',squat);upd('planned-dl',dl);
     upd('planned-pullup',plan.lifts.pullup);upd('planned-row',plan.lifts.row);
+    ['bench','ohp','squat','dl','pullup','row'].forEach(lift=>{
+      const l=plan.lifts[lift];if(!l||!(l.weight>0))return;
+      DEF[lift]=l.weight;renderSets(lift);
+    });
     return;
   }
   const lifts=presc.mainWork.lifts;
@@ -4264,9 +4268,8 @@ function updateLogTabPlanned(){
   upd('planned-dl','dl');upd('planned-pullup','pullup');upd('planned-row','row');
   ['bench','ohp','squat','dl','pullup','row'].forEach(lift=>{
     const l=lifts[lift];if(!l)return;
-    const container=document.getElementById(lift+'-sets');if(!container)return;
-    container.querySelectorAll('input.wt').forEach(inp=>{if(!inp.value)inp.placeholder=l.weight>0?String(l.weight):'BW';});
-    container.querySelectorAll('input.rp').forEach(inp=>{if(!inp.value)inp.placeholder=typeof l.reps==='number'?String(l.reps):String(l.reps);});
+    if(l.weight>0)DEF[lift]=l.weight;
+    renderSets(lift);
   });
 }
 
