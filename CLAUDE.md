@@ -83,7 +83,7 @@ TODAY · LOG SESSION · THIS WEEK · PROGRESS · PROGRAM · MILESTONES · RULES 
 `sessions[]` · `runs[]` · `checkins[]` · `healthLogs[]` ·
 `healthLastSync` · `stravaLastSync` · `adaptivePlanCache` ·
 `runPrescriptions{}` · `dailyPrescriptions{}` · `coachingMemory{}` ·
-`scheduleOverrides{}` · `coachingLog[]` · `bodyMetrics[]`
+`coachingLog[]` · `bodyMetrics[]`
 
 ## Lift Keys
 `bench` · `ohp` · `pullup` · `row` · `squat` · `dl`
@@ -473,3 +473,6 @@ elevationGain: feet
   chk() and restChk() retained — still used by Milestones tab checkboxes (mhw1–mhw7)
 - REDUCE IF: and REDUCTION ORDER: cards from Today tab (g2 grid wrapper removed too)
   Content lives in RULES tab — was redundant on Today
+- scheduleOverrides — D.scheduleOverrides field (defD), override dot (calendar),
+  overrides context block (buildAthleteContext) — nothing ever wrote to it after
+  the schedule system was removed; was always passing {} to the AI

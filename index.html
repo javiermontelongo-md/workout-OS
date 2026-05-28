@@ -2094,7 +2094,7 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},coachingMemory:{compressed:null,notes:[]},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[],scheduleOverrides:{}}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},coachingMemory:{compressed:null,notes:[]},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[]}; }
 
 // ============================================================
 // INIT
@@ -2778,7 +2778,7 @@ function buildAthleteContext() {
     const ds = localDS(d);
     next14.push({
       date: ds,
-      dayType: D.scheduleOverrides?.[ds] ?? (dowMap[d.getDay()] || 'rest')
+      dayType: dowMap[d.getDay()] || 'rest'
     });
   }
 
@@ -2867,13 +2867,7 @@ function buildAthleteContext() {
       today,
       todayType:  next14[0]?.dayType || 'rest',
       next14,
-      activePlan,
-      overrides: Object.fromEntries(
-        Object.entries(D.scheduleOverrides || {})
-          .filter(([d]) => d >= today)
-          .sort(([a],[b]) => a.localeCompare(b))
-          .slice(0, 14)
-      )
+      activePlan
     },
     body: {
       weightLbs: lastBody.weight || ATHLETE.weightLbs,
