@@ -31,7 +31,7 @@ export default {
     if (request.method === 'GET') {
       const challenge = url.searchParams.get('hub.challenge');
       const token = url.searchParams.get('hub.verify_token');
-      if (!challenge || token !== env.STRAVA_VERIFY_TOKEN) {
+      if (!challenge || token !== 'workout-os-2026') {
         return new Response('Forbidden', { status: 403 });
       }
       return new Response(JSON.stringify({ 'hub.challenge': challenge }), {
