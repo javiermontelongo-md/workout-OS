@@ -13,8 +13,23 @@ function getMetric(metrics, name) {
   return m.data[0];
 }
 
+function getMetricForDate(metrics, name, targetDate) {
+  const m = metrics.find(x => x.name === name);
+  if (!m || !m.data || m.data.length === 0) return null;
+  // Prefer entry matching target date, fall back to first entry
+  const match = m.data.find(d => (d.date || '').startsWith(targetDate));
+  return match || m.data[0];
+}
+
 function getQty(metrics, name) {
   const entry = getMetric(metrics, name);
+  if (!entry || entry.qty === undefined || entry.qty === null) return null;
+  const val = parseFloat(entry.qty);
+  return isNaN(val) ? null : val;
+}
+
+function getQtyForDate(metrics, name, targetDate) {
+  const entry = getMetricForDate(metrics, name, targetDate);
   if (!entry || entry.qty === undefined || entry.qty === null) return null;
   const val = parseFloat(entry.qty);
   return isNaN(val) ? null : val;
@@ -70,11 +85,19 @@ async function main() {
       ? (sleepEntry.inBed && sleepHoursRaw ? Math.max(0, Math.round((sleepEntry.inBed - sleepHoursRaw) * 10) / 10) : null)
       : null;
 
-    // Wrist temp: arrives in °F, convert to delta °C
-    const wristTempRaw = getQty(metrics, 'apple_sleeping_wrist_temperature');
+    // Wrist temp: match target date, then convert °F → delta °C
+    const wristTempRaw = getQtyForDate(metrics, 'apple_sleeping_wrist_temperature', date);
     const wristTemp = wristTempRaw !== null
       ? Math.round((wristTempRaw - 98.6) * (5 / 9) * 100) / 100
       : null;
+
+    // Steps: round to integer (HAE sends raw float from merged sources)
+    const stepsRaw = getQty(metrics, 'step_count');
+    const steps = stepsRaw !== null ? Math.round(stepsRaw) : null;
+
+    // Walking HR: round to integer
+    const walkingHRRaw = getQty(metrics, 'walking_heart_rate_average');
+    const walkingHR = walkingHRRaw !== null ? Math.round(walkingHRRaw) : null;
 
     entry = {
       date,
@@ -86,9 +109,9 @@ async function main() {
       sleepREM,
       sleepLight,
       sleepAwake,
-      steps: getQty(metrics, 'step_count'),
+      steps,
       exerciseMinutes: getQty(metrics, 'apple_exercise_time'),
-      walkingHR: getQty(metrics, 'walking_heart_rate_average'),
+      walkingHR,
       respiratoryRate: getQty(metrics, 'respiratory_rate'),
       vo2maxApple: getQty(metrics, 'vo2_max'),
       source: 'apple_health'
@@ -100,7 +123,7 @@ async function main() {
     const raw = healthDataRaw;
 
     function extractSimpleNumber(str, key) {
-      const re = new RegExp(`"+${key}"+\\s*:\\s*([\\d.]+)`, 'i');
+      const re = new RegExp(`"+${key}"+\s*:\s*([\d.]+)`, 'i');
       const match = str.match(re);
       if (match) {
         const val = parseFloat(match[1]);
@@ -137,9 +160,9 @@ async function main() {
       sleepREM: null,
       sleepLight: null,
       sleepAwake: null,
-      steps: extractSimpleNumber(raw, 'steps'),
+      steps: Math.round(extractSimpleNumber(raw, 'steps') ?? 0) || null,
       exerciseMinutes: extractSimpleNumber(raw, 'exerciseMinutes'),
-      walkingHR: extractSimpleNumber(raw, 'walkingHR'),
+      walkingHR: Math.round(extractSimpleNumber(raw, 'walkingHR') ?? 0) || null,
       respiratoryRate: extractSimpleNumber(raw, 'respiratoryRate'),
       vo2maxApple: extractSimpleNumber(raw, 'vo2max'),
       source: 'apple_health'
