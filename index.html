@@ -1000,11 +1000,6 @@ input[type=range]::-webkit-slider-thumb:hover {
     <button class="btn bp" style="width:100%;" onclick="saveCheckin()">Save Check-in to GitHub</button>
     <div id="checkin-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
   </div>
-  <div class="card"><div class="lbl">ai coach</div><div id="today-out"><div class="air"><div class="al">TRAINING COACH</div><p>Check your fatigue score above first. If moderate or higher, reduce working weight 5-10% and protect bar speed over ego.</p><p><strong>Recovery rules the program.</strong> Sustainable training during residency beats optimal training every time. A 70% effort session that happens is worth more than a perfect session that doesn't.</p></div></div><div class="brow"><button class="btn bs bi" onclick="genToday()">Regenerate</button></div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px;padding:0 4px;">Today's coaching narrative only — does not change your plan weights or prescriptions</div></div>
-  <div class="g2">
-    <div class="card"><div class="lbl" style="color:var(--a);">reduce if:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>Fatigue score above 70</div><div>Sleep average below 6 hours</div><div>Performance declining 2+ weeks</div><div>Persistent joint soreness</div><div>Cardio metrics regressing</div><div>Severe residency stress (ICU, nights)</div></div></div>
-    <div class="card"><div class="lbl" style="color:var(--a3);">reduction order:</div><div style="font-size:12px;color:var(--t2);line-height:2.0;"><div>1. Reduce volume first</div><div>2. Reduce intensity second</div><div>3. Reduce frequency third</div><div>4. Switch to minimum viable</div></div><div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.15);border-radius:var(--r);font-size:12px;color:var(--a);line-height:1.6;">Reduced training is always preferred over missed training. Consistency during residency IS success.</div></div>
-  </div>
   <div class="card" id="system-log-card">
     <div class="lbl">system log · last 7 days</div>
     <div id="system-log-feed">
@@ -2269,7 +2264,6 @@ function renderSystemLog() {
   (D.coachingLog || []).forEach(entry => {
     if (!entry.ts || entry.ts < sevenDaysAgo) return;
     const labels = {
-      today_coaching: 'AI today coaching generated',
       week_plan: 'AI weekly plan generated',
       run_prescription: 'AI run prescription generated',
       daily_prescription: 'Daily prescription generated',
@@ -2559,11 +2553,9 @@ function renderCalendar(){
     else if(run&&!isFuture&&!isToday){ cellContent=getActivityBadges([],ds); }
     else if(isFuture||isToday){ cellContent=getPlannedBadge(ds); }
     else{ cellContent='<div class="cal-rest">rest</div>'; }
-    const hasOverride=D?.scheduleOverrides?.[ds]!==undefined;
-    const overrideDot=hasOverride?'<div style="width:5px;height:5px;border-radius:50%;background:var(--a);margin:1px auto 0;opacity:.8;"></div>':'';
     const isScheduled=(isFuture||isToday)&&!!getPlannedBadge(ds);
     const isActionable=sessions.length>0||isScheduled;
-    html+=`<div class="cal-cell${isToday?' today':''}" data-date="${ds}"${isActionable?' style="cursor:pointer;"':''}><div class="cal-date">${d.getDate()}</div>${overrideDot}${cellContent}</div>`;
+    html+=`<div class="cal-cell${isToday?' today':''}" data-date="${ds}"${isActionable?' style="cursor:pointer;"':''}><div class="cal-date">${d.getDate()}</div>${cellContent}</div>`;
   }
   grid.innerHTML=html;
   grid.onclick=null;
@@ -2808,16 +2800,6 @@ function buildAthleteContext() {
       : null;
   };
 
-  // Recent coaching — last 5 today_coaching entries, trimmed
-  const recentCoaching = (D.coachingLog || [])
-    .filter(c => c.type === 'today_coaching')
-    .slice(-5)
-    .map(c => ({
-      date: c.date,
-      summary: typeof c.response === 'string'
-        ? c.response.slice(0, 200) : null
-    }));
-
   // Active plan — today's specific prescription if available
   const activePlan = window._adaptivePlan ? {
     weeklyFocus: window._adaptivePlan.weeklyFocus || null,
@@ -2875,8 +2857,7 @@ function buildAthleteContext() {
       currentLifts:     D.currentLifts || {},
       recentSessions,
       recentRuns,
-      rpeConfirmations: (D.rpeLog || []).slice(-20),
-      recentCoaching
+      rpeConfirmations: (D.rpeLog || []).slice(-20)
     },
     checkin: {
       energy:       lastCI.energy       || null,
@@ -2940,101 +2921,6 @@ async function ai(prompt, maxTokens = 800) {
     if(d.error){ return 'API Error: '+d.error.message; }
     return d.content?.[0]?.text||null;
   }catch(e){ console.error('AI error:', e.message); return 'Error: '+e.message; }
-}
-function fai(t,id){document.getElementById(id).innerHTML=t?`<div class="air"><div class="al">TRAINING COACH</div><p>${t.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p></div>`:`<div class="air"><div class="al">NOTE</div><p>Add your Anthropic API key in Settings -- paste key and click Save key. Or check browser console (F12) for error details.</p></div>`;}
-
-async function genToday() {
-  const ctx = buildAthleteContext();
-
-  // Cache — skip API if inputs unchanged since last call
-  const cacheKey = [
-    ctx.schedule.today,
-    ctx.checkin.energy,
-    ctx.checkin.sleep,
-    ctx.biometrics.todayHRV
-  ].join('|');
-  if (window._genTodayCache?.key === cacheKey &&
-      window._genTodayCache?.response) {
-    fai(window._genTodayCache.response, 'today-out');
-    return;
-  }
-
-  const prompt = [
-    `Today is ${ctx.schedule.today}. Day type: ${ctx.schedule.todayType}.`,
-    `Training mode: ${D.trainingMode || 'normal'}.`,
-    `Block: week ${ctx.training.blockWeek.weekNum}, ${ctx.training.blockParams.label}.`,
-    `Check-in — energy: ${ctx.checkin.energy}/5, sleep: ${ctx.checkin.sleep}h, soreness: ${ctx.checkin.soreness}/5, fatigue: ${ctx.checkin.fatigueScore}/10.`,
-    `7-day averages — energy: ${ctx.checkin.avg7Day.energy}, sleep: ${ctx.checkin.avg7Day.sleep}h, soreness: ${ctx.checkin.avg7Day.soreness}.`,
-    `Biometrics — HRV: ${ctx.biometrics.todayHRV}ms (7d avg: ${ctx.biometrics.sevenDayHRV}ms), RHR: ${ctx.biometrics.todayRHR}bpm.`,
-    `Lift bests: ${Object.entries(ctx.training.liftBests).map(([k,v])=>`${k}:${v}lb`).join(', ')}.`,
-    `Last 3 sessions: ${JSON.stringify(ctx.training.recentSessions.slice(-3))}.`,
-    `Next 7 days: ${ctx.schedule.next14.slice(0,7).map(d=>`${d.date}=${d.dayType}`).join(', ')}.`,
-    ctx.schedule.activePlan
-      ? `Weekly plan focus: ${ctx.schedule.activePlan.weeklyFocus}. Today's plan: ${JSON.stringify(ctx.schedule.activePlan.todayPlan)}.`
-      : '',
-    ctx.training.recentCoaching.length
-      ? `Recent coaching (do not repeat these themes): ${ctx.training.recentCoaching.map(c=>c.summary).join(' | ')}.`
-      : '',
-    ``,
-    `Respond ONLY with valid JSON, no markdown fencing:`,
-    `{`,
-    `  "coaching": "3-4 sentences. Specific loading rec for today, one auto-regulation rule, one recovery priority.",`,
-    `  "scheduleNote": "optional — one sentence describing a conflict in the next 7 days and the fix. Omit key entirely if schedule is clean.",`,
-    `  "scheduleAdjustment": {"YYYY-MM-DD": "dayType"}`,
-    `  // optional — only if scheduleNote present. Next 14 days only. Omit entirely if no adjustment needed.`,
-    `}`
-  ].filter(Boolean).join('\n');
-
-  spin('today-out');
-  const raw = await ai(prompt, 1000);
-  if (!raw) return;
-
-  // Parse JSON — fallback to plain text if malformed
-  let parsed = null;
-  try {
-    const clean = raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
-    parsed = JSON.parse(clean);
-  } catch(e) {
-    fai(raw, 'today-out');
-    return;
-  }
-
-  // Render coaching narrative
-  const coachingText = parsed.coaching || raw;
-  fai(coachingText, 'today-out');
-
-  // Cache result
-  window._genTodayCache = { key: cacheKey, response: coachingText };
-
-  // Apply schedule adjustment — 14-day horizon only
-  if (parsed.scheduleAdjustment &&
-      typeof parsed.scheduleAdjustment === 'object') {
-    if (!D.scheduleOverrides) D.scheduleOverrides = {};
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() + 14);
-    const cutoffStr = localDS(cutoff);
-    Object.entries(parsed.scheduleAdjustment).forEach(([date, type]) => {
-      if (date >= ctx.schedule.today && date <= cutoffStr) {
-        D.scheduleOverrides[date] = type;
-      }
-    });
-    renderCalendar();
-    if (document.getElementById('panel-week')?.classList.contains('on')) {
-      renderWeekSuggestions(D.dailyPrescriptions?.[localDS(new Date())]?.weekPlan||null);
-    }
-  }
-
-  // Write to coaching log — INSIDE function (bug fix)
-  if (!D.coachingLog) D.coachingLog = [];
-  D.coachingLog.push({
-    date: ctx.schedule.today,
-    type: 'today_coaching',
-    response: coachingText
-  });
-  D.coachingLog = D.coachingLog.slice(-50);
-
-  pushSilent();
-  renderSystemLog();
 }
 // ============================================================
 // ADAPTIVE PROGRAMMING ENGINE
