@@ -170,7 +170,7 @@ body {
   flex: 1;
   padding: 24px 32px;
   width: 100%;
-  max-width: 50%;
+  max-width: 80%;
   margin: 0 auto;
 }
 
@@ -683,6 +683,11 @@ input[type=range]::-webkit-slider-thumb:hover {
 .cal-badge.run-moderate { background: rgba(192,132,252,0.12); color: var(--a5); border: 1px solid rgba(192,132,252,0.22); }
 .cal-week-summary { font-family: var(--mono); font-size: 24px; color: var(--t3); text-align: center; padding: 5px 0 2px; }
 .cal-rest { font-family: var(--mono); font-size: 22px; color: var(--t3); opacity: .4; }
+.cal-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 2px;}
+.cal-dot.lift{background:var(--a);}
+.cal-dot.run{background:var(--a2);}
+.cal-dots{text-align:center;margin-top:4px;line-height:1;}
+.cal-cell.cal-empty{background:transparent;border-color:transparent;pointer-events:none;}
 
 /* ── PROGRAM TAB ── */
 .prog-day-card { background: var(--s1); border: 1px solid var(--b); border-radius: 12px; overflow: hidden; transition: border-color .2s; }
@@ -908,7 +913,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <button class="tab on" onclick="showTab('today')">TODAY</button>
     <button class="tab" onclick="showTab('program')">PROGRAM</button>
     <button class="tab" onclick="showTab('log')">LOG SESSION</button>
-    <button class="tab" onclick="showTab('week')">THIS WEEK</button>
+    <button class="tab" onclick="showTab('week')">ACTIVITY</button>
     <button class="tab" onclick="showTab('progress')">PROGRESS</button>
     <button class="tab" onclick="showTab('milestones')">MILESTONES</button>
     <button class="tab" onclick="showTab('rules')">RULES</button>
@@ -1151,7 +1156,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 <!-- v2026-05-22 -->
 <div id="panel-week" class="panel">
-  <div class="h1">This <span>week</span></div>
+  <div class="h1">Activity <span>history</span></div>
   <div class="card" id="activity-calendar-card">
     <div class="cal-nav-row">
       <button class="cal-nav-btn" onclick="calNav(-1)">&#8592;</button>
@@ -1487,7 +1492,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
         <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">Override schedule</div>
-        <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">When life forces you to do a different workout than scheduled. Use the Today's Workout dropdown in THIS WEEK tab. The schedule ripples forward automatically.</div>
+        <div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">When life forces you to do a different workout than scheduled. Use the Today's Workout dropdown in Activity tab. The schedule ripples forward automatically.</div>
       </div>
       <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);">
         <div style="font-family:var(--mono);font-size:11px;color:var(--aw);margin-bottom:4px;">When to rest</div>
@@ -1772,7 +1777,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 <nav class="bnav">
   <button class="ni on" onclick="showTab('today')"><span class="nicon">T</span><span class="nlbl">TODAY</span></button>
   <button class="ni" onclick="showTab('log')"><span class="nicon">L</span><span class="nlbl">LOG</span></button>
-  <button class="ni" onclick="showTab('week')"><span class="nicon">W</span><span class="nlbl">WEEK</span></button>
+  <button class="ni" onclick="showTab('week')"><span class="nicon">W</span><span class="nlbl">ACTIVITY</span></button>
   <button class="ni" onclick="showTab('progress')"><span class="nicon">P</span><span class="nlbl">PROG</span></button>
   <button class="ni" onclick="showTab('program')"><span class="nicon">Pg</span><span class="nlbl">PGRM</span></button>
   <button class="ni" onclick="showTab('milestones')"><span class="nicon">G</span><span class="nlbl">GOALS</span></button>
@@ -2612,8 +2617,22 @@ function handleDayCardClick(dateStr){
   if(sessions.length>0&&dateStr<=today){ openSessionDrawer(sessions[0],dateStr); return; }
   const stravaRun=dateStr<=today?(D.runs||[]).find(r=>r.date===dateStr):null;
   if(stravaRun){
-    const fmt=s=>s?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:null;
-    const fake={date:stravaRun.date,day:stravaRun.runType||'run',cardio:{type:stravaRun.name||'Run',dur:stravaRun.duration?Math.round(stravaRun.duration/60):null,dist:stravaRun.distanceMi,hr:stravaRun.heartRateAvg,pace:fmt(stravaRun.pace),notes:'Strava \xb7 '+(stravaRun.name||'Run')}};
+    const fmtPace=s=>s?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:null;
+    const fake={
+      date:stravaRun.date,
+      day:stravaRun.runType||'run',
+      isStrava:true,
+      cardio:{
+        type:stravaRun.name||'Run',
+        runType:stravaRun.runType,
+        dur:stravaRun.duration?Math.round(stravaRun.duration/60):null,
+        dist:stravaRun.distanceMi,
+        hr:stravaRun.heartRateAvg,
+        hrMax:stravaRun.heartRateMax,
+        pace:fmtPace(stravaRun.pace),
+        elev:stravaRun.elevationGain,
+      }
+    };
     openSessionDrawer(fake,dateStr);
     return;
   }
@@ -2681,7 +2700,25 @@ function buildSessionDrawerContent(session,dateStr){
   if(liftSections||legacyPullups){
     html+=`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Lifts</div>${liftSections}${legacyPullups}`;
   }
-  if(session.cardio&&(session.cardio.dur>0||session.cardio.dist>0)){
+  const _runTypes=['run','run_easy','run_quality','run_long','easy','long','intervals','tempo','moderate'];
+  const _isRunDay=_runTypes.includes(String(session.day||'').toLowerCase());
+  if(session.cardio&&_isRunDay){
+    const c=session.cardio;
+    const fmtDur=m=>m==null?null:m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`;
+    const stats=[
+      c.dist?{lbl:'Distance',val:`${Number(c.dist).toFixed(2)} mi`}:null,
+      c.dur?{lbl:'Duration',val:fmtDur(c.dur)}:null,
+      c.pace?{lbl:'Pace',val:`${c.pace}/mi`}:null,
+      c.hr?{lbl:'Avg HR',val:`${c.hr} bpm`}:null,
+      c.hrMax?{lbl:'Max HR',val:`${c.hrMax} bpm`}:null,
+      c.elev?{lbl:'Elevation',val:`${Math.round(c.elev)} ft`}:null,
+    ].filter(Boolean);
+    const statBoxes=stats.map(s=>`<div style="background:var(--s3);border:1px solid var(--b);border-radius:10px;padding:10px 14px;text-align:center;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:14px;color:var(--t);font-weight:500;">${s.val}</div></div>`).join('');
+    const runTypeBadge=c.runType?`<span style="font-family:var(--mono);font-size:9px;background:rgba(42,160,112,0.15);color:var(--a2);padding:3px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.06em;margin-right:6px;">${c.runType}</span>`:'';
+    const stravaBadge=session.isStrava?`<span style="font-family:var(--mono);font-size:9px;background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">Strava</span>`:'';
+    const actName=(c.type&&c.type!=='Run')?`<div style="font-size:15px;color:var(--t);font-weight:500;margin-bottom:10px;">${c.type}</div>`:'';
+    html+=`<div style="margin-bottom:20px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Run</div>${actName}<div style="margin-bottom:10px;">${runTypeBadge}${stravaBadge}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">${statBoxes}</div></div>`;
+  } else if(session.cardio&&(session.cardio.dur>0||session.cardio.dist>0)){
     const c=session.cardio;
     const cardioMeta=[c.type,c.dur?`${c.dur} min`:null,c.dist?`${c.dist} mi`:null,c.pace?`${c.pace}/mi`:null,c.hr?`HR ${c.hr} bpm`:null,c.rpe?`RPE ${c.rpe}`:null].filter(Boolean).join(' · ');
     html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Cardio</div><div style="font-family:var(--mono);font-size:13px;color:var(--t);">${cardioMeta}</div>${c.notes?`<div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;">${c.notes}</div>`:''}</div>`;
