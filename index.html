@@ -1950,7 +1950,32 @@ function _applyFontSize(px){document.body.style.fontSize=px+'px';}
 function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
 function setFontPair(name){localStorage.setItem('wos-font',name);_applyFont(name);_syncAppearanceUI();}
 function setFontSize(px){localStorage.setItem('wos-fontsize',px);_applyFontSize(px);const e=document.getElementById('font-size-lbl');if(e)e.textContent=px;_syncFontPresetBtns(+px);}
-function applyFontPreset(px){setFontSize(px);const r=document.getElementById('font-size-range');if(r){r.value=px;}}
+const FONT_PRESETS={
+  14:{base:14,logo:21,nav:18,heading:21,sublabel:15,badge:18,input:17,btn:18,cardtext:17,exercise:17,dataval:24,caltext:16,mono:18,presctext:10,m_mlogo:15,m_nav:10,m_navlbl:6,m_heading:16,m_label:10,m_input:12,m_btn:9,m_cardtext:10},
+  17:{base:17,logo:25,nav:22,heading:26,sublabel:18,badge:21,input:21,btn:22,cardtext:21,exercise:21,dataval:29,caltext:20,mono:21,presctext:12,m_mlogo:18,m_nav:13,m_navlbl:7,m_heading:20,m_label:12,m_input:14,m_btn:11,m_cardtext:13},
+  19:{base:19,logo:28,nav:25,heading:29,sublabel:20,badge:24,input:23,btn:25,cardtext:23,exercise:23,dataval:32,caltext:22,mono:24,presctext:13,m_mlogo:20,m_nav:14,m_navlbl:8,m_heading:22,m_label:13,m_input:16,m_btn:12,m_cardtext:14},
+  22:{base:22,logo:32,nav:29,heading:34,sublabel:23,badge:28,input:27,btn:29,cardtext:27,exercise:27,dataval:37,caltext:26,mono:28,presctext:15,m_mlogo:23,m_nav:16,m_navlbl:9,m_heading:25,m_label:15,m_input:19,m_btn:14,m_cardtext:16},
+  26:{base:26,logo:38,nav:34,heading:40,sublabel:27,badge:28,input:31,btn:34,cardtext:31,exercise:31,dataval:44,caltext:28,mono:28,presctext:18,m_mlogo:27,m_nav:19,m_navlbl:11,m_heading:30,m_label:18,m_input:22,m_btn:16,m_cardtext:19}
+};
+function applyFontPreset(px){
+  const preset=FONT_PRESETS[px];if(!preset) return;
+  // save and apply all values
+  Object.entries(preset).forEach(([key,val])=>{
+    if(key==='base'){
+      localStorage.setItem('wos-fontsize',val);
+      _applyFontSize(val);
+      const lbl=document.getElementById('font-size-lbl');if(lbl)lbl.textContent=val;
+      const rng=document.getElementById('font-size-range');if(rng)rng.value=val;
+    } else {
+      localStorage.setItem('wos-fs-'+key,val);
+      const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=val;
+      const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=val;
+    }
+  });
+  _applyComponentFontSizes();
+  _applyMobileComponentFontSizes();
+  _syncFontPresetBtns(px);
+}
 function _syncFontPresetBtns(px){
   const map={14:'fsp-xs',17:'fsp-s',19:'fsp-m',22:'fsp-l',26:'fsp-xl'};
   Object.entries(map).forEach(([size,id])=>{
@@ -2854,17 +2879,20 @@ function editSession(ts){
   drawer.innerHTML=buildEditForm(D.sessions[idx]);
 }
 function buildEditForm(session){
+  window._EF={};
   const liftKeys=[{key:'bench',label:'Bench Press'},{key:'ohp',label:'OHP'},{key:'pullup',label:'Pull-ups'},{key:'row',label:'Barbell Row'},{key:'squat',label:'Back Squat'},{key:'dl',label:'Deadlift'}];
   const dayOpts=['push','pull','legs','run','run_easy','run_quality','run_long','rest'];
   const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
   const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
-  const colHdr=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:4px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">WEIGHT</div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">REPS</div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">RPE</div></div>`;
+  const colHdr=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:4px;"><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">WEIGHT</div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">REPS</div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;">RPE</div><div></div></div>`;
+  const rmBtn=(key,i)=>`<button onclick="removeEditSet('${key}',${i},${session.ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button>`;
   let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:1;"><div style="font-family:var(--mono);font-size:11px;color:var(--a);text-transform:uppercase;letter-spacing:.08em;">Edit &middot; ${session.date}</div><button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;">&#215;</button></div><div style="padding:20px;">`;
   html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Session type</div><select id="edit-day" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;">${dayOpts.map(o=>`<option value="${o}"${session.day===o?' selected':''}>${o}</option>`).join('')}</select></div>`;
   liftKeys.forEach(({key,label})=>{
     const lift=session[key]; if(!lift?.sets?.length) return;
-    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}`;
-    lift.sets.forEach((s,i)=>{html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;">${numInp(`edit-${key}-w-${i}`,s.w,'lb')}${numInp(`edit-${key}-r-${i}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${i}`,s.rpe,'RPE')}</div>`;});
+    window._EF[key]=lift.sets.map(s=>({...s}));
+    const rowsHtml=lift.sets.map((s,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${i}`,s.w,'lb')}${numInp(`edit-${key}-r-${i}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${i}`,s.rpe,'RPE')}${rmBtn(key,i)}</div>`).join('');
+    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:10px;color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}<div id="edit-sets-${key}">${rowsHtml}</div>`;
     html+=`<input id="edit-${key}-notes" type="text" value="${esc(lift.notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;margin-top:2px;"></div>`;
   });
   if(session.cardio){
@@ -2874,6 +2902,17 @@ function buildEditForm(session){
   html+=`<div style="margin-bottom:20px;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Session notes</div><textarea id="edit-session-notes" rows="3" placeholder="Notes..." style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:8px;width:100%;box-sizing:border-box;resize:vertical;">${esc(session.notes)}</textarea></div>`;
   html+=`<div style="display:flex;gap:8px;"><button id="edit-save-btn" onclick="saveEditedSession(${session.ts})" style="flex:1;font-family:var(--mono);font-size:12px;background:var(--a);color:#fff;border:none;border-radius:8px;padding:10px;cursor:pointer;">Save changes</button><button onclick="openSessionDrawerByTs(${session.ts})" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:8px;padding:10px 16px;cursor:pointer;">Cancel</button></div><div id="edit-save-msg" style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:8px;text-align:center;"></div></div>`;
   return html;
+}
+function removeEditSet(key,i,ts){
+  if(!window._EF||!window._EF[key]) return;
+  const g=id=>document.getElementById(id);
+  window._EF[key].forEach((_,j)=>{window._EF[key][j]={w:+g(`edit-${key}-w-${j}`)?.value||null,r:+g(`edit-${key}-r-${j}`)?.value||null,rpe:+g(`edit-${key}-rpe-${j}`)?.value||null};});
+  window._EF[key].splice(i,1);
+  const cont=document.getElementById('edit-sets-'+key);
+  if(!cont) return;
+  const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
+  const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
+  cont.innerHTML=window._EF[key].map((s,j)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${j}`,s.w,'lb')}${numInp(`edit-${key}-r-${j}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${j}`,s.rpe,'RPE')}<button onclick="removeEditSet('${key}',${j},${ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button></div>`).join('');
 }
 async function saveEditedSession(ts){
   const btn=document.getElementById('edit-save-btn');
@@ -2887,7 +2926,8 @@ async function saveEditedSession(ts){
   session.day=g('edit-day')?.value||session.day;
   liftKeys.forEach(key=>{
     if(!session[key]?.sets) return;
-    session[key].sets=session[key].sets.map((_,i)=>({w:+g(`edit-${key}-w-${i}`)?.value||null,r:+g(`edit-${key}-r-${i}`)?.value||null,rpe:+g(`edit-${key}-rpe-${i}`)?.value||null}));
+    const setCount=(window._EF&&window._EF[key])?window._EF[key].length:session[key].sets.length;
+    session[key].sets=Array.from({length:setCount},(_,i)=>({w:+g(`edit-${key}-w-${i}`)?.value||null,r:+g(`edit-${key}-r-${i}`)?.value||null,rpe:+g(`edit-${key}-rpe-${i}`)?.value||null}));
     session[key].notes=g(`edit-${key}-notes`)?.value||'';
   });
   if(session.cardio){
