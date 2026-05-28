@@ -1,15 +1,21 @@
-name: Strava Nightly Sync
+name: Strava Sync
 
 on:
   schedule:
-    - cron: '0 7 * * *'  # 2am EST (7am UTC) every day
-  workflow_dispatch:       # Manual trigger from GitHub Actions tab
+    - cron: '0 7 * * *'   # 2am EST nightly fallback
+  workflow_dispatch:
+  repository_dispatch:
+    types: [strava-activity]  # triggered by Cloudflare webhook relay
+
+concurrency:
+  group: strava-sync
+  cancel-in-progress: false  # let an in-flight sync finish; queue next
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: write      # needed to push data.json
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -33,4 +39,5 @@ jobs:
           git config user.email "bot@workout-os"
           git add data.json
           git diff --staged --quiet || git commit -m "strava sync $(date -u +%Y-%m-%d)"
+          git pull --rebase
           git push
