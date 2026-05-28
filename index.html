@@ -1022,6 +1022,14 @@ input[type=range]::-webkit-slider-thumb:hover {
 <div id="panel-log" class="panel">
   <div class="h1">Log <span>session</span></div>
 
+  <!-- shown when there is no prescription for today -->
+  <div id="log-no-plan" class="card" style="text-align:center;padding:48px 24px;">
+    <div style="font-size:32px;margin-bottom:16px;">📋</div>
+    <div style="font-size:17px;font-weight:600;color:var(--t);margin-bottom:10px;">No plan for today</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--t3);line-height:1.7;margin-bottom:20px;">Go to the <strong style="color:var(--t2);">Program</strong> tab, select a workout type and duration,<br>then tap <strong style="color:var(--t2);">"Get Prescription"</strong> to generate today's plan.</div>
+    <button class="btn bp" onclick="showTab('program')" style="margin:0 auto;">Go to Program →</button>
+  </div>
+
   <div id="run-prescription-card" style="display:none;" class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div>
@@ -1149,7 +1157,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="ig"><label>Notes</label><textarea id="run-notes" rows="2" placeholder="How did it feel? Any discomfort?"></textarea></div>
     </div>
   </div>
-  <div class="card"><div class="ig"><label>Session notes</label><textarea id="log-notes" placeholder="What went well? What felt off? Any PRs? Anything to flag for next session?"></textarea></div></div>
+  <div id="log-notes-card" class="card"><div class="ig"><label>Session notes</label><textarea id="log-notes" placeholder="What went well? What felt off? Any PRs? Anything to flag for next session?"></textarea></div></div>
 
   <button class="sbtn" id="log-sbtn" onclick="saveSession()">Save session to GitHub</button>
   <div class="smsg" id="log-smsg"></div>
@@ -4547,21 +4555,39 @@ function setChartLift(lift){
 
 function updateLogTabPlanned(){
   const today=localDS(new Date());
-  const presc=D.dailyPrescriptions?.[today];
-  if(!presc?.mainWork?.lifts){
-    const plan=window._adaptivePlan;
-    if(!plan?.lifts)return;
-    const{bench,ohp,squat,dl}=plan.lifts;
-    const upd=(id,l)=>{if(!l)return;const el=document.getElementById(id);if(el)el.textContent=`Planned: ${l.sets}×${l.reps} @ ${l.weight}lb`;};
-    upd('planned-bench',bench);upd('planned-ohp',ohp);upd('planned-squat',squat);upd('planned-dl',dl);
-    upd('planned-pullup',plan.lifts.pullup);upd('planned-row',plan.lifts.row);
-    ['bench','ohp','squat','dl','pullup','row'].forEach(lift=>{
-      const l=plan.lifts[lift];if(!l||!(l.weight>0))return;
-      DEF[lift]=l.weight;renderSets(lift);
-    });
+  const presc=D?.dailyPrescriptions?.[today];
+  const noplanEl=document.getElementById('log-no-plan');
+  const formEls=['bench-block','ohp-block','squat-block','deadlift-block','pullup-block','row-block',
+                 'accessories-block','run-log-section','run-prescription-card','log-notes-card','log-sbtn','log-smsg'];
+
+  // ── NO PRESCRIPTION FOR TODAY ──────────────────────────────
+  if(!presc || presc.workoutType==='rest' || (!presc.mainWork?.lifts && !['run','cycling'].includes(presc.workoutType))){
+    if(noplanEl) noplanEl.style.display='';
+    formEls.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    window._logAccessories=[];
     return;
   }
-  const lifts=presc.mainWork.lifts;
+
+  // ── PRESCRIPTION EXISTS ─────────────────────────────────────
+  if(noplanEl) noplanEl.style.display='none';
+  // Show the save button and notes card
+  const saveBtn=document.getElementById('log-sbtn');
+  if(saveBtn) saveBtn.style.display='';
+  const smsg=document.getElementById('log-smsg');
+  if(smsg) smsg.style.display='';
+  const notesCard=document.getElementById('log-notes-card');
+  if(notesCard) notesCard.style.display='';
+
+  // Map prescription type → onDayTypeChange value, then apply
+  const typeMap={push:'A',pull:'B',legs:'C',run:'run',cycling:'run'};
+  const dayType=typeMap[presc.workoutType]||presc.workoutType||'';
+  if(dayType){
+    window._logDayType=dayType;
+    onDayTypeChange(dayType);
+  }
+
+  // ── LIFT-DAY LABEL UPDATES ──────────────────────────────────
+  const lifts=presc.mainWork?.lifts||{};
   const upd=(id,lift)=>{
     const l=lifts[lift];if(!l)return;
     const el=document.getElementById(id);if(!el)return;
@@ -4575,20 +4601,23 @@ function updateLogTabPlanned(){
     if(l.weight>0)DEF[lift]=l.weight;
     renderSets(lift);
   });
-  // Render accessories from prescription
+
+  // ── ACCESSORIES ─────────────────────────────────────────────
   const accBlock=document.getElementById('accessories-block');
-  const accessories=presc.mainWork.accessories||[];
+  const accessories=presc.mainWork?.accessories||[];
   window._logAccessories=accessories;
   if(accBlock){
     if(accessories.length){
       let aHtml=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="bdg" style="background:rgba(160,102,212,0.12);color:var(--a5);border:1px solid rgba(160,102,212,0.25);">ACCESSORIES</span><span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${accessories.length} prescribed</span></div>`;
       accessories.forEach((acc,i)=>{
-        const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+\((.+)\))?$/);
+        // Parse "Name 3×10 @ weight (note)" or "Name 3×10 (note)"
+        const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+@[^(]+)?(?:\s+\((.+)\))?$/);
         const name=m?m[1].trim():String(acc);
         const pSets=m?m[2]:'';
         const pReps=m?m[3]:'';
         const pNote=m?m[4]:'';
-        const prescLabel=pSets?`Planned: ${pSets}×${pReps}${pNote?' · '+pNote:''}`:String(acc);
+        // Show the full prescription string as the label (it may include weight hints like "@ 50lb per hand")
+        const prescLabel=`Planned: ${String(acc).replace(/^.+?\s+(\d+[×x]\d+)/,'$1')}`;
         aHtml+=`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--b);">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
             <span style="font-family:var(--mono);font-size:11px;color:var(--a5);font-weight:600;text-transform:uppercase;">${name}</span>
