@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-27",
+  "lastUpdated": "2026-05-28",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -2762,119 +2762,97 @@
       "weekPlan": null
     },
     "2026-05-27": {
-      "type": "push",
+      "type": "pull",
       "duration": 90,
-      "summary": "Push — Upper Strength & Zone 2 Run",
-      "reasoning": "Your last bench session was 205×3-4 at RPE 9-10 on May 20th, indicating you pushed hard. Today we'll use a conservative 190lb (your earlier @7 load) for volume work at RPE 8 to build strength without overreaching. OHP will progress from your 100×7 performance. Running HR has been 165-171 on recent easy runs—well above your Zone 2 ceiling of 145bpm. Today's run prescription enforces strict HR discipline.",
-      "warmup": "5min jog or bike, then dynamic warmup: arm circles, band pull-aparts, scap push-ups, light KB swings. 2 sets: empty bar bench ×10, empty bar OHP ×8. Then ramp: bench 95×5, 135×5, 165×3; OHP 45×5, 65×5, 80×3.",
+      "summary": "Pull — Back & Biceps",
+      "reasoning": "Full 90-minute pull session focusing on back development and biceps. Recent data shows solid pull-up capacity (3 sets logged) and barbell row work at 115lb. Today we'll progress rowing weight to 135lb at manageable volume and push pull-up sets to 5 to build upper back strength. RPE stays capped at 8 to respect recovery demands of residency.",
+      "warmup": "5min dynamic: arm circles, band pull-aparts, scapular wall slides. Then 2 ramping sets: empty bar rows ×10, 95lb rows ×6.",
       "mainWork": {
-        "summary": "Bench 4×5 @ 190lb, OHP 3×5 @ 95lb, Barbell Row 4×6 @ 115lb, Pull-ups 4×max BW, accessories, then 30min Zone 2 run",
+        "summary": "2 main lifts · 4 accessories",
         "lifts": {
-          "bench": {
-            "sets": 4,
-            "reps": 5,
-            "weight": 190,
-            "targetRPE": 8,
-            "variation": "Barbell Bench Press",
-            "coachNote": "Control descent, pause on chest, explosive press. Rest 3min between sets. If set 4 feels >8 RPE, drop to 185lb."
-          },
-          "ohp": {
-            "sets": 3,
-            "reps": 5,
-            "weight": 95,
-            "targetRPE": 8,
-            "variation": "Barbell Strict OHP",
-            "coachNote": "Slight step up from 100×7. Brace hard, squeeze glutes, press straight up. Rest 2.5min."
-          },
           "row": {
             "sets": 4,
             "reps": 6,
-            "weight": 115,
+            "weight": 135,
             "targetRPE": 7,
             "variation": "Barbell Bent-Over Row",
-            "coachNote": "Pull to lower chest, squeeze shoulder blades. Maintain horizontal torso. Rest 2min."
+            "coachNote": "Hinge at hips, chest proud, pull elbows back not up. Bar to lower chest. Control the eccentric."
           },
           "pullup": {
-            "sets": 4,
+            "sets": 5,
             "reps": "max",
             "weight": 0,
             "targetRPE": 8,
             "variation": "Pull-ups",
-            "coachNote": "Bodyweight only. Full ROM, chin over bar. Stop each set 1-2 reps shy of failure. Rest 2min."
+            "coachNote": "Bodyweight. Full ROM, chin over bar. If hitting failure before set 3, consider band assistance for final sets."
           }
         },
         "accessories": [
-          "Face Pulls 3×15 @ light-moderate (upper back health)",
-          "Overhead Tricep Extension 3×10-12 (DB or cable)",
-          "Incline DB Curl 3×10 (elbow health, bicep balance)"
-        ],
-        "runType": "easy",
-        "totalDistance": "3-4 miles",
-        "paceTarget": "11:45-12:45/mile",
-        "hrCeiling": 145,
-        "effort": "Conversational — you should be able to speak full sentences comfortably. If HR creeps above 145, slow down or walk until it drops.",
-        "mainSet": "After lifting, 30min continuous easy run. Start at 12:30/mile pace or slower. Monitor HR every 0.25mi. Goal is to keep HR 130-145bpm throughout. If HR hits 146+, immediately reduce pace or insert 30sec walk breaks. This is aerobic base work, not tempo."
+          "Lat Pulldown 3×10 @ moderate weight, focus on scapular retraction",
+          "Face Pulls 3×15 with rope attachment, external rotation at finish",
+          "Incline DB Curl 3×12 per arm, controlled tempo",
+          "Rear Delt Fly 3×15 with light DBs, squeeze at contraction"
+        ]
       },
-      "cooldown": "5min walk, then foam roll quads, hip flexors, lats. Stretch pecs, shoulders, hip flexors 30sec each. Hydrate and consume 20-30g protein within 60min.",
-      "coachNote": "Javier—your recent easy runs have been threshold efforts (165-171 HR). Today's run MUST stay ≤145bpm. Start slower than feels natural. This is the discipline that will unlock your sub-20 5K by building aerobic base. Track your pace—if you can hold 12:00/mi at 140 HR, that's progress. Residency fatigue is real; prioritize sleep tonight.",
-      "ifTooHard": "If post-call or fatigued: drop bench to 3×5 @ 185lb, OHP to 2×5 @ 90lb, skip accessories, and reduce run to 20min easy walk at <130 HR. Full recovery beats a mediocre grind.",
+      "cooldown": "3min: dead hang 3×20-30sec, doorway pec stretch 2×30sec each side, child's pose 60sec.",
+      "coachNote": "Your rowing weight progression from 115lb to 135lb is appropriate given your deadlift base of 215lb. Focus on maintaining torso angle throughout the set—if you're bouncing the weight off your chest or jerking upright, reduce load by 10lb. Quality reps build the back, not ego lifting.",
+      "ifTooHard": "Reduce row weight to 125lb or drop pull-up sets to 4. Maintain RPE ceiling.",
       "watchOutFor": [
-        "HR discipline on run—use your watch's HR alert set to 145bpm",
-        "Shoulder fatigue after bench+OHP—if pull-ups feel sketchy, use assisted pull-up machine or bands",
-        "Lower back tightness post-lift—spend extra time on cooldown mobility if needed"
+        "Lower back fatigue during rows—if form breaks, stop the set",
+        "Bicep tendon irritation from high pull-up volume—monitor for sharp elbow pain"
       ],
-      "workoutType": "push",
+      "workoutType": "pull",
       "durationMins": 90,
-      "generatedAt": "2026-05-27T18:13:14.956Z",
+      "generatedAt": "2026-05-28T04:46:09.330Z",
       "weekPlan": [
         {
           "date": "2026-05-28",
           "dow": "Thu",
-          "suggestion": "Rest or 30min Zone 2 Run",
+          "suggestion": "Rest or easy mobility 20min",
           "confidence": "high",
-          "reason": "Post-push recovery day. Optional easy run if energy is high, otherwise full rest for Friday quality work."
+          "reason": "Day after heavy pull volume, residency demands likely high mid-week"
         },
         {
           "date": "2026-05-29",
           "dow": "Fri",
-          "suggestion": "Pull — Upper Strength",
+          "suggestion": "Lower — Squat focus 60min",
           "confidence": "high",
-          "reason": "72hrs since last upper session. Focus on rows, pull-ups, rear delts; light OHP accessory work."
+          "reason": "Adequate recovery from Wed pull, squat e1RM 215lb needs consistent work"
         },
         {
           "date": "2026-05-30",
           "dow": "Sat",
-          "suggestion": "Tempo Run or Threshold Intervals",
+          "suggestion": "Quality run: 6×800m intervals or tempo",
           "confidence": "medium",
-          "reason": "Quality running day. 3-4mi tempo at 155-165 HR or 6×800m intervals. Aligns with polarized 20% quality work."
+          "reason": "Weekend allows focus on VO2max work, follows lower day not upper"
         },
         {
           "date": "2026-05-31",
           "dow": "Sun",
-          "suggestion": "Long Easy Run (60-75min)",
+          "suggestion": "Easy Zone 2 run 40-50min",
           "confidence": "high",
-          "reason": "Aerobic endurance priority. 7-8mi at strict <145 HR. Build mitochondrial density for VO2max gains."
+          "reason": "Recovery day in polarized model, builds aerobic base post-Saturday quality"
         },
         {
           "date": "2026-06-01",
           "dow": "Mon",
-          "suggestion": "Legs — Lower Strength",
+          "suggestion": "Push — Bench & OHP 75min",
           "confidence": "high",
-          "reason": "Squat and deadlift focus. Last logged DL/squat was 215lb; progress volume at 175-185lb range."
+          "reason": "Fresh week start, upper push pattern rested since 5/27, bench e1RM 232.5lb ready to progress"
         },
         {
           "date": "2026-06-02",
           "dow": "Tue",
-          "suggestion": "Easy Run 40min + Core",
-          "confidence": "medium",
-          "reason": "Active recovery between leg day and next quality session. Zone 2 run <145 HR, 15min core finisher."
+          "suggestion": "Easy Zone 2 run 30-40min",
+          "confidence": "high",
+          "reason": "Active recovery, accumulate Zone 2 volume without interference to Wed lower session"
         },
         {
           "date": "2026-06-03",
           "dow": "Wed",
-          "suggestion": "Push — Upper Strength",
-          "confidence": "high",
-          "reason": "14 days since last hard push session. Progress bench to 195×5 or 190×6 if today goes well."
+          "suggestion": "Lower — Deadlift focus 60min",
+          "confidence": "medium",
+          "reason": "Alternates with squat focus, DL e1RM 215lb benefits from weekly exposure"
         }
       ]
     }
@@ -2888,6 +2866,14 @@
         "durationMins": 90,
         "mainWorkSummary": "Bench 4×5 @ 190lb, OHP 3×5 @ 95lb, Barbell Row 4×6 @ 115lb, Pull-ups 4×max BW, accessories, then 30min Zone 2 run",
         "coachNote": "Javier—your recent easy runs have been threshold efforts (165-171 HR). Today's run MUST stay ≤145bpm. Start slower than feels natural. This is the discipline that will unlock your sub-20 5K by building aerobic base. Track your pace—if you can hold 12:00/mi at 140 HR, that's progress. Residency fatigue is real; prioritize sleep tonight.",
+        "flags": []
+      },
+      {
+        "date": "2026-05-27",
+        "workoutType": "pull",
+        "durationMins": 90,
+        "mainWorkSummary": "2 main lifts · 4 accessories",
+        "coachNote": "Your rowing weight progression from 115lb to 135lb is appropriate given your deadlift base of 215lb. Focus on maintaining torso angle throughout the set—if you're bouncing the weight off your chest or jerking upright, reduce load by 10lb. Quality reps build the back, not ego lifting.",
         "flags": []
       }
     ]
