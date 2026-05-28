@@ -1151,7 +1151,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <button class="sbtn" id="log-sbtn" onclick="saveSession()">Save session to GitHub</button>
   <div class="smsg" id="log-smsg"></div>
 
-  <div class="card" style="margin-top:16px;"><div class="lbl">recent sessions</div><div id="sess-hist"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div></div>
+
 </div>
 
 <!-- v2026-05-22 -->
@@ -1301,7 +1301,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div style="position:relative;height:180px;"><canvas id="body-chart"></canvas></div>
   <div id="body-chart-legend" style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px;"></div>
 </div>
-  <div class="card"><div class="lbl">session history</div><div id="all-sessions"><div style="font-size:12px;color:var(--t3);font-style:italic;">No sessions logged yet.</div></div></div>
+  <div class="card"><div class="lbl">session history</div><div id="prog-sess-rows"><div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No sessions logged yet.</div></div><div id="prog-sess-nav"></div></div>
 </div>
 
 <!-- v2026-05-22 -->
@@ -2379,6 +2379,7 @@ function showTab(n){
   const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); p.scrollTop=0; }
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='week'){ renderCalendar(); renderSessionList(); }
+  if(n==='progress'){ renderProgressSessions(); }
   if(n==='rules') renderRulesTab();
   if(n==='settings') _syncAppearanceUI();
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
@@ -2499,7 +2500,7 @@ function renderSessHist(){
       return`<div class="le"><div class="ld">${s.date}</div><div class="lc"><div class="lt">${dayNames[s.day]||'Session'}${s.rpe?' -- RPE '+s.rpe:''}</div><div class="ldt">${pts.join(' -- ')||'No lift data'}${s.notes?' -- '+s.notes.substring(0,60):''}</div></div></div>`;
     }).join('');
   };
-  render('sess-hist',10); render('all-sessions',20);
+  render('sess-hist',10);
 }
 function updProgressStats(){
   if(!D||!D.currentLifts) return;
@@ -2522,6 +2523,7 @@ function updProgressStats(){
 // ============================================================
 var calMonthOffset=0;
 var sessionListPage=0;
+var progressSessionPage=0;
 const HEIGHT_INCHES = 69.5; // 5'9.5"
 const HEIGHT_CM = 176.53;
 function getSessionsForDate(dateStr){
@@ -2763,6 +2765,36 @@ function renderSessionList(){
   if(navEl){
     const hasPrev=start>0,hasNext=start+10<total;
     navEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);"><button onclick="sessionListPage--;renderSessionList()" ${hasPrev?'':'disabled'} style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasPrev?'':'opacity:0.35;'}">&#8592; Older</button><span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${start+1}–${Math.min(start+10,total)} of ${total}</span><button onclick="sessionListPage++;renderSessionList()" ${hasNext?'':'disabled'} style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasNext?'':'opacity:0.35;'}">Newer &#8594;</button></div>`;
+  }
+}
+function renderProgressSessions(){
+  const el=document.getElementById('prog-sess-rows');
+  const navEl=document.getElementById('prog-sess-nav');
+  if(!el||!D) return;
+  const isRunType=d=>['run','run_easy','run_quality','run_long'].includes(d);
+  const DAY_LBL={A:'Push',B:'Pull',C:'Legs',push:'Push',pull:'Pull',legs:'Legs',run:'Run',run_easy:'Easy Run',run_quality:'Quality Run',run_long:'Long Run',rest:'Rest',1:'Lift A',2:'Lift B',3:'Easy Run',4:'Lift C',5:'Quality Run'};
+  const acts=[...(D.sessions||[])].sort((a,b)=>b.date.localeCompare(a.date)||(b.ts||0)-(a.ts||0));
+  const total=acts.length;
+  const start=progressSessionPage*10;
+  const slice=acts.slice(start,start+10);
+  if(!total){
+    el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--t3);padding:12px 0;">No sessions logged yet.</div>';
+    if(navEl) navEl.innerHTML='';
+    return;
+  }
+  el.innerHTML=slice.map(s=>{
+    const dateObj=new Date(s.date+'T12:00:00');
+    const ds=dateObj.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const label=DAY_LBL[s.day]||s.day||'Session';
+    const pts=[];
+    ['bench','ohp','squat','dl'].forEach(k=>{if(s[k]?.sets?.length){const b=s[k].sets.filter(x=>x.w).sort((a,b)=>b.w-a.w)[0];if(b)pts.push(k.toUpperCase()+' '+b.w+'\xd7'+b.r);}});
+    if(s.cardio?.dist) pts.push(s.cardio.dist+'mi');
+    const dotClr=isRunType(s.day)?'var(--a2)':'var(--a)';
+    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:9px;height:9px;border-radius:50%;background:${dotClr};flex-shrink:0;display:inline-block;margin-top:1px;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:var(--mono);font-size:11px;color:var(--t3);">${ds}</span><span style="font-family:var(--mono);font-size:11px;color:var(--t);font-weight:500;">${label}</span></div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
+  }).join('');
+  if(navEl){
+    const hasPrev=start>0,hasNext=start+10<total;
+    navEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);"><button onclick="progressSessionPage--;renderProgressSessions()" ${hasPrev?'':'disabled'} style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasPrev?'':'opacity:0.35;'}">&#8592; Older</button><span style="font-family:var(--mono);font-size:10px;color:var(--t3);">${start+1}–${Math.min(start+10,total)} of ${total}</span><button onclick="progressSessionPage++;renderProgressSessions()" ${hasNext?'':'disabled'} style="font-family:var(--mono);font-size:11px;background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasNext?'':'opacity:0.35;'}">Newer &#8594;</button></div>`;
   }
 }
 function editSession(ts){
