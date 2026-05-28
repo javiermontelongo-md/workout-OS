@@ -202,7 +202,6 @@ All line numbers are from origin/main. Verify before editing:
 ### Settings & Config UI
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2006 | modeChg() | Training mode change handler |
 | 2011 | setTrainingMode(val) | Sets D.trainingMode |
 | 2307 | saveCFG() | Save settings |
 | 2314 | testCon() | Test GitHub connection |
@@ -219,8 +218,6 @@ All line numbers are from origin/main. Verify before editing:
 | 2357 | liftTrend(key, sessions, weeks=4) | Computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
 | 2375 | buildAthleteContext() | Single shared context object for all AI calls. Returns athlete (with goals + vo2maxEstimate), hardRules, biometrics, training, checkin, body. Calls evaluateTrainingStatus() once. |
 | 2551 | ai(prompt, maxTokens=800) | Shared Anthropic fetch wrapper — system prompt built from buildAthleteContext(). All AI calls route here. |
-| 2582 | fai(t, id) | Renders AI text response into a DOM element |
-| 2584 | genToday() | Daily coaching narrative — calls ai(1000). Returns JSON with coaching + optional scheduleAdjustment. Caches on date+checkin+HRV. |
 | 3673 | generateDailyPrescription(workoutType, durationMins) | **Primary prescription entry point.** Single direct API call (claude-sonnet-4-5, 2500 tokens). Produces todayPrescription (warmup/mainWork/cooldown/coachNote/ifTooHard/watchOutFor) + weekPlan (7-day suggestions with confidence). Stores to D.dailyPrescriptions[today]. Calls renderPrescriptionCard, renderWeekSuggestions, updateLogTabPlanned, pushSilent. |
 | 3839 | maybeCompressCoachingMemory() | Compresses oldest 15 coaching notes to structured profile if ≥15 notes. Stores to D.coachingMemory.compressed. Anti-drift: only structured observations, never prose fed back as AI input. |
 | 3499 | generatePostRunFeedback(targetDate) | Post-run feedback — requires D.dailyPrescriptions[targetDate] (fallback to runPrescriptions) AND matching Strava run. Compares prescribed vs actual. Calls renderRunLogCard(). |
@@ -234,8 +231,8 @@ All line numbers are from origin/main. Verify before editing:
 ### Session Logging
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2021 | chk(id) | Checkbox state helper |
-| 2028 | restChk() | Rest day checkbox handler |
+| 2021 | chk(id) | Checkbox toggle + D.checks persistence — used by Milestones tab only |
+| 2028 | restChk() | Restore checkbox state from D.checks on load — used by Milestones tab only |
 | 2040 | initSets() | Initialize set tracking state |
 | 2041 | addSet(lift) | Add a set to a lift block |
 | 2046 | removeSet(lift, i) | Remove a set from a lift block |
@@ -345,7 +342,6 @@ buildAthleteContext()  ← called once per AI invocation
 ai(prompt, maxTokens=800)  ← shared fetch wrapper
   └── buildAthleteContext()  ← system prompt built here
   └── called by:
-      ├── genToday()                    (1000 tokens)
       ├── maybeCompressCoachingMemory() (1200 tokens)
       └── generatePostRunFeedback()     (800 tokens)
 
@@ -481,3 +477,7 @@ elevationGain: feet
 - **Replaced by:** generateDailyPrescription (single AI call → prescription + 7-day plan),
   renderPrescriptionCard, renderWeekSuggestions, renderRunLogCard,
   maybeCompressCoachingMemory
+- SESSION CHECKLIST card from Today tab (ci-wu/ci-mn/ci-ac/ci-cd/ci-lg/ci-pr/ci-sl)
+  chk() and restChk() retained — still used by Milestones tab checkboxes (mhw1–mhw7)
+- REDUCE IF: and REDUCTION ORDER: cards from Today tab (g2 grid wrapper removed too)
+  Content lives in RULES tab — was redundant on Today
