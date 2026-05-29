@@ -2586,8 +2586,36 @@ function updProgressStats(){
   if(e('pr-squat'))e('pr-squat').textContent=D.currentLifts.squatE1RM||215;
   if(e('pr-dl'))e('pr-dl').textContent=D.currentLifts.deadliftE1RM||215;
   if(e('pr-ohp'))e('pr-ohp').textContent=D.currentLifts.ohpE1RM||120;
-  if(e('pr-pu'))e('pr-pu').textContent=D.currentLifts.pullups||5;
-  if(D.cardioBaseline){if(e('pr-pace'))e('pr-pace').textContent=D.cardioBaseline.pace||'10:30';if(e('pr-hr'))e('pr-hr').textContent=D.cardioBaseline.avgHR||165;}
+
+  // Max clean pullups — max bodyweight-only reps across all logged sessions
+  const maxPU=(()=>{
+    let best=0;
+    (D.sessions||[]).forEach(s=>{
+      (s.pullup?.sets||[]).forEach(x=>{if((!x.w||x.w===0)&&x.r>best)best=x.r;});
+    });
+    return best||D.currentLifts.pullups||5;
+  })();
+  if(e('pr-pu'))e('pr-pu').textContent=maxPU;
+
+  // Run pace — avg pace of last 20 Strava runs (any type), fallback to baseline
+  const paceRuns=(D.runs||[]).filter(r=>r.pace).slice(-20);
+  if(paceRuns.length>0){
+    const avgSec=Math.round(paceRuns.reduce((s,r)=>s+r.pace,0)/paceRuns.length);
+    const mm=Math.floor(avgSec/60);const ss=String(avgSec%60).padStart(2,'0');
+    if(e('pr-pace'))e('pr-pace').textContent=`${mm}:${ss}`;
+  } else {
+    if(e('pr-pace'))e('pr-pace').textContent=D.cardioBaseline?.pace||'10:30';
+  }
+
+  // Zone 2 avg HR — avg heartRateAvg of easy runs (runType 'easy' or 'run_easy'), fallback to baseline
+  const easyRuns=(D.runs||[]).filter(r=>r.heartRateAvg&&['easy','run_easy'].includes(r.runType||'')).slice(-20);
+  if(easyRuns.length>0){
+    const avgHR=Math.round(easyRuns.reduce((s,r)=>s+r.heartRateAvg,0)/easyRuns.length);
+    if(e('pr-hr'))e('pr-hr').textContent=avgHR;
+  } else {
+    if(e('pr-hr'))e('pr-hr').textContent=D.cardioBaseline?.avgHR||165;
+  }
+
   if(D.profile&&e('pr-bw'))e('pr-bw').textContent=D.profile.bodyweight||225;
   if(D.volumeBests){if(e('vol-bench'))e('vol-bench').textContent=D.volumeBests.bench||'190x5x5';if(e('vol-ohp'))e('vol-ohp').textContent=D.volumeBests.ohp||'90x3x5';if(e('vol-squat'))e('vol-squat').textContent=D.volumeBests.squat||'160x5x5';if(e('vol-dl'))e('vol-dl').textContent=D.volumeBests.deadlift||'160x3x5';}
 }
