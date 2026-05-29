@@ -3528,7 +3528,8 @@ function hrRegressionPredict(runs) {
 }
 
 function calcRacePredictions() {
-  const runs = (D.runs || []).filter(r => r.type === 'run');
+  // Exclude walks — runType='walk' pollutes pace anchors and inflates CI via pace std dev
+  const runs = (D.runs || []).filter(r => r.type === 'run' && r.runType !== 'walk');
   const runCount = runs.length;
 
   // Need at least 1 run or VO2max data
