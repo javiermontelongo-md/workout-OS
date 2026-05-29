@@ -1213,16 +1213,34 @@ input[type=range]::-webkit-slider-thumb:hover {
         <button class="btn bs bi chart-lift-btn" id="chart-squat" onclick="setChartLift('squat')" style="font-size:var(--fs-xs);padding:5px 10px;">SQUAT</button>
         <button class="btn bs bi chart-lift-btn" id="chart-dl" onclick="setChartLift('dl')" style="font-size:var(--fs-xs);padding:5px 10px;">DL</button>
         <button class="btn bs bi chart-lift-btn" id="chart-ohp" onclick="setChartLift('ohp')" style="font-size:var(--fs-xs);padding:5px 10px;">OHP</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-pullup" onclick="setChartLift('pullup')" style="font-size:var(--fs-xs);padding:5px 10px;">PULLUP</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-row" onclick="setChartLift('row')" style="font-size:var(--fs-xs);padding:5px 10px;">ROW</button>
+        <button class="btn bs bi" id="chart-eq-btn" onclick="toggleEquationDrawer()" title="Show formula" style="font-size:var(--fs-xs);padding:5px 10px;">ƒ(x)</button>
       </div>
     </div>
     <div style="position:relative;height:220px;">
       <canvas id="e1rm-chart"></canvas>
     </div>
-    <div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">
-      <span>── Actual e1RM</span>
-      <span style="color:rgba(255,183,77,.6);">── Optimistic</span>
-      <span style="color:rgba(79,195,247,.6);">── Conservative</span>
-      <span style="border-left:2px dashed var(--t3);padding-left:6px;">│ Today</span>
+    <div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);flex-wrap:wrap;align-items:center;">
+      <span style="color:#ffb74d;">── Actual e1RM</span>
+      <span style="color:rgba(255,183,77,.6);">- - Optimistic</span>
+      <span style="color:rgba(79,195,247,.6);">- - Conservative</span>
+      <span style="color:rgba(168,180,204,.4);">│ Today</span>
+    </div>
+    <div id="eq-drawer" style="display:none;margin-top:12px;padding:14px;background:var(--s2);border-radius:var(--r);border:1px solid var(--b2);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);letter-spacing:.06em;margin-bottom:6px;">EPLEY e1RM FORMULA</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);background:var(--s3);padding:8px 10px;border-radius:6px;margin-bottom:6px;">e1RM = weight × (1 + reps ÷ 30)</div>
+          <div style="font-size:var(--fs-xs);color:var(--t2);line-height:1.6;">Rounded to nearest 2.5 lb. Epley (1990) — accurate for 1–10 rep ranges. Pull-ups use <em>bodyweight + added weight</em> as the load input.</div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);letter-spacing:.06em;margin-bottom:6px;">RECENCY WEIGHTS</div>
+          <div style="font-size:var(--fs-xs);color:var(--t2);line-height:1.8;margin-bottom:10px;">0–14 days: <span style="color:var(--t);">1.0×</span><br>15–30 days: <span style="color:var(--t);">0.7×</span><br>31–60 days: <span style="color:var(--t);">0.4×</span></div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);letter-spacing:.06em;margin-bottom:6px;">PROJECTION</div>
+          <div style="font-size:var(--fs-xs);color:var(--t2);line-height:1.6;">Linear regression on last 6 sessions → slope × weeks.<br><span style="color:rgba(255,183,77,.8);">Optimistic</span> = full slope · <span style="color:rgba(79,195,247,.8);">Conservative</span> = half slope (floor: 90% / 85% of current e1RM).<br>Confidence: Low &lt;3 sessions · Med 3–6 · High 7+</div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="card" style="margin-bottom:14px;">
@@ -3245,15 +3263,24 @@ function getLiftHistory(liftKey,daysBack=60){
   if(!D||!D.sessions) return [];
   const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-daysBack);
   const cutoffStr=cutoff.toISOString().split('T')[0];
+  const bw=D.profile?.bodyweight||ATHLETE.weightLbs; // bodyweight for pullup e1RM
+  const isPullup=liftKey==='pullup';
   const results=[];
   D.sessions.filter(s=>s.date>=cutoffStr&&s[liftKey]&&s[liftKey].sets&&s[liftKey].sets.length).forEach(s=>{
-    const valid=s[liftKey].sets.filter(x=>x.w&&x.r);
+    const sets=s[liftKey].sets;
+    const valid=sets.filter(x=>x.r&&(isPullup||x.w)); // pullups can have w=0 (BW)
     if(!valid.length) return;
-    const best=valid.reduce((b,x)=>calcE1RM(x.w,x.r)>calcE1RM(b.w,b.r)?x:b);
-    const e1RM=calcE1RM(best.w,best.r);
+    let best,e1RM;
+    if(isPullup){
+      best=valid.reduce((b,x)=>calcE1RM(bw+(x.w||0),x.r)>calcE1RM(bw+(b.w||0),b.r)?x:b);
+      e1RM=calcE1RM(bw+(best.w||0),best.r);
+    } else {
+      best=valid.reduce((b,x)=>calcE1RM(x.w,x.r)>calcE1RM(b.w,b.r)?x:b);
+      e1RM=calcE1RM(best.w,best.r);
+    }
     const daysAgo=Math.floor((new Date()-new Date(s.date))/86400000);
     const rw=daysAgo<=14?1.0:daysAgo<=30?0.7:0.4;
-    results.push({date:s.date,e1RM,sessionRPE:s.rpe,weight:best.w,reps:best.r,recencyWeight:rw});
+    results.push({date:s.date,e1RM,sessionRPE:s.rpe,weight:isPullup?bw+(best.w||0):best.w,reps:best.r,addedWeight:isPullup?(best.w||0):null,recencyWeight:rw});
   });
   return results.sort((a,b)=>a.date.localeCompare(b.date));
 }
@@ -3290,7 +3317,8 @@ function buildPredictions(currentE1RM,slope){
 }
 
 function predictLift(liftKey,blockWeek){
-  const baselines={bench:{e1RM:255,weight:190},ohp:{e1RM:120,weight:90},squat:{e1RM:215,weight:160},dl:{e1RM:215,weight:160}};
+  const bw=D?.profile?.bodyweight||ATHLETE.weightLbs;
+  const baselines={bench:{e1RM:255,weight:190},ohp:{e1RM:120,weight:90},squat:{e1RM:215,weight:160},dl:{e1RM:215,weight:160},pullup:{e1RM:Math.round(bw*(1+5/30)/2.5)*2.5,weight:bw},row:{e1RM:135,weight:115}};
   const bl=baselines[liftKey];
   const history=getLiftHistory(liftKey);
   const {sets,reps,targetRPE}=getBlockParams(blockWeek);
@@ -4558,7 +4586,21 @@ function renderPredictionChart(lift='bench'){
     if(planData?.predictedE1RMs){
       datasets.push({label:'Optimistic',data:optPadded,borderColor:'rgba(255,183,77,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:'+1',backgroundColor:'rgba(255,183,77,0.08)',tension:0.3,spanGaps:false},{label:'Conservative',data:conPadded,borderColor:'rgba(79,195,247,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:false});
     }
-    window._e1rmChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const isPU=lift==='pullup';
+    const todayStr=localDS(new Date());
+    const todayPlugin={id:'todayLine',afterDraw(chart){
+      const idx=labels.indexOf(todayStr);
+      if(idx<0) return;
+      const meta=chart.getDatasetMeta(0);
+      if(!meta.data[idx]) return;
+      const x=meta.data[idx].x;
+      const {top,bottom}=chart.chartArea;
+      const c=chart.ctx;
+      c.save();c.beginPath();c.moveTo(x,top);c.lineTo(x,bottom);
+      c.strokeStyle='rgba(168,180,204,0.35)';c.setLineDash([4,4]);c.lineWidth=1;c.stroke();c.restore();
+    }};
+    window._e1rmChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label(ctx){const v=ctx.parsed.y;if(v===null)return null;if(isPU)return `${ctx.dataset.label}: ${v} lb (BW+added)`;return `${ctx.dataset.label}: ${v} lb`;}}}},scales:{x:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:11},maxTicksLimit:7,maxRotation:0,callback(val){const l=this.getLabelForValue(val);if(!l)return'';const[,m,d]=l.split('-');return months[parseInt(m)-1]+' '+parseInt(d);}},grid:{color:'rgba(104,112,200,0.08)'}},y:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:11},callback:v=>v+' lb'},grid:{color:'rgba(104,112,200,0.08)'}}}},plugins:[todayPlugin]});
   }catch(e){
     console.warn('Chart render failed:',e);
     const ctx=canvas.getContext('2d');ctx.font='12px monospace';ctx.fillStyle='#4a5068';
@@ -4570,6 +4612,13 @@ function setChartLift(lift){
   document.querySelectorAll('.chart-lift-btn').forEach(b=>b.classList.remove('active'));
   const btn=document.getElementById('chart-'+lift);if(btn)btn.classList.add('active');
   renderPredictionChart(lift);
+}
+function toggleEquationDrawer(){
+  const d=document.getElementById('eq-drawer');if(!d)return;
+  const open=d.style.display==='none';
+  d.style.display=open?'block':'none';
+  const btn=document.getElementById('chart-eq-btn');
+  if(btn)btn.classList.toggle('active',open);
 }
 
 function updateLogTabPlanned(){
