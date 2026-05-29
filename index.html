@@ -3741,7 +3741,7 @@ function renderRacePredChart(dist) {
   if (_racePredChart) { _racePredChart.destroy(); _racePredChart = null; }
 
   try{
-  const runs = (D.runs||[]).filter(r=>r.type==='run').sort((a,b)=>a.date.localeCompare(b.date));
+  const runs = (D.runs||[]).filter(r=>r.type==='run'&&r.runType!=='walk').sort((a,b)=>a.date.localeCompare(b.date));
   const distKey = { '5k':'s5k', '10k':'s10k', 'half':'shalf', 'full':'sfull' }[dist];
   const distLabel = {s5k:'5K',s10k:'10K',shalf:'Half Marathon',sfull:'Marathon'}[distKey];
 
