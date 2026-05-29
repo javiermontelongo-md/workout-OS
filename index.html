@@ -4295,6 +4295,17 @@ volumeModifier: ${ts.volumeModifier} — multiply all set counts by this (round 
 activeFlags: ${ts.activeFlags.join(', ')||'none'}
 reasons: ${ts.reasons.join(' | ')||'all clear'}
 
+PROGRAMMING RULES (enforce precisely — do not deviate):
+Double progression: increase reps first within range, then add weight only when ALL sets hit the TOP of rep range at RPE ≤8.
+Rep ranges: DL 3–5 · Squat 4–6 · Bench 5–8 · OHP 5–8 · Row 6–10 · Pullup 6–10
+Load increments: lower body +5lb · upper body +2.5lb · pullup belt +5lb
+Stall detection: if last 2+ sessions of a lift are below rep range minimum → prescribe 90% of current working weight as a reset
+Weekly volume ceilings (max sets across all sessions): Squat 16 · DL 10 · Bench 18 · OHP 14 · Row 16 · Pullup 16
+Recovery windows: quality→quality min 48h · long run→quality min 72h · legs day→quality run min 24h · legs day→long run min 48h
+Run volume: max +10% weekly mileage increase · long run ≤35% of weekly total · deload week = 50% of peak mileage
+Zone 2: ALL easy runs hard-capped at ${ts.mafHR}bpm — prescribe a pace slow enough to actually stay under this ceiling (current easy runs at 165–174bpm are threshold, not Zone 2)
+80/20 polarization: ~80% of weekly run volume at Zone 2/easy (≤${ts.mafHR}bpm) · ~20% at quality intensity
+
 RECENT SESSIONS (last 8):
 ${JSON.stringify(recentSessions)}
 ${runDataSection}
