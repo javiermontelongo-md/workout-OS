@@ -2637,7 +2637,7 @@ function updProgressStats(){
 
   // Bodyweight — most recent logged body metric, fallback to profile default
   const latestBW=(D.bodyMetrics||[]).slice(-1)[0];
-  if(e('pr-bw'))e('pr-bw').textContent=latestBW?.weight||D.profile?.bodyweight||225;
+  if(e('pr-bw'))e('pr-bw').textContent=latestBW?.weightLbs||D.profile?.bodyweight||225;
   if(D.volumeBests){if(e('vol-bench'))e('vol-bench').textContent=D.volumeBests.bench||'190x5x5';if(e('vol-ohp'))e('vol-ohp').textContent=D.volumeBests.ohp||'90x3x5';if(e('vol-squat'))e('vol-squat').textContent=D.volumeBests.squat||'160x5x5';if(e('vol-dl'))e('vol-dl').textContent=D.volumeBests.deadlift||'160x3x5';}
 }
 
@@ -3219,8 +3219,8 @@ function buildAthleteContext() {
       next14
     },
     body: {
-      weightLbs: lastBody.weight || ATHLETE.weightLbs,
-      waistIn:   lastBody.waist  || ATHLETE.waistInches,
+      weightLbs: lastBody.weightLbs || ATHLETE.weightLbs,
+      waistIn:   lastBody.waistInches || ATHLETE.waistInches,
       bmi:       lastBody.bmi    || null
     }
   };
@@ -3232,7 +3232,7 @@ async function ai(prompt, maxTokens = 800) {
     const ctx = buildAthleteContext();
     const systemPrompt = [
       `You are a strength and running coach.`,
-      `Athlete: ${ctx.athlete.age}yo male, ${ctx.athlete.weightLbs}lb, ${ctx.athlete.heightIn}in, waist ${ctx.athlete.waistIn}in. Location: ${ctx.athlete.location}.`,
+      `Athlete: ${ctx.athlete.age}yo male, ${ctx.body.weightLbs}lb, ${ctx.athlete.heightIn}in, waist ${ctx.body.waistIn}in. Location: ${ctx.athlete.location}.`,
       `Schedule: ${ctx.athlete.schedule}.`,
       `MAF HR ceiling: ${ctx.athlete.mafHR}bpm — hard ceiling for all easy runs, never exceed.`,
       `Goals: ${ctx.athlete.goals.primary} · ${ctx.athlete.goals.secondary}.`,
