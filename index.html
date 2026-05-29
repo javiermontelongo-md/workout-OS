@@ -1346,8 +1346,6 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div style="margin-bottom:20px;">
     <div id="prog-date-header" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;"></div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <div id="prog-block-badge"></div>
-      <div id="prog-block-desc" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);"></div>
     </div>
   </div>
   <div id="prog-today-card" class="prog-day-card prog-today" style="margin-bottom:12px;"></div>
@@ -2237,7 +2235,6 @@ applyAppearance(); // apply saved theme/font/size before anything renders
 const now=new Date();
 if(document.getElementById('dd')) document.getElementById('dd').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 if(document.getElementById('md')) document.getElementById('md').textContent=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-const di2=document.getElementById('rec-date'); if(di2) di2.value=now.toISOString().split('T')[0];
 if(CFG.tok) document.getElementById('gh-tok').value=CFG.tok;
 document.getElementById('gh-usr').value=CFG.usr;
 document.getElementById('gh-repo').value=CFG.repo;
@@ -2263,8 +2260,6 @@ function onLoad(){
   initCheckinTab();
   renderSnapshotCharts();
   rendered.today=true;
-  const modeSelect=document.getElementById('training-mode');
-  if(modeSelect&&D.trainingMode){modeSelect.value=D.trainingMode;setTrainingMode(D.trainingMode);}
   renderSystemLog();
 }
 
@@ -2341,20 +2336,6 @@ function renderSystemLog() {
         color: 'var(--t2)',
         title: 'GitHub data saved',
         detail: 'data.json last written ' + D.lastUpdated
-      });
-    }
-  }
-  // AI plan
-  if (D.adaptivePlanCache && D.adaptivePlanCache.generatedDate) {
-    const ts = fmtDate(D.adaptivePlanCache.generatedDate + 'T12:00:00');
-    if (ts && ts >= sevenDaysAgo) {
-      const conf = D.adaptivePlanCache.lifts?.bench?.confidence || 'unknown';
-      events.push({
-        ts,
-        icon: '◈',
-        color: 'var(--a)',
-        title: 'AI weekly plan generated',
-        detail: 'confidence: ' + conf + (D.adaptivePlanCache.weeklyFocus ? ' · ' + D.adaptivePlanCache.weeklyFocus.slice(0, 60) : '')
       });
     }
   }
@@ -2490,13 +2471,6 @@ function sync(state,label){
 function msg(id,html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
 
 
-function setTrainingMode(val){
-  const descs={normal:'Standard progressive overload, balanced volume',performance:'Push intensity, prioritize PRs, reduce accessories',recovery:'Reduce volume 20–30%, keep frequency, no new PRs',deload:'50% volume, easy runs only, active recovery week'};
-  const el=document.getElementById('training-mode-desc');
-  if(el)el.textContent=descs[val]||'';
-  if(D){D.trainingMode=val;if(typeof pushSilent==='function')pushSilent();}
-}
-
 // ============================================================
 // CHECKBOXES
 // ============================================================
@@ -2574,7 +2548,7 @@ async function saveSession(){
   if(session.row.sets.length) updE(session.row.sets,'rowE1RM');
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
-  if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); D.adaptivePlanCache=null; // D.runPrescriptions intentionally NOT touched
+  if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); // D.runPrescriptions intentionally NOT touched
  renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); }
   else { D.sessions.pop(); D.adherence.completed--; }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
@@ -2632,29 +2606,6 @@ const HEIGHT_CM = 176.53;
 function getSessionsForDate(dateStr){
   if(!D||!D.sessions) return [];
   return D.sessions.filter(s=>s.date===dateStr);
-}
-function getActivityBadges(sessions,dateStr){
-  const DAY_BADGE={'A':{label:'Upper Str',cls:'strength'},'B':{label:'Squat',cls:'strength'},'C':{label:'Deadlift',cls:'strength'},'run':{label:'Run',cls:'run-easy'},'run_easy':{label:'Easy Run',cls:'run-easy'},'run_quality':{label:'Intervals',cls:'run-quality'},'run_long':{label:'Long Run',cls:'run-long'},'1':{label:'Upper Str',cls:'strength'},'2':{label:'Lower Str',cls:'strength'},'3':{label:'Recovery',cls:'cardio'},'4':{label:'Upper Hyp',cls:'strength'},'5':{label:'Lower+Cond',cls:'strength'}};
-  let html='';
-  sessions.forEach(s=>{
-    const badge=DAY_BADGE[String(s.day)];
-    if(badge) html+=`<span class="cal-badge ${badge.cls}">${badge.label}</span>`;
-    if(s.cardio&&s.cardio.dur>0) html+=`<span class="cal-badge cardio">Cardio</span>`;
-  });
-  if(dateStr&&!sessions.length){
-    const run=(D.runs||[]).find(r=>r.date===dateStr);
-    if(run){const rb={easy:{label:'Easy Run',cls:'run-easy'},long:{label:'Long Run',cls:'run-long'},intervals:{label:'Intervals',cls:'run-quality'},tempo:{label:'Tempo',cls:'run-quality'},moderate:{label:'Moderate Run',cls:'run-moderate'}};const rb2=rb[run.runType]||{label:'Run',cls:'run-easy'};html+=`<span class="cal-badge ${rb2.cls}">${rb2.label}</span>`;}
-  }
-  return html;
-}
-function getPlannedBadge(dateStr){
-  const sched=window._adaptivePlan?.schedule;
-  if(!sched) return '';
-  const entry=sched.find(d=>d.date===dateStr);
-  if(!entry||entry.isRest) return '';
-  const DAY_LABEL={'A':'Push','B':'Pull','C':'Legs','run':'Run','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run',1:'Lift A',2:'Lift B',3:'Easy Run',4:'Lift C',5:'Quality Run'};
-  const lbl=DAY_LABEL[entry.dayType]||'Training';
-  return `<span class="cal-badge planned">${lbl}</span>`;
 }
 function calNav(dir){
   const now=new Date();
@@ -3046,7 +2997,6 @@ function clrCFG(){if(confirm('Clear local settings (token, API key)? Your data o
 // ============================================================
 // AI
 // ============================================================
-function spin(id){document.getElementById(id).innerHTML='<div class="spin"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Generating...</span></div>';}
 function liftTrend(key, sessions, weeks = 4) {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - (weeks * 7));
@@ -3187,7 +3137,7 @@ function buildAthleteContext() {
       todayTemp:   lastHL.wristTemp || null,
       sevenDayHRV: sevenDay.hrv    || null,
       sevenDayRHR: sevenDay.rhr    || null,
-      todaySleep:  lastCI.sleepHours ?? lastCI.sleep ?? null,
+      todaySleep:  lastCI.sleepHours ?? lastCI.sleep ?? lastHL.sleepHours ?? null,
       vo2max:      lastHL.vo2max    || estimateVO2max()
     },
     training: {
@@ -3202,7 +3152,7 @@ function buildAthleteContext() {
     },
     checkin: {
       energy:       lastCI.energy       || null,
-      sleep:        lastCI.sleepHours   ?? lastCI.sleep ?? null,
+      sleep:        lastCI.sleepHours   ?? lastCI.sleep ?? lastHL.sleepHours ?? null,
       soreness:     lastCI.soreness     || null,
       fatigueScore: lastCI.fatigueScore || null,
       mood:         lastCI.mood         || null,
@@ -3229,7 +3179,6 @@ function buildAthleteContext() {
 async function ai(prompt, maxTokens = 800) {
   const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
   if(!apiKey){ console.error('AI: no key found'); return null; }
-  console.log('AI: key prefix', apiKey.substring(0,12));
   try{
     const ctx = buildAthleteContext();
     const systemPrompt = [
@@ -3250,9 +3199,7 @@ async function ai(prompt, maxTokens = 800) {
       `Lift trends (last 4 weeks): ${JSON.stringify(ctx.training.liftTrends)}.`
     ].join('\n');
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:maxTokens,system:systemPrompt,messages:[{role:'user',content:prompt}]})});
-    console.log('AI: status', r.status);
     const d=await r.json();
-    console.log('AI: response', JSON.stringify(d).substring(0,200));
     if(d.error){ return 'API Error: '+d.error.message; }
     return d.content?.[0]?.text||null;
   }catch(e){ console.error('AI error:', e.message); return 'Error: '+e.message; }
@@ -3292,7 +3239,6 @@ function detectBlockWeek(){
   const recentSessions=sessions.filter(s=>s.date>=cutoff14Str);
 
   if(recentSessions.length<3){
-    console.log('Block week: reset to W1 — only '+recentSessions.length+' sessions in last 14 days');
     return {weekNum:1,label:labels[0]};
   }
 
@@ -3354,14 +3300,6 @@ function predictLift(liftKey,blockWeek){
   const trend=slope>1?'up':slope<-1?'down':'flat';
   const confidence=history.length<3?'low':history.length<7?'medium':'high';
   return {weight:nextW,sets,reps,targetRPE,trend,confidence,predictedE1RMs:buildPredictions(wAvgE1RM,slope)};
-}
-
-function getAccessoryVariation(liftKey){
-  const idx=Math.floor((D.sessions?.length||0)/3)%3;
-  const rot={bench:['Barbell Bench Press 5x5','DB Bench Press 4x8-10','Machine Chest Press 4x10-12'],ohp:['Barbell OHP 3x5','DB Shoulder Press 3x8-10','Machine Shoulder Press 3x10-12'],squat:['Back Squat 5x5','Hack Squat 4x8-10','Leg Press 4x10-12'],dl:['Conventional Deadlift 3x5','Romanian DL 3x8-10','Trap Bar DL 3x6-8']};
-  const full=rot[liftKey][idx];
-  const m=full.match(/^(.+?)\s+(\d+x[\d\-]+)$/);
-  return m?{name:m[1],setsReps:m[2]}:{name:full,setsReps:''};
 }
 
 function localDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -3509,9 +3447,6 @@ function calcRacePredictions() {
     return paces[Math.floor(paces.length/2)];
   })() : null;
 
-  console.log('Race predictions - Riegel:', riegel ? {s5k:secsToRaceTime(riegel.s5k), s10k:secsToRaceTime(riegel.s10k)} : 'N/A',
-    'VO2max:', vdot ? {s5k:secsToRaceTime(vdot.s5k), s10k:secsToRaceTime(vdot.s10k)} : 'N/A',
-    'HRreg:', hrReg ? {s5k:secsToRaceTime(hrReg.s5k), s10k:secsToRaceTime(hrReg.s10k)} : 'N/A');
 
   const distances = ['s5k','s10k','shalf','sfull'];
 
@@ -3559,9 +3494,7 @@ function calcRacePredictions() {
       const predictedPacePerMile = wt / 3.107; // sec/mile for 5K
       const maxReasonablePace = medianTrainingPace * 0.92; // 8% faster than training = race effort
       if (predictedPacePerMile < maxReasonablePace * 0.85) { // >15% too fast
-        const cappedTime = maxReasonablePace * 3.107;
-        console.log(`Reality check: 5K capped from ${secsToRaceTime(Math.round(wt))} to ${secsToRaceTime(Math.round(cappedTime))} (training pace ${secsToRaceTime(Math.round(medianTrainingPace))}/mi)`);
-        wt = cappedTime;
+        wt = maxReasonablePace * 3.107;
       }
     }
 
@@ -3909,12 +3842,10 @@ function renderRunMetricsSummary(){
   const el=document.getElementById('run-metrics-summary');if(!el)return;
   const syncEl=document.getElementById('run-last-sync');
   if(syncEl)syncEl.textContent=D.stravaLastSync?new Date(D.stravaLastSync).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'never';
-  const plan=window._adaptivePlan;
   const localMetrics=calcRunMetrics();
   const totalRuns=(D.runs||[]).filter(r=>r.type==='run'&&r.distance>=1).length;
-  // Prefer AI plan values if available, fall back to local calculation
-  const estimated5KTime=plan?.estimated5KTime||localMetrics?.estimated5KTime||null;
-  const vo2maxEstimate=plan?.vo2maxEstimate||localMetrics?.vo2maxEstimate||null;
+  const estimated5KTime=localMetrics?.estimated5KTime||null;
+  const vo2maxEstimate=localMetrics?.vo2maxEstimate||null;
   if(!estimated5KTime&&!vo2maxEstimate&&!totalRuns){
     el.innerHTML='<div style="grid-column:1/-1;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:8px 0;">No run data yet — Strava syncs automatically overnight once configured.</div>';
     return;
@@ -3978,11 +3909,6 @@ function renderRunChart(type='pace'){
   }
 }
 function setRunChart(type){renderRunChart(type);}
-function toggleRunLogSection(){
-  const day=window._logDayType||'';
-  const sec=document.getElementById('run-log-section');
-  if(sec)sec.style.display=['run_easy','run_quality','run_long'].includes(day)?'block':'none';
-}
 function onDayTypeChange(value){
   const blocks={
     bench:document.getElementById('bench-block'),
@@ -4165,7 +4091,7 @@ function evaluateTrainingStatus(){
     reasons.push(`Wrist temp +${wristTemp}°C — fever signal. Rest only.`);
   }
 
-  const sleepHours=todayCI.sleepHours||todayCI.sleep||null;
+  const sleepHours=todayCI.sleepHours||todayCI.sleep||latest.sleepHours||null;
   if(sleepHours!==null&&sleepHours<ATHLETE.SLEEP_BLOCK){
     flags.push('SLEEP_BLOCK');
     canDoQuality=false; canDoHeavyLifts=false;
@@ -4549,7 +4475,7 @@ function renderPredictionChart(lift='bench'){
     document.querySelectorAll('.chart-lift-btn').forEach(b=>b.classList.remove('active'));
     const ab=document.getElementById('chart-'+lift);if(ab)ab.classList.add('active');
     const history=getLiftHistory(lift,120);
-    const planData=(window._adaptivePlan||D.adaptivePlanCache)?.lifts?.[lift];
+    const planData=predictLift(lift, detectBlockWeek());
     const labels=history.map(h=>h.date);
     const actualPts=history.map(h=>h.e1RM);
     let predLabels=[],optVals=[],conVals=[];
@@ -4677,7 +4603,7 @@ function showRPEConfirm(lift){
   const row=document.getElementById('rpe-confirm-'+lift),pillsEl=document.getElementById('rpe-pills-'+lift),predEl=document.getElementById('rpe-pred-'+lift);
   if(!row||!pillsEl)return;
   row.style.display='block';
-  const targetRPE=window._adaptivePlan?.lifts[lift]?.targetRPE;
+  const targetRPE=predictLift(lift, detectBlockWeek())?.targetRPE;
   if(predEl)predEl.textContent=targetRPE?`(predicted: RPE ${targetRPE})`:'';
   pillsEl.innerHTML=[5,6,7,8,9,10].map(r=>`<span class="rpe-pill${r===targetRPE?' predicted':''}" data-rpe="${r}" onclick="confirmRPE('${lift}',${r})">${r}</span>`).join('');
 }
@@ -4756,41 +4682,6 @@ async function saveCheckin(){
     msgEl.style.color='var(--a4)';
   }
   setTimeout(()=>{msgEl.textContent='';},3000);
-}
-
-function _buildSparkRows(checkins30,larger){
-  const barH=larger?40:28;
-  const today=new Date();
-  const days=[];
-  for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);days.push(d.toISOString().split('T')[0]);}
-  const byDate={};
-  checkins30.forEach(c=>{byDate[c.date]=c;});
-  const metrics=[
-    {key:'energy',label:'ENERGY',invert:false,unit:'',max:10},
-    {key:'sleep',label:'SLEEP',invert:false,unit:'h',max:12},
-    {key:'soreness',label:'SORENESS',invert:true,unit:'',max:10},
-    {key:'motivation',label:'MOTIVATION',invert:false,unit:'',max:10},
-    {key:'fatigueScore',label:'FATIGUE',invert:true,unit:'',max:10}
-  ];
-  return metrics.map(m=>{
-    const vals=checkins30.map(c=>c[m.key]).filter(v=>v!=null);
-    const avg=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length):null;
-    const avgStr=avg!=null?(m.key==='sleep'?avg.toFixed(1)+'h':avg.toFixed(1)):'-';
-    const titleAttr=larger?' title="'+m.label+'"':'';
-    const bars=days.map(d=>{
-      const c=byDate[d];
-      if(!c||c[m.key]==null){
-        return `<div class="spark-bar empty" style="height:${larger?8:4}px;"${titleAttr}></div>`;
-      }
-      const v=c[m.key];
-      const pct=Math.max(0.05,Math.min(1,v/m.max));
-      const h=Math.round(pct*(larger?barH:28));
-      const cls=m.invert?(v>6?'stress':v>3?'neutral':'good'):(v>=7?'good':v>=4?'neutral':'stress');
-      const tip=larger?` title="${m.label}: ${v} (${d})"`:' title="'+d+'"';
-      return `<div class="spark-bar ${cls}" style="height:${h}px;"${tip}></div>`;
-    }).join('');
-    return `<div class="spark-row"><div class="spark-label">${m.label}</div><div class="spark-avg">${avgStr}</div><div class="spark-bars">${bars}</div></div>`;
-  }).join('');
 }
 
 function renderSnapshotCharts(){
