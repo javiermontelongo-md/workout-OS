@@ -2173,11 +2173,13 @@ const ATHLETE = {
   DELOAD_OVERREACH:      0.80,
 };
 
+function esc(v){return v!=null?String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
+
 function lCFG(){
-  try{ const d=localStorage.getItem('wkt_v3'); if(d) Object.assign(CFG,JSON.parse(d)); }catch(e){}
-  try{ const k=localStorage.getItem('jm_api_key'); if(k) CFG.api=k; }catch(e){}
+  try{ const d=localStorage.getItem('wkt_v3'); if(d) Object.assign(CFG,JSON.parse(d)); }catch(e){console.warn('lCFG config load failed:',e);}
+  try{ const k=localStorage.getItem('jm_api_key'); if(k) CFG.api=k; }catch(e){console.warn('lCFG api key load failed:',e);}
 }
-function sCFG(){ try{ localStorage.setItem('wkt_v3',JSON.stringify(CFG)); }catch(e){} }
+function sCFG(){ try{ localStorage.setItem('wkt_v3',JSON.stringify(CFG)); }catch(e){console.warn('sCFG save failed:',e);} }
 lCFG();
 
 // ============================================================
@@ -2437,7 +2439,7 @@ function renderSystemLog() {
     el.innerHTML = '<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;">No activity in the last 7 days.</div>';
     return;
   }
-  el.innerHTML = events.map(e => `<div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--b);align-items:flex-start;"><div style="font-size:16px;color:${e.color};flex-shrink:0;width:20px;text-align:center;margin-top:1px;">${e.icon}</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><div style="font-size:var(--fs-sm);color:var(--t);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.title}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);flex-shrink:0;">${fmtTs(e.ts)}</div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.detail}</div></div></div>`).join('');
+  el.innerHTML = events.map(e => `<div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--b);align-items:flex-start;"><div style="font-size:16px;color:${e.color};flex-shrink:0;width:20px;text-align:center;margin-top:1px;">${e.icon}</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><div style="font-size:var(--fs-sm);color:var(--t);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(e.title)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);flex-shrink:0;">${fmtTs(e.ts)}</div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(e.detail)}</div></div></div>`).join('');
 }
 
 // ============================================================
@@ -3056,8 +3058,8 @@ async function testCon(){
     msg('gh-st',r.ok?'Connected -- '+CFG.file+' found and readable':'Failed -- check token and repo name. Make sure '+CFG.file+' exists in the repo root.');
   }catch(e){msg('gh-st','Network error');}
 }
-function saveAPI(){CFG.api=document.getElementById('api-key').value.trim();sCFG();try{localStorage.setItem('jm_api_key',CFG.api);}catch(e){}document.getElementById('api-st').textContent=CFG.api?'Key saved (shared across both dashboards)':'No key entered';}
-function clearAPI(){CFG.api='';document.getElementById('api-key').value='';document.getElementById('api-st').textContent='Cleared';sCFG();try{localStorage.removeItem('jm_api_key');}catch(e){}}
+function saveAPI(){CFG.api=document.getElementById('api-key').value.trim();sCFG();try{localStorage.setItem('jm_api_key',CFG.api);}catch(e){console.warn('saveAPI localStorage failed:',e);}document.getElementById('api-st').textContent=CFG.api?'Key saved (shared across both dashboards)':'No key entered';}
+function clearAPI(){CFG.api='';document.getElementById('api-key').value='';document.getElementById('api-st').textContent='Cleared';sCFG();try{localStorage.removeItem('jm_api_key');}catch(e){console.warn('clearAPI localStorage failed:',e);}}
 function debugAPI(){
   const fromCFG=CFG.api||'(empty)';
   const fromLS=localStorage.getItem('jm_api_key')||'(empty)';
@@ -3203,7 +3205,7 @@ function buildAthleteContext() {
       mafHR:       ATHLETE.mafHR,
       hrvBaseline: ATHLETE.hrvBaseline,
       rhrBaseline: ATHLETE.rhrBaseline,
-      location:    'Kaiser SF',
+      location:    'Kaiser San Francisco, CA (recently relocated from East Coast — still acclimating)',
       schedule:    'Lift A Mon · Run Tue · Lift B Wed · Run Thu · Lift C Fri · Run Sat · Rest Sun',
       goals: {
         primary:       ATHLETE.goals.primary,
@@ -3423,13 +3425,24 @@ function estimateVO2max(run){
 // ── RACE PREDICTION ENGINE ────────────────────────────────────────────────────
 
 // VDOT table: [vo2max, 5kSecs, 10kSecs, halfSecs, fullSecs]
+// Extended down to VO2max=30 and up to VO2max=65 for better interpolation at all fitness levels
 const VDOT_TABLE = [
-  [44, 1500, 3120, 6840, 14340],
-  [46, 1425, 2970, 6540, 13740],
-  [48, 1365, 2820, 6240, 13140],
-  [50, 1290, 2670, 5910, 12360],
-  [52, 1230, 2550, 5640, 11820],
-  [55, 1155, 2385, 5280, 11040]
+  [30, 2340, 4860, 10680, 22380],
+  [32, 2220, 4620, 10140, 21240],
+  [34, 2100, 4380,  9600, 20100],
+  [36, 2010, 4170,  9150, 19140],
+  [38, 1920, 3990,  8760, 18300],
+  [40, 1830, 3810,  8370, 17460],
+  [42, 1755, 3630,  7980, 16680],
+  [44, 1500, 3120,  6840, 14340],
+  [46, 1425, 2970,  6540, 13740],
+  [48, 1365, 2820,  6240, 13140],
+  [50, 1290, 2670,  5910, 12360],
+  [52, 1230, 2550,  5640, 11820],
+  [55, 1155, 2385,  5280, 11040],
+  [58, 1095, 2250,  4980, 10440],
+  [62, 1020, 2100,  4620,  9660],
+  [65,  975, 2010,  4440,  9300]
 ];
 
 function vdotPredict(vo2max) {
@@ -4084,7 +4097,7 @@ function renderRunLogCard(targetDate){
   const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
   const isCompleted=presc?.completed===true;
   if(presc.postRunFeedback){
-    completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;">'+presc.postRunFeedback+'</div></div>';
+    completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;">'+esc(presc.postRunFeedback)+'</div></div>';
   }else if(isCompleted&&stravaRun){
     completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\''+targetDate+'\')" style="font-size:var(--fs-sm);padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
   }else if(isCompleted){
@@ -4141,7 +4154,7 @@ async function generatePostRunFeedback(targetDate) {
     renderSystemLog();
   } catch(err) {
     console.error('Post-run feedback failed:',err);
-    if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);padding:10px;">Failed: '+err.message+'</div>';
+    if(completeArea) completeArea.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);padding:10px;">Failed: '+esc(err.message)+'</div>';
   }
 }
 
@@ -4282,7 +4295,7 @@ async function generateDailyPrescription(workoutType,durationMins){
       renderPrescriptionCard(D.dailyPrescriptions[today]);
       if(D.dailyPrescriptions[today].weekPlan)renderWeekSuggestions(D.dailyPrescriptions[today].weekPlan);
       const sumEl=document.getElementById('presc-summary');
-      if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${D.dailyPrescriptions[today].summary||''}</div><div style="font-size:var(--fs-presc-text);color:var(--t2);">${D.dailyPrescriptions[today].mainWork?.summary||''}</div>`;
+      if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${esc(D.dailyPrescriptions[today].summary||'')}</div><div style="font-size:var(--fs-presc-text);color:var(--t2);">${esc(D.dailyPrescriptions[today].mainWork?.summary||'')}</div>`;
       if(genMsg){genMsg.textContent='Using cached prescription ✓';genMsg.style.color='var(--a3)';setTimeout(()=>{if(genMsg)genMsg.textContent='';},3000);}
       return;
     }
@@ -4447,7 +4460,7 @@ RULES:
     updateLogTabPlanned();
     renderSystemLog();
     const sumEl=document.getElementById('presc-summary');
-    if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${parsed.todayPrescription.summary||workoutLabel[workoutType]||workoutType}</div><div style="font-size:var(--fs-presc-text);color:var(--t2);">${parsed.todayPrescription.mainWork?.summary||''}</div>`;
+    if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${esc(parsed.todayPrescription.summary||workoutLabel[workoutType]||workoutType)}</div><div style="font-size:var(--fs-presc-text);color:var(--t2);">${esc(parsed.todayPrescription.mainWork?.summary||'')}</div>`;
     if(!D.coachingLog)D.coachingLog=[];
     D.coachingLog.push({ts:Date.now(),type:'daily_prescription',label:`${workoutType} ${durationMins}min · ${today}`});
     if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);

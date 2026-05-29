@@ -2,7 +2,7 @@ name: Strava Sync
 
 on:
   schedule:
-    - cron: '0 7 * * *'   # 2am EST nightly fallback
+    - cron: '0 8 * * *'   # midnight PST / 1am PDT nightly fallback
   workflow_dispatch:
   repository_dispatch:
     types: [strava-activity]  # triggered by Cloudflare webhook relay
