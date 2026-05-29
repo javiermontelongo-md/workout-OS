@@ -3091,12 +3091,6 @@ function buildAthleteContext() {
       : null;
   };
 
-  // Active plan — today's specific prescription if available
-  const activePlan = window._adaptivePlan ? {
-    weeklyFocus: window._adaptivePlan.weeklyFocus || null,
-    todayPlan: window._adaptivePlan.schedule?.[next14[0]?.dayType] || null
-  } : null;
-
   return {
     athlete: {
       age:         ATHLETE.age,
@@ -3166,8 +3160,7 @@ function buildAthleteContext() {
     schedule: {
       today,
       todayType:  next14[0]?.dayType || 'rest',
-      next14,
-      activePlan
+      next14
     },
     body: {
       weightLbs: lastBody.weight || ATHLETE.weightLbs,
@@ -4133,7 +4126,7 @@ function evaluateTrainingStatus(){
     reasons.push(`Sleep ${sleepHours}h — reduced volume and RPE cap 7.`);
   }
 
-  const bw=window._adaptivePlan?.blockWeek||detectBlockWeek();
+  const bw=detectBlockWeek();
   if(bw.weekNum===4){
     flags.push('DELOAD_WEEK');
     canDoQuality=false;
@@ -4451,10 +4444,9 @@ function renderWeekSuggestions(weekPlan){
 }
 
 async function confirmRPE(lift,actualRPE){
-  const plan=window._adaptivePlan;
-  const ld=plan?.lifts[lift];
+  const pred=predictLift(lift, detectBlockWeek());
   if(!D.rpeConfirmations) D.rpeConfirmations=[];
-  D.rpeConfirmations.push({date:new Date().toISOString().split('T')[0],lift,predictedRPE:ld?.targetRPE||null,actualRPE,weight:ld?.weight||null,sets:ld?.sets||null,reps:ld?.reps||null});
+  D.rpeConfirmations.push({date:new Date().toISOString().split('T')[0],lift,predictedRPE:pred?.targetRPE||null,actualRPE,weight:pred?.weight||null,sets:pred?.sets||null,reps:pred?.reps||null});
   const pills=document.getElementById('rpe-pills-'+lift);
   if(pills) pills.querySelectorAll('.rpe-pill').forEach(p=>{if(+p.dataset.rpe===actualRPE)p.classList.add('confirmed');else p.classList.remove('predicted');});
   const row=document.getElementById('rpe-confirm-'+lift);
