@@ -1160,6 +1160,13 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="ig"><label>Notes</label><textarea id="run-notes" rows="2" placeholder="How did it feel? Any discomfort?"></textarea></div>
     </div>
   </div>
+  <div id="log-session-meta-card" class="card">
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Session feel</div>
+    <div class="g2" style="gap:10px;">
+      <div class="ig"><label>Overall RPE <span style="font-weight:normal;color:var(--t3);">1–10</span></label><input type="number" id="log-session-rpe" min="1" max="10" placeholder="7"></div>
+      <div class="ig"><label style="color:var(--t3);">Energy <span style="font-family:var(--mono);font-size:var(--fs-xs);">from today's check-in</span></label><input type="number" id="log-session-energy-disp" disabled placeholder="—" style="opacity:0.5;"></div>
+    </div>
+  </div>
   <div id="log-notes-card" class="card"><div class="ig"><label>Session notes</label><textarea id="log-notes" placeholder="What went well? What felt off? Any PRs? Anything to flag for next session?"></textarea></div></div>
 
   <button class="sbtn" id="log-sbtn" onclick="saveSession()">Save session to GitHub</button>
@@ -1204,6 +1211,12 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="stat"><div class="sv b" id="pr-hr">165</div><div class="sl">Zone 2 avg HR</div></div>
     <div class="stat"><div class="sv g" id="pr-pu">5</div><div class="sl">Max clean pullups</div></div>
     <div class="stat"><div class="sv" id="pr-bw">225</div><div class="sl">Bodyweight (lb)</div></div>
+  </div>
+  <div class="g4 k2" style="margin-bottom:14px;">
+    <div class="stat"><div class="sv a" id="vol-bench" style="font-size:22px;">—</div><div class="sl">Bench vol best</div></div>
+    <div class="stat"><div class="sv a" id="vol-squat" style="font-size:22px;">—</div><div class="sl">Squat vol best</div></div>
+    <div class="stat"><div class="sv a" id="vol-dl" style="font-size:22px;">—</div><div class="sl">DL vol best</div></div>
+    <div class="stat"><div class="sv a" id="vol-ohp" style="font-size:22px;">—</div><div class="sl">OHP vol best</div></div>
   </div>
   <div class="card" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -2553,7 +2566,13 @@ async function saveSession(){
     const note=document.getElementById('acc-note-'+i)?.value||'';
     return(wt||sets||reps||note)?{name,prescribed,weight:wt,sets,reps,notes:note}:null;
   }).filter(Boolean);
-  const session={date,day,notes:document.getElementById('log-notes')?.value||'',bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
+  // Session-level feel — RPE from input, energy+BW auto-pulled from today's check-in/body metrics
+  const sessionRpe=+document.getElementById('log-session-rpe')?.value||null;
+  const todayCI=(D.checkins||[]).slice().reverse().find(c=>c.date===date)||{};
+  const sessionEnergy=todayCI.energy||null;
+  const latestBodyEntry=(D.bodyMetrics||[]).slice(-1)[0]||{};
+  const sessionBW=latestBodyEntry.weightLbs||D.profile?.bodyweight||null;
+  const session={date,day,notes:document.getElementById('log-notes')?.value||'',...(sessionRpe?{rpe:sessionRpe}:{}),...(sessionEnergy?{energy:sessionEnergy}:{}),...(sessionBW?{bw:sessionBW}:{}),bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
   D.adherence=(D.adherence||{});D.adherence.completed=(D.adherence.completed||0)+1;
@@ -2573,7 +2592,7 @@ async function saveSession(){
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
 function resetLogForm(){
-  ['log-notes','pullup-notes','row-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['log-notes','log-session-rpe','pullup-notes','row-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   initSets();
   // Clear accessories inputs without hiding the block (updateLogTabPlanned will re-render)
   (window._logAccessories||[]).forEach((_,i)=>{
@@ -2597,6 +2616,27 @@ function renderSessHist(){
     }).join('');
   };
   render('sess-hist',10);
+}
+function computeVolumeBests(){
+  // For each lift: best working weight used for ≥3 reps (≥5 for upper body).
+  // Returns "weight×sets×reps" string — e.g. "190×5×5".
+  const minReps={bench:5,ohp:5,squat:5,dl:3};
+  const result={bench:null,ohp:null,squat:null,dl:null};
+  Object.keys(result).forEach(k=>{
+    let bestW=0,bestSets=0,bestReps=0;
+    (D.sessions||[]).forEach(s=>{
+      const valid=(s[k]?.sets||[]).filter(x=>x.w&&x.r>=minReps[k]);
+      if(!valid.length) return;
+      const maxW=Math.max(...valid.map(x=>x.w));
+      const atMax=valid.filter(x=>x.w===maxW);
+      const avgR=Math.round(atMax.reduce((s,x)=>s+x.r,0)/atMax.length);
+      if(maxW>bestW||(maxW===bestW&&atMax.length>bestSets)){
+        bestW=maxW; bestSets=atMax.length; bestReps=avgR;
+      }
+    });
+    result[k]=bestW?`${bestW}×${bestSets}×${bestReps}`:null;
+  });
+  return result;
 }
 function updProgressStats(){
   if(!D||!D.currentLifts) return;
@@ -2638,7 +2678,11 @@ function updProgressStats(){
   // Bodyweight — most recent logged body metric, fallback to profile default
   const latestBW=(D.bodyMetrics||[]).slice(-1)[0];
   if(e('pr-bw'))e('pr-bw').textContent=latestBW?.weightLbs||D.profile?.bodyweight||225;
-  if(D.volumeBests){if(e('vol-bench'))e('vol-bench').textContent=D.volumeBests.bench||'190x5x5';if(e('vol-ohp'))e('vol-ohp').textContent=D.volumeBests.ohp||'90x3x5';if(e('vol-squat'))e('vol-squat').textContent=D.volumeBests.squat||'160x5x5';if(e('vol-dl'))e('vol-dl').textContent=D.volumeBests.deadlift||'160x3x5';}
+  const vb=computeVolumeBests();
+  if(e('vol-bench'))e('vol-bench').textContent=vb.bench||'—';
+  if(e('vol-ohp'))e('vol-ohp').textContent=vb.ohp||'—';
+  if(e('vol-squat'))e('vol-squat').textContent=vb.squat||'—';
+  if(e('vol-dl'))e('vol-dl').textContent=vb.dl||'—';
 }
 
 // ============================================================
@@ -3078,6 +3122,10 @@ function buildAthleteContext() {
   const lastBody = D.bodyMetrics?.slice(-1)[0] || {};
   const blockWeek = detectBlockWeek();
 
+  // Compute live max clean pullups (BW-only sets) — keep D.currentLifts.pullups fresh for AI context
+  const _livePullups=(()=>{let b=0;(D.sessions||[]).forEach(s=>{(s.pullup?.sets||[]).forEach(x=>{if((!x.w||x.w===0)&&x.r>b)b=x.r;});});return b||D.currentLifts?.pullups||5;})();
+  if(D.currentLifts) D.currentLifts.pullups=_livePullups;
+
   // All 6 lifts with per-set detail
   const recentSessions = (D.sessions || []).slice(-8).map(s => {
     const fmt = sets => (sets || [])
@@ -3290,9 +3338,15 @@ function detectBlockWeek(){
   const sessions=D?.sessions||[];
   if(!sessions.length) return {weekNum:1,label:labels[0]};
 
-  // Anchor to the first ever logged session date and advance one phase per calendar week.
-  // Missed weeks still advance the phase — you're undertrained within that phase, not stuck.
-  // This keeps the cycle predictable regardless of attendance.
+  // Reset signal: fewer than 3 lift sessions in the last 14 days → restart at Week 1
+  // This prevents the cycle from advancing through gaps in training.
+  const liftDays=['push','pull','legs','A','B','C'];
+  const cutoff14=new Date(); cutoff14.setDate(cutoff14.getDate()-14);
+  const cutoff14Str=localDS(cutoff14);
+  const recentLifts=sessions.filter(s=>s.date>=cutoff14Str&&liftDays.includes(s.day||''));
+  if(recentLifts.length<3) return {weekNum:1,label:labels[0]};
+
+  // Anchor to first ever session and advance one phase per calendar week
   const firstDate=new Date(sessions[0].date+'T12:00:00');
   const now=new Date();
   const weeksSinceStart=Math.floor((now-firstDate)/(7*24*60*60*1000));
@@ -4626,7 +4680,7 @@ function updateLogTabPlanned(){
   const presc=D?.dailyPrescriptions?.[today];
   const noplanEl=document.getElementById('log-no-plan');
   const formEls=['bench-block','ohp-block','squat-block','deadlift-block','pullup-block','row-block',
-                 'accessories-block','run-log-section','run-prescription-card','log-notes-card','log-sbtn','log-smsg'];
+                 'accessories-block','run-log-section','run-prescription-card','log-session-meta-card','log-notes-card','log-sbtn','log-smsg'];
 
   // ── NO PRESCRIPTION FOR TODAY ──────────────────────────────
   if(!presc || presc.workoutType==='rest' || (!presc.mainWork?.lifts && !['run','cycling'].includes(presc.workoutType))){
@@ -4645,6 +4699,10 @@ function updateLogTabPlanned(){
   if(smsg) smsg.style.display='';
   const notesCard=document.getElementById('log-notes-card');
   if(notesCard) notesCard.style.display='';
+  // Populate energy read-only display from today's check-in
+  const _todayCI=(D.checkins||[]).slice().reverse().find(c=>c.date===today)||{};
+  const energyDisp=document.getElementById('log-session-energy-disp');
+  if(energyDisp) energyDisp.placeholder=_todayCI.energy?`${_todayCI.energy}/10`:'no check-in today';
 
   // Map prescription type → onDayTypeChange value, then apply
   const typeMap={push:'A',pull:'B',legs:'C',run:'run',cycling:'run'};
