@@ -2544,7 +2544,7 @@ async function saveSession(){
   const cardioObj=hasCardioData?{type:cardioTypeMap[day]||'Run',dur:runDur,dist:runDist,hr:runHr,rpe:runRpe,pace:(runDist&&runDur)?`${Math.floor(runDur/runDist)}:${String(Math.round((runDur/runDist%1)*60)).padStart(2,'0')}`:'',notes:runNotes}:null;
   // Collect accessories
   const accData=(window._logAccessories||[]).map((acc,i)=>{
-    const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+\((.+)\))?$/);
+    const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+@[^(]+)?(?:\s+\((.+)\))?$/);
     const name=m?m[1].trim():String(acc);
     const prescribed=m?`${m[2]}×${m[3]}${m[4]?' ('+m[4]+')':''}`:String(acc);
     const wt=+document.getElementById('acc-wt-'+i)?.value||null;
@@ -3081,7 +3081,7 @@ function buildAthleteContext() {
   // All 6 lifts with per-set detail
   const recentSessions = (D.sessions || []).slice(-8).map(s => {
     const fmt = sets => (sets || [])
-      .map(x => `${x.weight}×${x.reps}@${x.rpe}`).join(',');
+      .map(x => `${x.w}×${x.r}@${x.rpe}`).join(',');
     const fmtAcc=a=>(a||[]).filter(x=>x.sets||x.reps||x.weight).map(x=>`${x.name}:${x.sets||'?'}×${x.reps||'?'}${x.weight?'@'+x.weight+'lb':''}`).join(', ');
     return {
       date: s.date, type: s.day||s.type,
@@ -3103,7 +3103,7 @@ function buildAthleteContext() {
     let best = 0;
     (D.sessions || []).forEach(s =>
       (s[k]?.sets || []).forEach(x => {
-        const e = calcE1RM(x.weight, x.reps);
+        const e = calcE1RM(x.w, x.r);
         if (e > best) best = e;
       })
     );
