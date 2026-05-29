@@ -235,7 +235,6 @@ All line numbers are from origin/main. Verify before editing:
 ### Settings & Config UI
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2400 | setTrainingMode(val) | Sets D.trainingMode |
 | 2803 | saveCFG() | Save settings |
 | 2810 | testCon() | Test GitHub connection |
 | 2818 | saveAPI() | Save Anthropic API key |
@@ -248,7 +247,6 @@ All line numbers are from origin/main. Verify before editing:
 ### AI Layer
 | Line | Function | Purpose |
 |------|----------|---------|
-| 2852 | spin(id) | Spinner toggle helper |
 | 2853 | liftTrend(key, sessions, weeks=4) | Computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
 | 2871 | buildAthleteContext() | Single shared context object for all AI calls. Returns athlete (with goals + vo2maxEstimate), hardRules, biometrics, training, checkin, body. Calls evaluateTrainingStatus() once. |
 | 3030 | ai(prompt, maxTokens=800) | Shared Anthropic fetch wrapper — system prompt built from buildAthleteContext(). All AI calls route here. |
@@ -274,7 +272,6 @@ All line numbers are from origin/main. Verify before editing:
 | 2444 | saveSession() | Save session to D.sessions[] |
 | 2478 | resetLogForm() | Reset log form to defaults |
 | 2482 | renderSessHist() | Render session history list (LOG tab legacy view) |
-| 3782 | toggleRunLogSection() | Show/hide run inputs |
 | 3787 | onDayTypeChange(value) | Shows correct lift blocks per day type; calls renderRunLogCard() for run types |
 | 3826 | startLoggingSession() | Navigate to LOG tab and set day type from presc-workout-type dropdown |
 | 3834 | renderRunLogCard(targetDate) | Renders run prescription summary in LOG tab run card. Reads dailyPrescriptions first, falls back to runPrescriptions. Manages markRunComplete/postRunFeedback complete area. |
@@ -282,7 +279,7 @@ All line numbers are from origin/main. Verify before editing:
 | 4267 | renderPrescriptionCard(prescription) | Renders full prescription in #prog-today-card. Handles push/pull/legs (lift table + accessories) and run/cycling (mainSet/pace/HR). Shows reasoning, warmup, cooldown, coachNote, ifTooHard, watchOutFor. |
 | 4311 | renderWeekSuggestions(weekPlan) | Renders 7-day confidence grid in #week-suggestions. Shows date/dow + suggestion + confidence badge (HIGH/MED/LOW) + reason. |
 | 4328 | confirmRPE(lift, actualRPE) | RPE confirmation after session |
-| 4388 | updateLogTabPlanned() | Pre-fill planned values in LOG tab from D.dailyPrescriptions[today]. Mutates DEF[] and re-renders sets so weight placeholders always match prescription. Falls back to window._adaptivePlan. |
+| 4388 | updateLogTabPlanned() | Pre-fill planned values in LOG tab from D.dailyPrescriptions[today]. Mutates DEF[] and re-renders sets so weight placeholders always match prescription. |
 | 4420 | showRPEConfirm(lift) | RPE confirmation UI |
 
 ### Check-in
@@ -292,7 +289,6 @@ All line numbers are from origin/main. Verify before editing:
 | 4438 | updateFatiguePreview() | Live fatigue preview in check-in UI |
 | 4450 | togglePostCall() | POST_CALL flag toggle — blocks all quality/heavy |
 | 4460 | saveCheckin() | Save check-in to D.checkins[] |
-| 4505 | _buildSparkRows(checkins30, larger) | Sparkline row builder for snapshot |
 | 4540 | renderSnapshotCharts() | Render check-in snapshot charts |
 | 4729 | initCheckinTab() | Initialize check-in tab |
 
@@ -301,8 +297,6 @@ All line numbers are from origin/main. Verify before editing:
 |------|----------|---------|
 | 2499 | updProgressStats() | Update progress tab stats |
 | 2522 | getSessionsForDate(dateStr) | Filter D.sessions[] for a given date string |
-| 2526 | getActivityBadges(sessions, dateStr) | Activity badge HTML for calendar cells |
-| 2540 | getPlannedBadge(dateStr) | Planned workout badge for calendar cells |
 | 2549 | calNav(dir) | Month calendar navigation — clamps to May 2026 floor and current month ceiling |
 | 2556 | renderCalendar() | Full month grid render — blank leading cells, lift/run dots per day, disables nav at limits, summary "X strength · Y runs" |
 | 2609 | handleDayCardClick(dateStr) | Day card click — past lift→drawer, past Strava-only run→fake-session drawer, future→program tab |
@@ -321,10 +315,9 @@ All line numbers are from origin/main. Verify before editing:
 |------|----------|---------|
 | 3084 | detectBlockWeek() | Block week 1-4, resets on <3 sessions in 14 days |
 | 3117 | getBlockParams(blockWeek) | Sets/reps/targetRPE per block week |
-| 3122 | buildPredictions(currentE1RM, slope) | 4-week e1RM projections |
-| 3133 | predictLift(liftKey, blockWeek) | Predicted e1RM for a lift |
-| 3160 | getAccessoryVariation(liftKey) | Accessory exercise variation string |
-| 4345 | renderPredictionChart(lift) | e1RM prediction chart |
+| 3122 | buildPredictions(currentE1RM, slope) | 4-week e1RM projections (optimistic/conservative dashed lines) |
+| 3133 | predictLift(liftKey, blockWeek) | Predicted e1RM for a lift — called by renderPredictionChart, showRPEConfirm, confirmRPE |
+| 4345 | renderPredictionChart(lift) | e1RM prediction chart — wired to predictLift(lift, detectBlockWeek()); optimistic/conservative projection lines are live |
 | 4382 | setChartLift(lift) | Set active lift for prediction chart |
 
 ### Run Metrics
@@ -569,3 +562,20 @@ elevationGain: feet
   - concurrency group added — HAE fires duplicate webhooks; without this, parallel runs
     raced to push and 3 of 4 would fail with "failed to push some refs"
   - git pull --rebase added before git push
+- **Dead code purge (May 2026):**
+  - setTrainingMode() + D.trainingMode — AI never read the mode; UI element never existed in HTML
+  - spin(id) — spinner helper; all callers were in genToday/fai/modeChg which were removed prior session
+  - getActivityBadges() / getPlannedBadge() — old calendar badge helpers; renderCalendar never called them
+  - getAccessoryVariation() — rotation helper for the old plan system; generateDailyPrescription uses AI now
+  - toggleRunLogSection() — run section visibility managed by onDayTypeChange/renderRunLogCard
+  - _buildSparkRows() — old sparkline builder for check-in cards; renderSnapshotCharts does not call it
+  - console.logs: AI key prefix, AI status/response, block week reset, race prediction, reality check cap
+  - Dead activePlan block in buildAthleteContext (window._adaptivePlan never set → always null)
+  - window._adaptivePlan fallbacks in evaluateTrainingStatus (bw) and confirmRPE
+  - prog-block-badge + prog-block-desc HTML divs in PROGRAM tab — never written to by JS
+  - D.adaptivePlanCache=null in saveSession — adaptivePlanCache never populated; clear was no-op
+- **prediction chart wired up (May 2026):**
+  - renderPredictionChart: replaced (window._adaptivePlan||D.adaptivePlanCache)?.lifts?.[lift]
+    with predictLift(lift, detectBlockWeek()) — optimistic/conservative dashed lines are now live
+  - showRPEConfirm: targetRPE now from predictLift (was always undefined via dead _adaptivePlan)
+  - confirmRPE: predictedRPE/weight/sets/reps now from predictLift (was always null via dead _adaptivePlan)
