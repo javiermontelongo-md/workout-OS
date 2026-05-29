@@ -4686,7 +4686,7 @@ function renderSnapshotCharts(){
   const ciMap={};
   (D.checkins||[]).forEach(c=>{ciMap[c.date]=c;});
 
-  // Build last 7 calendar days
+  // Build last 7 calendar days (chart display window)
   const dates=[];
   for(let i=6;i>=0;i--){
     const d=new Date();
@@ -4697,6 +4697,17 @@ function renderSnapshotCharts(){
     dates.push(`${y}-${mo}-${dd}`);
   }
 
+  // Build last 30 calendar days (for average computation only)
+  const dates30=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date();
+    d.setDate(d.getDate()-i);
+    const y=d.getFullYear();
+    const mo=String(d.getMonth()+1).padStart(2,'0');
+    const dd=String(d.getDate()).padStart(2,'0');
+    dates30.push(`${y}-${mo}-${dd}`);
+  }
+
   const hasData=Object.keys(hlMap).length>0||Object.keys(ciMap).length>0;
   if(!hasData){
     container.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;">No health data yet — sync via Shortcut or export</div>';
@@ -4705,44 +4716,44 @@ function renderSnapshotCharts(){
 
   // x-axis label helper — shows "Mon 26" style for each of the 7 days
   const xLabel=ds=>{const d=new Date(ds+'T12:00:00');return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]+' '+d.getDate();};
-  const xTicks={color:'#7e8caa',font:{size:11,family:'DM Mono'},maxTicksLimit:7,maxRotation:0,callback:function(_,i){return xLabel(dates[i]);}};
-  const xGrid={color:'rgba(255,255,255,0.04)'};
+  const xTicks={color:'#a8b4cc',font:{size:15,family:'DM Mono'},maxTicksLimit:7,maxRotation:0,callback:function(_,i){return xLabel(dates[i]);}};
+  const xGrid={color:'rgba(255,255,255,0.06)'};
 
   container.innerHTML=`
-    <div style="margin-bottom:24px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-family:var(--mono);font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Sleep · 7 days</div>
-        <div style="font-family:var(--mono);font-size:14px;font-weight:500;color:var(--t);" id="snap-sleep-avg"></div>
+    <div style="margin-bottom:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Sleep · 7 days</div>
+        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-sleep-avg"></div>
       </div>
-      <div style="position:relative;height:160px;"><canvas id="snap-sleep-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;">
+      <div style="position:relative;height:210px;"><canvas id="snap-sleep-chart"></canvas></div>
+      <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(34,197,94,0.85);">── Actual sleep</span>
         <span>- - Optimal 7–7.5h</span>
-        <span style="color:rgba(255,183,77,0.7);">- - 7d avg</span>
+        <span style="color:rgba(255,183,77,0.7);">- - 30d avg</span>
       </div>
     </div>
-    <div style="margin-bottom:24px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-family:var(--mono);font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Steps + Exercise · 7 days</div>
-        <div style="font-family:var(--mono);font-size:14px;font-weight:500;color:var(--t);" id="snap-activity-avg"></div>
+    <div style="margin-bottom:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Steps + Exercise · 7 days</div>
+        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-activity-avg"></div>
       </div>
-      <div style="position:relative;height:170px;"><canvas id="snap-activity-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;">
+      <div style="position:relative;height:220px;"><canvas id="snap-activity-chart"></canvas></div>
+      <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(0,212,255,0.85);">── Steps (L)</span>
         <span style="color:rgba(168,85,247,0.85);">── Exercise min (R)</span>
-        <span>- - Avg</span>
+        <span>- - 30d avg</span>
       </div>
     </div>
     <div style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-family:var(--mono);font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Heart Rate · 7 days</div>
-        <div style="font-family:var(--mono);font-size:14px;font-weight:500;color:var(--t);" id="snap-hr-avg"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Heart Rate · 7 days</div>
+        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-hr-avg"></div>
       </div>
-      <div style="position:relative;height:170px;"><canvas id="snap-hr-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;">
+      <div style="position:relative;height:220px;"><canvas id="snap-hr-chart"></canvas></div>
+      <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(255,99,71,0.85);">── Resting HR (L)</span>
         <span style="color:rgba(255,183,77,0.85);">── Walking HR (R)</span>
-        <span>- - Avg</span>
+        <span>- - 30d avg</span>
       </div>
     </div>
   `;
@@ -4753,10 +4764,12 @@ function renderSnapshotCharts(){
     const hl=hlMap[date];
     return ci?.sleepHours||hl?.sleepHours||null;
   });
-  const validSleep=sleepData.filter(v=>v!==null);
-  const avgSleep=validSleep.length?(validSleep.reduce((s,v)=>s+v,0)/validSleep.length).toFixed(1):null;
+  // 30-day avg for avg line
+  const sleepData30=dates30.map(date=>{const ci=ciMap[date];const hl=hlMap[date];return ci?.sleepHours||hl?.sleepHours||null;});
+  const validSleep30=sleepData30.filter(v=>v!==null);
+  const avgSleep=validSleep30.length?(validSleep30.reduce((s,v)=>s+v,0)/validSleep30.length).toFixed(1):null;
   const sleepAvgEl=document.getElementById('snap-sleep-avg');
-  if(sleepAvgEl&&avgSleep)sleepAvgEl.textContent=avgSleep+'h avg';
+  if(sleepAvgEl&&avgSleep)sleepAvgEl.textContent=avgSleep+'h 30d avg';
 
   const sleepCtx=document.getElementById('snap-sleep-chart')?.getContext('2d');
   if(sleepCtx){
@@ -4765,10 +4778,10 @@ function renderSnapshotCharts(){
       data:{
         labels:dates,
         datasets:[
-          {label:'Sleep',data:sleepData,borderColor:'rgba(34,197,94,0.85)',backgroundColor:'rgba(34,197,94,0.12)',pointRadius:4,pointHoverRadius:6,borderWidth:2,tension:0.3,fill:false,spanGaps:true},
+          {label:'Sleep',data:sleepData,borderColor:'rgba(34,197,94,0.85)',backgroundColor:'rgba(34,197,94,0.12)',pointRadius:5,pointHoverRadius:7,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true},
           {label:'Optimal min',data:dates.map(()=>7),borderColor:'rgba(34,197,94,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0},
           {label:'Optimal max',data:dates.map(()=>7.5),borderColor:'rgba(34,197,94,0.3)',borderDash:[5,4],pointRadius:0,fill:'-1',backgroundColor:'rgba(34,197,94,0.06)',tension:0},
-          {label:'7d avg',data:dates.map(()=>avgSleep?parseFloat(avgSleep):null),borderColor:'rgba(255,183,77,0.65)',borderDash:[6,3],pointRadius:0,fill:false,tension:0,spanGaps:true}
+          {label:'30d avg',data:dates.map(()=>avgSleep?parseFloat(avgSleep):null),borderColor:'rgba(255,183,77,0.65)',borderDash:[6,3],pointRadius:0,fill:false,tension:0,spanGaps:true}
         ]
       },
       options:{
@@ -4780,7 +4793,7 @@ function renderSnapshotCharts(){
         },
         scales:{
           x:{ticks:xTicks,grid:xGrid},
-          y:{min:4,max:10,ticks:{color:'#a8b4cc',font:{size:11,family:'DM Mono'},callback:function(v){return v+'h';}},grid:{color:'rgba(255,255,255,0.04)'}}
+          y:{min:4,max:10,ticks:{color:'#a8b4cc',font:{size:15,family:'DM Mono'},callback:function(v){return v+'h';}},grid:{color:'rgba(255,255,255,0.06)'}}
         }
       }
     });
@@ -4789,16 +4802,19 @@ function renderSnapshotCharts(){
   // ── STEPS + EXERCISE CHART ──
   const stepsData=dates.map(date=>hlMap[date]?.steps||null);
   const exerciseData=dates.map(date=>hlMap[date]?.exerciseMinutes||null);
-  const validSteps=stepsData.filter(v=>v!==null);
-  const validExercise=exerciseData.filter(v=>v!==null);
-  const avgSteps=validSteps.length?Math.round(validSteps.reduce((s,v)=>s+v,0)/validSteps.length):null;
-  const avgExercise=validExercise.length?Math.round(validExercise.reduce((s,v)=>s+v,0)/validExercise.length):null;
+  // 30-day avgs
+  const stepsData30=dates30.map(date=>hlMap[date]?.steps||null);
+  const exerciseData30=dates30.map(date=>hlMap[date]?.exerciseMinutes||null);
+  const validSteps30=stepsData30.filter(v=>v!==null);
+  const validExercise30=exerciseData30.filter(v=>v!==null);
+  const avgSteps=validSteps30.length?Math.round(validSteps30.reduce((s,v)=>s+v,0)/validSteps30.length):null;
+  const avgExercise=validExercise30.length?Math.round(validExercise30.reduce((s,v)=>s+v,0)/validExercise30.length):null;
 
   const actAvgEl=document.getElementById('snap-activity-avg');
   if(actAvgEl){
     const parts=[];
-    if(avgSteps)parts.push(avgSteps.toLocaleString()+' steps avg');
-    if(avgExercise)parts.push(avgExercise+' min avg');
+    if(avgSteps)parts.push(avgSteps.toLocaleString()+' steps 30d avg');
+    if(avgExercise)parts.push(avgExercise+' min 30d avg');
     actAvgEl.textContent=parts.join(' · ');
   }
 
@@ -4809,10 +4825,10 @@ function renderSnapshotCharts(){
       data:{
         labels:dates,
         datasets:[
-          {label:'Steps',data:stepsData,borderColor:'rgba(0,212,255,0.85)',backgroundColor:'rgba(0,212,255,0.07)',pointRadius:4,borderWidth:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySteps'},
-          {label:'Steps avg',data:avgSteps?dates.map(()=>avgSteps):[],borderColor:'rgba(0,212,255,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySteps'},
-          {label:'Exercise',data:exerciseData,borderColor:'rgba(168,85,247,0.85)',backgroundColor:'rgba(168,85,247,0.07)',pointRadius:4,borderWidth:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
-          {label:'Exercise avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'}
+          {label:'Steps',data:stepsData,borderColor:'rgba(0,212,255,0.85)',backgroundColor:'rgba(0,212,255,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySteps'},
+          {label:'Steps 30d avg',data:avgSteps?dates.map(()=>avgSteps):[],borderColor:'rgba(0,212,255,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySteps'},
+          {label:'Exercise',data:exerciseData,borderColor:'rgba(168,85,247,0.85)',backgroundColor:'rgba(168,85,247,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
+          {label:'Exercise 30d avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'}
         ]
       },
       options:{
@@ -4821,8 +4837,8 @@ function renderSnapshotCharts(){
         plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
         scales:{
           x:{ticks:xTicks,grid:xGrid},
-          ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.75)',font:{size:11,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.04)'}},
-          yExercise:{type:'linear',position:'right',ticks:{color:'rgba(168,85,247,0.75)',font:{size:11,family:'DM Mono'},callback:function(v){return v+'m';}},grid:{display:false}}
+          ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.06)'}},
+          yExercise:{type:'linear',position:'right',ticks:{color:'rgba(168,85,247,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v+'m';}},grid:{display:false}}
         }
       }
     });
@@ -4833,14 +4849,19 @@ function renderSnapshotCharts(){
   const walkingHRData=dates.map(date=>hlMap[date]?.walkingHR||null);
   const validResting=restingHRData.filter(v=>v!==null);
   const validWalking=walkingHRData.filter(v=>v!==null);
-  const avgResting=validResting.length?Math.round(validResting.reduce((s,v)=>s+v,0)/validResting.length):null;
-  const avgWalking=validWalking.length?Math.round(validWalking.reduce((s,v)=>s+v,0)/validWalking.length):null;
+  // 30-day avgs
+  const restingHRData30=dates30.map(date=>hlMap[date]?.restingHR||null);
+  const walkingHRData30=dates30.map(date=>hlMap[date]?.walkingHR||null);
+  const validResting30=restingHRData30.filter(v=>v!==null);
+  const validWalking30=walkingHRData30.filter(v=>v!==null);
+  const avgResting=validResting30.length?Math.round(validResting30.reduce((s,v)=>s+v,0)/validResting30.length):null;
+  const avgWalking=validWalking30.length?Math.round(validWalking30.reduce((s,v)=>s+v,0)/validWalking30.length):null;
 
   const hrAvgEl=document.getElementById('snap-hr-avg');
   if(hrAvgEl){
     const parts=[];
-    if(avgResting)parts.push('RHR '+avgResting+' bpm');
-    if(avgWalking)parts.push('WHR '+avgWalking+' bpm');
+    if(avgResting)parts.push('RHR '+avgResting+' bpm 30d');
+    if(avgWalking)parts.push('WHR '+avgWalking+' bpm 30d');
     hrAvgEl.textContent=parts.join(' · ');
   }
 
@@ -4851,10 +4872,10 @@ function renderSnapshotCharts(){
       data:{
         labels:dates,
         datasets:[
-          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,99,71,0.85)',backgroundColor:'rgba(255,99,71,0.07)',pointRadius:4,borderWidth:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
-          {label:'Resting avg',data:avgResting?dates.map(()=>avgResting):[],borderColor:'rgba(255,99,71,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResting'},
-          {label:'Walking HR',data:walkingHRData,borderColor:'rgba(255,183,77,0.85)',backgroundColor:'rgba(255,183,77,0.07)',pointRadius:4,borderWidth:2,tension:0.3,fill:false,spanGaps:true,yAxisID:'yWalking'},
-          {label:'Walking avg',data:avgWalking?dates.map(()=>avgWalking):[],borderColor:'rgba(255,183,77,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yWalking'}
+          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,99,71,0.85)',backgroundColor:'rgba(255,99,71,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
+          {label:'Resting 30d avg',data:avgResting?dates.map(()=>avgResting):[],borderColor:'rgba(255,99,71,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResting'},
+          {label:'Walking HR',data:walkingHRData,borderColor:'rgba(255,183,77,0.85)',backgroundColor:'rgba(255,183,77,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yWalking'},
+          {label:'Walking 30d avg',data:avgWalking?dates.map(()=>avgWalking):[],borderColor:'rgba(255,183,77,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yWalking'}
         ]
       },
       options:{
@@ -4863,8 +4884,8 @@ function renderSnapshotCharts(){
         plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
         scales:{
           x:{ticks:xTicks,grid:xGrid},
-          yResting:{type:'linear',position:'left',min:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.15,3);return Math.floor(rMin-rPad);})(),max:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.15,3);return Math.ceil(rMax+rPad);})(),ticks:{color:'rgba(255,99,71,0.8)',font:{size:11,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.04)'}},
-          yWalking:{type:'linear',position:'right',min:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.15,3);return Math.floor(wMin-wPad);})(),max:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.15,3);return Math.ceil(wMax+wPad);})(),ticks:{color:'rgba(255,183,77,0.8)',font:{size:11,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{display:false}}
+          yResting:{type:'linear',position:'left',min:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.15,3);return Math.floor(rMin-rPad);})(),max:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.15,3);return Math.ceil(rMax+rPad);})(),ticks:{color:'rgba(255,99,71,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.06)'}},
+          yWalking:{type:'linear',position:'right',min:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.15,3);return Math.floor(wMin-wPad);})(),max:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.15,3);return Math.ceil(wMax+wPad);})(),ticks:{color:'rgba(255,183,77,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{display:false}}
         }
       }
     });
