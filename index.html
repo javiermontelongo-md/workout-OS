@@ -4410,6 +4410,7 @@ function renderPrescriptionCard(prescription){
   if(!prescription){
     if(el)el.style.display='none';
     if(noplan)noplan.style.display='block';
+    const cc=document.getElementById('prog-custom-card');if(cc)cc.style.display='none';
     return;
   }
   if(noplan)noplan.style.display='none';
@@ -4444,6 +4445,42 @@ function renderPrescriptionCard(prescription){
   el.className='prog-day-card prog-today';
   el.style.borderColor=color;
   el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${label}</div><div class="prog-day-title">${prescription.summary||''}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:16px 18px;">${prescription.reasoning?`<div style="font-size:var(--fs-presc-text);color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:var(--s2);border-radius:8px;">${prescription.reasoning}</div>`:''}${prescription.warmup?`<div style="margin-bottom:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Warmup</span>${prescription.warmup}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">Cooldown</span>${prescription.cooldown}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:var(--s2);border-left:2px solid ${color}80;border-radius:0 8px 8px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">${prescription.coachNote}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
+  renderCustomExercises();
+}
+function renderCustomExercises(){
+  const el=document.getElementById('prog-custom-card');
+  if(!el)return;
+  const today=localDS(new Date());
+  const presc=D.dailyPrescriptions?.[today];
+  if(!presc){el.style.display='none';return;}
+  el.style.display='';
+  const customs=presc.customExercises||[];
+  const inp=(id,ph,type='text')=>`<input id="${id}" type="${type}" placeholder="${ph}" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;text-align:center;">`;
+  const listHtml=customs.map((ex,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b);"><div><div style="font-size:var(--fs-presc-text);color:var(--t);">${ex.name}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${[ex.sets&&ex.reps?ex.sets+'×'+ex.reps:null,ex.weight?ex.weight+' lb':null,ex.note||null].filter(Boolean).join(' · ')}</div></div><button onclick="removeCustomExercise(${i})" style="background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:0 6px;line-height:1;flex-shrink:0;">×</button></div>`).join('');
+  el.innerHTML=`<div class="card" style="margin-bottom:0;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;margin-bottom:${customs.length?'10px':'0'};">${customs.length?'CUSTOM EXERCISES':''}</div>${listHtml}<div style="margin-top:${customs.length?'12px':'0'};"><input id="cex-name" type="text" placeholder="Exercise name" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">${inp('cex-sets','Sets','number')}${inp('cex-reps','Reps','number')}${inp('cex-weight','lb','number')}</div><input id="cex-note" type="text" placeholder="Note (optional)" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;"><button onclick="addCustomExercise()" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:8px;padding:10px;cursor:pointer;letter-spacing:.04em;">+ Add exercise</button></div></div>`;
+}
+function addCustomExercise(){
+  const name=document.getElementById('cex-name')?.value?.trim();
+  if(!name)return;
+  const today=localDS(new Date());
+  if(!D.dailyPrescriptions?.[today])return;
+  if(!D.dailyPrescriptions[today].customExercises)D.dailyPrescriptions[today].customExercises=[];
+  D.dailyPrescriptions[today].customExercises.push({
+    name,
+    sets:+document.getElementById('cex-sets')?.value||null,
+    reps:+document.getElementById('cex-reps')?.value||null,
+    weight:+document.getElementById('cex-weight')?.value||null,
+    note:document.getElementById('cex-note')?.value?.trim()||''
+  });
+  pushSilent();
+  renderCustomExercises();
+}
+function removeCustomExercise(i){
+  const today=localDS(new Date());
+  if(!D.dailyPrescriptions?.[today]?.customExercises)return;
+  D.dailyPrescriptions[today].customExercises.splice(i,1);
+  pushSilent();
+  renderCustomExercises();
 }
 
 function renderWeekSuggestions(weekPlan){
