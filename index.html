@@ -2598,8 +2598,8 @@ function updProgressStats(){
   })();
   if(e('pr-pu'))e('pr-pu').textContent=maxPU;
 
-  // Run pace — avg pace of last 20 Strava runs (any type), fallback to baseline
-  const paceRuns=(D.runs||[]).filter(r=>r.pace).slice(-20);
+  // Run pace — avg pace of last 20 actual runs (excluding walks), fallback to baseline
+  const paceRuns=(D.runs||[]).filter(r=>r.pace&&r.runType!=='walk').slice(-20);
   if(paceRuns.length>0){
     const avgSec=Math.round(paceRuns.reduce((s,r)=>s+r.pace,0)/paceRuns.length);
     const mm=Math.floor(avgSec/60);const ss=String(avgSec%60).padStart(2,'0');
@@ -2617,7 +2617,9 @@ function updProgressStats(){
     if(e('pr-hr'))e('pr-hr').textContent=D.cardioBaseline?.avgHR||165;
   }
 
-  if(D.profile&&e('pr-bw'))e('pr-bw').textContent=D.profile.bodyweight||225;
+  // Bodyweight — most recent logged body metric, fallback to profile default
+  const latestBW=(D.bodyMetrics||[]).slice(-1)[0];
+  if(e('pr-bw'))e('pr-bw').textContent=latestBW?.weight||D.profile?.bodyweight||225;
   if(D.volumeBests){if(e('vol-bench'))e('vol-bench').textContent=D.volumeBests.bench||'190x5x5';if(e('vol-ohp'))e('vol-ohp').textContent=D.volumeBests.ohp||'90x3x5';if(e('vol-squat'))e('vol-squat').textContent=D.volumeBests.squat||'160x5x5';if(e('vol-dl'))e('vol-dl').textContent=D.volumeBests.deadlift||'160x3x5';}
 }
 
