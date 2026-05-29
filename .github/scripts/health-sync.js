@@ -185,8 +185,18 @@ async function main() {
 
   const existingIdx = data.healthLogs.findIndex(h => h.date === entry.date);
   if (existingIdx >= 0) {
-    data.healthLogs[existingIdx] = entry;
-    console.log(`Updated health log for ${entry.date}`);
+    // Merge: never wipe a field that was already recorded just because this
+    // sync doesn't have it (e.g. morning sleep sync followed by evening
+    // activity sync — both cover the same date with different non-null fields).
+    const existing = data.healthLogs[existingIdx];
+    const merged = { ...existing };
+    for (const [key, val] of Object.entries(entry)) {
+      if (val !== null && val !== undefined) {
+        merged[key] = val;
+      }
+    }
+    data.healthLogs[existingIdx] = merged;
+    console.log(`Merged health log for ${entry.date}`);
   } else {
     data.healthLogs.push(entry);
     console.log(`Added health log for ${entry.date}`);
