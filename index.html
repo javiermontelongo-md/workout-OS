@@ -1260,14 +1260,9 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div class="card" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">running trajectory</div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn bs bi" onclick="setRunChart('pace')" id="run-chart-pace" style="font-size:var(--fs-xs);padding:5px 10px;">PACE</button>
-        <button class="btn bs bi" onclick="setRunChart('distance')" id="run-chart-distance" style="font-size:var(--fs-xs);padding:5px 10px;">DISTANCE</button>
-        <button class="btn bs bi" onclick="setRunChart('vo2')" id="run-chart-vo2" style="font-size:var(--fs-xs);padding:5px 10px;">VO2</button>
-      </div>
     </div>
-    <div id="run-metrics-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
-    <div style="position:relative;height:200px;"><canvas id="run-chart"></canvas></div>
+    <div id="run-metrics-summary" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;"></div>
+    <div style="position:relative;height:220px;"><canvas id="run-chart"></canvas></div>
     <div id="run-chart-legend"></div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
   </div>
@@ -2494,7 +2489,7 @@ function showTab(n){
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
   else if(n==='week'){ }
-  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart('pace'); renderBodyChart('weight'); renderRacePredictions(); }
+  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderBodyChart('weight'); renderRacePredictions(); }
   else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); }
 }
 
@@ -3958,10 +3953,9 @@ function renderRunMetricsSummary(){
   const syncEl=document.getElementById('run-last-sync');
   if(syncEl)syncEl.textContent=D.stravaLastSync?new Date(D.stravaLastSync).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'never';
   const localMetrics=calcRunMetrics();
-  const totalRuns=(D.runs||[]).filter(r=>r.type==='run'&&r.distance>=1).length;
   const estimated5KTime=localMetrics?.estimated5KTime||null;
   const vo2maxEstimate=localMetrics?.vo2maxEstimate||null;
-  if(!estimated5KTime&&!vo2maxEstimate&&!totalRuns){
+  if(!estimated5KTime&&!vo2maxEstimate){
     el.innerHTML='<div style="grid-column:1/-1;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:8px 0;">No run data yet — Strava syncs automatically overnight once configured.</div>';
     return;
   }
@@ -3969,61 +3963,83 @@ function renderRunMetricsSummary(){
   const sec5k=parseTime(estimated5KTime);
   const tColor=sec5k<1200?'var(--a3)':sec5k<1500?'var(--a)':'var(--t2)';
   const vo2Color=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
-  const vo2Pct=vo2maxEstimate?Math.min(100,Math.round((vo2maxEstimate/55)*100)):0;
-  const vo2BarColor=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
-  const appleVO2=(D.healthLogs||[]).filter(h=>h.vo2maxApple).slice(-1)[0]?.vo2maxApple;
-  el.innerHTML=`<div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div><div class="stat"><div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div><div class="sl">Est. VO2max (HR reserve)</div>${appleVO2?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:rgba(200,255,0,0.9);margin-top:4px;">Apple Watch: ${appleVO2} ml/kg/min</div>`:''}<div class="pbw" style="margin-top:8px;"><div class="pbl"><span>Target 55</span><span>${vo2Pct}%</span></div><div class="pbb"><div class="pbf" style="width:${vo2Pct}%;background:${vo2BarColor};"></div></div></div></div><div class="stat"><div class="sv g" style="font-size:18px;">${totalRuns}</div><div class="sl">Total runs</div></div>`;
+  // Apple Watch VO2max — round to 3 sig figs (1 decimal for typical 30-65 range)
+  const appleVO2Raw=(D.healthLogs||[]).filter(h=>h.vo2maxApple).slice(-1)[0]?.vo2maxApple;
+  const appleVO2=appleVO2Raw?Math.round(appleVO2Raw*10)/10:null;
+  el.innerHTML=`
+    <div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div>
+    <div class="stat">
+      <div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div>
+      <div class="sl">Est. VO2max</div>
+      ${appleVO2?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:4px;">Apple Watch: <span style="color:rgba(200,255,0,0.9);">${appleVO2}</span> ml/kg/min</div>`:''}
+    </div>`;
 }
-function renderRunChart(type='pace'){
+function renderRunChart(){
   const canvas=document.getElementById('run-chart');
   if(!canvas||typeof Chart==='undefined') return;
   if(window._runChart){window._runChart.destroy();window._runChart=null;}
-  document.querySelectorAll('[id^="run-chart-"]').forEach(b=>b.classList.remove('active'));
-  const ab=document.getElementById('run-chart-'+type);if(ab)ab.classList.add('active');
-  const runs=(D.runs||[]).filter(r=>r.type==='run'&&r.distance>=1);
+  // Last 10 runs only (exclude walks, need distance)
+  const runs=(D.runs||[]).filter(r=>r.type==='run'&&r.runType!=='walk'&&r.distance>=0.5).slice(-10);
+  const legendEl=document.getElementById('run-chart-legend');
   if(!runs.length){
     const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(legendEl)legendEl.innerHTML='';
     return;
   }
   try{
-    const typeColors={easy:'rgba(127,255,110,0.8)',long:'rgba(79,195,247,0.8)',intervals:'rgba(255,183,77,0.8)',tempo:'rgba(255,183,77,0.8)',moderate:'rgba(206,147,216,0.8)'};
-    const labels=runs.map(r=>r.date);
-    if(type==='pace'){
-      const legendEl=document.getElementById('run-chart-legend');if(legendEl)legendEl.innerHTML='';
-      const data=runs.map(r=>+(r.pace/60).toFixed(2));
-      const pointColors=runs.map(r=>typeColors[r.runType]||'rgba(255,183,77,0.8)');
-      const targetPace=6.43;
-      window._runChart=new Chart(canvas,{type:'line',data:{labels,datasets:[{label:'Pace (min/mi)',data,borderColor:'rgba(255,183,77,0.6)',backgroundColor:'rgba(255,183,77,0.08)',borderWidth:2,pointRadius:5,pointBackgroundColor:pointColors,tension:0.3},{label:'Sub-20 5K target',data:labels.map(()=>targetPace),borderColor:'rgba(127,255,110,0.4)',borderDash:[5,5],borderWidth:1.5,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>{const v=ctx.raw;const m=Math.floor(v);const s=Math.round((v-m)*60);return ctx.dataset.label+': '+m+':'+(s<10?'0':'')+s+'/mi';}}}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{reverse:true,ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},callback:v=>{const m=Math.floor(v);const s=Math.round((v-m)*60);return m+':'+(s<10?'0':'')+s;}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
-    } else if(type==='distance'){
-      const bgColors=runs.map(r=>typeColors[r.runType]||'rgba(255,183,77,0.6)');
-      window._runChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'Distance (mi)',data:runs.map(r=>r.distance),backgroundColor:bgColors,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
-      const legendEl=document.getElementById('run-chart-legend');
-      if(legendEl)legendEl.innerHTML='<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Easy / Zone 2</span> — avg HR &lt;148 bpm · conversational pace · no keywords</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(0,212,255,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Long Run</span> — distance ≥6 miles (overrides HR classification)</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,183,77,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Intervals / Tempo</span> — avg HR ≥165 bpm · or name contains "400m", "interval", "tempo", "track"</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(168,85,247,0.7);flex-shrink:0;"></span><span><span style="color:var(--t2);">Moderate</span> — avg HR 148–164 bpm · harder than easy, not quite threshold</span></div><div style="margin-top:2px;color:var(--t3);font-size:var(--fs-xs);">Classification uses avg HR from Apple Watch. Name keywords override HR when present.</div></div>';
-    } else {
-      const vo2RunMap={};
-      (D.runs||[]).filter(r=>r.type==='run'&&r.heartRateAvg&&r.distance>=1).forEach(r=>{
-        const v=estimateVO2max(r);if(v){if(!vo2RunMap[r.date])vo2RunMap[r.date]=[];vo2RunMap[r.date].push(v);}
-      });
-      const appleMap={};
-      (D.healthLogs||[]).filter(h=>h.vo2maxApple).forEach(h=>{appleMap[h.date]=h.vo2maxApple;});
-      const allDates=[...new Set([...Object.keys(vo2RunMap),...Object.keys(appleMap)])].sort();
-      const calcData=allDates.map(d=>vo2RunMap[d]?Math.round(vo2RunMap[d].reduce((a,b)=>a+b,0)/vo2RunMap[d].length*10)/10:null);
-      const appleData=allDates.map(d=>appleMap[d]||null);
-      const legendEl=document.getElementById('run-chart-legend');
-      if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:16px;margin-top:10px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"><span style="color:rgba(0,212,255,0.8);">── Calculated (runs)</span><span style="color:rgba(200,255,0,0.8);">- - Apple Watch</span><span style="border-left:2px dashed var(--t3);padding-left:6px;">│ Target 55</span></div>';
-      window._runChart=new Chart(canvas,{type:'line',data:{labels:allDates,datasets:[
-        {label:'Calculated (HR reserve)',data:calcData,borderColor:'rgba(0,212,255,0.8)',backgroundColor:'rgba(0,212,255,0.06)',borderWidth:2,pointRadius:4,spanGaps:false,tension:0.3},
-        {label:'Apple Watch',data:appleData,borderColor:'rgba(200,255,0,0.8)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,5],pointRadius:3,spanGaps:true,tension:0.3},
-        {label:'Target 55',data:allDates.map(()=>55),borderColor:'rgba(127,255,110,0.3)',borderDash:[3,6],borderWidth:1,pointRadius:0}
-      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,filter:i=>i.raw!==null}},scales:{x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10},maxTicksLimit:10},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:30,ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
-    }
+    const typeColors={easy:'rgba(127,255,110,0.85)',long:'rgba(79,195,247,0.85)',intervals:'rgba(255,183,77,0.85)',tempo:'rgba(255,183,77,0.85)',moderate:'rgba(206,147,216,0.85)'};
+    const labels=runs.map(r=>r.date.slice(5)); // MM-DD for brevity
+    const paceData=runs.map(r=>r.pace?+(r.pace/60).toFixed(2):null);
+    const distData=runs.map(r=>r.distance||null);
+    const hrData=runs.map(r=>r.heartRateAvg||null);
+    const pointColors=runs.map(r=>typeColors[r.runType]||'rgba(255,183,77,0.85)');
+    const targetPace=6.43; // sub-20 5K pace in min/mi
+    // Pace y-axis range: pad ±1 min around data
+    const validPaces=paceData.filter(v=>v!=null);
+    const pMin=validPaces.length?Math.max(5,Math.floor(Math.min(...validPaces))-1):5;
+    const pMax=validPaces.length?Math.ceil(Math.max(...validPaces))+1:18;
+    // HR y-axis range
+    const validHR=hrData.filter(v=>v!=null);
+    const hrMin=validHR.length?Math.max(100,Math.floor(Math.min(...validHR)/10)*10-10):100;
+    const hrMax=validHR.length?Math.ceil(Math.max(...validHR)/10)*10+10:200;
+    window._runChart=new Chart(canvas,{
+      type:'bar',
+      data:{labels,datasets:[
+        // Distance bars (background, left axis mapped to secondary scale)
+        {type:'bar',label:'Distance (mi)',data:distData,backgroundColor:runs.map(r=>(typeColors[r.runType]||'rgba(255,183,77,0.85)').replace('0.85','0.25')),borderColor:runs.map(r=>(typeColors[r.runType]||'rgba(255,183,77,0.85)').replace('0.85','0.55')),borderWidth:1,borderRadius:4,yAxisID:'yDist',order:3},
+        // Pace line (left axis, inverted — lower = faster)
+        {type:'line',label:'Pace (min/mi)',data:paceData,borderColor:'rgba(255,183,77,0.9)',backgroundColor:'transparent',borderWidth:2.5,pointRadius:5,pointBackgroundColor:pointColors,pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'yPace',order:1},
+        // Sub-20 target pace reference
+        {type:'line',label:'Sub-20 target',data:labels.map(()=>targetPace),borderColor:'rgba(127,255,110,0.35)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,yAxisID:'yPace',order:4},
+        // Avg HR line (right axis)
+        {type:'line',label:'Avg HR (bpm)',data:hrData,borderColor:'rgba(232,93,138,0.85)',backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:'rgba(232,93,138,0.85)',pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'yHR',order:2}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
+          label:c=>{
+            if(c.dataset.label==='Sub-20 target') return null;
+            if(c.dataset.label==='Pace (min/mi)'||c.dataset.label==='Sub-20 target'){const v=c.raw;if(v==null)return null;const m=Math.floor(v);const s=Math.round((v-m)*60);return 'Pace: '+m+':'+(s<10?'0':'')+s+'/mi';}
+            if(c.dataset.label==='Avg HR (bpm)') return c.raw!=null?'HR: '+c.raw+' bpm':null;
+            if(c.dataset.label==='Distance (mi)') return c.raw!=null?'Dist: '+c.raw.toFixed(1)+' mi':null;
+            return null;
+          }
+        }}},
+        scales:{
+          x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
+          yPace:{type:'linear',position:'left',reverse:true,min:pMin,max:pMax,ticks:{color:'rgba(255,183,77,0.7)',font:{family:'DM Mono',size:9},callback:v=>{const m=Math.floor(v);const s=Math.round((v-m)*60);return m+':'+(s<10?'0':'')+s;}},grid:{color:'rgba(255,255,255,0.04)'}},
+          yHR:{type:'linear',position:'right',min:hrMin,max:hrMax,ticks:{color:'rgba(232,93,138,0.7)',font:{family:'DM Mono',size:9},callback:v=>v+' bpm'},grid:{display:false}},
+          yDist:{type:'linear',display:false,min:0,max:Math.max(...distData.filter(v=>v!=null))*3}
+        }
+      }
+    });
+    if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"><span style="color:rgba(255,183,77,0.9);">── Pace</span><span style="color:rgba(232,93,138,0.9);">── Avg HR</span><span>▪ Bars = distance · color = run type</span><span style="color:rgba(127,255,110,0.6);">- - Sub-20 target</span></div>';
   }catch(e){
     console.warn('Chart render failed:',e);
     const ctx=canvas.getContext('2d');ctx.font='12px monospace';ctx.fillStyle='#4a5068';
     ctx.fillText('Chart unavailable — check data',10,30);
   }
 }
-function setRunChart(type){renderRunChart(type);}
+function setRunChart(){renderRunChart();}
 function onDayTypeChange(value){
   const blocks={
     bench:document.getElementById('bench-block'),
