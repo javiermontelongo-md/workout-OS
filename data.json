@@ -202,7 +202,7 @@
     {
       "date": "2026-03-23",
       "stravaId": 17827360705,
-      "name": "Carrera de mañana",
+      "name": "Carrera de ma\u00f1ana",
       "type": "run",
       "distance": 0.47,
       "duration": 238,
@@ -216,7 +216,7 @@
     {
       "date": "2026-03-23",
       "stravaId": 17830451061,
-      "name": "Caminata de mañana",
+      "name": "Caminata de ma\u00f1ana",
       "type": "walk",
       "distance": 1.44,
       "duration": 1864,
@@ -300,7 +300,7 @@
     {
       "date": "2026-04-04",
       "stravaId": 17978252072,
-      "name": "Spring run 🌸",
+      "name": "Spring run \ud83c\udf38",
       "type": "run",
       "distance": 6.23,
       "duration": 3717,
@@ -314,7 +314,7 @@
     {
       "date": "2026-04-06",
       "stravaId": 18005097509,
-      "name": "Buttercup 🌼 szn >> cherry blossom 🌸 szn",
+      "name": "Buttercup \ud83c\udf3c szn >> cherry blossom \ud83c\udf38 szn",
       "type": "run",
       "distance": 6,
       "duration": 3116,
@@ -468,7 +468,7 @@
     {
       "date": "2026-04-19",
       "stravaId": 18177712795,
-      "name": "Spring long run 🌸",
+      "name": "Spring long run \ud83c\udf38",
       "type": "run",
       "distance": 10.01,
       "duration": 6698,
@@ -524,7 +524,7 @@
     {
       "date": "2026-05-01",
       "stravaId": 18332461934,
-      "name": "Carrera de mañana",
+      "name": "Carrera de ma\u00f1ana",
       "type": "run",
       "distance": 4.01,
       "duration": 2641,
@@ -664,7 +664,7 @@
   ],
   "stravaLastSync": "2026-05-28T18:22:11.443Z",
   "adaptivePlanCache": {
-    "narrative": "Week 1 of volume accumulation. Last bench session hit RPE 9-10 at 205lb for triples/quads, indicating significant overreach. Dropping to 192.5lb×4×4 to build sustainable volume at RPE 8. OHP showed good capacity at 100lb×7. Easy runs are being executed at threshold HR (165-174 bpm) instead of Zone 2 (130-145 bpm) — strict MAF HR compliance required.",
+    "narrative": "Week 1 of volume accumulation. Last bench session hit RPE 9-10 at 205lb for triples/quads, indicating significant overreach. Dropping to 192.5lb\u00d74\u00d74 to build sustainable volume at RPE 8. OHP showed good capacity at 100lb\u00d77. Easy runs are being executed at threshold HR (165-174 bpm) instead of Zone 2 (130-145 bpm) \u2014 strict MAF HR compliance required.",
     "weeklyFocus": "Re-establish true Zone 2 easy running at MAF HR 147 ceiling and build bench volume at sustainable RPE 8",
     "autoRegulationRule": "If easy run average HR exceeds 150 bpm, slow pace by 30 seconds per mile next session until HR stabilizes in 130-145 zone",
     "lifts": {
@@ -676,7 +676,7 @@
         "variation": "Weighted Pull-ups",
         "trend": "flat",
         "confidence": "low",
-        "coachNote": "0 = bodyweight. Establish baseline volume at bodyweight for 5×5 before adding load."
+        "coachNote": "0 = bodyweight. Establish baseline volume at bodyweight for 5\u00d75 before adding load."
       },
       "row": {
         "weight": 135,
@@ -706,7 +706,7 @@
         "variation": "Barbell OHP",
         "trend": "flat",
         "confidence": "medium",
-        "coachNote": "Last session hit 3×7 at RPE 7-8. Adding one set to build volume. Maintain strict form with no leg drive."
+        "coachNote": "Last session hit 3\u00d77 at RPE 7-8. Adding one set to build volume. Maintain strict form with no leg drive."
       },
       "squat": {
         "weight": 160,
@@ -739,7 +739,7 @@
       },
       "thursday": {
         "type": "intervals",
-        "workout": "6 × 400m with 2min rest",
+        "workout": "6 \u00d7 400m with 2min rest",
         "targetPace": "7:15-7:30/mile per rep",
         "warmup": "10 min easy at MAF HR",
         "cooldown": "10 min easy at MAF HR",
@@ -755,24 +755,24 @@
     },
     "accessories": {
       "dayA": [
-        "Face Pulls 3×15",
-        "Tricep Pushdown 3×12",
-        "Hammer Curls 3×10",
-        "Band Pull-Aparts 3×20"
+        "Face Pulls 3\u00d715",
+        "Tricep Pushdown 3\u00d712",
+        "Hammer Curls 3\u00d710",
+        "Band Pull-Aparts 3\u00d720"
       ],
       "dayB": [
-        "Bulgarian Split Squat 3×8 each",
-        "Leg Curl 3×10",
-        "Calf Raises 3×15",
-        "Pallof Press 3×10 each",
-        "Dead Bug 3×10 each"
+        "Bulgarian Split Squat 3\u00d78 each",
+        "Leg Curl 3\u00d710",
+        "Calf Raises 3\u00d715",
+        "Pallof Press 3\u00d710 each",
+        "Dead Bug 3\u00d710 each"
       ],
       "dayC": [
-        "Romanian DL 3×8 at 115lb",
-        "Step-ups 3×10 each",
-        "Copenhagen Plank 3×20s each",
+        "Romanian DL 3\u00d78 at 115lb",
+        "Step-ups 3\u00d710 each",
+        "Copenhagen Plank 3\u00d720s each",
         "Hip Flexor Stretch 2min each",
-        "Glute Bridge 3×12"
+        "Glute Bridge 3\u00d712"
       ]
     },
     "vo2maxEstimate": 48.4,
@@ -1019,7 +1019,7 @@
       "sleepHours": 8.12,
       "steps": 21370,
       "exerciseMinutes": 20,
-      "walkingHR": 96.5,
+      "walkingHR": 97,
       "respiratoryRate": 15.29,
       "vo2maxApple": null
     },
@@ -1087,7 +1087,7 @@
       "sleepHours": 5.73,
       "steps": 22529,
       "exerciseMinutes": 50,
-      "walkingHR": 101.5,
+      "walkingHR": 102,
       "respiratoryRate": 17.13,
       "vo2maxApple": 43.26
     },
@@ -1274,7 +1274,7 @@
       "sleepHours": 7.29,
       "steps": 30753,
       "exerciseMinutes": 90,
-      "walkingHR": 115.5,
+      "walkingHR": 116,
       "respiratoryRate": 18.16,
       "vo2maxApple": 45.37
     },
@@ -1291,7 +1291,7 @@
       "sleepHours": 9.17,
       "steps": 35860,
       "exerciseMinutes": 91,
-      "walkingHR": 82.5,
+      "walkingHR": 83,
       "respiratoryRate": 17.58,
       "vo2maxApple": 45.78
     },
@@ -1325,7 +1325,7 @@
       "sleepHours": 6.28,
       "steps": 13455,
       "exerciseMinutes": 36,
-      "walkingHR": 102.5,
+      "walkingHR": 103,
       "respiratoryRate": 17.85,
       "vo2maxApple": null
     },
@@ -1393,7 +1393,7 @@
       "sleepHours": 6.45,
       "steps": 25957,
       "exerciseMinutes": 69,
-      "walkingHR": 87.5,
+      "walkingHR": 88,
       "respiratoryRate": 17.12,
       "vo2maxApple": 47.59
     },
@@ -1427,7 +1427,7 @@
       "sleepHours": 7.11,
       "steps": 44238,
       "exerciseMinutes": 136,
-      "walkingHR": 93.5,
+      "walkingHR": 94,
       "respiratoryRate": 17.79,
       "vo2maxApple": 48.27
     },
@@ -1478,7 +1478,7 @@
       "sleepHours": 6.96,
       "steps": 30874,
       "exerciseMinutes": 72,
-      "walkingHR": 94.5,
+      "walkingHR": 95,
       "respiratoryRate": 16.72,
       "vo2maxApple": null
     },
@@ -1682,7 +1682,7 @@
       "sleepHours": 6.43,
       "steps": 20467,
       "exerciseMinutes": 43,
-      "walkingHR": 91.5,
+      "walkingHR": 92,
       "respiratoryRate": 16.97,
       "vo2maxApple": 48.24
     },
@@ -1801,7 +1801,7 @@
       "sleepHours": 7.23,
       "steps": 28699,
       "exerciseMinutes": 81,
-      "walkingHR": 67.5,
+      "walkingHR": 68,
       "respiratoryRate": 16.72,
       "vo2maxApple": 48
     },
@@ -1818,7 +1818,7 @@
       "sleepHours": 7.34,
       "steps": 45284,
       "exerciseMinutes": 140,
-      "walkingHR": 88.5,
+      "walkingHR": 89,
       "respiratoryRate": 17.3,
       "vo2maxApple": 47.86
     },
@@ -1903,7 +1903,7 @@
       "sleepHours": 7.17,
       "steps": 6761,
       "exerciseMinutes": 16,
-      "walkingHR": 72.5,
+      "walkingHR": 73,
       "respiratoryRate": 18.11,
       "vo2maxApple": null
     },
@@ -2039,7 +2039,7 @@
       "sleepHours": null,
       "steps": 24632,
       "exerciseMinutes": 73,
-      "walkingHR": 119.5,
+      "walkingHR": 120,
       "respiratoryRate": null,
       "vo2maxApple": 45.51
     },
@@ -2107,7 +2107,7 @@
       "sleepHours": 8.72,
       "steps": 26605,
       "exerciseMinutes": 89,
-      "walkingHR": 85.5,
+      "walkingHR": 86,
       "respiratoryRate": 16.78,
       "vo2maxApple": 45.73
     },
@@ -2141,7 +2141,7 @@
       "sleepHours": 6.82,
       "steps": 19568,
       "exerciseMinutes": 35,
-      "walkingHR": 87.5,
+      "walkingHR": 88,
       "respiratoryRate": 16.72,
       "vo2maxApple": null
     },
@@ -2158,7 +2158,7 @@
       "sleepHours": 7.12,
       "steps": 14746,
       "exerciseMinutes": 40,
-      "walkingHR": 98.5,
+      "walkingHR": 99,
       "respiratoryRate": 17.01,
       "vo2maxApple": null
     },
@@ -2294,7 +2294,7 @@
       "sleepHours": 6.88,
       "steps": 51401,
       "exerciseMinutes": 103,
-      "walkingHR": 85.5,
+      "walkingHR": 86,
       "respiratoryRate": 16.01,
       "vo2maxApple": 45.08
     },
@@ -2514,7 +2514,7 @@
       "sleepAwake": null,
       "steps": 9185,
       "exerciseMinutes": 43,
-      "walkingHR": 94.5,
+      "walkingHR": 95,
       "respiratoryRate": 16.65277777777778,
       "vo2maxApple": null,
       "source": "apple_health"
@@ -2548,7 +2548,7 @@
       "sleepAwake": null,
       "steps": 9185,
       "exerciseMinutes": 43,
-      "walkingHR": 94.5,
+      "walkingHR": 95,
       "respiratoryRate": 16.65277777777778,
       "vo2maxApple": null,
       "source": "apple_health"
@@ -2563,9 +2563,9 @@
       "sleepREM": 1.2862657702962557,
       "sleepLight": 3.7250592114196883,
       "sleepAwake": null,
-      "steps": 11091.17423951689,
+      "steps": 11091,
       "exerciseMinutes": 18,
-      "walkingHR": 95.50000000000001,
+      "walkingHR": 96,
       "respiratoryRate": 19.25,
       "vo2maxApple": null,
       "source": "apple_health"
@@ -2580,7 +2580,7 @@
       "sleepREM": 1.8204975081814658,
       "sleepLight": 3.6410857862896386,
       "sleepAwake": null,
-      "steps": 9188.365855961896,
+      "steps": 9188,
       "exerciseMinutes": 21,
       "walkingHR": 99,
       "respiratoryRate": 17.093023255813954,
@@ -2597,7 +2597,7 @@
       "sleepREM": 1.6621717679169443,
       "sleepLight": 3.5999146794610555,
       "sleepAwake": null,
-      "steps": 9422.741826865331,
+      "steps": 9423,
       "exerciseMinutes": 32,
       "walkingHR": 88,
       "respiratoryRate": 16.539473684210527,
@@ -2750,12 +2750,12 @@
     {
       "date": "2026-05-26",
       "type": "today_coaching",
-      "response": "Today's easy run should be 25–35 minutes at strictly MAF-capped HR (147bpm ceiling). With HRV at 32ms in the warning zone, prioritize nasal breathing and walk breaks as needed to keep HR compliant—consistency under the ceiling matters more than pace. If HR drifts above 147 even at easy effort, cut the session short at 20 minutes. Prioritize 8+ hours sleep tonight and hydration throughout the day to support HRV recovery."
+      "response": "Today's easy run should be 25\u201335 minutes at strictly MAF-capped HR (147bpm ceiling). With HRV at 32ms in the warning zone, prioritize nasal breathing and walk breaks as needed to keep HR compliant\u2014consistency under the ceiling matters more than pace. If HR drifts above 147 even at easy effort, cut the session short at 20 minutes. Prioritize 8+ hours sleep tonight and hydration throughout the day to support HRV recovery."
     },
     {
       "date": "2026-05-26",
       "type": "today_coaching",
-      "response": "Your HRV jumped to 44ms today—up 16% from your 7-day average and much closer to your baseline. Run easy for 30–35 minutes at strict MAF cap (147bpm ceiling), starting conservatively and allowing HR to settle naturally. If you feel strong in the second half and HR stays comfortably under 145bpm, you can extend to 40 minutes, but walk immediately if you approach 147bpm. Prioritize sleep tonight to consolidate this HRV recovery before tomorrow's Lift B session."
+      "response": "Your HRV jumped to 44ms today\u2014up 16% from your 7-day average and much closer to your baseline. Run easy for 30\u201335 minutes at strict MAF cap (147bpm ceiling), starting conservatively and allowing HR to settle naturally. If you feel strong in the second half and HR stays comfortably under 145bpm, you can extend to 40 minutes, but walk immediately if you approach 147bpm. Prioritize sleep tonight to consolidate this HRV recovery before tomorrow's Lift B session."
     },
     {
       "ts": 1779841026549,
@@ -2765,18 +2765,18 @@
     {
       "ts": 1779854879756,
       "type": "run_prescription",
-      "label": "quality · 2026-05-26"
+      "label": "quality \u00b7 2026-05-26"
     },
     {
       "ts": 1779943570400,
       "type": "daily_prescription",
-      "label": "pull 90min · 2026-05-27"
+      "label": "pull 90min \u00b7 2026-05-27"
     }
   ],
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
-      "reasoning": "HRV is low (43.9ms vs 53.5ms baseline), but 7-day trend shows recovery improving (37.9→43.9ms). With 34 days since last quality work and canDoQuality=true, it's time to reintroduce structured speed work cautiously. Starting with moderate intervals rather than aggressive threshold work given the HRV suppression.",
+      "reasoning": "HRV is low (43.9ms vs 53.5ms baseline), but 7-day trend shows recovery improving (37.9\u219243.9ms). With 34 days since last quality work and canDoQuality=true, it's time to reintroduce structured speed work cautiously. Starting with moderate intervals rather than aggressive threshold work given the HRV suppression.",
       "workout": {
         "name": "Reintroduction VO2max Intervals",
         "description": "4x800m at 5K goal pace (6:26/mi) with 400m easy jog recovery. This reintroduces quality stimulus after 5+ weeks off while managing current recovery status.",
@@ -2802,7 +2802,7 @@
       "durationMins": 60,
       "generatedAt": "2026-05-27T17:57:11.584Z",
       "summary": "quality",
-      "reasoning": "HRV is low (43.9ms vs 53.5ms baseline), but 7-day trend shows recovery improving (37.9→43.9ms). With 34 days since last quality work and canDoQuality=true, it's time to reintroduce structured speed work cautiously. Starting with moderate intervals rather than aggressive threshold work given the HRV suppression.",
+      "reasoning": "HRV is low (43.9ms vs 53.5ms baseline), but 7-day trend shows recovery improving (37.9\u219243.9ms). With 34 days since last quality work and canDoQuality=true, it's time to reintroduce structured speed work cautiously. Starting with moderate intervals rather than aggressive threshold work given the HRV suppression.",
       "warmup": "2 miles easy at MAF-10 heart rate (~137bpm), conversational pace. Include 4x100m strides at the end.",
       "mainWork": {
         "runType": "quality",
@@ -2829,11 +2829,11 @@
     "2026-05-27": {
       "type": "push",
       "duration": 90,
-      "summary": "Push — Upper Strength",
-      "reasoning": "Your last push session on 5/20 showed solid OHP volume (3×7 @ 100lb at RPE 7-8) and bench work at 205lb hit RPE 9-10, indicating you were pushing limits. Today we're programming conservative loads: bench at 190lb for volume work (same as your 5/10 session at RPE 7) and OHP at 95lb to build capacity without exceeding RPE 8. Your HRV averaged 34.5ms this week—solid recovery window for quality pressing.",
-      "warmup": "5min bike or row easy effort, then: arm circles 10 each direction, band pull-aparts 2×15, empty barbell bench press 2×10, progressive bench warmup sets: 45lb×10, 95lb×8, 135lb×5, 165lb×3",
+      "summary": "Push \u2014 Upper Strength",
+      "reasoning": "Your last push session on 5/20 showed solid OHP volume (3\u00d77 @ 100lb at RPE 7-8) and bench work at 205lb hit RPE 9-10, indicating you were pushing limits. Today we're programming conservative loads: bench at 190lb for volume work (same as your 5/10 session at RPE 7) and OHP at 95lb to build capacity without exceeding RPE 8. Your HRV averaged 34.5ms this week\u2014solid recovery window for quality pressing.",
+      "warmup": "5min bike or row easy effort, then: arm circles 10 each direction, band pull-aparts 2\u00d715, empty barbell bench press 2\u00d710, progressive bench warmup sets: 45lb\u00d710, 95lb\u00d78, 135lb\u00d75, 165lb\u00d73",
       "mainWork": {
-        "summary": "2 main lifts · 4 accessories",
+        "summary": "2 main lifts \u00b7 4 accessories",
         "lifts": {
           "bench": {
             "sets": 4,
@@ -2841,7 +2841,7 @@
             "weight": 190,
             "targetRPE": 7,
             "variation": "Barbell Bench Press",
-            "coachNote": "Same load as your 5/10 session where you hit RPE 7. Focus on controlled descent (2-second eccentric), pause on chest, explosive press. Rest 3min between sets. If rep 5 feels like RPE 8+, stop at 4 reps—we're building volume capacity, not testing maxes."
+            "coachNote": "Same load as your 5/10 session where you hit RPE 7. Focus on controlled descent (2-second eccentric), pause on chest, explosive press. Rest 3min between sets. If rep 5 feels like RPE 8+, stop at 4 reps\u2014we're building volume capacity, not testing maxes."
           },
           "ohp": {
             "sets": 3,
@@ -2849,22 +2849,22 @@
             "weight": 95,
             "targetRPE": 7,
             "variation": "Barbell Strict OHP",
-            "coachNote": "Slightly lower than your 5/20 work at 100lb for 3×7. Prioritize vertical bar path—keep elbows slightly forward, squeeze glutes to prevent hyperextension. Full lockout overhead, controlled descent. Rest 2.5min between sets."
+            "coachNote": "Slightly lower than your 5/20 work at 100lb for 3\u00d77. Prioritize vertical bar path\u2014keep elbows slightly forward, squeeze glutes to prevent hyperextension. Full lockout overhead, controlled descent. Rest 2.5min between sets."
           }
         },
         "accessories": [
-          "Incline DB Press 3×10 @ 50lb per hand (upper chest volume, RPE 7)",
-          "Cable Tricep Pushdown 3×12 @ moderate weight (elbow health, controlled tempo)",
-          "DB Lateral Raise 3×15 @ 20lb per hand (side delt volume, no momentum)",
-          "Overhead Tricep Extension 3×12 @ 35lb DB (long head emphasis, stretch position)"
+          "Incline DB Press 3\u00d710 @ 50lb per hand (upper chest volume, RPE 7)",
+          "Cable Tricep Pushdown 3\u00d712 @ moderate weight (elbow health, controlled tempo)",
+          "DB Lateral Raise 3\u00d715 @ 20lb per hand (side delt volume, no momentum)",
+          "Overhead Tricep Extension 3\u00d712 @ 35lb DB (long head emphasis, stretch position)"
         ]
       },
-      "cooldown": "Chest doorway stretch 2×30sec each arm, cross-body shoulder stretch 2×30sec each side, tricep overhead stretch 2×20sec each arm, light foam rolling for pecs and lats 3min total",
-      "coachNote": "Your bench e1RM is 232.5lb, so today's 190lb for sets of 5 should feel controlled and crisp. The goal is pristine bar path and zero grind reps—every rep should look identical. If your lockout speed slows noticeably, rack it. Accessory work is about time under tension, not chasing weight. Residency stress is cumulative; this volume will stimulate growth without burying you for tomorrow.",
-      "ifTooHard": "Reduce bench to 3 sets of 5 @ 185lb, OHP to 3×5 @ 90lb, and cut one accessory exercise entirely. Extend rest periods to 4min for bench, 3min for OHP.",
+      "cooldown": "Chest doorway stretch 2\u00d730sec each arm, cross-body shoulder stretch 2\u00d730sec each side, tricep overhead stretch 2\u00d720sec each arm, light foam rolling for pecs and lats 3min total",
+      "coachNote": "Your bench e1RM is 232.5lb, so today's 190lb for sets of 5 should feel controlled and crisp. The goal is pristine bar path and zero grind reps\u2014every rep should look identical. If your lockout speed slows noticeably, rack it. Accessory work is about time under tension, not chasing weight. Residency stress is cumulative; this volume will stimulate growth without burying you for tomorrow.",
+      "ifTooHard": "Reduce bench to 3 sets of 5 @ 185lb, OHP to 3\u00d75 @ 90lb, and cut one accessory exercise entirely. Extend rest periods to 4min for bench, 3min for OHP.",
       "watchOutFor": [
-        "Shoulder discomfort on OHP lockout—if present, regress weight to 90lb and check that you're not hyperextending lumbar spine",
-        "Elbow pain on tricep work—use lighter weight and prioritize full ROM over load; switch to rope attachment if straight bar causes issues"
+        "Shoulder discomfort on OHP lockout\u2014if present, regress weight to 90lb and check that you're not hyperextending lumbar spine",
+        "Elbow pain on tricep work\u2014use lighter weight and prioritize full ROM over load; switch to rope attachment if straight bar causes issues"
       ],
       "workoutType": "push",
       "durationMins": 90,
@@ -2873,62 +2873,62 @@
         {
           "date": "2026-05-28",
           "dow": "Thu",
-          "suggestion": "Easy Zone 2 Run — 45min @ ≤147bpm",
+          "suggestion": "Easy Zone 2 Run \u2014 45min @ \u2264147bpm",
           "confidence": "high",
           "reason": "Day-after-push recovery run; build aerobic base with strict HR discipline"
         },
         {
           "date": "2026-05-29",
           "dow": "Fri",
-          "suggestion": "Pull — Upper Strength (90min)",
+          "suggestion": "Pull \u2014 Upper Strength (90min)",
           "confidence": "high",
           "reason": "72hr since last pull work; deadlift + rowing + pullup volume day"
         },
         {
           "date": "2026-05-30",
           "dow": "Sat",
-          "suggestion": "Easy Zone 2 Run — 60min @ ≤147bpm",
+          "suggestion": "Easy Zone 2 Run \u2014 60min @ \u2264147bpm",
           "confidence": "high",
           "reason": "Weekend longer aerobic session; build mitochondrial density for VO2max gains"
         },
         {
           "date": "2026-05-31",
           "dow": "Sun",
-          "suggestion": "Legs — Lower Strength (90min)",
+          "suggestion": "Legs \u2014 Lower Strength (90min)",
           "confidence": "medium",
           "reason": "Squat-focused day; ensure 48hr gap before Tuesday quality run"
         },
         {
           "date": "2026-06-01",
           "dow": "Mon",
-          "suggestion": "Easy Zone 2 Run — 40min @ ≤147bpm",
+          "suggestion": "Easy Zone 2 Run \u2014 40min @ \u2264147bpm",
           "confidence": "high",
           "reason": "Active recovery from leg day; maintain aerobic stimulus without fatigue"
         },
         {
           "date": "2026-06-02",
           "dow": "Tue",
-          "suggestion": "Interval Run — 8×400m @ 5K pace, 200m jog recovery",
+          "suggestion": "Interval Run \u2014 8\u00d7400m @ 5K pace, 200m jog recovery",
           "confidence": "medium",
           "reason": "Quality speed work (20% bucket); 48hr post-leg day allows neuromuscular readiness"
         },
         {
           "date": "2026-06-03",
           "dow": "Wed",
-          "suggestion": "Push — Upper Strength (90min)",
+          "suggestion": "Push \u2014 Upper Strength (90min)",
           "confidence": "high",
-          "reason": "7-day push cycle; progress bench to 195lb 4×5 if today's session feels RPE ≤7"
+          "reason": "7-day push cycle; progress bench to 195lb 4\u00d75 if today's session feels RPE \u22647"
         }
       ]
     },
     "2026-05-28": {
       "type": "push",
       "duration": 90,
-      "summary": "Push — Upper Strength (Bench + OHP)",
-      "reasoning": "Your May 20 session showed bench at 205×3-4 @ RPE 9-10 and OHP 100×7 @ RPE 7-8. Today we're backing off to sustainable volume: bench at 190lb for clean sets of 5 (same as May 10 where you hit RPE 7), and OHP at 95lb to lock in form without the grind. This respects the RPE 8 cap while building quality volume. Your e1RM supports heavier loads, but residency fatigue demands we prioritize bar speed and recovery.",
-      "warmup": "5min row or bike easy, then: 10 band pull-aparts, 10 scap push-ups, 5 empty bar bench press, 5 empty bar OHP. Ramp bench: 95×5, 135×5, 165×3. Ramp OHP: 45×5, 65×3, 80×2.",
+      "summary": "Push \u2014 Upper Strength (Bench + OHP)",
+      "reasoning": "Your May 20 session showed bench at 205\u00d73-4 @ RPE 9-10 and OHP 100\u00d77 @ RPE 7-8. Today we're backing off to sustainable volume: bench at 190lb for clean sets of 5 (same as May 10 where you hit RPE 7), and OHP at 95lb to lock in form without the grind. This respects the RPE 8 cap while building quality volume. Your e1RM supports heavier loads, but residency fatigue demands we prioritize bar speed and recovery.",
+      "warmup": "5min row or bike easy, then: 10 band pull-aparts, 10 scap push-ups, 5 empty bar bench press, 5 empty bar OHP. Ramp bench: 95\u00d75, 135\u00d75, 165\u00d73. Ramp OHP: 45\u00d75, 65\u00d73, 80\u00d72.",
       "mainWork": {
-        "summary": "2 main lifts · 4 accessories",
+        "summary": "2 main lifts \u00b7 4 accessories",
         "lifts": {
           "bench": {
             "sets": 4,
@@ -2936,7 +2936,7 @@
             "weight": 190,
             "targetRPE": 7.5,
             "variation": "Barbell Bench Press",
-            "coachNote": "Same load as May 10. Focus on bar path—straight vertical line over mid-chest to lockout. Every rep should move identically. If rep 4 slows noticeably, rack it and call the set."
+            "coachNote": "Same load as May 10. Focus on bar path\u2014straight vertical line over mid-chest to lockout. Every rep should move identically. If rep 4 slows noticeably, rack it and call the set."
           },
           "ohp": {
             "sets": 3,
@@ -2948,19 +2948,19 @@
           }
         },
         "accessories": [
-          "Incline DB Press 3×10 @ 50lb per hand (chest volume, control eccentric)",
-          "Cable Tricep Pushdown 3×12 @ moderate weight (pump, not failure)",
-          "DB Lateral Raise 3×15 @ 15-20lb (strict form, shoulders stay down)",
-          "Cable Face Pulls 3×15 @ light weight (rear delt health, external rotation focus)"
+          "Incline DB Press 3\u00d710 @ 50lb per hand (chest volume, control eccentric)",
+          "Cable Tricep Pushdown 3\u00d712 @ moderate weight (pump, not failure)",
+          "DB Lateral Raise 3\u00d715 @ 15-20lb (strict form, shoulders stay down)",
+          "Cable Face Pulls 3\u00d715 @ light weight (rear delt health, external rotation focus)"
         ]
       },
-      "cooldown": "Prone chest stretch on foam roller 2×30sec each side, doorway pec stretch 2×30sec, tricep overhead stretch 2×20sec each arm. Light dynamic shaking of arms.",
-      "coachNote": "Your bench e1RM is 232.5lb, so 190×5 should feel controlled—if you're grinding, you're going too heavy for a Thursday mid-residency week. Accessory work is time under tension, not PRs. Save your CNS for the main lifts. Sleep and nutrition are your limiters right now, not training stimulus.",
+      "cooldown": "Prone chest stretch on foam roller 2\u00d730sec each side, doorway pec stretch 2\u00d730sec, tricep overhead stretch 2\u00d720sec each arm. Light dynamic shaking of arms.",
+      "coachNote": "Your bench e1RM is 232.5lb, so 190\u00d75 should feel controlled\u2014if you're grinding, you're going too heavy for a Thursday mid-residency week. Accessory work is time under tension, not PRs. Save your CNS for the main lifts. Sleep and nutrition are your limiters right now, not training stimulus.",
       "ifTooHard": "Drop bench to 185lb and OHP to 90lb. Cut accessory work to 2 sets each. Skip face pulls if shoulder fatigue is high.",
       "watchOutFor": [
-        "Shoulder impingement on OHP—if you feel pinching at top lockout, widen grip 1 inch",
-        "Elbow flare on bench—keep elbows 45° from torso, not 90°",
-        "Rushing rest periods—take full 3min between main lift sets"
+        "Shoulder impingement on OHP\u2014if you feel pinching at top lockout, widen grip 1 inch",
+        "Elbow flare on bench\u2014keep elbows 45\u00b0 from torso, not 90\u00b0",
+        "Rushing rest periods\u2014take full 3min between main lift sets"
       ],
       "workoutType": "push",
       "durationMins": 90,
@@ -2971,12 +2971,12 @@
           "dow": "Fri",
           "suggestion": "Zone 2 Run (40min easy)",
           "confidence": "high",
-          "reason": "Active recovery day after push volume; strict MAF HR ≤147bpm to rebuild aerobic base"
+          "reason": "Active recovery day after push volume; strict MAF HR \u2264147bpm to rebuild aerobic base"
         },
         {
           "date": "2026-05-30",
           "dow": "Sat",
-          "suggestion": "Pull — Back & Biceps",
+          "suggestion": "Pull \u2014 Back & Biceps",
           "confidence": "high",
           "reason": "Barbell row progression to 135lb, weighted pull-ups, rear delt work; fresh legs after Friday easy run"
         },
@@ -2985,35 +2985,35 @@
           "dow": "Sun",
           "suggestion": "Long Zone 2 Run (60-75min)",
           "confidence": "high",
-          "reason": "Aerobic base builder at ≤147bpm; weekend allows focus on HR discipline without time pressure"
+          "reason": "Aerobic base builder at \u2264147bpm; weekend allows focus on HR discipline without time pressure"
         },
         {
           "date": "2026-06-01",
           "dow": "Mon",
-          "suggestion": "Legs — Squat Focus",
+          "suggestion": "Legs \u2014 Squat Focus",
           "confidence": "medium",
-          "reason": "Squat 4×5 @ 175lb, RDL 3×8, single-leg work; fresh from Sunday Zone 2"
+          "reason": "Squat 4\u00d75 @ 175lb, RDL 3\u00d78, single-leg work; fresh from Sunday Zone 2"
         },
         {
           "date": "2026-06-02",
           "dow": "Tue",
-          "suggestion": "Intervals (6×800m @ 5K pace)",
+          "suggestion": "Intervals (6\u00d7800m @ 5K pace)",
           "confidence": "medium",
           "reason": "Quality session with full recovery; fits 20% high-intensity protocol for VO2max development"
         },
         {
           "date": "2026-06-03",
           "dow": "Wed",
-          "suggestion": "Push — Volume Day",
+          "suggestion": "Push \u2014 Volume Day",
           "confidence": "high",
-          "reason": "Bench 4×6 @ 175lb, OHP 3×8 @ 85lb; hypertrophy rep ranges after Tuesday intervals"
+          "reason": "Bench 4\u00d76 @ 175lb, OHP 3\u00d78 @ 85lb; hypertrophy rep ranges after Tuesday intervals"
         },
         {
           "date": "2026-06-04",
           "dow": "Thu",
           "suggestion": "Zone 2 Run (45min) + Core",
           "confidence": "high",
-          "reason": "Easy aerobic work at ≤147bpm; 15min core circuit for trunk stability"
+          "reason": "Easy aerobic work at \u2264147bpm; 15min core circuit for trunk stability"
         }
       ]
     }
@@ -3025,32 +3025,32 @@
         "date": "2026-05-27",
         "workoutType": "push",
         "durationMins": 90,
-        "mainWorkSummary": "Bench 4×5 @ 190lb, OHP 3×5 @ 95lb, Barbell Row 4×6 @ 115lb, Pull-ups 4×max BW, accessories, then 30min Zone 2 run",
-        "coachNote": "Javier—your recent easy runs have been threshold efforts (165-171 HR). Today's run MUST stay ≤145bpm. Start slower than feels natural. This is the discipline that will unlock your sub-20 5K by building aerobic base. Track your pace—if you can hold 12:00/mi at 140 HR, that's progress. Residency fatigue is real; prioritize sleep tonight.",
+        "mainWorkSummary": "Bench 4\u00d75 @ 190lb, OHP 3\u00d75 @ 95lb, Barbell Row 4\u00d76 @ 115lb, Pull-ups 4\u00d7max BW, accessories, then 30min Zone 2 run",
+        "coachNote": "Javier\u2014your recent easy runs have been threshold efforts (165-171 HR). Today's run MUST stay \u2264145bpm. Start slower than feels natural. This is the discipline that will unlock your sub-20 5K by building aerobic base. Track your pace\u2014if you can hold 12:00/mi at 140 HR, that's progress. Residency fatigue is real; prioritize sleep tonight.",
         "flags": []
       },
       {
         "date": "2026-05-27",
         "workoutType": "pull",
         "durationMins": 90,
-        "mainWorkSummary": "2 main lifts · 4 accessories",
-        "coachNote": "Your rowing weight progression from 115lb to 135lb is appropriate given your deadlift base of 215lb. Focus on maintaining torso angle throughout the set—if you're bouncing the weight off your chest or jerking upright, reduce load by 10lb. Quality reps build the back, not ego lifting.",
+        "mainWorkSummary": "2 main lifts \u00b7 4 accessories",
+        "coachNote": "Your rowing weight progression from 115lb to 135lb is appropriate given your deadlift base of 215lb. Focus on maintaining torso angle throughout the set\u2014if you're bouncing the weight off your chest or jerking upright, reduce load by 10lb. Quality reps build the back, not ego lifting.",
         "flags": []
       },
       {
         "date": "2026-05-27",
         "workoutType": "push",
         "durationMins": 90,
-        "mainWorkSummary": "2 main lifts · 4 accessories",
-        "coachNote": "Your bench e1RM is 232.5lb, so today's 190lb for sets of 5 should feel controlled and crisp. The goal is pristine bar path and zero grind reps—every rep should look identical. If your lockout speed slows noticeably, rack it. Accessory work is about time under tension, not chasing weight. Residency stress is cumulative; this volume will stimulate growth without burying you for tomorrow.",
+        "mainWorkSummary": "2 main lifts \u00b7 4 accessories",
+        "coachNote": "Your bench e1RM is 232.5lb, so today's 190lb for sets of 5 should feel controlled and crisp. The goal is pristine bar path and zero grind reps\u2014every rep should look identical. If your lockout speed slows noticeably, rack it. Accessory work is about time under tension, not chasing weight. Residency stress is cumulative; this volume will stimulate growth without burying you for tomorrow.",
         "flags": []
       },
       {
         "date": "2026-05-28",
         "workoutType": "push",
         "durationMins": 90,
-        "mainWorkSummary": "2 main lifts · 4 accessories",
-        "coachNote": "Your bench e1RM is 232.5lb, so 190×5 should feel controlled—if you're grinding, you're going too heavy for a Thursday mid-residency week. Accessory work is time under tension, not PRs. Save your CNS for the main lifts. Sleep and nutrition are your limiters right now, not training stimulus.",
+        "mainWorkSummary": "2 main lifts \u00b7 4 accessories",
+        "coachNote": "Your bench e1RM is 232.5lb, so 190\u00d75 should feel controlled\u2014if you're grinding, you're going too heavy for a Thursday mid-residency week. Accessory work is time under tension, not PRs. Save your CNS for the main lifts. Sleep and nutrition are your limiters right now, not training stimulus.",
         "flags": []
       }
     ]
