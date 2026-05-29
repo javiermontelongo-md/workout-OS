@@ -1349,6 +1349,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
   </div>
   <div id="prog-today-card" class="prog-day-card prog-today" style="margin-bottom:12px;"></div>
+  <div id="prog-custom-card" style="display:none;margin-bottom:12px;"></div>
   <div id="prog-no-plan" style="display:none;padding:20px;text-align:center;">
     <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">Select workout type and duration above, then tap "Get Prescription".</div>
   </div>
@@ -3046,7 +3047,13 @@ function liftTrend(key, sessions, weeks = 4) {
 function buildAthleteContext() {
   const ts = evaluateTrainingStatus();
   const sevenDay = compute7DayMeans();
-  const lastCI = D.checkins?.slice(-1)[0] || {};
+  // lastCI: use most recent check-in, but cap at 2 days old
+  const _latestCI = D.checkins?.slice(-1)[0] || null;
+  const _ciAgeDays = _latestCI?.date
+    ? Math.floor((new Date(localDS(new Date())+'T12:00:00') - new Date(_latestCI.date+'T12:00:00')) / 86400000)
+    : null;
+  const lastCI = (_latestCI && _ciAgeDays !== null && _ciAgeDays <= 2) ? _latestCI : {};
+  const lastCIAge = (_latestCI && _ciAgeDays !== null && _ciAgeDays <= 2) ? _ciAgeDays : null;
   const lastHL = D.healthLogs?.slice(-1)[0] || {};
   const lastBody = D.bodyMetrics?.slice(-1)[0] || {};
   const blockWeek = detectBlockWeek();
@@ -3173,6 +3180,7 @@ function buildAthleteContext() {
       rpeConfirmations: (D.rpeConfirmations || []).slice(-20)
     },
     checkin: {
+      ageLabel:     lastCIAge === null ? 'no recent check-in (>2 days old or missing)' : lastCIAge === 0 ? 'today' : `${lastCIAge} day${lastCIAge > 1 ? 's' : ''} ago`,
       energy:       lastCI.energy       || null,
       sleep:        lastCI.sleepHours   ?? lastCI.sleep ?? lastHL.sleepHours ?? null,
       soreness:     lastCI.soreness     || null,
