@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-28",
+  "lastUpdated": "2026-05-29",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -78,11 +78,6 @@
       },
       "ohp": {
         "sets": [
-          {
-            "w": null,
-            "r": null,
-            "rpe": null
-          },
           {
             "w": 100,
             "r": 7,
@@ -2659,66 +2654,66 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-05-27T17:58:18.814Z",
-    "vo2maxUsed": 44.48,
-    "runCount": 23,
+    "generatedAt": "2026-05-29T04:04:32.204Z",
+    "vo2maxUsed": 42.09,
+    "runCount": 24,
     "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1734,
-        "ciSeconds": 295,
+        "seconds": 1721,
+        "ciSeconds": 293,
         "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3580,
-        "ciSeconds": 791,
+        "seconds": 3553,
+        "ciSeconds": 785,
         "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 7810,
-        "ciSeconds": 2257,
+        "seconds": 7747,
+        "ciSeconds": 2239,
         "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 16194,
-        "ciSeconds": 7158,
+        "seconds": 16058,
+        "ciSeconds": 7097,
         "method": "VO2max / VDOT"
       }
     },
-    "medianTrainingPace": 661.2,
+    "medianTrainingPace": 632.3275862068966,
     "debugInfo": {
       "riegelPred": {
-        "s5k": 2081,
-        "s10k": 4339,
-        "shalf": 9574,
-        "sfull": 19961,
+        "s5k": 1999,
+        "s10k": 4168,
+        "shalf": 9197,
+        "sfull": 19175,
         "anchor": {
-          "date": "2026-05-02",
-          "stravaId": 18353167787,
-          "name": "Ez run",
+          "date": "2026-05-26",
+          "stravaId": 18670031015,
+          "name": "Evening Run",
           "type": "run",
-          "distance": 2.5,
-          "duration": 1653,
-          "pace": 661,
-          "elevationGain": 94,
-          "heartRateAvg": 151.5,
-          "heartRateMax": 166,
+          "distance": 2.32,
+          "duration": 1467,
+          "pace": 631,
+          "elevationGain": 71,
+          "heartRateAvg": 172,
+          "heartRateMax": 187,
           "source": "strava",
-          "runType": "easy"
+          "runType": "intervals"
         },
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1482,
-        "s10k": 3084,
-        "shalf": 6768,
-        "sfull": 14196
+        "s5k": 1500,
+        "s10k": 3120,
+        "shalf": 6840,
+        "sfull": 14340
       },
       "hrPred": {
-        "s5k": 1841,
-        "s10k": 3683,
-        "shalf": 7770,
-        "sfull": 15540
+        "s5k": 1858,
+        "s10k": 3715,
+        "shalf": 7838,
+        "sfull": 15675
       },
       "weights": {
         "riegel": 0.3,
@@ -2726,7 +2721,7 @@
         "hr": 0.2
       },
       "vo2maxSource": "Apple Watch",
-      "medianPace": 661.2
+      "medianPace": 632.3275862068966
     }
   },
   "coachingLog": [
