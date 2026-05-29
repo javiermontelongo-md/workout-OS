@@ -2648,7 +2648,7 @@
       "sleepREM": null,
       "sleepLight": null,
       "sleepAwake": null,
-      "steps": 8,
+      "steps": 3,
       "exerciseMinutes": null,
       "walkingHR": null,
       "respiratoryRate": null,
@@ -2656,7 +2656,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-05-29T14:10:36.391Z",
+  "healthLastSync": "2026-05-29T19:27:54.325Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
