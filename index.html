@@ -1190,10 +1190,11 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-week-summary" id="cal-week-summary"></div>
   </div>
-  <div class="card" id="week-suggestions-card" style="margin-bottom:14px;">
-    <div class="lbl">7-day suggestions</div>
-    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · go to Program tab to regenerate</div>
-    <div id="week-suggestions"></div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="lbl">session history</div>
+    <div id="prog-sess-count" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;"></div>
+    <div id="prog-sess-rows"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">No sessions logged yet.</div></div>
+    <div id="prog-sess-nav"></div>
   </div>
 </div>
 
@@ -3205,7 +3206,7 @@ function buildAthleteContext() {
       mafHR:       ATHLETE.mafHR,
       hrvBaseline: ATHLETE.hrvBaseline,
       rhrBaseline: ATHLETE.rhrBaseline,
-      location:    'Kaiser San Francisco, CA (recently relocated from East Coast — still acclimating)',
+      location:    'Kaiser San Francisco, CA',
       schedule:    'Lift A Mon · Run Tue · Lift B Wed · Run Thu · Lift C Fri · Run Sat · Rest Sun',
       goals: {
         primary:       ATHLETE.goals.primary,
