@@ -140,13 +140,13 @@ async function main() {
 
   if (!data.runs) data.runs = [];
 
-  // 4. Process activities — only Run and Walk, skip weight training
+  // 4. Process activities — only Run, skip walks and weight training
   const existingIds = new Set(data.runs.map(r => r.stravaId));
   let newCount = 0;
 
   for (const activity of activities) {
     const type = activity.type || activity.sport_type || '';
-    if (!['Run', 'Walk'].includes(type)) continue;
+    if (type !== 'Run') continue;
 
     if (existingIds.has(activity.id)) continue;
 
