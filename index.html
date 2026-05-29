@@ -2710,7 +2710,7 @@ function handleDayCardClick(dateStr){
         type:stravaRun.name||'Run',
         runType:stravaRun.runType,
         dur:stravaRun.duration?Math.round(stravaRun.duration/60):null,
-        dist:stravaRun.distanceMi,
+        dist:stravaRun.distance||stravaRun.distanceMi,
         hr:stravaRun.heartRateAvg,
         hrMax:stravaRun.heartRateMax,
         pace:fmtPace(stravaRun.pace),
@@ -3090,7 +3090,7 @@ function buildAthleteContext() {
   // Recent runs — last 10
   const recentRuns = (D.runs || []).slice(-10).map(r => ({
     date: r.date, type: r.runType || r.type,
-    distanceMi: r.distanceMi,
+    distanceMi: r.distance || r.distanceMi,
     pace: r.paceMinkm || r.pace,
     hrAvg: r.heartRateAvg, hrMax: r.heartRateMax
   }));
@@ -3170,7 +3170,7 @@ function buildAthleteContext() {
       currentLifts:     D.currentLifts || {},
       recentSessions,
       recentRuns,
-      rpeConfirmations: (D.rpeLog || []).slice(-20)
+      rpeConfirmations: (D.rpeConfirmations || []).slice(-20)
     },
     checkin: {
       energy:       lastCI.energy       || null,
@@ -3251,32 +3251,15 @@ function getLiftHistory(liftKey,daysBack=60){
 function detectBlockWeek(){
   const labels=['Volume Accumulation','Strength Emphasis','Peak Intensity','Deload'];
   const sessions=D?.sessions||[];
-
   if(!sessions.length) return {weekNum:1,label:labels[0]};
 
+  // Anchor to the first ever logged session date and advance one phase per calendar week.
+  // Missed weeks still advance the phase — you're undertrained within that phase, not stuck.
+  // This keeps the cycle predictable regardless of attendance.
+  const firstDate=new Date(sessions[0].date+'T12:00:00');
   const now=new Date();
-  const cutoff14=new Date(now); cutoff14.setDate(now.getDate()-14);
-  const cutoff14Str=localDS(cutoff14);
-  const recentSessions=sessions.filter(s=>s.date>=cutoff14Str);
-
-  if(recentSessions.length<3){
-    return {weekNum:1,label:labels[0]};
-  }
-
-  const cutoff8w=new Date(now); cutoff8w.setDate(now.getDate()-56);
-  const cutoff8wStr=localDS(cutoff8w);
-
-  const weekSessionCounts={};
-  sessions.filter(s=>s.date>=cutoff8wStr&&s.day!=='rest').forEach(s=>{
-    const d=new Date(s.date+'T12:00:00');
-    const mon=new Date(d);
-    mon.setDate(d.getDate()-((d.getDay()+6)%7));
-    const key=localDS(mon);
-    weekSessionCounts[key]=(weekSessionCounts[key]||0)+1;
-  });
-
-  const activeWeeks=Object.values(weekSessionCounts).filter(c=>c>=2).length;
-  const idx=activeWeeks%4;
+  const weeksSinceStart=Math.floor((now-firstDate)/(7*24*60*60*1000));
+  const idx=weeksSinceStart%4;
   return {weekNum:idx+1,label:labels[idx]};
 }
 
