@@ -4856,7 +4856,7 @@ function renderSnapshotCharts(){
         maintainAspectRatio:false,
         plugins:{
           legend:{display:false},
-          tooltip:{callbacks:{label:ctx=>{if(ctx.dataset.label==='Sleep'){const v=ctx.parsed.y;const h=Math.floor(v);const m=Math.round((v-h)*60);return h+'h '+m+'m';}return null;}}}
+          tooltip:{filter:item=>item.raw!==null,callbacks:{label:ctx=>{if(ctx.dataset.label==='Sleep'){const v=ctx.parsed.y;const h=Math.floor(v);const m=Math.round((v-h)*60);return h+'h '+m+'m';}return null;}}}
         },
         scales:{
           x:{ticks:xTicks,grid:xGrid},
@@ -4901,7 +4901,7 @@ function renderSnapshotCharts(){
       options:{
         responsive:true,
         maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,filter:item=>item.raw!==null&&!item.dataset.label.includes('avg')}},
         scales:{
           x:{ticks:xTicks,grid:xGrid},
           ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.06)'}},
@@ -4948,7 +4948,7 @@ function renderSnapshotCharts(){
       options:{
         responsive:true,
         maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,filter:item=>item.raw!==null&&!item.dataset.label.includes('avg')}},
         scales:{
           x:{ticks:xTicks,grid:xGrid},
           yResting:{type:'linear',position:'left',min:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.15,3);return Math.floor(rMin-rPad);})(),max:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.15,3);return Math.ceil(rMax+rPad);})(),ticks:{color:'rgba(255,99,71,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.06)'}},
