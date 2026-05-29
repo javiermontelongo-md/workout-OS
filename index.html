@@ -3006,7 +3006,7 @@ function liftTrend(key, sessions, weeks = 4) {
   if (relevant.length < 2) return 'insufficient_data';
   const e1rms = relevant.map(s =>
     Math.max(...(s[key].sets || [])
-      .map(x => calcE1RM(x.weight, x.reps)))
+      .map(x => calcE1RM(x.w, x.r)))
   );
   const half = Math.ceil(e1rms.length / 2);
   const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -3061,10 +3061,10 @@ function buildAthleteContext() {
 
   // Recent runs — last 10
   const recentRuns = (D.runs || []).slice(-10).map(r => ({
-    date: r.date, type: r.type,
+    date: r.date, type: r.runType || r.type,
     distanceMi: r.distanceMi,
     pace: r.paceMinkm || r.pace,
-    hrAvg: r.hrAvg, hrMax: r.hrMax
+    hrAvg: r.heartRateAvg, hrMax: r.heartRateMax
   }));
 
   // 14-day schedule
@@ -3110,7 +3110,7 @@ function buildAthleteContext() {
           const _bestHRRun = (D.runs || [])
             .filter(r => r.heartRateAvg && (r.distanceMi || r.distance) >= 2)
             .slice(-1)[0];
-          return estimateVO2max(_bestHRRun) || lastHL.vo2max || null;
+          return estimateVO2max(_bestHRRun) || lastHL.vo2maxApple || null;
         })()
       }
     },
@@ -3127,12 +3127,12 @@ function buildAthleteContext() {
     },
     biometrics: {
       todayHRV:    lastHL.hrv       || null,
-      todayRHR:    lastHL.rhr       || null,
-      todayTemp:   lastHL.wristTemp || null,
-      sevenDayHRV: sevenDay.hrv    || null,
-      sevenDayRHR: sevenDay.rhr    || null,
+      todayRHR:    lastHL.restingHR  || null,
+      todayTemp:   lastHL.wristTemp  || null,
+      sevenDayHRV: sevenDay.hrv     || null,
+      sevenDayRHR: sevenDay.rhr     || null,
       todaySleep:  lastCI.sleepHours ?? lastCI.sleep ?? lastHL.sleepHours ?? null,
-      vo2max:      lastHL.vo2max    || estimateVO2max()
+      vo2max:      lastHL.vo2maxApple || estimateVO2max()
     },
     training: {
       blockWeek,
@@ -4045,7 +4045,7 @@ async function generatePostRunFeedback(targetDate) {
 function compute7DayMeans(){
   const logs=D.healthLogs||[];
   const today=new Date();
-  const cutoff=new Date(today); cutoff.setDate(today.getDate()-7);
+  const cutoff=new Date(today); cutoff.setDate(today.getDate()-6);
   const cutoffStr=localDS(cutoff);
   const recent=logs.filter(l=>l.date>=cutoffStr);
   const hrv7d=recent.filter(l=>l.hrv).map(l=>l.hrv);
@@ -4062,7 +4062,8 @@ function evaluateTrainingStatus(){
   const latest=logs[logs.length-1]||{};
   const means=compute7DayMeans();
   const checkins=D.checkins||[];
-  const todayCI=checkins[checkins.length-1]||{};
+  const todayStr=localDS(new Date());
+  const todayCI=checkins.slice().reverse().find(c=>c.date===todayStr)||{};
 
   const flags=[];
   let canTrain=true,canDoQuality=true,canDoHeavyLifts=true;
@@ -4639,15 +4640,15 @@ async function saveCheckin(){
   const motivation=+document.getElementById('ci-motivation').value;
   const stress=+document.getElementById('ci-stress').value;
   const sleepInput=document.getElementById('ci-sleep-input')?.value;
-  const sleepHours=parseSleepHHMM(sleepInput);
-  const sleep=sleepHours||7;
-  const fatigueScore=calcFatigue(energy,sleep,soreness,motivation,stress);
+  const sleepHours=parseSleepHHMM(sleepInput)||null;
+  const sleepForFatigue=sleepHours||7;
+  const fatigueScore=calcFatigue(energy,sleepForFatigue,soreness,motivation,stress);
   const weightLbs=parseFloat(document.getElementById('ci-weight')?.value)||null;
   const waistInches=parseFloat(document.getElementById('ci-waist')?.value)||null;
   if(!D.checkins)D.checkins=[];
   const existing=D.checkins.findIndex(c=>c.date===today);
-  const entry={date:today,energy,sleep,soreness,motivation,stress,fatigueScore,postCall:document.getElementById('ci-postcall-btn')?.textContent?.trim()==='Yes'};
-  if(sleepHours)entry.sleepHours=sleepHours;
+  const entry={date:today,energy,soreness,motivation,stress,fatigueScore,postCall:document.getElementById('ci-postcall-btn')?.textContent?.trim()==='Yes'};
+  if(sleepHours!=null){entry.sleepHours=sleepHours;entry.sleep=sleepHours;}
   if(existing>=0)D.checkins[existing]=entry;else D.checkins.push(entry);
   if(weightLbs||waistInches){
     if(!D.bodyMetrics)D.bodyMetrics=[];
