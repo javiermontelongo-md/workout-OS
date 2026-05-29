@@ -13,12 +13,13 @@ function getMetric(metrics, name) {
   return m.data[0];
 }
 
+// Strict date match — no fallback to data[0].
+// Avoids cross-date contamination when a payload covers multiple days.
 function getMetricForDate(metrics, name, targetDate) {
   const m = metrics.find(x => x.name === name);
   if (!m || !m.data || m.data.length === 0) return null;
-  // Prefer entry matching target date, fall back to first entry
   const match = m.data.find(d => (d.date || '').startsWith(targetDate));
-  return match || m.data[0];
+  return match || null;
 }
 
 function getQty(metrics, name) {
@@ -33,6 +34,96 @@ function getQtyForDate(metrics, name, targetDate) {
   if (!entry || entry.qty === undefined || entry.qty === null) return null;
   const val = parseFloat(entry.qty);
   return isNaN(val) ? null : val;
+}
+
+// Sum all qty values for a metric on a given date.
+// Handles both summarized payloads (single entry = daily total already) and
+// unsummarized payloads (many per-minute entries, e.g. step_count from "Today").
+function getSumQtyForDate(metrics, name, targetDate) {
+  const m = metrics.find(x => x.name === name);
+  if (!m || !m.data || m.data.length === 0) return null;
+  const entries = m.data.filter(d => (d.date || '').startsWith(targetDate));
+  if (entries.length === 0) return null;
+  const sum = entries.reduce((acc, e) => {
+    const v = parseFloat(e.qty);
+    return acc + (isNaN(v) ? 0 : v);
+  }, 0);
+  return sum > 0 ? sum : null;
+}
+
+// Extract all distinct calendar dates (YYYY-MM-DD) found across all metrics.
+// Works for single-day ("Since Last Sync") and multi-day ("Last N Days") payloads.
+function getAllDates(metrics) {
+  const dateSet = new Set();
+  for (const metric of metrics) {
+    if (!metric.data) continue;
+    for (const entry of metric.data) {
+      const raw = entry.date || entry.inBedStart || '';
+      const m = raw.match(/(\d{4}-\d{2}-\d{2})/);
+      if (m) dateSet.add(m[1]);
+    }
+  }
+  return Array.from(dateSet).sort();
+}
+
+// Build one day's health log entry from the full metrics array.
+// Each metric lookup is scoped to targetDate, so this works correctly
+// whether the payload has 1 day or 7 days worth of data.
+function buildEntryForDate(metrics, date) {
+  // Sleep — HAE files sleep under the session START date (the night you went
+  // to bed), not the wake-up date. So sleep ending morning of May 29 is
+  // dated May 28, and will be found when processing the May 28 entry.
+  const sleepEntry = getMetricForDate(metrics, 'sleep_analysis', date);
+  const sleepHoursRaw = sleepEntry ? (sleepEntry.totalSleep || sleepEntry.asleep || null) : null;
+  const sleepHours = sleepHoursRaw !== null
+    ? Math.min(Math.round(sleepHoursRaw * 10) / 10, 14)
+    : null;
+  const sleepDeep  = sleepEntry ? (sleepEntry.deep || null) : null;
+  const sleepREM   = sleepEntry ? (sleepEntry.rem  || null) : null;
+  const sleepLight = sleepEntry ? (sleepEntry.core || null) : null;
+  const sleepAwakeRaw = sleepEntry ? (sleepEntry.awake || null) : null;
+  const sleepAwake = sleepAwakeRaw !== null
+    ? Math.round(sleepAwakeRaw * 10) / 10
+    : null;
+
+  // Wrist temp: convert °F → delta °C
+  const wristTempRaw = getQtyForDate(metrics, 'apple_sleeping_wrist_temperature', date);
+  const wristTemp = wristTempRaw !== null
+    ? Math.round((wristTempRaw - 98.6) * (5 / 9) * 100) / 100
+    : null;
+
+  // Steps: SUM all entries for this date.
+  // With Summarize Data ON + completed day → single entry, sum = that value.
+  // With in-progress "Today" sync → many per-minute entries, sum = running total.
+  const stepsRaw = getSumQtyForDate(metrics, 'step_count', date);
+  const steps = stepsRaw !== null ? Math.round(stepsRaw) : null;
+
+  // Exercise minutes: also accumulates; sum handles both cases
+  const exerciseRaw = getSumQtyForDate(metrics, 'apple_exercise_time', date);
+  const exerciseMinutes = exerciseRaw !== null ? Math.round(exerciseRaw) : null;
+
+  // Walking HR: daily average, single-point metric
+  const walkingHRRaw = getQtyForDate(metrics, 'walking_heart_rate_average', date);
+  const walkingHR = walkingHRRaw !== null ? Math.round(walkingHRRaw) : null;
+
+  return {
+    date,
+    restingHR:     getQtyForDate(metrics, 'resting_heart_rate', date),
+    hrv:           getQtyForDate(metrics, 'heart_rate_variability_sdnn', date)
+                   ?? getQtyForDate(metrics, 'heart_rate_variability', date),
+    wristTemp,
+    sleepHours,
+    sleepDeep,
+    sleepREM,
+    sleepLight,
+    sleepAwake,
+    steps,
+    exerciseMinutes,
+    walkingHR,
+    respiratoryRate: getQtyForDate(metrics, 'respiratory_rate', date),
+    vo2maxApple:   getQtyForDate(metrics, 'vo2_max', date),
+    source: 'apple_health'
+  };
 }
 
 async function main() {
@@ -55,69 +146,37 @@ async function main() {
   // Support both HAE format { data: { metrics: [...] } } and legacy flat object
   const isHAE = payload && payload.data && Array.isArray(payload.data.metrics);
 
-  let entry;
+  const entries = [];
 
   if (isHAE) {
     console.log('Detected HAE format');
     const metrics = payload.data.metrics;
-    // Extract date from first metric's data array, fall back to today
-    let date = payload.date || null;
-    if (!date) {
-      const firstMetric = metrics.find(m => m.data && m.data.length > 0);
-      if (firstMetric) {
-        const rawDate = firstMetric.data[0].date || '';
-        const dateMatch = rawDate.match(/(\d{4}-\d{2}-\d{2})/);
-        if (dateMatch) date = dateMatch[1];
-      }
+
+    // Discover all distinct dates in the payload.
+    // Single-day payloads ("Since Last Sync") produce one date.
+    // Multi-day payloads ("Last 2 Days", "Last 7 Days") produce multiple dates.
+    let dates = getAllDates(metrics);
+    if (dates.length === 0) {
+      dates = [payload.date || localDateStr(new Date())];
     }
-    if (!date) date = localDateStr(new Date());
+    console.log(`Dates in payload: ${dates.join(', ')}`);
 
-    // Sleep
-    const sleepEntry = getMetric(metrics, 'sleep_analysis');
-    const sleepHoursRaw = sleepEntry ? (sleepEntry.totalSleep || sleepEntry.asleep || null) : null;
-    const sleepHours = sleepHoursRaw !== null
-      ? Math.min(Math.round(sleepHoursRaw * 10) / 10, 14)
-      : null;
-    const sleepDeep = sleepEntry ? (sleepEntry.deep || null) : null;
-    const sleepREM = sleepEntry ? (sleepEntry.rem || null) : null;
-    const sleepLight = sleepEntry ? (sleepEntry.core || null) : null;
-    // HAE sends awake time directly; inBed is often 0 so don't compute from it
-    const sleepAwakeRaw = sleepEntry ? (sleepEntry.awake || null) : null;
-    const sleepAwake = sleepAwakeRaw !== null
-      ? Math.round(sleepAwakeRaw * 10) / 10
-      : null;
+    for (const date of dates) {
+      const entry = buildEntryForDate(metrics, date);
 
-    // Wrist temp: match target date, then convert °F → delta °C
-    const wristTempRaw = getQtyForDate(metrics, 'apple_sleeping_wrist_temperature', date);
-    const wristTemp = wristTempRaw !== null
-      ? Math.round((wristTempRaw - 98.6) * (5 / 9) * 100) / 100
-      : null;
+      // Skip dates that had absolutely no data in the payload
+      const hasAnyData = Object.entries(entry)
+        .filter(([k]) => k !== 'date' && k !== 'source')
+        .some(([, v]) => v !== null && v !== undefined);
 
-    // Steps: round to integer (HAE sends raw float from merged sources)
-    const stepsRaw = getQty(metrics, 'step_count');
-    const steps = stepsRaw !== null ? Math.round(stepsRaw) : null;
+      if (!hasAnyData) {
+        console.log(`Skipping ${date} — all metrics null for this date`);
+        continue;
+      }
 
-    // Walking HR: round to integer
-    const walkingHRRaw = getQty(metrics, 'walking_heart_rate_average');
-    const walkingHR = walkingHRRaw !== null ? Math.round(walkingHRRaw) : null;
-
-    entry = {
-      date,
-      restingHR: getQty(metrics, 'resting_heart_rate'),
-      hrv: getQty(metrics, 'heart_rate_variability_sdnn') ?? getQty(metrics, 'heart_rate_variability'),
-      wristTemp,
-      sleepHours,
-      sleepDeep,
-      sleepREM,
-      sleepLight,
-      sleepAwake,
-      steps,
-      exerciseMinutes: getQty(metrics, 'apple_exercise_time'),
-      walkingHR,
-      respiratoryRate: getQty(metrics, 'respiratory_rate'),
-      vo2maxApple: getQty(metrics, 'vo2_max'),
-      source: 'apple_health'
-    };
+      console.log(`Extracted entry for ${date}:`, JSON.stringify(entry));
+      entries.push(entry);
+    }
 
   } else {
     // Legacy Shortcut flat format — keep old regex parser as fallback
@@ -152,26 +211,29 @@ async function main() {
       ? Math.round((wristTempRaw - 98.6) * (5 / 9) * 100) / 100
       : null;
 
-    entry = {
+    entries.push({
       date,
-      restingHR: extractSimpleNumber(raw, 'restingHR'),
-      hrv: extractSimpleNumber(raw, 'hrv'),
+      restingHR:     extractSimpleNumber(raw, 'restingHR'),
+      hrv:           extractSimpleNumber(raw, 'hrv'),
       wristTemp,
       sleepHours,
-      sleepDeep: null,
-      sleepREM: null,
-      sleepLight: null,
-      sleepAwake: null,
-      steps: Math.round(extractSimpleNumber(raw, 'steps') ?? 0) || null,
+      sleepDeep:     null,
+      sleepREM:      null,
+      sleepLight:    null,
+      sleepAwake:    null,
+      steps:         Math.round(extractSimpleNumber(raw, 'steps') ?? 0) || null,
       exerciseMinutes: extractSimpleNumber(raw, 'exerciseMinutes'),
-      walkingHR: Math.round(extractSimpleNumber(raw, 'walkingHR') ?? 0) || null,
+      walkingHR:     Math.round(extractSimpleNumber(raw, 'walkingHR') ?? 0) || null,
       respiratoryRate: extractSimpleNumber(raw, 'respiratoryRate'),
-      vo2maxApple: extractSimpleNumber(raw, 'vo2max'),
+      vo2maxApple:   extractSimpleNumber(raw, 'vo2max'),
       source: 'apple_health'
-    };
+    });
   }
 
-  console.log('Extracted entry:', JSON.stringify(entry));
+  if (entries.length === 0) {
+    console.log('No entries to upsert — nothing changed');
+    process.exit(0);
+  }
 
   const dataPath = './data.json';
   let data = {};
@@ -183,23 +245,25 @@ async function main() {
 
   if (!data.healthLogs) data.healthLogs = [];
 
-  const existingIdx = data.healthLogs.findIndex(h => h.date === entry.date);
-  if (existingIdx >= 0) {
-    // Merge: never wipe a field that was already recorded just because this
-    // sync doesn't have it (e.g. morning sleep sync followed by evening
-    // activity sync — both cover the same date with different non-null fields).
-    const existing = data.healthLogs[existingIdx];
-    const merged = { ...existing };
-    for (const [key, val] of Object.entries(entry)) {
-      if (val !== null && val !== undefined) {
-        merged[key] = val;
+  for (const entry of entries) {
+    const existingIdx = data.healthLogs.findIndex(h => h.date === entry.date);
+    if (existingIdx >= 0) {
+      // Merge: never wipe a field that was already recorded just because this
+      // sync doesn't have it (e.g. morning sleep sync followed by evening
+      // activity sync — both cover the same date with different non-null fields).
+      const existing = data.healthLogs[existingIdx];
+      const merged = { ...existing };
+      for (const [key, val] of Object.entries(entry)) {
+        if (val !== null && val !== undefined) {
+          merged[key] = val;
+        }
       }
+      data.healthLogs[existingIdx] = merged;
+      console.log(`Merged health log for ${entry.date}`);
+    } else {
+      data.healthLogs.push(entry);
+      console.log(`Added health log for ${entry.date}`);
     }
-    data.healthLogs[existingIdx] = merged;
-    console.log(`Merged health log for ${entry.date}`);
-  } else {
-    data.healthLogs.push(entry);
-    console.log(`Added health log for ${entry.date}`);
   }
 
   data.healthLogs.sort((a, b) => a.date.localeCompare(b.date));
