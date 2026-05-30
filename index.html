@@ -5059,13 +5059,13 @@ function renderSnapshotCharts(){
   }
 
   // ── STEPS + EXERCISE + CALORIES CHART ──
-  const stepsData=dates.map(date=>hlMap[date]?.steps||null);
-  const exerciseData=dates.map(date=>hlMap[date]?.exerciseMinutes||null);
-  const activeCalData=dates.map(date=>hlMap[date]?.activeCalories||null);
+  const stepsData=dates.map(date=>hlMap[date]?.steps??null);
+  const exerciseData=dates.map(date=>hlMap[date]?.exerciseMinutes??null);
+  const activeCalData=dates.map(date=>hlMap[date]?.activeCalories??null);
   // 30-day avgs
-  const stepsData30=dates30.map(date=>hlMap[date]?.steps||null);
-  const exerciseData30=dates30.map(date=>hlMap[date]?.exerciseMinutes||null);
-  const activeCalData30=dates30.map(date=>hlMap[date]?.activeCalories||null);
+  const stepsData30=dates30.map(date=>hlMap[date]?.steps??null);
+  const exerciseData30=dates30.map(date=>hlMap[date]?.exerciseMinutes??null);
+  const activeCalData30=dates30.map(date=>hlMap[date]?.activeCalories??null);
   const validSteps30=stepsData30.filter(v=>v!==null);
   const validExercise30=exerciseData30.filter(v=>v!==null);
   const validActiveCal30=activeCalData30.filter(v=>v!==null);
@@ -5093,8 +5093,8 @@ function renderSnapshotCharts(){
           {label:'Steps 30d avg',data:avgSteps?dates.map(()=>avgSteps):[],borderColor:'rgba(0,212,255,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySteps'},
           {label:'Exercise min',data:exerciseData,borderColor:'rgba(168,85,247,0.85)',backgroundColor:'rgba(168,85,247,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
           {label:'Exercise 30d avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'},
-          {label:'Active kcal',data:activeCalData,borderColor:'rgba(251,146,60,0.85)',backgroundColor:'rgba(251,146,60,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
-          {label:'Active kcal 30d avg',data:avgActiveCal?dates.map(()=>avgActiveCal):[],borderColor:'rgba(251,146,60,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'}
+          {label:'Active kcal',data:activeCalData,borderColor:'rgba(251,146,60,0.85)',backgroundColor:'rgba(251,146,60,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yCalories'},
+          {label:'Active kcal 30d avg',data:avgActiveCal?dates.map(()=>avgActiveCal):[],borderColor:'rgba(251,146,60,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yCalories'}
         ]
       },
       options:{
@@ -5104,7 +5104,8 @@ function renderSnapshotCharts(){
         scales:{
           x:{ticks:xTicks,grid:xGrid},
           ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.06)'}},
-          yExercise:{type:'linear',position:'right',min:0,ticks:{color:'rgba(168,85,247,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=100?v+'kcal':v+'m';}},grid:{display:false}}
+          yExercise:{type:'linear',position:'right',min:0,display:exerciseData.some(v=>v!==null),ticks:{color:'rgba(168,85,247,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v+'m';}},grid:{display:false}},
+          yCalories:{type:'linear',position:'right',min:0,offset:true,display:activeCalData.some(v=>v!==null),ticks:{color:'rgba(251,146,60,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v+'kcal';}},grid:{display:false}}
         }
       }
     });
