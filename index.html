@@ -46,8 +46,8 @@
   --fs-presc-text: 13px;
   --fs-presc-lift: 13px;
   /* Small UI text — controls all inline tiny text; overridden by small-text slider */
-  --fs-xs: 10px;
-  --fs-sm: 12px;
+  --fs-xs: 19px;
+  --fs-sm: 22px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -1661,8 +1661,8 @@ input[type=range]::-webkit-slider-thumb:hover {
         <label style="margin:0;">Small text size</label>
         <span style="font-family:var(--mono);color:var(--a);"><span id="small-text-lbl">12</span>px</span>
       </div>
-      <input type="range" id="small-text-range" min="9" max="22" value="12" oninput="setSmallTextSize(this.value)">
-      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:5px;"><span>9 tiny</span><span>22 large</span></div>
+      <input type="range" id="small-text-range" min="22" max="30" value="22" oninput="setSmallTextSize(this.value)">
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:5px;"><span>22 min</span><span>30 large</span></div>
     </div>
 
     <div style="margin-bottom:8px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);">
@@ -2051,7 +2051,7 @@ function setSmallTextSize(px){
   const rng=document.getElementById('small-text-range');if(rng)rng.value=px;
 }
 function _applySmallTextSize(px){
-  const xs=Math.max(9,Math.round(+px*0.85));
+  const xs=Math.max(18,Math.round(+px*0.85));
   document.documentElement.style.setProperty('--fs-xs',xs+'px');
   document.documentElement.style.setProperty('--fs-sm',px+'px');
 }
@@ -2079,7 +2079,7 @@ function applyFontPreset(px){
   });
   // scale small text proportionally with the preset
   const smallPx=Math.round(12*(+px/19));
-  setSmallTextSize(Math.max(9,Math.min(22,smallPx)));
+  setSmallTextSize(Math.max(22,Math.min(30,smallPx)));
   _applyComponentFontSizes();
   _applyMobileComponentFontSizes();
   _syncFontPresetBtns(px);
@@ -5020,8 +5020,11 @@ function renderSnapshotCharts(){
       <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(0,212,255,0.85);">── Steps (L)</span>
         <span style="color:rgba(168,85,247,0.85);">── Exercise min (R)</span>
-        <span style="color:rgba(251,146,60,0.85);">── Active kcal (R)</span>
         <span>- - 30d avg</span>
+      </div>
+      <div style="margin-top:14px;">
+        <div style="font-family:var(--mono);font-size:11px;color:rgba(251,146,60,0.7);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Active kcal</div>
+        <div style="position:relative;height:72px;"><canvas id="snap-calories-chart"></canvas></div>
       </div>
     </div>
     <div style="margin-bottom:28px;">
@@ -5125,9 +5128,7 @@ function renderSnapshotCharts(){
           {label:'Steps',data:stepsData,borderColor:'rgba(0,212,255,0.85)',backgroundColor:'rgba(0,212,255,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySteps'},
           {label:'Steps 30d avg',data:avgSteps?dates.map(()=>avgSteps):[],borderColor:'rgba(0,212,255,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySteps'},
           {label:'Exercise min',data:exerciseData,borderColor:'rgba(168,85,247,0.85)',backgroundColor:'rgba(168,85,247,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
-          {label:'Exercise 30d avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'},
-          {label:'Active kcal',data:activeCalData,borderColor:'rgba(251,146,60,0.85)',backgroundColor:'rgba(251,146,60,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yCalories'},
-          {label:'Active kcal 30d avg',data:avgActiveCal?dates.map(()=>avgActiveCal):[],borderColor:'rgba(251,146,60,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yCalories'}
+          {label:'Exercise 30d avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'}
         ]
       },
       options:{
@@ -5137,8 +5138,47 @@ function renderSnapshotCharts(){
         scales:{
           x:{ticks:xTicks,grid:xGrid},
           ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.06)'}},
-          yExercise:{type:'linear',position:'right',min:0,display:exerciseData.some(v=>v!==null),ticks:{color:'rgba(168,85,247,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v+'m';}},grid:{display:false}},
-          yCalories:{type:'linear',position:'right',min:0,offset:true,display:activeCalData.some(v=>v!==null),ticks:{color:'rgba(251,146,60,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v+'kcal';}},grid:{display:false}}
+          yExercise:{type:'linear',position:'right',min:0,ticks:{color:'rgba(168,85,247,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v+'m';}},grid:{display:false}}
+        }
+      }
+    });
+  }
+
+  // ── ACTIVE CALORIES BAR CHART ──
+  const calCtx=document.getElementById('snap-calories-chart')?.getContext('2d');
+  if(calCtx){
+    const calValuePlugin={
+      id:'calValueLabels',
+      afterDraw(chart){
+        const ctx=chart.ctx;
+        chart.getDatasetMeta(0).data.forEach((bar,i)=>{
+          const v=chart.data.datasets[0].data[i];
+          if(v==null) return;
+          ctx.save();
+          ctx.fillStyle='rgba(251,146,60,0.75)';
+          ctx.font='600 11px DM Mono,monospace';
+          ctx.textAlign='center';
+          ctx.textBaseline='top';
+          ctx.fillText(Math.round(v),bar.x,chart.chartArea.bottom+4);
+          ctx.restore();
+        });
+      }
+    };
+    new Chart(calCtx,{
+      type:'bar',
+      data:{
+        labels:dates,
+        datasets:[{label:'Active kcal',data:activeCalData,backgroundColor:'rgba(251,146,60,0.35)',borderColor:'rgba(251,146,60,0.75)',borderWidth:1.5,borderRadius:3}]
+      },
+      plugins:[calValuePlugin],
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        layout:{padding:{bottom:20}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y+' kcal'}}},
+        scales:{
+          x:{display:false},
+          y:{display:false,min:0}
         }
       }
     });
