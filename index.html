@@ -1394,6 +1394,39 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · tap "Get Prescription" to regenerate</div>
     <div id="week-suggestions"></div>
   </div>
+
+  <!-- ── AI FLOW DIAGRAM ── -->
+  <div class="card" id="ai-flow-card" style="margin-top:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div class="lbl" style="margin:0;">how prescriptions work</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);">tap any node to explore</div>
+    </div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:18px;">Every time you hit "Get Prescription", all of the inputs below are assembled and sent to Claude in a single call. The AI reads everything simultaneously and returns the outputs on the right.</div>
+
+    <!-- 3-column grid: inputs | engine | outputs -->
+    <div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:0;align-items:start;" id="afd-grid">
+
+      <!-- ── LEFT: INPUTS ── -->
+      <div style="display:flex;flex-direction:column;gap:7px;padding-right:8px;" id="afd-inputs"></div>
+
+      <!-- ── CENTER: AI ENGINE ── -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding-top:4px;" id="afd-center">
+        <div id="afd-engine" style="background:linear-gradient(135deg,rgba(104,112,200,0.25),rgba(160,102,212,0.18));border:1.5px solid rgba(104,112,200,0.55);border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .2s;width:72px;" onclick="afdShowDetail('engine')">
+          <div style="font-size:18px;margin-bottom:4px;">🤖</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--a);text-transform:uppercase;letter-spacing:.04em;line-height:1.4;">Claude<br>Sonnet<br>4.5</div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--t3);margin-top:4px;">2,500<br>tokens</div>
+        </div>
+        <!-- animated flow arrows drawn by JS -->
+        <div id="afd-arrows" style="position:relative;width:72px;"></div>
+      </div>
+
+      <!-- ── RIGHT: OUTPUTS ── -->
+      <div style="display:flex;flex-direction:column;gap:7px;padding-left:8px;" id="afd-outputs"></div>
+    </div>
+
+    <!-- ── DETAIL PANEL ── -->
+    <div id="afd-detail" style="display:none;margin-top:18px;background:var(--s2);border:1px solid var(--b2);border-radius:12px;padding:16px;"></div>
+  </div>
 </div>
 
 <!-- v2026-05-22 -->
@@ -2500,7 +2533,7 @@ function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
   else if(n==='week'){ }
   else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); }
-  else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); }
+  else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); renderAIFlowDiagram(); }
 }
 
 // ============================================================
@@ -5313,6 +5346,463 @@ function setBodyChart(type){
     if(btn)btn.style.opacity=t===type?'1':'0.5';
   });
   renderBodyChart(type);
+}
+
+// ─────────────────────────────────────────────────────────────
+// AI FLOW DIAGRAM
+// ─────────────────────────────────────────────────────────────
+function renderAIFlowDiagram(){
+  const inputsEl=document.getElementById('afd-inputs');
+  const outputsEl=document.getElementById('afd-outputs');
+  if(!inputsEl||!outputsEl)return;
+
+  // ── INPUT NODE DEFINITIONS ──────────────────────────────────
+  const inputs=[
+    {
+      id:'biometrics',
+      icon:'📡',
+      label:'Biometrics',
+      sublabel:'Apple Watch · daily sync',
+      color:'rgba(56,189,248,0.85)',
+      bg:'rgba(56,189,248,0.08)',
+      border:'rgba(56,189,248,0.35)',
+      detail(){
+        const hl=(D.healthLogs||[]).slice(-1)[0]||{};
+        const hl7=(D.healthLogs||[]).slice(-7);
+        const mean7=(arr,key)=>{const v=arr.map(x=>x[key]).filter(Number.isFinite);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length*10)/10:null;};
+        const hrv7=mean7(hl7,'hrv'), rhr7=mean7(hl7,'restingHR');
+        const rows=[
+          ['HRV (today)', hl.hrv?hl.hrv.toFixed(1)+' ms':'—', `Baseline: ${ATHLETE.hrvBaseline} ms. Overnight SDNN from Apple Watch. The AI uses this vs your 7-day rolling mean to detect recovery crashes.`],
+          ['HRV (7d mean)', hrv7?hrv7+' ms':'—', 'Used as the denominator for HRV crash detection. If today < 80% of this, quality and heavy work are blocked.'],
+          ['Resting HR (today)', hl.restingHR?hl.restingHR+' bpm':'—', `Baseline: ${ATHLETE.rhrBaseline} bpm. If today is >8 bpm above 7d mean, quality work is blocked.`],
+          ['Resting HR (7d mean)', rhr7?rhr7+' bpm':'—', 'Rolling context for RHR spike detection.'],
+          ['Wrist Temp', hl.wristTemp!=null?hl.wristTemp.toFixed(2)+'°C delta':'—', 'Delta from 98.6°F baseline. If ≥ +1.5°C, fever signal fires — all training blocked. Normal range: −2 to −0.5°C.'],
+          ['Sleep (latest)', hl.sleepHours?hl.sleepHours+'h':'—', 'Time asleep (not in bed). If < 5h, heavy + quality work blocked. If 5–6.5h, volume reduced and RPE capped at 7.'],
+          ['VO₂max estimate', hl.vo2maxApple?hl.vo2maxApple.toFixed(1)+' ml/kg/min':'—', 'Apple Watch weekly estimate. Also computed from pace+HR on runs ≥2 mi. Informs run prescription intensity.'],
+          ['Sleep stages', hl.sleepDeep?`Deep ${hl.sleepDeep.toFixed(1)}h · REM ${(hl.sleepREM||0).toFixed(1)}h · Light ${(hl.sleepLight||0).toFixed(1)}h`:'—', 'Available from Health Auto Export (HAE) since May 2026. Not yet used by the AI — future use for recovery quality scoring.'],
+          ['Resp Rate', hl.respiratoryRate?Math.round(hl.respiratoryRate*10)/10+' br/min':'—', 'Overnight respiratory rate from Apple Watch. Normal: 12–20. Shown in recovery snapshot; not yet a hard-rule trigger.'],
+        ];
+        return{title:'📡 Biometrics — Apple Watch via HAE',desc:'Your Apple Watch writes health data to Apple Health. The Health Auto Export (HAE) app fires a webhook to GitHub Actions on every sync (usually 2–4×/day). The health-sync.js script parses the JSON and upserts one entry per day into data.json.',rows};
+      }
+    },
+    {
+      id:'hardrules',
+      icon:'🔒',
+      label:'Hard Rules Engine',
+      sublabel:'28 deterministic rules · runs before AI',
+      color:'rgba(194,77,114,0.9)',
+      bg:'rgba(194,77,114,0.08)',
+      border:'rgba(194,77,114,0.35)',
+      detail(){
+        const ts=evaluateTrainingStatus();
+        const flagDesc={
+          POST_CALL:'You toggled "Post-call / no sleep" in today\'s check-in. All structured training blocked — walk ≤30 min at HR <100 only.',
+          FEVER_SIGNAL:'Wrist temp ≥ +1.5°C above baseline. Rest only — no training.',
+          SLEEP_BLOCK:'Sleep < 5h. No quality or heavy lifts. RPE capped at 6, volume at 80%.',
+          HRV_ACUTE_CRASH:'Today\'s HRV is < 80% of 7-day mean. Quality + heavy work blocked. RPE cap 6, volume 75%.',
+          HRV_WARNING:'Today\'s HRV is 80–90% of 7-day mean. RPE cap 7, volume 85%.',
+          RHR_SPIKE:'Resting HR > 8 bpm above 7-day mean. Quality work blocked, RPE cap 7, volume 85%.',
+          SLEEP_WARNING:'Sleep 5–6.5h. RPE cap 7, volume 85%.',
+          DELOAD_WEEK:'Block week 4 — automatic deload. No quality, volume at 60%, RPE cap 6.',
+        };
+        const rows=[
+          ['Can Train', ts.canTrain?'✅ Yes':'🚫 No', 'If false, only restorative activity (walking, stretching) is prescribed.'],
+          ['Can Do Quality', ts.canDoQuality?'✅ Yes':'🚫 No', 'Quality = tempo runs, intervals, hard effort work. Blocked by HRV crash, RHR spike, sleep < 5h, deload week.'],
+          ['Can Lift Heavy', ts.canDoHeavyLifts?'✅ Yes':'🚫 No', 'Heavy = >80% e1RM, high RPE sets. Blocked by same signals as quality.'],
+          ['RPE Cap', ts.liftRPECap+' / 10', 'AI is instructed never to prescribe sets above this RPE. Normally 8; reduced to 6–7 on warning flags.'],
+          ['Volume Modifier', Math.round(ts.volumeModifier*100)+'%', 'Multiplied against planned sets/reps. 100% = full load. 60% = deload week. 75–85% = warning flags.'],
+          ['Stress Score', ts.stressScore+' / 3', '0 = green. 1 = one warning flag. 2 = multiple warnings. 3 = hard block (POST_CALL, FEVER, etc).'],
+          ['Active Flags', ts.activeFlags.length?ts.activeFlags.join(', '):'None today 🟢', ts.activeFlags.map(f=>flagDesc[f]||f).join(' ') || 'All systems clear.'],
+          ['MAF HR', ts.mafHR+' bpm', '180 − age (28) − modifier (5) = 147. The AI uses this as the aerobic ceiling for easy runs and zone 2 cardio.'],
+        ];
+        return{title:'🔒 Hard Rules Engine — runs before AI sees anything',desc:'This is a deterministic (no AI) rule engine that runs first. It evaluates your biometrics and check-in, fires flags, and then constrains what the AI is allowed to prescribe. The AI cannot override these limits — they are enforced in the system prompt as hard instructions.',rows};
+      }
+    },
+    {
+      id:'checkin',
+      icon:'📋',
+      label:'Daily Check-In',
+      sublabel:'you fill this in each day',
+      color:'rgba(42,160,112,0.9)',
+      bg:'rgba(42,160,112,0.08)',
+      border:'rgba(42,160,112,0.35)',
+      detail(){
+        const today=localDS(new Date());
+        const ci=(D.checkins||[]).slice().reverse().find(c=>c.date===today)||{};
+        const avg7=(key)=>{const vals=(D.checkins||[]).slice(-7).map(c=>c[key]).filter(Number.isFinite);return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*10)/10:null;};
+        const rows=[
+          ['Energy', ci.energy!=null?ci.energy+' / 10':'— (not entered today)', 'Scale 1–10. Feeds into fatigue score and modulates AI tone + intensity recommendations.'],
+          ['Soreness', ci.soreness!=null?ci.soreness+' / 10':'—', 'Muscle soreness 1–10. High soreness → AI shifts toward accessory work, longer warmup.'],
+          ['Motivation', ci.motivation!=null?ci.motivation+' / 10':'—', 'Subjective motivation 1–10. AI adjusts prescription framing and optional volume.'],
+          ['Stress', ci.stress!=null?ci.stress+' / 10':'—', 'Life/work stress 1–10. Combined with sleep and energy for the overall fatigue score.'],
+          ['Sleep (today)', ci.sleepHours!=null?ci.sleepHours+'h':'—', 'Entered in HH:MM format. Overrides Apple Watch sleep if entered. Feeds hard rules engine.'],
+          ['Fatigue Score', ci.fatigueScore!=null?ci.fatigueScore+' / 10':'—', 'Computed from energy, sleep, soreness, motivation, stress. ≥8 triggers RPE cap + volume reduction.'],
+          ['Post-Call Flag', ci.postCall?'🚨 ON — all training blocked':'Off', 'One-tap flag for call shifts or total sleep loss. Instantly fires POST_CALL hard block.'],
+          ['7d avg energy', avg7('energy')!=null?avg7('energy')+' / 10':'—', 'Rolling 7-day average of your energy scores. AI uses this to distinguish acute dips from chronic fatigue.'],
+          ['7d avg sleep', avg7('sleepHours')!=null?avg7('sleepHours')+'h':'—', 'Rolling average sleep. AI references this to flag if you\'re consistently under-sleeping.'],
+          ['Check-in age', '', 'Only check-ins from the last 2 days are used. If yours is older, the AI notes the gap explicitly.'],
+        ];
+        return{title:'📋 Daily Check-In — subjective state',desc:'Filled in on the TODAY tab. The AI compares your subjective report against your objective biometrics — if they diverge (e.g., HRV is fine but you feel terrible), the AI weighs the subjective report more heavily for intensity decisions.',rows};
+      }
+    },
+    {
+      id:'lifthistory',
+      icon:'💪',
+      label:'Lift History',
+      sublabel:'last 8 sessions · e1RM · trends',
+      color:'rgba(104,112,200,0.9)',
+      bg:'rgba(104,112,200,0.08)',
+      border:'rgba(104,112,200,0.35)',
+      detail(){
+        const liftKeys=['bench','ohp','pullup','row','squat','dl'];
+        const liftLabels={bench:'Bench Press',ohp:'Overhead Press',pullup:'Pullups',row:'Barbell Row',squat:'Squat',dl:'Deadlift'};
+        const bw=(()=>{const bk=detectBlockWeek();return bk;})();
+        const bp=getBlockParams(bw.weekNum);
+        const rows=[
+          ...liftKeys.map(k=>{
+            const best=D.currentLifts?.[k+'E1RM']||D.currentLifts?.[k]||0;
+            const trend=(()=>{try{return liftTrend(k,D.sessions);}catch(e){return'—';}})();
+            return[liftLabels[k],best?best+'lb e1RM':'—',`Trend: ${trend}. The AI uses this to calculate today's working weight (typically 75–85% of e1RM).`];
+          }),
+          ['Block Week', bw.weekNum+' of 4', 'A 4-week progressive overload cycle. Week 4 is always a deload. Resets if fewer than 3 sessions in 14 days.'],
+          ['Block Params', `${bp.sets}×${bp.reps} @ RPE ${bp.targetRPE}`, 'Sets × reps × target RPE for this block week. Week 1 = volume base. Week 3 = intensity peak.'],
+          ['Last 8 sessions', (D.sessions||[]).length+' total logged', 'Sent as structured log: date, type, and per-set weight×reps@RPE for all 6 lifts + accessories.'],
+          ['RPE Confirmations', (D.rpeConfirmations||[]).length+' total', 'After each session you can confirm actual RPE vs prescribed. The AI uses the last 20 to calibrate future weight recommendations.'],
+          ['Clean pullups (max)', D.currentLifts?.pullups||'—', 'Live-computed from bodyweight-only sets. Used to scale pullup prescriptions.'],
+        ];
+        return{title:'💪 Lift History — 6 compound movements tracked',desc:'Every logged session is stored with full per-set detail (weight × reps @ RPE). The AI receives the last 8 sessions and your current e1RM bests for all 6 lifts, plus trend direction computed deterministically before the AI sees anything.',rows};
+      }
+    },
+    {
+      id:'runhistory',
+      icon:'🏃',
+      label:'Run History',
+      sublabel:'last 10 runs via Strava',
+      color:'rgba(42,160,112,0.9)',
+      bg:'rgba(42,160,112,0.07)',
+      border:'rgba(42,160,112,0.3)',
+      detail(){
+        const runs=(D.runs||[]).slice(-5);
+        const rows=[
+          ...runs.map(r=>[r.date,(r.distanceMi||r.distance||0).toFixed(2)+'mi @ '+(r.paceMinkm||r.pace||'—'),`Type: ${r.runType||r.type||'—'} · Avg HR: ${r.heartRateAvg||'—'} bpm · Max HR: ${r.heartRateMax||'—'} bpm`]),
+          ['Total runs logged', (D.runs||[]).length+'', 'All runs stored. AI receives last 10.'],
+          ['Run types', 'easy · tempo · intervals · long · moderate', 'The AI uses run type distribution to assess training load balance for polarized 80/20 approach.'],
+          ['Strava sync', D.stravaLastSync?'Last: '+D.stravaLastSync.split('T')[0]:'Not synced', 'Runs come from Strava via GitHub Actions. Manual logging also supported on LOG SESSION tab.'],
+        ];
+        return{title:'🏃 Run History — last 10 runs from Strava',desc:'Run data flows from Strava → GitHub Actions → data.json. Each run includes distance (mi), pace (min/mi), avg and max heart rate, elevation gain, and run type. The AI uses this to prescribe appropriate run type, pace target, and HR ceiling.',rows};
+      }
+    },
+    {
+      id:'profile',
+      icon:'🎯',
+      label:'Athlete Profile',
+      sublabel:'your constants + goals',
+      color:'rgba(255,183,77,0.9)',
+      bg:'rgba(255,183,77,0.07)',
+      border:'rgba(255,183,77,0.3)',
+      detail(){
+        const lastBody=(D.bodyMetrics||[]).slice(-1)[0]||{};
+        const rows=[
+          ['Age', ATHLETE.age+' years', 'Used to compute MAF HR (180 − 28 − 5 = 147 bpm aerobic ceiling).'],
+          ['Weight', (lastBody.weightLbs||ATHLETE.weightLbs)+'lb', 'Latest from body metrics log, falls back to profile constant. Used for relative strength calculations.'],
+          ['Height', ATHLETE.heightInches+'" (5\'10")', 'Used for BMI and waist-to-height ratio.'],
+          ['MAF HR', ATHLETE.mafHR+' bpm', '180 − age − mafModifier. This is the maximum HR for zone 2 / easy runs. AI is instructed to keep easy runs below this.'],
+          ['HRV Baseline', ATHLETE.hrvBaseline+'ms', '95-day Apple Watch average (Feb–May 2026). The hard rules engine computes today\'s HRV as a % of this baseline.'],
+          ['RHR Baseline', ATHLETE.rhrBaseline+' bpm', '95-day average. Used as reference for RHR spike detection (+8 bpm triggers quality block).'],
+          ['Primary Goal', ATHLETE.goals.primary, 'Shapes all AI decisions — run prescriptions favor sub-20 5K pace progression.'],
+          ['Secondary Goal', ATHLETE.goals.secondary, 'VO2max development through polarized training.'],
+          ['Training Approach', 'Polarized 80/20', '80% of runs at easy/zone 2 intensity, 20% quality (tempo/intervals). AI applies this ratio to weekly suggestions.'],
+          ['Training Block', 'Mon Lift A · Tue Run · Wed Lift B · Thu Run · Fri Lift C · Sat Run · Sun Rest', 'Default weekly structure the AI uses to generate 14-day schedule context.'],
+        ];
+        return{title:'🎯 Athlete Profile — your constants',desc:'These values are hardcoded in the app (the ATHLETE constant). They provide stable reference points that don\'t fluctuate day-to-day, unlike biometrics. The AI uses them as anchors when interpreting your current data.',rows};
+      }
+    },
+    {
+      id:'coachmem',
+      icon:'🧠',
+      label:'Coaching Memory',
+      sublabel:'compressed from past prescriptions',
+      color:'rgba(160,102,212,0.9)',
+      bg:'rgba(160,102,212,0.07)',
+      border:'rgba(160,102,212,0.3)',
+      detail(){
+        const mem=D.coachingMemory||{};
+        const noteCount=(mem.notes||[]).length;
+        const compressed=mem.compressed;
+        const rows=[
+          ['Notes stored', noteCount+' / 15 before compression', 'After each prescription, a structured observation note is saved. When 15 accumulate, they\'re compressed by Claude into the summary below.'],
+          ['Lift trend pattern', compressed?.liftTrends||'—', 'Compressed summary of strength trajectory across multiple training blocks.'],
+          ['Run fitness pattern', compressed?.runFitnessPattern||'—', 'How your running fitness has evolved — pace, HR, distance trends.'],
+          ['Recovery pattern', compressed?.recoveryPattern||'—', 'Observations about how your HRV, RHR, and sleep typically respond to training load.'],
+          ['Injury flags', compressed?.injuryFlags||'None noted', 'Any persistent pain or movement restrictions flagged in past prescriptions.'],
+          ['Responds best to', compressed?.respondsBestTo||'—', 'Training stimuli that have historically produced your best adaptations.'],
+          ['Compressed through', compressed?.compressedThrough||'—', 'Date through which notes were compressed. Newer notes exist as raw entries above.'],
+        ];
+        return{title:'🧠 Coaching Memory — accumulated prescription history',desc:'Every prescription generates a structured observation note (date, workout type, key observations, coaching points). Once 15 notes accumulate, Claude compresses them into a structured summary that travels with every future AI call. This is how the AI "remembers" your training history without hitting token limits.',rows};
+      }
+    },
+    {
+      id:'request',
+      icon:'📅',
+      label:'Your Request',
+      sublabel:'workout type + duration',
+      color:'rgba(255,99,71,0.9)',
+      bg:'rgba(255,99,71,0.07)',
+      border:'rgba(255,99,71,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const cached=D.dailyPrescriptions?.[today];
+        const rows=[
+          ['Workout Type', 'Push · Pull · Legs · Run · Cycling · Rest', 'You select this from the dropdown. Determines which lift pattern (upper push, back/biceps, lower body) or cardio modality is prescribed.'],
+          ['Duration', '30 · 60 · 90 min', 'The AI scales volume and exercise count to fit the time. 30 min = trimmed main work + quick warmup. 90 min = full program with accessories.'],
+          ['Today\'s date', today, 'Sent explicitly so the AI knows the day of week and can reference your training schedule.'],
+          ['Last prescription', cached?cached.workoutType+' · '+cached.durationMins+'min · '+cached.generatedAt?.split('T')[0]:'None today', 'Cached to avoid redundant API calls. Same type + duration re-uses the cache.'],
+          ['14-day schedule', 'Mon A · Tue Run · Wed B · Thu Run · Fri C · Sat Run · Sun Rest × 2', 'The AI sees a 2-week look-ahead so the 7-day suggestions it generates are consistent with your planned structure.'],
+        ];
+        return{title:'📅 Your Request — what you asked for',desc:'The simplest input — just two dropdowns. But combined with all other context, it tells the AI which muscle groups to target, how much volume fits the time window, and what cardio variables to specify.',rows};
+      }
+    },
+  ];
+
+  // ── OUTPUT NODE DEFINITIONS ──────────────────────────────────
+  const outputs=[
+    {
+      id:'out-reasoning',
+      icon:'💭',
+      label:'Reasoning',
+      sublabel:'why this session',
+      color:'rgba(104,112,200,0.85)',
+      bg:'rgba(104,112,200,0.08)',
+      border:'rgba(104,112,200,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const p=D.dailyPrescriptions?.[today];
+        return{title:'💭 Reasoning — AI rationale',desc:'A 1–3 sentence explanation of why the AI chose this specific prescription. References your biometrics, recent training load, and goals. Shown at the top of the prescription card.',rows:[
+          ['Example', p?.reasoning||'(generate a prescription to see)',''],
+        ]};
+      }
+    },
+    {
+      id:'out-warmup',
+      icon:'🔥',
+      label:'Warmup + Cooldown',
+      sublabel:'dynamic movements + recovery',
+      color:'rgba(255,183,77,0.85)',
+      bg:'rgba(255,183,77,0.07)',
+      border:'rgba(255,183,77,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const p=D.dailyPrescriptions?.[today];
+        return{title:'🔥 Warmup & Cooldown',desc:'Specific warm-up movements tailored to the workout type. Push day gets shoulder/chest activation; leg day gets hip + ankle mobility. Cooldown includes targeted static stretches. Both are scaled to available time.',rows:[
+          ['Warmup', p?.warmup||'(generate a prescription to see)',''],
+          ['Cooldown', p?.cooldown||'—',''],
+        ]};
+      }
+    },
+    {
+      id:'out-mainwork',
+      icon:'🏋️',
+      label:'Main Work',
+      sublabel:'lifts or cardio prescription',
+      color:'rgba(42,160,112,0.85)',
+      bg:'rgba(42,160,112,0.07)',
+      border:'rgba(42,160,112,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const p=D.dailyPrescriptions?.[today];
+        const mw=p?.mainWork;
+        let rows=[];
+        if(mw?.lifts){
+          Object.entries(mw.lifts).forEach(([k,v])=>{
+            if(v)rows.push([k.charAt(0).toUpperCase()+k.slice(1),typeof v==='object'?`${v.sets||'?'}×${v.reps||'?'} @ ${v.weight||'?'}lb RPE ${v.rpe||'?'}`:v,'Working weight derived from your e1RM × intensity% for this block week.']);
+          });
+        } else if(mw){
+          rows=[
+            ['Main Set', mw.mainSet||'—',''],
+            ['Distance', mw.totalDistance?mw.totalDistance+' mi':'—',''],
+            ['Pace Target', mw.paceTarget||'—',''],
+            ['HR Ceiling', mw.hrCeiling?mw.hrCeiling+' bpm':'—','Based on MAF HR or workout intensity zone.'],
+            ['Effort', mw.effort||'—',''],
+          ];
+        } else {
+          rows=[['Status','Generate a prescription to see live values','']];
+        }
+        return{title:'🏋️ Main Work — the core prescription',desc:'For strength days: per-lift prescription with working weight (calculated from e1RM × block week intensity %), sets, reps, and target RPE. For run/cycling: main set structure, total distance, pace target, and HR ceiling. The AI cannot exceed the RPE cap or volume modifier set by the hard rules engine.',rows};
+      }
+    },
+    {
+      id:'out-accessories',
+      icon:'🎒',
+      label:'Accessories',
+      sublabel:'3–5 support exercises',
+      color:'rgba(56,189,248,0.85)',
+      bg:'rgba(56,189,248,0.07)',
+      border:'rgba(56,189,248,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const p=D.dailyPrescriptions?.[today];
+        const acc=p?.accessories||[];
+        const rows=acc.length?acc.map(a=>[a.name,`${a.sets||'?'}×${a.reps||'?'}`,a.note||'']):
+          [['Status','Generate a prescription to see live accessories','']];
+        return{title:'🎒 Accessories — support work',desc:'3–5 accessory exercises chosen to complement the main work. Push day gets triceps, rear delts, cable work. Pull day gets face pulls, curls. Legs gets Nordic curls, single-leg work. Volume is scaled by the block week and any active fatigue flags.',rows};
+      }
+    },
+    {
+      id:'out-coachnote',
+      icon:'📌',
+      label:'Coach Note + Warnings',
+      sublabel:'key insight · if too hard · watch out for',
+      color:'rgba(194,77,114,0.85)',
+      bg:'rgba(194,77,114,0.07)',
+      border:'rgba(194,77,114,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const p=D.dailyPrescriptions?.[today];
+        return{title:'📌 Coach Note + Safety Warnings',desc:'Three distinct outputs the AI generates to guide and protect the session.',rows:[
+          ['Coach Note', p?.coachNote||'(generate to see)', 'The most important thing to focus on today. Shown with a colored left border in the prescription card.'],
+          ['If Too Hard', p?.ifTooHard||'—', 'Specific modifications if the prescribed weights feel too heavy. Amber warning banner.'],
+          ['Watch Out For', (p?.watchOutFor||[]).join(' · ')||'—', 'A checklist of injury risks, form cues, or recovery signals specific to today\'s session.'],
+        ]};
+      }
+    },
+    {
+      id:'out-weekplan',
+      icon:'📆',
+      label:'7-Day Suggestions',
+      sublabel:'confidence · reasoning per day',
+      color:'rgba(160,102,212,0.85)',
+      bg:'rgba(160,102,212,0.07)',
+      border:'rgba(160,102,212,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const p=D.dailyPrescriptions?.[today];
+        const wp=p?.weekPlan||[];
+        const rows=wp.length?wp.map(d=>[d.date+' '+d.dow,d.suggestion+' — '+(d.confidence||'').toUpperCase(),d.reason||'']):
+          [['Status','Generate a prescription to see week plan','']];
+        return{title:'📆 7-Day Suggestions — full week plan',desc:'Generated alongside today\'s prescription in the same API call. Each day gets a workout suggestion with HIGH / MEDIUM / LOW confidence and a one-line reason. Confidence reflects how certain the AI is given your current fatigue state and training schedule. Shown in the 7-Day Suggestions card above.',rows};
+      }
+    },
+  ];
+
+  // ── RENDER NODES ──────────────────────────────────────────────
+  function nodeHTML(n, side){
+    return `<div class="afd-node" data-id="${n.id}" onclick="afdShowDetail('${n.id}')"
+      style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:all .18s;background:${n.bg};border:1px solid ${n.border};">
+      <span style="font-size:14px;flex-shrink:0;">${n.icon}</span>
+      <div style="min-width:0;">
+        <div style="font-family:var(--mono);font-size:11px;color:${n.color};font-weight:600;line-height:1.3;">${n.label}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${n.sublabel}</div>
+      </div>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--t3);flex-shrink:0;">${side==='input'?'›':''}</div>
+    </div>`;
+  }
+
+  inputsEl.innerHTML=inputs.map(n=>nodeHTML(n,'input')).join('');
+  outputsEl.innerHTML=outputs.map(n=>nodeHTML(n,'output')).join('');
+
+  // ── CONNECTING LINES (SVG) ─────────────────────────────────────
+  // Drawn after a tick so we can measure positions
+  setTimeout(()=>{
+    const grid=document.getElementById('afd-grid');
+    const engine=document.getElementById('afd-engine');
+    const inNodes=document.querySelectorAll('#afd-inputs .afd-node');
+    const outNodes=document.querySelectorAll('#afd-outputs .afd-node');
+    if(!grid||!engine||!inNodes.length)return;
+    const gridR=grid.getBoundingClientRect();
+    const engR=engine.getBoundingClientRect();
+    const engCX=engR.left-gridR.left+engR.width/2;
+    const engCY=engR.top-gridR.top+engR.height/2;
+    let svgH=gridR.height;
+    let lines='';
+    inNodes.forEach(n=>{
+      const r=n.getBoundingClientRect();
+      const nx=r.right-gridR.left;
+      const ny=r.top-gridR.top+r.height/2;
+      const mx=(nx+engR.left-gridR.left)/2;
+      lines+=`<path d="M${nx},${ny} C${mx},${ny} ${mx},${engCY} ${engR.left-gridR.left},${engCY}" stroke="rgba(104,112,200,0.2)" stroke-width="1.5" fill="none" stroke-dasharray="4,3"/>`;
+    });
+    outNodes.forEach(n=>{
+      const r=n.getBoundingClientRect();
+      const nx=r.left-gridR.left;
+      const ny=r.top-gridR.top+r.height/2;
+      const mx=(nx+engR.right-gridR.left)/2;
+      lines+=`<path d="M${engR.right-gridR.left},${engCY} C${mx},${engCY} ${mx},${ny} ${nx},${ny}" stroke="rgba(160,102,212,0.2)" stroke-width="1.5" fill="none" stroke-dasharray="4,3"/>`;
+    });
+    const existing=document.getElementById('afd-svg');
+    if(existing)existing.remove();
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.id='afd-svg';
+    svg.style.cssText=`position:absolute;top:0;left:0;width:100%;height:${svgH}px;pointer-events:none;overflow:visible;`;
+    svg.innerHTML=lines;
+    grid.style.position='relative';
+    grid.appendChild(svg);
+  },80);
+
+  // ── DETAIL DATA MAP ────────────────────────────────────────────
+  window._afdNodes=[...inputs,...outputs];
+  window._afdNodes.push({
+    id:'engine',
+    detail(){
+      return{
+        title:'🤖 Claude Sonnet 4.5 — the AI engine',
+        desc:'All inputs are assembled into a single system prompt (~800–1200 tokens of context) and sent to Claude in one API call (max 2500 output tokens). The AI returns a structured JSON object that the app parses and renders. There is no streaming — the full prescription arrives at once.',
+        rows:[
+          ['Model','claude-sonnet-4-5','Anthropic\'s latest performance model as of May 2026. Balances speed, cost, and reasoning quality.'],
+          ['System prompt','~900 tokens typical','Contains your full athlete context — biometrics, training history, goals, hard rules. Rebuilt fresh on every call.'],
+          ['Max output tokens','2,500','Enough for a full prescription + 7-day plan with reasoning per day.'],
+          ['Response format','Strict JSON','The AI is instructed to return a specific JSON schema. The app JSON.parses the response and renders it — any deviation causes an error.'],
+          ['Hard rule enforcement','In system prompt','The hard rules engine output (RPE cap, volume modifier, active flags) is written verbatim into the system prompt as explicit constraints.'],
+          ['Coaching memory','Summarized','If you have 15+ past prescriptions, a compressed summary travels with every call. This is how the AI "remembers" without re-reading all history.'],
+          ['Calls per prescription','1','Single API call generates both today\'s prescription and the 7-day plan. No chaining.'],
+        ]
+      };
+    }
+  });
+}
+
+function afdShowDetail(nodeId){
+  const node=window._afdNodes?.find(n=>n.id===nodeId);
+  const panel=document.getElementById('afd-detail');
+  if(!node||!panel)return;
+
+  // Highlight active node
+  document.querySelectorAll('.afd-node').forEach(n=>{
+    n.style.opacity=n.dataset.id===nodeId?'1':'0.55';
+    n.style.transform=n.dataset.id===nodeId?'scale(1.02)':'scale(1)';
+  });
+  if(nodeId==='engine'){
+    const eng=document.getElementById('afd-engine');
+    if(eng){eng.style.background='linear-gradient(135deg,rgba(104,112,200,0.4),rgba(160,102,212,0.3))';eng.style.borderColor='rgba(104,112,200,0.9)';}
+  }
+
+  const d=node.detail();
+  const rowsHTML=(d.rows||[]).map(([label,val,desc])=>`
+    <div style="padding:10px 0;border-bottom:1px solid rgba(104,110,210,0.12);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:${desc?'4px':'0'};">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t2);flex-shrink:0;min-width:120px;">${label}</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t);text-align:right;">${val||'—'}</div>
+      </div>
+      ${desc?`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.5;">${desc}</div>`:''}
+    </div>`).join('');
+
+  panel.style.display='block';
+  panel.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-family:var(--mono);font-size:13px;color:var(--t);font-weight:600;">${d.title}</div>
+      <button onclick="afdCloseDetail()" style="background:transparent;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;">✕</button>
+    </div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px;padding:10px;background:var(--s3);border-radius:8px;">${d.desc}</div>
+    <div>${rowsHTML}</div>
+  `;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function afdCloseDetail(){
+  const panel=document.getElementById('afd-detail');
+  if(panel)panel.style.display='none';
+  document.querySelectorAll('.afd-node').forEach(n=>{n.style.opacity='1';n.style.transform='scale(1)';});
+  const eng=document.getElementById('afd-engine');
+  if(eng){eng.style.background='linear-gradient(135deg,rgba(104,112,200,0.25),rgba(160,102,212,0.18))';eng.style.borderColor='rgba(104,112,200,0.55)';}
 }
 
 </script>
