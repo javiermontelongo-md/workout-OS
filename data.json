@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-29",
+  "lastUpdated": "2026-05-30",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -2709,29 +2709,29 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-05-29T04:04:32.204Z",
-    "vo2maxUsed": 42.09,
+    "generatedAt": "2026-05-30T14:53:31.004Z",
+    "vo2maxUsed": 42.605000000000004,
     "runCount": 24,
     "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1721,
-        "ciSeconds": 293,
+        "seconds": 1810,
+        "ciSeconds": 308,
         "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3553,
-        "ciSeconds": 785,
+        "seconds": 3731,
+        "ciSeconds": 825,
         "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 7747,
-        "ciSeconds": 2239,
+        "seconds": 8144,
+        "ciSeconds": 2354,
         "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 16058,
-        "ciSeconds": 7097,
+        "seconds": 16874,
+        "ciSeconds": 7458,
         "method": "VO2max / VDOT"
       }
     },
@@ -2759,10 +2759,10 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1500,
-        "s10k": 3120,
-        "shalf": 6840,
-        "sfull": 14340
+        "s5k": 1678,
+        "s10k": 3476,
+        "shalf": 7635,
+        "sfull": 15972
       },
       "hrPred": {
         "s5k": 1858,
@@ -3054,6 +3054,101 @@
           "reason": "Easy aerobic work at ≤147bpm; 15min core circuit for trunk stability"
         }
       ]
+    },
+    "2026-05-30": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "reasoning": "Your May 20th push showed bench at 205×3-4 at RPE 9-10, which exceeded the RPE 8 cap and indicated you went too heavy. Pulling back to 190lb for sets of 5 aligns with your e1RM of 232.5lb and should yield controlled, quality reps at RPE 7-8. OHP at 100×7 was appropriate; today we'll use 100lb for 5-rep sets to build strength in a lower rep range while respecting the RPE ceiling.",
+      "warmup": "5min bike or row easy, then: empty bar bench 2×10, 95lb×8, 135lb×5, 165lb×3; empty bar OHP 2×8, 65lb×5, 80lb×3. Band pull-aparts 2×15, shoulder dislocates with PVC 2×10.",
+      "mainWork": {
+        "summary": "2 main lifts · 4 accessories",
+        "lifts": {
+          "bench": {
+            "sets": 4,
+            "reps": 5,
+            "weight": 190,
+            "targetRPE": 8,
+            "variation": "Barbell Bench Press",
+            "coachNote": "Bar path should track straight over mid-chest to lockout. Every rep should look identical—no grinding. If rep 5 slows noticeably, rack it and adjust weight next session."
+          },
+          "ohp": {
+            "sets": 3,
+            "reps": 5,
+            "weight": 100,
+            "targetRPE": 8,
+            "variation": "Barbell Strict OHP",
+            "coachNote": "Brace hard, glutes tight, zero knee drive. Bar path tight to face on ascent. If you're leaning back excessively, drop to 95lb."
+          }
+        },
+        "accessories": [
+          "Incline DB Press 3×8-10 @ RPE 7 (upper chest volume)",
+          "Cable Tricep Pushdown 3×12 @ RPE 7 (elbow health, control eccentric)",
+          "DB Lateral Raise 3×12-15 @ RPE 7 (strict form, no momentum)",
+          "Overhead Tricep Extension 3×10-12 @ RPE 7 (long head emphasis)"
+        ]
+      },
+      "cooldown": "Static stretch: doorway pec stretch 2×30s each side, tricep overhead stretch 2×30s, cross-body shoulder stretch 2×30s. Foam roll upper back if tight.",
+      "coachNote": "You exceeded RPE cap on May 20th bench—today's load is deliberately conservative to rebuild pristine movement quality. Residency fatigue compounds fast; hitting RPE 8 with flawless reps builds more strength than grinding RPE 10. Accessory work is about time under tension, not chasing weight.",
+      "ifTooHard": "Drop bench to 185lb and OHP to 95lb. Cut accessories to 2 sets each. Residency weeks vary—adapt the stimulus to your recovery capacity today.",
+      "watchOutFor": [
+        "Shoulder discomfort on bench—if present, widen grip slightly or reduce ROM with board press",
+        "Lower back arching excessively on OHP—cue glute squeeze and slight posterior pelvic tilt"
+      ],
+      "workoutType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-05-30T15:24:19.425Z",
+      "weekPlan": [
+        {
+          "date": "2026-05-31",
+          "dow": "Sun",
+          "suggestion": "Rest or 30min Zone 2 run ≤147bpm",
+          "confidence": "high",
+          "reason": "Active recovery day post-push; if running, pace must be slow enough to stay under MAF ceiling"
+        },
+        {
+          "date": "2026-06-01",
+          "dow": "Mon",
+          "suggestion": "Pull — Upper Strength (60min)",
+          "confidence": "high",
+          "reason": "48h recovery from push complete; deadlift or row emphasis with pullup volume"
+        },
+        {
+          "date": "2026-06-02",
+          "dow": "Tue",
+          "suggestion": "Easy run 40min Zone 2 ≤147bpm",
+          "confidence": "high",
+          "reason": "Aerobic base building; 24h+ post-pull allows easy running without interference"
+        },
+        {
+          "date": "2026-06-03",
+          "dow": "Wed",
+          "suggestion": "Legs — Lower Strength (60min)",
+          "confidence": "high",
+          "reason": "Squat focus day; 48h recovery window from last lower session maintained"
+        },
+        {
+          "date": "2026-06-04",
+          "dow": "Thu",
+          "suggestion": "Tempo run or intervals (45min)",
+          "confidence": "medium",
+          "reason": "Quality run session for VO2max stimulus; 24h post-legs, allows 48h before next quality effort"
+        },
+        {
+          "date": "2026-06-05",
+          "dow": "Fri",
+          "suggestion": "Push — Upper Strength (60min)",
+          "confidence": "high",
+          "reason": "48h+ recovery from Wednesday legs; bench and OHP progression"
+        },
+        {
+          "date": "2026-06-06",
+          "dow": "Sat",
+          "suggestion": "Long run 60-75min Zone 2 ≤147bpm",
+          "confidence": "high",
+          "reason": "Aerobic volume day; 48h post-legs, 72h since last quality run maintains recovery windows"
+        }
+      ]
     }
   },
   "coachingMemory": {
@@ -3089,6 +3184,14 @@
         "durationMins": 90,
         "mainWorkSummary": "2 main lifts · 4 accessories",
         "coachNote": "Your bench e1RM is 232.5lb, so 190×5 should feel controlled—if you're grinding, you're going too heavy for a Thursday mid-residency week. Accessory work is time under tension, not PRs. Save your CNS for the main lifts. Sleep and nutrition are your limiters right now, not training stimulus.",
+        "flags": []
+      },
+      {
+        "date": "2026-05-30",
+        "workoutType": "push",
+        "durationMins": 60,
+        "mainWorkSummary": "2 main lifts · 4 accessories",
+        "coachNote": "You exceeded RPE cap on May 20th bench—today's load is deliberately conservative to rebuild pristine movement quality. Residency fatigue compounds fast; hitting RPE 8 with flawless reps builds more strength than grinding RPE 10. Accessory work is about time under tension, not chasing weight.",
         "flags": []
       }
     ]
