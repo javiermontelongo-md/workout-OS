@@ -1262,9 +1262,20 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="lbl" style="margin:0;">running trajectory</div>
     </div>
     <div id="run-metrics-summary" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;"></div>
-    <div style="position:relative;height:220px;"><canvas id="run-chart"></canvas></div>
+    <div style="position:relative;height:340px;"><canvas id="run-chart"></canvas></div>
     <div id="run-chart-legend"></div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
+  </div>
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="lbl" style="margin:0;">VO2max trend</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);" id="vo2-trend-meta"></div>
+    </div>
+    <div style="position:relative;height:240px;"><canvas id="vo2-chart"></canvas></div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
+      <span style="color:rgba(0,212,255,0.85);">── App estimate (per run)</span>
+      <span style="color:rgba(200,255,0,0.85);">◆ Apple Watch</span>
+    </div>
   </div>
 <div class="card" id="race-predictions-card" style="margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -2489,7 +2500,7 @@ function showTab(n){
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
   else if(n==='week'){ }
-  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderBodyChart('weight'); renderRacePredictions(); }
+  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); }
   else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); }
 }
 
@@ -2589,7 +2600,7 @@ async function saveSession(){
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
   if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); // D.runPrescriptions intentionally NOT touched
- renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); }
+ renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); renderVO2TrendChart(); }
   else { D.sessions.pop(); D.adherence.completed--; }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
@@ -4025,9 +4036,9 @@ function renderRunChart(){
           }
         }}},
         scales:{
-          x:{ticks:{color:'#4a5068',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
-          yPace:{type:'linear',position:'left',reverse:true,min:pMin,max:pMax,ticks:{color:'rgba(255,183,77,0.7)',font:{family:'DM Mono',size:9},callback:v=>{const m=Math.floor(v);const s=Math.round((v-m)*60);return m+':'+(s<10?'0':'')+s;}},grid:{color:'rgba(255,255,255,0.04)'}},
-          yHR:{type:'linear',position:'right',min:hrMin,max:hrMax,ticks:{color:'rgba(232,93,138,0.7)',font:{family:'DM Mono',size:9},callback:v=>v+' bpm'},grid:{display:false}},
+          x:{ticks:{color:'#a8b4cc',font:{family:'DM Mono',size:13},maxRotation:0},grid:{color:'rgba(255,255,255,0.05)'}},
+          yPace:{type:'linear',position:'left',reverse:true,min:pMin,max:pMax,ticks:{color:'rgba(255,183,77,0.85)',font:{family:'DM Mono',size:13},callback:v=>{const m=Math.floor(v);const s=Math.round((v-m)*60);return m+':'+(s<10?'0':'')+s;}},grid:{color:'rgba(255,255,255,0.05)'}},
+          yHR:{type:'linear',position:'right',min:hrMin,max:hrMax,ticks:{color:'rgba(232,93,138,0.85)',font:{family:'DM Mono',size:13},callback:v=>v+' bpm'},grid:{display:false}},
           yDist:{type:'linear',display:false,min:0,max:Math.max(...distData.filter(v=>v!=null))*3}
         }
       }
@@ -4040,6 +4051,52 @@ function renderRunChart(){
   }
 }
 function setRunChart(){renderRunChart();}
+function renderVO2TrendChart(){
+  const canvas=document.getElementById('vo2-chart');
+  if(!canvas||typeof Chart==='undefined') return;
+  if(window._vo2Chart){window._vo2Chart.destroy();window._vo2Chart=null;}
+  // Per-run app estimates — only runs with HR + distance ≥ 2mi
+  const hrRuns=(D.runs||[]).filter(r=>r.type==='run'&&r.heartRateAvg&&r.distance>=2);
+  const appPoints=hrRuns.map(r=>({date:r.date,vo2:estimateVO2max(r)})).filter(p=>p.vo2!=null);
+  // Apple Watch VO2max — sparse, only days with a value
+  const applePoints=(D.healthLogs||[]).filter(h=>h.vo2maxApple).map(h=>({date:h.date,vo2:Math.round(h.vo2maxApple*10)/10}));
+  const metaEl=document.getElementById('vo2-trend-meta');
+  if(!appPoints.length&&!applePoints.length){
+    canvas.parentElement.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:20px 0;">Need runs with HR data (≥2 mi) to estimate VO2max</div>';
+    if(metaEl)metaEl.textContent='';
+    return;
+  }
+  // Build unified date axis from all points
+  const allDates=[...new Set([...appPoints.map(p=>p.date),...applePoints.map(p=>p.date)])].sort();
+  const appMap=Object.fromEntries(appPoints.map(p=>[p.date,p.vo2]));
+  const appleMap=Object.fromEntries(applePoints.map(p=>[p.date,p.vo2]));
+  const appData=allDates.map(d=>appMap[d]??null);
+  const appleData=allDates.map(d=>appleMap[d]??null);
+  const labels=allDates.map(d=>d.slice(5));
+  // Y range
+  const allVals=[...appPoints.map(p=>p.vo2),...applePoints.map(p=>p.vo2)];
+  const yMin=Math.max(25,Math.floor(Math.min(...allVals))-3);
+  const yMax=Math.ceil(Math.max(...allVals))+3;
+  const latestApp=appPoints.slice(-1)[0]?.vo2;
+  const latestApple=applePoints.slice(-1)[0]?.vo2;
+  if(metaEl)metaEl.textContent=[latestApp?`App: ${latestApp}`:null,latestApple?`Watch: ${latestApple}`:null].filter(Boolean).join(' · ');
+  window._vo2Chart=new Chart(canvas,{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'App estimate',data:appData,borderColor:'rgba(0,212,255,0.9)',backgroundColor:'rgba(0,212,255,0.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'rgba(0,212,255,0.9)',tension:0.3,spanGaps:false,fill:true},
+      {label:'Apple Watch',data:appleData,borderColor:'rgba(200,255,0,0.0)',backgroundColor:'rgba(200,255,0,0.0)',pointRadius:appleData.map(v=>v!=null?8:0),pointBackgroundColor:'rgba(200,255,0,0.85)',pointBorderColor:'rgba(200,255,0,0.4)',pointBorderWidth:2,pointStyle:'rectRot',spanGaps:false,fill:false,showLine:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
+        label:c=>{if(c.raw==null)return null;return c.dataset.label+': '+c.raw+' ml/kg/min';}
+      }}},
+      scales:{
+        x:{ticks:{color:'#a8b4cc',font:{family:'DM Mono',size:13},maxRotation:0,maxTicksLimit:10},grid:{color:'rgba(255,255,255,0.05)'}},
+        y:{min:yMin,max:yMax,ticks:{color:'rgba(0,212,255,0.85)',font:{family:'DM Mono',size:13},callback:v=>v+' ml'},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+}
 function onDayTypeChange(value){
   const blocks={
     bench:document.getElementById('bench-block'),
