@@ -1261,7 +1261,6 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">running trajectory</div>
     </div>
-    <div id="run-metrics-summary" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;"></div>
     <div style="position:relative;height:340px;"><canvas id="run-chart"></canvas></div>
     <div id="run-chart-legend"></div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
@@ -3960,30 +3959,9 @@ function calcRunMetrics(){
   return{estimated5KTime,estimated5KSeconds,racePacePerMile:racePace,vo2maxEstimate,totalRuns:runs.length,avgPace};
 }
 function renderRunMetricsSummary(){
-  const el=document.getElementById('run-metrics-summary');if(!el)return;
+  // Only updates the sync date label — stat cards removed (redundant with race predictions below)
   const syncEl=document.getElementById('run-last-sync');
   if(syncEl)syncEl.textContent=D.stravaLastSync?new Date(D.stravaLastSync).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'never';
-  const localMetrics=calcRunMetrics();
-  const estimated5KTime=localMetrics?.estimated5KTime||null;
-  const vo2maxEstimate=localMetrics?.vo2maxEstimate||null;
-  if(!estimated5KTime&&!vo2maxEstimate){
-    el.innerHTML='<div style="grid-column:1/-1;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:8px 0;">No run data yet — Strava syncs automatically overnight once configured.</div>';
-    return;
-  }
-  const parseTime=t=>{if(!t)return Infinity;const p=String(t).split(':');return p.length===2?+p[0]*60+ +p[1]:Infinity;};
-  const sec5k=parseTime(estimated5KTime);
-  const tColor=sec5k<1200?'var(--a3)':sec5k<1500?'var(--a)':'var(--t2)';
-  const vo2Color=vo2maxEstimate>=50?'var(--a3)':vo2maxEstimate>=40?'var(--a)':'var(--a2)';
-  // Apple Watch VO2max — round to 3 sig figs (1 decimal for typical 30-65 range)
-  const appleVO2Raw=(D.healthLogs||[]).filter(h=>h.vo2maxApple).slice(-1)[0]?.vo2maxApple;
-  const appleVO2=appleVO2Raw?Math.round(appleVO2Raw*10)/10:null;
-  el.innerHTML=`
-    <div class="stat"><div class="sv" style="color:${tColor};font-size:18px;">${estimated5KTime||'--'}</div><div class="sl">Est. 5K time</div></div>
-    <div class="stat">
-      <div class="sv" style="color:${vo2Color};font-size:18px;">${vo2maxEstimate||'--'}</div>
-      <div class="sl">Est. VO2max</div>
-      ${appleVO2?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:4px;">Apple Watch: <span style="color:rgba(200,255,0,0.9);">${appleVO2}</span> ml/kg/min</div>`:''}
-    </div>`;
 }
 function renderRunChart(){
   const canvas=document.getElementById('run-chart');
@@ -4083,8 +4061,8 @@ function renderVO2TrendChart(){
   window._vo2Chart=new Chart(canvas,{
     type:'line',
     data:{labels,datasets:[
-      {label:'App estimate',data:appData,borderColor:'rgba(0,212,255,0.9)',backgroundColor:'rgba(0,212,255,0.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'rgba(0,212,255,0.9)',tension:0.3,spanGaps:false,fill:true},
-      {label:'Apple Watch',data:appleData,borderColor:'rgba(200,255,0,0.0)',backgroundColor:'rgba(200,255,0,0.0)',pointRadius:appleData.map(v=>v!=null?8:0),pointBackgroundColor:'rgba(200,255,0,0.85)',pointBorderColor:'rgba(200,255,0,0.4)',pointBorderWidth:2,pointStyle:'rectRot',spanGaps:false,fill:false,showLine:false}
+      {label:'App estimate',data:appData,borderColor:'rgba(0,212,255,0.9)',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'rgba(0,212,255,0.9)',tension:0.3,spanGaps:false,fill:false},
+      {label:'Apple Watch',data:appleData,borderColor:'rgba(200,255,0,0.5)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:appleData.map(v=>v!=null?8:0),pointBackgroundColor:'rgba(200,255,0,0.85)',pointBorderColor:'rgba(200,255,0,0.4)',pointBorderWidth:2,pointStyle:'rectRot',spanGaps:true,fill:false}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
