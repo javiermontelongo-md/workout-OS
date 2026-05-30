@@ -2667,17 +2667,17 @@
       "sleepREM": 1.1943275169531502,
       "sleepLight": 4.601971692641576,
       "sleepAwake": 0,
-      "steps": 2408,
-      "exerciseMinutes": 2,
-      "activeCalories": 144,
-      "walkingHR": null,
-      "walkingSpeed": 2.97,
+      "steps": 3018,
+      "exerciseMinutes": 3,
+      "activeCalories": 180,
+      "walkingHR": 79,
+      "walkingSpeed": 2.85,
       "respiratoryRate": 16.945652173913043,
       "vo2maxApple": null,
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-05-30T22:04:06.043Z",
+  "healthLastSync": "2026-05-30T22:04:17.890Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
