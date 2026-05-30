@@ -2023,7 +2023,7 @@ function applyAppearance(){
   const savedSize=localStorage.getItem('wos-fontsize')||'19';
   _applyFontSize(savedSize);
   _syncFontPresetBtns(+savedSize);
-  _applySmallTextSize(localStorage.getItem('wos-smalltext')||'12');
+  _applySmallTextSize(Math.max(22,+(localStorage.getItem('wos-smalltext')||'22')));
   _applyComponentFontSizes();
   _applyMobileComponentFontSizes();
 }
