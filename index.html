@@ -4971,7 +4971,7 @@ function renderSnapshotCharts(){
         <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Sleep · 7 days</div>
         <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-sleep-avg"></div>
       </div>
-      <div style="position:relative;height:210px;"><canvas id="snap-sleep-chart"></canvas></div>
+      <div style="position:relative;height:300px;"><canvas id="snap-sleep-chart"></canvas></div>
       <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(34,197,94,0.85);">── Actual sleep</span>
         <span>- - Optimal 7–7.5h</span>
@@ -4980,25 +4980,38 @@ function renderSnapshotCharts(){
     </div>
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Steps + Exercise · 7 days</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Steps + Exercise + Calories · 7 days</div>
         <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-activity-avg"></div>
       </div>
-      <div style="position:relative;height:220px;"><canvas id="snap-activity-chart"></canvas></div>
+      <div style="position:relative;height:300px;"><canvas id="snap-activity-chart"></canvas></div>
       <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(0,212,255,0.85);">── Steps (L)</span>
         <span style="color:rgba(168,85,247,0.85);">── Exercise min (R)</span>
+        <span style="color:rgba(251,146,60,0.85);">── Active kcal (R)</span>
+        <span>- - 30d avg</span>
+      </div>
+    </div>
+    <div style="margin-bottom:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Walking HR + Speed · 7 days</div>
+        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-hr-avg"></div>
+      </div>
+      <div style="position:relative;height:300px;"><canvas id="snap-hr-chart"></canvas></div>
+      <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
+        <span style="color:rgba(255,183,77,0.85);">── Walking HR (L)</span>
+        <span style="color:rgba(56,189,248,0.85);">── Walking Speed mph (R)</span>
         <span>- - 30d avg</span>
       </div>
     </div>
     <div style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Heart Rate · 7 days</div>
-        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-hr-avg"></div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Resting HR + Respiratory Rate · 7 days</div>
+        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-recovery-avg"></div>
       </div>
-      <div style="position:relative;height:220px;"><canvas id="snap-hr-chart"></canvas></div>
+      <div style="position:relative;height:300px;"><canvas id="snap-recovery-chart"></canvas></div>
       <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(255,99,71,0.85);">── Resting HR (L)</span>
-        <span style="color:rgba(255,183,77,0.85);">── Walking HR (R)</span>
+        <span style="color:rgba(167,139,250,0.85);">── Resp Rate br/min (R)</span>
         <span>- - 30d avg</span>
       </div>
     </div>
@@ -5045,27 +5058,32 @@ function renderSnapshotCharts(){
     });
   }
 
-  // ── STEPS + EXERCISE CHART ──
+  // ── STEPS + EXERCISE + CALORIES CHART ──
   const stepsData=dates.map(date=>hlMap[date]?.steps||null);
   const exerciseData=dates.map(date=>hlMap[date]?.exerciseMinutes||null);
+  const activeCalData=dates.map(date=>hlMap[date]?.activeCalories||null);
   // 30-day avgs
   const stepsData30=dates30.map(date=>hlMap[date]?.steps||null);
   const exerciseData30=dates30.map(date=>hlMap[date]?.exerciseMinutes||null);
+  const activeCalData30=dates30.map(date=>hlMap[date]?.activeCalories||null);
   const validSteps30=stepsData30.filter(v=>v!==null);
   const validExercise30=exerciseData30.filter(v=>v!==null);
+  const validActiveCal30=activeCalData30.filter(v=>v!==null);
   const avgSteps=validSteps30.length?Math.round(validSteps30.reduce((s,v)=>s+v,0)/validSteps30.length):null;
   const avgExercise=validExercise30.length?Math.round(validExercise30.reduce((s,v)=>s+v,0)/validExercise30.length):null;
+  const avgActiveCal=validActiveCal30.length?Math.round(validActiveCal30.reduce((s,v)=>s+v,0)/validActiveCal30.length):null;
 
   const actAvgEl=document.getElementById('snap-activity-avg');
   if(actAvgEl){
     const parts=[];
     if(avgSteps)parts.push(avgSteps.toLocaleString()+' steps 30d avg');
     if(avgExercise)parts.push(avgExercise+' min 30d avg');
+    if(avgActiveCal)parts.push(avgActiveCal+' kcal 30d avg');
     actAvgEl.textContent=parts.join(' · ');
   }
 
   const actCtx=document.getElementById('snap-activity-chart')?.getContext('2d');
-  if(actCtx&&(avgSteps!==null||avgExercise!==null)){
+  if(actCtx){
     new Chart(actCtx,{
       type:'line',
       data:{
@@ -5073,8 +5091,10 @@ function renderSnapshotCharts(){
         datasets:[
           {label:'Steps',data:stepsData,borderColor:'rgba(0,212,255,0.85)',backgroundColor:'rgba(0,212,255,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySteps'},
           {label:'Steps 30d avg',data:avgSteps?dates.map(()=>avgSteps):[],borderColor:'rgba(0,212,255,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySteps'},
-          {label:'Exercise',data:exerciseData,borderColor:'rgba(168,85,247,0.85)',backgroundColor:'rgba(168,85,247,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
-          {label:'Exercise 30d avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'}
+          {label:'Exercise min',data:exerciseData,borderColor:'rgba(168,85,247,0.85)',backgroundColor:'rgba(168,85,247,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
+          {label:'Exercise 30d avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'},
+          {label:'Active kcal',data:activeCalData,borderColor:'rgba(251,146,60,0.85)',backgroundColor:'rgba(251,146,60,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise'},
+          {label:'Active kcal 30d avg',data:avgActiveCal?dates.map(()=>avgActiveCal):[],borderColor:'rgba(251,146,60,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise'}
         ]
       },
       options:{
@@ -5084,44 +5104,43 @@ function renderSnapshotCharts(){
         scales:{
           x:{ticks:xTicks,grid:xGrid},
           ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.06)'}},
-          yExercise:{type:'linear',position:'right',ticks:{color:'rgba(168,85,247,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v+'m';}},grid:{display:false}}
+          yExercise:{type:'linear',position:'right',min:0,ticks:{color:'rgba(168,85,247,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=100?v+'kcal':v+'m';}},grid:{display:false}}
         }
       }
     });
   }
 
-  // ── HEART RATE CHART ──
-  const restingHRData=dates.map(date=>hlMap[date]?.restingHR||null);
+  // ── WALKING HR + SPEED CHART ──
   const walkingHRData=dates.map(date=>hlMap[date]?.walkingHR||null);
-  const validResting=restingHRData.filter(v=>v!==null);
+  const walkingSpeedData=dates.map(date=>hlMap[date]?.walkingSpeed||null);
   const validWalking=walkingHRData.filter(v=>v!==null);
-  // 30-day avgs
-  const restingHRData30=dates30.map(date=>hlMap[date]?.restingHR||null);
+  const validSpeed=walkingSpeedData.filter(v=>v!==null);
   const walkingHRData30=dates30.map(date=>hlMap[date]?.walkingHR||null);
-  const validResting30=restingHRData30.filter(v=>v!==null);
+  const walkingSpeedData30=dates30.map(date=>hlMap[date]?.walkingSpeed||null);
   const validWalking30=walkingHRData30.filter(v=>v!==null);
-  const avgResting=validResting30.length?Math.round(validResting30.reduce((s,v)=>s+v,0)/validResting30.length):null;
+  const validSpeed30=walkingSpeedData30.filter(v=>v!==null);
   const avgWalking=validWalking30.length?Math.round(validWalking30.reduce((s,v)=>s+v,0)/validWalking30.length):null;
+  const avgSpeed=validSpeed30.length?Math.round(validSpeed30.reduce((s,v)=>s+v,0)/validSpeed30.length*100)/100:null;
 
   const hrAvgEl=document.getElementById('snap-hr-avg');
   if(hrAvgEl){
     const parts=[];
-    if(avgResting)parts.push('RHR '+avgResting+' bpm 30d');
     if(avgWalking)parts.push('WHR '+avgWalking+' bpm 30d');
+    if(avgSpeed)parts.push(avgSpeed+' mph 30d avg');
     hrAvgEl.textContent=parts.join(' · ');
   }
 
   const hrCtx=document.getElementById('snap-hr-chart')?.getContext('2d');
-  if(hrCtx&&(validResting.length>0||validWalking.length>0)){
+  if(hrCtx&&(validWalking.length>0||validSpeed.length>0)){
     new Chart(hrCtx,{
       type:'line',
       data:{
         labels:dates,
         datasets:[
-          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,99,71,0.85)',backgroundColor:'rgba(255,99,71,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
-          {label:'Resting 30d avg',data:avgResting?dates.map(()=>avgResting):[],borderColor:'rgba(255,99,71,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResting'},
           {label:'Walking HR',data:walkingHRData,borderColor:'rgba(255,183,77,0.85)',backgroundColor:'rgba(255,183,77,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yWalking'},
-          {label:'Walking 30d avg',data:avgWalking?dates.map(()=>avgWalking):[],borderColor:'rgba(255,183,77,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yWalking'}
+          {label:'Walking HR 30d avg',data:avgWalking?dates.map(()=>avgWalking):[],borderColor:'rgba(255,183,77,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yWalking'},
+          {label:'Walking Speed',data:walkingSpeedData,borderColor:'rgba(56,189,248,0.85)',backgroundColor:'rgba(56,189,248,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySpeed'},
+          {label:'Speed 30d avg',data:avgSpeed?dates.map(()=>avgSpeed):[],borderColor:'rgba(56,189,248,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySpeed'}
         ]
       },
       options:{
@@ -5130,8 +5149,54 @@ function renderSnapshotCharts(){
         plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,filter:item=>item.raw!==null&&!item.dataset.label.includes('avg')}},
         scales:{
           x:{ticks:xTicks,grid:xGrid},
-          yResting:{type:'linear',position:'left',min:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.15,3);return Math.floor(rMin-rPad);})(),max:(()=>{const rMin=validResting.length?Math.min(...validResting):45;const rMax=validResting.length?Math.max(...validResting):75;const rPad=Math.max((rMax-rMin)*0.15,3);return Math.ceil(rMax+rPad);})(),ticks:{color:'rgba(255,99,71,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.06)'}},
-          yWalking:{type:'linear',position:'right',min:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.15,3);return Math.floor(wMin-wPad);})(),max:(()=>{const wMin=validWalking.length?Math.min(...validWalking):85;const wMax=validWalking.length?Math.max(...validWalking):130;const wPad=Math.max((wMax-wMin)*0.15,3);return Math.ceil(wMax+wPad);})(),ticks:{color:'rgba(255,183,77,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{display:false}}
+          yWalking:{type:'linear',position:'left',min:(()=>{const mn=validWalking.length?Math.min(...validWalking):75;const mx=validWalking.length?Math.max(...validWalking):120;const pad=Math.max((mx-mn)*0.15,3);return Math.floor(mn-pad);})(),max:(()=>{const mn=validWalking.length?Math.min(...validWalking):75;const mx=validWalking.length?Math.max(...validWalking):120;const pad=Math.max((mx-mn)*0.15,3);return Math.ceil(mx+pad);})(),ticks:{color:'rgba(255,183,77,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.06)'}},
+          ySpeed:{type:'linear',position:'right',min:(()=>{const mn=validSpeed.length?Math.min(...validSpeed):1.5;const mx=validSpeed.length?Math.max(...validSpeed):4;const pad=Math.max((mx-mn)*0.15,0.1);return Math.floor((mn-pad)*10)/10;})(),max:(()=>{const mn=validSpeed.length?Math.min(...validSpeed):1.5;const mx=validSpeed.length?Math.max(...validSpeed):4;const pad=Math.max((mx-mn)*0.15,0.1);return Math.ceil((mx+pad)*10)/10;})(),ticks:{color:'rgba(56,189,248,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' mph';}},grid:{display:false}}
+        }
+      }
+    });
+  }
+
+  // ── RESTING HR + RESPIRATORY RATE CHART ──
+  const restingHRData=dates.map(date=>hlMap[date]?.restingHR||null);
+  const respRateData=dates.map(date=>hlMap[date]?.respiratoryRate?Math.round(hlMap[date].respiratoryRate*10)/10:null);
+  const validResting=restingHRData.filter(v=>v!==null);
+  const validResp=respRateData.filter(v=>v!==null);
+  const restingHRData30=dates30.map(date=>hlMap[date]?.restingHR||null);
+  const respRateData30=dates30.map(date=>hlMap[date]?.respiratoryRate||null);
+  const validResting30=restingHRData30.filter(v=>v!==null);
+  const validResp30=respRateData30.filter(v=>v!==null);
+  const avgResting=validResting30.length?Math.round(validResting30.reduce((s,v)=>s+v,0)/validResting30.length):null;
+  const avgResp=validResp30.length?Math.round(validResp30.reduce((s,v)=>s+v,0)/validResp30.length*10)/10:null;
+
+  const recAvgEl=document.getElementById('snap-recovery-avg');
+  if(recAvgEl){
+    const parts=[];
+    if(avgResting)parts.push('RHR '+avgResting+' bpm 30d');
+    if(avgResp)parts.push(avgResp+' br/min 30d avg');
+    recAvgEl.textContent=parts.join(' · ');
+  }
+
+  const recCtx=document.getElementById('snap-recovery-chart')?.getContext('2d');
+  if(recCtx&&(validResting.length>0||validResp.length>0)){
+    new Chart(recCtx,{
+      type:'line',
+      data:{
+        labels:dates,
+        datasets:[
+          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,99,71,0.85)',backgroundColor:'rgba(255,99,71,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
+          {label:'Resting HR 30d avg',data:avgResting?dates.map(()=>avgResting):[],borderColor:'rgba(255,99,71,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResting'},
+          {label:'Resp Rate',data:respRateData,borderColor:'rgba(167,139,250,0.85)',backgroundColor:'rgba(167,139,250,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResp'},
+          {label:'Resp 30d avg',data:avgResp?dates.map(()=>avgResp):[],borderColor:'rgba(167,139,250,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResp'}
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,filter:item=>item.raw!==null&&!item.dataset.label.includes('avg')}},
+        scales:{
+          x:{ticks:xTicks,grid:xGrid},
+          yResting:{type:'linear',position:'left',min:(()=>{const mn=validResting.length?Math.min(...validResting):45;const mx=validResting.length?Math.max(...validResting):75;const pad=Math.max((mx-mn)*0.15,3);return Math.floor(mn-pad);})(),max:(()=>{const mn=validResting.length?Math.min(...validResting):45;const mx=validResting.length?Math.max(...validResting):75;const pad=Math.max((mx-mn)*0.15,3);return Math.ceil(mx+pad);})(),ticks:{color:'rgba(255,99,71,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' bpm';}},grid:{color:'rgba(255,255,255,0.06)'}},
+          yResp:{type:'linear',position:'right',min:(()=>{const mn=validResp.length?Math.min(...validResp):12;const mx=validResp.length?Math.max(...validResp):20;const pad=Math.max((mx-mn)*0.15,0.5);return Math.floor(mn-pad);})(),max:(()=>{const mn=validResp.length?Math.min(...validResp):12;const mx=validResp.length?Math.max(...validResp):20;const pad=Math.max((mx-mn)*0.15,0.5);return Math.ceil(mx+pad);})(),ticks:{color:'rgba(167,139,250,0.9)',font:{size:15,family:'DM Mono'},callback:function(v){return v+' br/m';}},grid:{display:false}}
         }
       }
     });

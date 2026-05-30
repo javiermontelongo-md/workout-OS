@@ -102,9 +102,17 @@ function buildEntryForDate(metrics, date) {
   const exerciseRaw = getSumQtyForDate(metrics, 'apple_exercise_time', date);
   const exerciseMinutes = exerciseRaw !== null ? Math.round(exerciseRaw) : null;
 
+  // Active calories (active_energy): accumulates like steps
+  const activeCalRaw = getSumQtyForDate(metrics, 'active_energy', date);
+  const activeCalories = activeCalRaw !== null ? Math.round(activeCalRaw) : null;
+
   // Walking HR: daily average, single-point metric
   const walkingHRRaw = getQtyForDate(metrics, 'walking_heart_rate_average', date);
   const walkingHR = walkingHRRaw !== null ? Math.round(walkingHRRaw) : null;
+
+  // Walking speed: daily average in mi/hr, single-point metric
+  const walkingSpeedRaw = getQtyForDate(metrics, 'walking_speed', date);
+  const walkingSpeed = walkingSpeedRaw !== null ? Math.round(walkingSpeedRaw * 100) / 100 : null;
 
   return {
     date,
@@ -119,7 +127,9 @@ function buildEntryForDate(metrics, date) {
     sleepAwake,
     steps,
     exerciseMinutes,
+    activeCalories,
     walkingHR,
+    walkingSpeed,
     respiratoryRate: getQtyForDate(metrics, 'respiratory_rate', date),
     vo2maxApple:   getQtyForDate(metrics, 'vo2_max', date),
     source: 'apple_health'
@@ -223,7 +233,9 @@ async function main() {
       sleepAwake:    null,
       steps:         Math.round(extractSimpleNumber(raw, 'steps') ?? 0) || null,
       exerciseMinutes: extractSimpleNumber(raw, 'exerciseMinutes'),
+      activeCalories: Math.round(extractSimpleNumber(raw, 'activeCalories') ?? 0) || null,
       walkingHR:     Math.round(extractSimpleNumber(raw, 'walkingHR') ?? 0) || null,
+      walkingSpeed:  extractSimpleNumber(raw, 'walkingSpeed'),
       respiratoryRate: extractSimpleNumber(raw, 'respiratoryRate'),
       vo2maxApple:   extractSimpleNumber(raw, 'vo2max'),
       source: 'apple_health'
