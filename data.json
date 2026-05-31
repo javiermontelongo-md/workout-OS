@@ -2667,7 +2667,7 @@
       "sleepREM": 1.1943275169531502,
       "sleepLight": 4.601971692641576,
       "sleepAwake": 0,
-      "steps": 3962,
+      "steps": 4378,
       "exerciseMinutes": 3,
       "activeCalories": 224,
       "walkingHR": 79,
@@ -2677,7 +2677,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-05-31T02:32:41.496Z",
+  "healthLastSync": "2026-05-31T04:10:29.106Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
