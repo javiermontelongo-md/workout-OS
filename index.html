@@ -2171,8 +2171,6 @@ const ATHLETE = {
   },
 
   // Hard rule thresholds
-  HRV_CRASH:      0.80,
-  HRV_WARNING:    0.90,
   RHR_SPIKE:      8,
   FEVER_TEMP:     1.5,
   SLEEP_BLOCK:    5.0,
@@ -2498,8 +2496,8 @@ function renderRulesTab(){
     {title:'Fever signal',desc:'Wrist temperature deviation ≥+1.5°C blocks all training. Medical contraindication.',flag:'FEVER_SIGNAL',threshold:'Trigger: wrist temp ≥ +1.5°C'},
     {title:'Sleep block',desc:'Sleep <5h blocks quality work and heavy lifts. Volume reduced to 80%, RPE capped at 6.',flag:'SLEEP_BLOCK',threshold:'Trigger: sleep < 5.0h'},
     {title:'Sleep warning',desc:'Sleep 5–6.5h reduces volume to 85% and caps RPE at 7.',flag:'SLEEP_WARNING',threshold:'Trigger: sleep 5.0–6.4h'},
-    {title:'HRV acute crash',desc:'HRV >20% below 7-day mean blocks quality work and heavy lifts. Volume at 75%, RPE cap 6.',flag:'HRV_ACUTE_CRASH',threshold:'Trigger: HRV < '+Math.round(ts.means.hrv*0.80)+'ms (today: '+(ts.latestHRV||'—')+'ms)'},
-    {title:'HRV warning',desc:'HRV 10–20% below 7-day mean reduces volume to 85% and caps RPE at 7.',flag:'HRV_WARNING',threshold:'Trigger: HRV '+Math.round(ts.means.hrv*0.80)+'–'+Math.round(ts.means.hrv*0.90)+'ms'},
+    {title:'HRV acute crash',desc:'HRV >1.5 SD below 60-day personal baseline blocks quality work and heavy lifts. Volume at 75%, RPE cap 6.',flag:'HRV_ACUTE_CRASH',threshold:'Trigger: HRV < '+(Math.round(ts.means.hrvBaseline60-1.5*ts.means.hrvSD60))+'ms (baseline '+Math.round(ts.means.hrvBaseline60)+'±'+Math.round(ts.means.hrvSD60)+'ms · today: '+(ts.latestHRV||'—')+'ms)'},
+    {title:'HRV warning',desc:'HRV 0.75–1.5 SD below 60-day personal baseline reduces volume to 85% and caps RPE at 7.',flag:'HRV_WARNING',threshold:'Trigger: HRV '+(Math.round(ts.means.hrvBaseline60-1.5*ts.means.hrvSD60))+'–'+(Math.round(ts.means.hrvBaseline60-0.75*ts.means.hrvSD60))+'ms'},
     {title:'Resting HR spike',desc:'Resting HR >8 bpm above 7-day mean blocks quality runs. Volume at 85%, RPE cap 7.',flag:'RHR_SPIKE',threshold:'Trigger: RHR > '+Math.round(ts.means.rhr+8)+'bpm (today: '+(ts.latestRHR||'—')+'bpm)'},
     {title:'Deload week (Week 4)',desc:'Week 4 of every block: no quality runs, volume at 60%, RPE capped at 6. Non-negotiable even with good biometrics.',flag:'DELOAD_WEEK',threshold:'Trigger: blockWeek.weekNum === 4'},
     {title:'MAF HR ceiling',desc:'All easy runs hard-capped at '+ATHLETE.mafHR+' bpm (MAF formula: 180 − '+ATHLETE.age+' − 5). Slow down or walk if exceeded.',flag:null,threshold:'Your MAF: '+ATHLETE.mafHR+' bpm. Current easy runs: 165–174 bpm (too high).'},
@@ -4256,10 +4254,27 @@ function compute7DayMeans(){
   const recent=logs.filter(l=>l.date>=cutoffStr);
   const hrv7d=recent.filter(l=>l.hrv).map(l=>l.hrv);
   const rhr7d=recent.filter(l=>l.restingHR).map(l=>l.restingHR);
+
+  // 60-day rolling personal baseline for HRV (mean + SD) — anchors thresholds to
+  // long-term normal so a bad week can't drag the crash threshold down with it.
+  const cutoff60=new Date(today); cutoff60.setDate(today.getDate()-59);
+  const cutoff60Str=localDS(cutoff60);
+  const hrv60=logs.filter(l=>l.date>=cutoff60Str&&l.hrv).map(l=>l.hrv);
+  let hrvBaseline60=ATHLETE.hrvBaseline, hrvSD60=10.5;
+  if(hrv60.length>=30){
+    hrvBaseline60=hrv60.reduce((a,b)=>a+b,0)/hrv60.length;
+    const variance=hrv60.reduce((a,b)=>a+(b-hrvBaseline60)**2,0)/hrv60.length;
+    hrvSD60=Math.sqrt(variance);
+  }
+
   return{
     hrv:hrv7d.length?hrv7d.reduce((a,b)=>a+b,0)/hrv7d.length:ATHLETE.hrvBaseline,
     rhr:rhr7d.length?rhr7d.reduce((a,b)=>a+b,0)/rhr7d.length:ATHLETE.rhrBaseline,
     count:recent.length,
+    // Personal SDNN baseline from 60-day rolling window (≥30 days required, else ATHLETE defaults)
+    hrvBaseline60,
+    hrvSD60,
+    hrv60Count:hrv60.length,
   };
 }
 
@@ -4303,17 +4318,23 @@ function evaluateTrainingStatus(){
   // ── QUALITY BLOCKS ────────────────────────────────────────────
   const latestHRV=latest.hrv||null;
   if(latestHRV&&means.hrv>0){
-    if(latestHRV<means.hrv*ATHLETE.HRV_CRASH){
+    // Z-score thresholds anchored to 60-day personal baseline (not 7d mean).
+    // Prevents a sustained bad week from collapsing the crash threshold downward.
+    // Crash: latest < baseline − 1.5 SD  |  Warning: latest < baseline − 0.75 SD
+    const _hrvRef=means.hrvBaseline60;
+    const _hrvSD=means.hrvSD60;
+    const _zScore=(_hrvRef-latestHRV)/_hrvSD; // positive = below baseline
+    if(_zScore>=1.5){
       flags.push('HRV_ACUTE_CRASH');
       canDoQuality=false; canDoHeavyLifts=false;
       liftRPECap=Math.min(liftRPECap,6);
       volumeModifier=Math.min(volumeModifier,0.75);
-      reasons.push(`HRV ${latestHRV}ms is ${Math.round((1-latestHRV/means.hrv)*100)}% below 7d mean (${Math.round(means.hrv)}ms). Quality and heavy work blocked.`);
-    } else if(latestHRV<means.hrv*ATHLETE.HRV_WARNING){
+      reasons.push(`HRV ${latestHRV}ms is ${_zScore.toFixed(1)} SD below your 60-day personal baseline (${Math.round(_hrvRef)}±${Math.round(_hrvSD)}ms). Quality and heavy work blocked.`);
+    } else if(_zScore>=0.75){
       flags.push('HRV_WARNING');
       liftRPECap=Math.min(liftRPECap,7);
       volumeModifier=Math.min(volumeModifier,0.85);
-      reasons.push(`HRV ${latestHRV}ms — warning zone. Volume reduced, RPE capped at 7.`);
+      reasons.push(`HRV ${latestHRV}ms — ${_zScore.toFixed(1)} SD below 60-day baseline (${Math.round(_hrvRef)}ms). Volume reduced, RPE capped at 7.`);
     }
   }
 
@@ -5421,8 +5442,8 @@ function renderAIFlowDiagram(){
           POST_CALL:'You toggled "Post-call / no sleep" in today\'s check-in. All structured training blocked — walk ≤30 min at HR <100 only.',
           FEVER_SIGNAL:'Wrist temp ≥ +1.5°C above baseline. Rest only — no training.',
           SLEEP_BLOCK:'Sleep < 5h. No quality or heavy lifts. RPE capped at 6, volume at 80%.',
-          HRV_ACUTE_CRASH:'Today\'s HRV is < 80% of 7-day mean. Quality + heavy work blocked. RPE cap 6, volume 75%.',
-          HRV_WARNING:'Today\'s HRV is 80–90% of 7-day mean. RPE cap 7, volume 85%.',
+          HRV_ACUTE_CRASH:'Today\'s HRV is >1.5 SD below your 60-day personal baseline. Quality + heavy work blocked. RPE cap 6, volume 75%.',
+          HRV_WARNING:'Today\'s HRV is 0.75–1.5 SD below your 60-day personal baseline. RPE cap 7, volume 85%.',
           RHR_SPIKE:'Resting HR > 8 bpm above 7-day mean. Quality work blocked, RPE cap 7, volume 85%.',
           SLEEP_WARNING:'Sleep 5–6.5h. RPE cap 7, volume 85%.',
           DELOAD_WEEK:'Block week 4 — automatic deload. No quality, volume at 60%, RPE cap 6.',
