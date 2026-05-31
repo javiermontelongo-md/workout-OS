@@ -84,7 +84,7 @@ TODAY · PROGRAM · LOG SESSION · ACTIVITY · PROGRESS · MILESTONES · RULES �
 ## Key data.json fields
 `sessions[]` · `runs[]` · `checkins[]` · `healthLogs[]` ·
 `healthLastSync` · `stravaLastSync` ·
-`runPrescriptions{}` · `dailyPrescriptions{}` · `coachingMemory{}` ·
+`runPrescriptions{}` · `dailyPrescriptions{}` ·
 `coachingLog[]` · `bodyMetrics[]`
 
 ## Lift Keys
@@ -260,17 +260,13 @@ All line numbers are from origin/main. Verify before editing:
 | Line | Function | Purpose |
 |------|----------|---------|
 | 3175 | liftTrend(key, sessions, weeks=4) | Computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
-| 3193 | buildAthleteContext() | Single shared context object for all AI calls. Returns athlete (with goals + vo2maxEstimate), hardRules, biometrics, training, checkin, body. Calls evaluateTrainingStatus() once. |
-| 3358 | ai(prompt, maxTokens=800) | Shared Anthropic fetch wrapper — system prompt built from buildAthleteContext(). All AI calls route here. |
-| 4248 | generatePostRunFeedback(targetDate) | Post-run feedback — requires D.dailyPrescriptions[targetDate] AND matching Strava run. Compares prescribed vs actual. Calls renderRunLogCard(). |
-| 4457 | generateDailyPrescription(workoutType, durationMins) | **Primary prescription entry point.** Direct API call (claude-sonnet-4-5, 2500 tokens). Produces todayPrescription + weekPlan[7]. Stores to D.dailyPrescriptions[today]. Calls renderPrescriptionCard, renderWeekSuggestions, updateLogTabPlanned, pushSilent. |
-| 4648 | maybeCompressCoachingMemory() | Compresses oldest 15 coaching notes to structured profile if ≥15 notes. Stores to D.coachingMemory.compressed. |
+| 4221 | generateDailyPrescription(workoutType, durationMins) | **Only AI entry point.** Direct API call (claude-sonnet-4-5, 2500 tokens). Triggered by "Get Prescription" button in Program tab. Produces todayPrescription + weekPlan[7]. Stores to D.dailyPrescriptions[today]. Calls renderPrescriptionCard, renderWeekSuggestions, updateLogTabPlanned, pushSilent. |
 
 ### Hard Rule Engine
 | Line | Function | Purpose |
 |------|----------|---------|
 | 4292 | compute7DayMeans() | Rolling 7-day HRV/RHR averages + 60-day personal z-score baseline. Returns: hrv, rhr, count, hrvBaseline60, hrvSD60, hrv60Count, rhrBaseline60, rhrSD60, rhr60Count. Falls back to ATHLETE.hrvBaseline/rhrBaseline if <30 days of data. |
-| 4337 | evaluateTrainingStatus() | Deterministic rule engine. Uses 60-day z-score baseline (not fixed % thresholds) for HRV/RHR. Called in buildAthleteContext() and renderRulesTab(). Returns: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR, latestHRV, latestRHR, sleepHours, means. |
+| 4337 | evaluateTrainingStatus() | Deterministic rule engine. Uses 60-day z-score baseline (not fixed % thresholds) for HRV/RHR. Called in generateDailyPrescription() and renderRulesTab(). Returns: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR, latestHRV, latestRHR, sleepHours, means. |
 
 ### Session Logging
 | Line | Function | Purpose |
@@ -286,7 +282,7 @@ All line numbers are from origin/main. Verify before editing:
 | 2685 | renderSessHist() | Render session history list (LOG tab legacy view) |
 | 4148 | onDayTypeChange(value) | Shows correct lift blocks per day type. Normalizes push/pull/legs→A/B/C internally; handles A/B/C and run/* types. Calls renderRunLogCard() for run types. |
 | 4191 | startLoggingSession() | Navigate to LOG tab and set day type from presc-workout-type dropdown |
-| 4199 | renderRunLogCard(targetDate) | Renders run prescription summary in LOG tab run card. Reads dailyPrescriptions first, falls back to runPrescriptions. Manages markRunComplete/postRunFeedback complete area. |
+| 4199 | renderRunLogCard(targetDate) | Renders run prescription summary in LOG tab run card. Reads dailyPrescriptions first, falls back to runPrescriptions. Shows Mark Run Complete button → ✓ Run logged message. |
 | 4240 | markRunComplete(targetDate) | Mark run complete in dailyPrescriptions. Calls renderRunLogCard(). |
 | 4685 | renderPrescriptionCard(prescription) | Renders full prescription in #prog-today-card. Handles push/pull/legs (lift table + accessories) and run/cycling (mainSet/pace/HR). Shows reasoning, warmup, cooldown, coachNote, ifTooHard, watchOutFor. |
 | 4766 | renderWeekSuggestions(weekPlan) | Renders 7-day confidence grid in #week-suggestions. Shows date/dow + suggestion + confidence badge (HIGH/MED/LOW) + reason. |
@@ -369,22 +365,9 @@ All line numbers are from origin/main. Verify before editing:
 
 ### Call Hierarchy
 ```
-buildAthleteContext()  ← called once per AI invocation
-  └── evaluateTrainingStatus()   ← hard rules, single call (z-score engine)
-  └── compute7DayMeans()         ← 7-day biometrics + 60-day personal baseline
-  └── detectBlockWeek()          ← block state
-      └── getBlockParams()
-  └── estimateVO2max(_bestHRRun) ← IIFE — finds latest run w/ HR + dist≥2
-
-ai(prompt, maxTokens=800)  ← shared fetch wrapper
-  └── buildAthleteContext()  ← system prompt built here
-  └── called by:
-      ├── maybeCompressCoachingMemory() (1200 tokens)
-      └── generatePostRunFeedback()     (800 tokens)
-
-generateDailyPrescription(workoutType, durationMins)  ← direct fetch
-  └── maybeCompressCoachingMemory()  ← compress if ≥15 notes
-  └── buildAthleteContext()          ← live biometrics + hard rules
+generateDailyPrescription(workoutType, durationMins)  ← only AI call in the app
+  └── evaluateTrainingStatus()  ← hard rules (z-score engine)
+  └── compute7DayMeans()        ← 7-day biometrics + 60-day personal baseline
   └── Direct Anthropic API (claude-sonnet-4-5, 2500 tokens)
   └── Produces: todayPrescription + weekPlan[7]
   └── Writes: D.dailyPrescriptions[today]
@@ -393,7 +376,7 @@ generateDailyPrescription(workoutType, durationMins)  ← direct fetch
 ```
 
 ### evaluateTrainingStatus() Call Sites (2)
-1. buildAthleteContext() — feeds all ai() calls
+1. generateDailyPrescription() — builds hard-rule context for the prompt
 2. renderRulesTab() — live status display in RULES tab
 
 ### HRV/RHR Rule Engine (z-score, not fixed %)
@@ -405,14 +388,8 @@ baseline (mean ± SD) computed by compute7DayMeans():
 Requires ≥30 days of HRV/RHR data; falls back to ATHLETE.hrvBaseline/rhrBaseline if fewer.
 The ATHLETE constant no longer stores HRV_CRASH or HRV_WARNING constants (those were fixed %).
 
-### coachingLog Write Sites (2)
-All use identical pattern: push → slice(-50) → renderSystemLog()
-- generateDailyPrescription() → type: 'daily_prescription'
-- generatePostRunFeedback() → type: 'post_run'
-
-### coachingMemory Write Sites (2)
-- generateDailyPrescription() → pushes structured note to D.coachingMemory.notes[]
-- maybeCompressCoachingMemory() → compresses oldest 15 notes to D.coachingMemory.compressed
+### coachingLog Write Sites (1)
+- generateDailyPrescription() → type: 'daily_prescription' → renderSystemLog()
 
 ---
 
@@ -475,7 +452,7 @@ watchOutFor:     string[]
 weekPlan:        [{date, dow, suggestion, confidence:'high'|'medium'|'low', reason}, ...]
 completed:       bool (run workouts only)
 completedAt:     ISO string
-postRunFeedback: string (from generatePostRunFeedback)
+postRunFeedback: removed
 customExercises: [{name, sets, reps, note}, ...] (user-added extras)
 ```
 
@@ -571,7 +548,10 @@ elevationGain: feet
 - getAccessoryVariation() — rotation helper for old plan system
 - toggleRunLogSection() — managed by onDayTypeChange/renderRunLogCard now
 - _buildSparkRows() — old sparkline builder, replaced by renderSnapshotCharts
-- Dead activePlan block in buildAthleteContext / window._adaptivePlan fallbacks
+- Dead activePlan block / window._adaptivePlan fallbacks
+- **ai(), buildAthleteContext(), generatePostRunFeedback(), maybeCompressCoachingMemory()** —
+  all removed. Only one AI function remains: generateDailyPrescription() (Program tab button).
+  coachingMemory field removed from defD and data structure entirely.
 - prog-block-badge + prog-block-desc HTML divs in PROGRAM tab
 - D.adaptivePlanCache=null in saveSession (adaptivePlanCache never populated)
 - **Fixed % HRV/RHR thresholds**: ATHLETE.HRV_CRASH and ATHLETE.HRV_WARNING removed.

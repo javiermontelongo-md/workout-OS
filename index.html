@@ -2260,6 +2260,7 @@ function lCFG(){
   try{ const k=localStorage.getItem('jm_api_key'); if(k) CFG.api=k; }catch(e){console.warn('lCFG api key load failed:',e);}
 }
 function sCFG(){ try{ localStorage.setItem('wkt_v3',JSON.stringify(CFG)); }catch(e){console.warn('sCFG save failed:',e);} }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[]}; }
 lCFG();
 
 // ============================================================
@@ -2340,7 +2341,6 @@ async function push(btnId,msgId){
   }
 }
 
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},coachingMemory:{compressed:null,notes:[]},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[]}; }
 
 // ============================================================
 // INIT
@@ -2366,10 +2366,8 @@ function onLoad(){
     D.dailyPrescriptions={};
     Object.entries(D.runPrescriptions).forEach(([date,presc])=>{
       if(!presc)return;
-      D.dailyPrescriptions[date]={workoutType:'run',durationMins:60,generatedAt:presc.generatedAt||new Date().toISOString(),summary:presc.recommendedType||'Run',reasoning:presc.reasoning||'',warmup:presc.workout?.warmup||'',mainWork:{runType:presc.recommendedType||'run',summary:presc.workout?.mainSet||'',paceTarget:presc.workout?.paceTarget||'',hrCeiling:presc.workout?.hrCeiling||null,totalDistance:presc.workout?.totalDistance||'',effort:presc.workout?.effort||'',mainSet:presc.workout?.mainSet||''},cooldown:presc.workout?.cooldown||'',coachNote:'',ifTooHard:presc.ifTooHard||'',watchOutFor:presc.watchOutFor||[],completed:presc.completed||false,completedAt:presc.completedAt||null,postRunFeedback:presc.postRunFeedback||null,weekPlan:null};
     });
   }
-  if(!D.coachingMemory)D.coachingMemory={compressed:null,notes:[]};
   if(!D.dailyPrescriptions)D.dailyPrescriptions={};
   initCheckinTab();
   renderSnapshotCharts();
@@ -2470,17 +2468,6 @@ function renderSystemLog() {
         title: 'AI run prescription · ' + date,
         detail: dt + (dist ? ' · ' + dist : '') + (pace ? ' · ' + pace : '')
       });
-      if (presc.postRunFeedback && presc.completedAt) {
-        const fts = new Date(presc.completedAt).getTime();
-        if (fts >= sevenDaysAgo) {
-          events.push({
-            ts: fts,
-            icon: '◈',
-            color: 'var(--a5)',
-            title: 'AI post-run feedback · ' + date,
-            detail: typeof presc.postRunFeedback === 'string' ? presc.postRunFeedback.slice(0, 80) + '...' : ''
-          });
-        }
       }
     });
   }
@@ -2491,7 +2478,6 @@ function renderSystemLog() {
       week_plan: 'AI weekly plan generated',
       run_prescription: 'AI run prescription generated',
       daily_prescription: 'Daily prescription generated',
-      post_run: 'AI post-run feedback generated'
     };
     events.push({
       ts: entry.ts,
@@ -4225,13 +4211,8 @@ function renderRunLogCard(targetDate){
   }
   ['run-presc-alternatives','run-presc-watchout','run-presc-reminders'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
   if(!completeArea)return;
-  const stravaRun=(D.runs||[]).find(r=>r.date===targetDate);
   const isCompleted=presc?.completed===true;
-  if(presc.postRunFeedback){
-    completeArea.innerHTML='<div style="margin-top:12px;background:var(--s2);border:1px solid var(--a3);border-radius:8px;padding:14px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">Post-Run Analysis</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.7;">'+esc(presc.postRunFeedback)+'</div></div>';
-  }else if(isCompleted&&stravaRun){
-    completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs" onclick="generatePostRunFeedback(\''+targetDate+'\')" style="font-size:var(--fs-sm);padding:8px 14px;width:100%;">Get Post-Run Feedback</button><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;text-align:center;">Strava data synced · Compare prescribed vs actual</div></div>';
-  }else if(isCompleted){
+  if(isCompleted){
     completeArea.innerHTML='<div style="margin-top:12px;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px;background:var(--s2);border-radius:6px;text-align:center;">&#10003; Run logged — Strava syncs overnight.</div>';
   }else{
     completeArea.innerHTML='<div style="margin-top:12px;"><button class="btn bs bi" onclick="markRunComplete(\''+targetDate+'\')" style="font-size:var(--fs-sm);padding:8px 14px;width:100%;border-color:var(--a3);color:var(--a3);">Mark Run Complete</button></div>';
@@ -4471,7 +4452,6 @@ async function generateDailyPrescription(workoutType,durationMins){
       if(genMsg){genMsg.textContent='Using cached prescription ✓';genMsg.style.color='var(--a3)';setTimeout(()=>{if(genMsg)genMsg.textContent='';},3000);}
       return;
     }
-    await maybeCompressCoachingMemory();
     const ts=evaluateTrainingStatus();
     const means=compute7DayMeans();
     const recentSessions=(D.sessions||[]).slice(-8).map(s=>({
@@ -4491,10 +4471,6 @@ async function generateDailyPrescription(workoutType,durationMins){
     const liftBests={bench:0,ohp:0,squat:0,dl:0};
     (D.sessions||[]).forEach(s=>{['bench','ohp','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if(set.w&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
     if(!liftBests.bench)liftBests.bench=255;if(!liftBests.ohp)liftBests.ohp=120;if(!liftBests.squat)liftBests.squat=215;if(!liftBests.dl)liftBests.dl=215;
-    const memCtx=D.coachingMemory||{compressed:null,notes:[]};
-    const memStr=memCtx.compressed?`\nCOACHING PROFILE (compressed):\n${JSON.stringify(memCtx.compressed)}`:'';
-    const recentNotes=memCtx.notes.slice(-5);
-    const notesStr=recentNotes.length?`\nRECENT COACHING NOTES:\n${JSON.stringify(recentNotes)}`:'';
     const workScope=durationMins===30?'CONDENSED (30min): 2-3 primary compound lifts only. No accessories.'
       :durationMins===90?'FULL (90min): Primary compounds + full accessory protocol.'
       :'STANDARD (60min): Primary compounds + key accessories (3-4 exercises total).';
@@ -4580,7 +4556,6 @@ ${JSON.stringify(recentSessions)}
 ${runDataSection}
 BIOMETRICS (7-day means):
 Resting HR: ${means.rhr||'?'}bpm · HRV: ${means.hrv||'?'}ms · 7-day entries: ${means.count}
-${memStr}${notesStr}
 
 NEXT 7 DAYS FOR SUGGESTIONS: ${next7Days.map(d=>d.date+'('+d.dow+')').join(', ')}
 
@@ -4623,9 +4598,6 @@ RULES:
     if(!parsed.todayPrescription||!parsed.weekPlan)throw new Error('Response missing required fields. Got: '+Object.keys(parsed).join(', '));
     if(!D.dailyPrescriptions)D.dailyPrescriptions={};
     D.dailyPrescriptions[today]={...parsed.todayPrescription,workoutType,durationMins,generatedAt:new Date().toISOString(),weekPlan:parsed.weekPlan};
-    if(!D.coachingMemory)D.coachingMemory={compressed:null,notes:[]};
-    D.coachingMemory.notes.push({date:today,workoutType,durationMins,mainWorkSummary:parsed.todayPrescription.mainWork?.summary||'',coachNote:parsed.todayPrescription.coachNote||'',flags:ts.activeFlags});
-    if(D.coachingMemory.notes.length>30)D.coachingMemory.notes=D.coachingMemory.notes.slice(-30);
     await pushSilent();
     renderPrescriptionCard(D.dailyPrescriptions[today]);
     renderWeekSuggestions(D.dailyPrescriptions[today].weekPlan);
@@ -5622,31 +5594,7 @@ function renderAIFlowDiagram(){
       }
     },
     {
-      id:'coachmem',
-      icon:'🧠',
-      label:'Coaching Memory',
-      sublabel:'compressed from past prescriptions',
-      color:'rgba(160,102,212,0.9)',
-      bg:'rgba(160,102,212,0.07)',
-      border:'rgba(160,102,212,0.3)',
-      detail(){
-        const mem=D.coachingMemory||{};
-        const noteCount=(mem.notes||[]).length;
-        const compressed=mem.compressed;
-        const rows=[
-          ['Notes stored', noteCount+' / 15 before compression', 'After each prescription, a structured observation note is saved. When 15 accumulate, they\'re compressed by Claude into the summary below.'],
-          ['Lift trend pattern', compressed?.liftTrends||'—', 'Compressed summary of strength trajectory across multiple training blocks.'],
-          ['Run fitness pattern', compressed?.runFitnessPattern||'—', 'How your running fitness has evolved — pace, HR, distance trends.'],
-          ['Recovery pattern', compressed?.recoveryPattern||'—', 'Observations about how your HRV, RHR, and sleep typically respond to training load.'],
-          ['Injury flags', compressed?.injuryFlags||'None noted', 'Any persistent pain or movement restrictions flagged in past prescriptions.'],
-          ['Responds best to', compressed?.respondsBestTo||'—', 'Training stimuli that have historically produced your best adaptations.'],
-          ['Compressed through', compressed?.compressedThrough||'—', 'Date through which notes were compressed. Newer notes exist as raw entries above.'],
-        ];
-        return{title:'🧠 Coaching Memory — accumulated prescription history',desc:'Every prescription generates a structured observation note (date, workout type, key observations, coaching points). Once 15 notes accumulate, Claude compresses them into a structured summary that travels with every future AI call. This is how the AI "remembers" your training history without hitting token limits.',rows};
-      }
-    },
-    {
-      id:'request',
+      id:\'request\',
       icon:'📅',
       label:'Your Request',
       sublabel:'workout type + duration',
