@@ -2654,7 +2654,7 @@ async function saveSession(){
   const sessionEnergy=todayCI.energy||null;
   const latestBodyEntry=(D.bodyMetrics||[]).slice(-1)[0]||{};
   const sessionBW=latestBodyEntry.weightLbs||D.profile?.bodyweight||null;
-  const session={date,day,notes:document.getElementById('log-notes')?.value||'',...(sessionRpe?{rpe:sessionRpe}:{}),...(sessionEnergy?{energy:sessionEnergy}:{}),...(sessionBW?{bw:sessionBW}:{}),bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
+  const session={date,day,type:day,notes:document.getElementById('log-notes')?.value||'',...(sessionRpe?{rpe:sessionRpe}:{}),...(sessionEnergy?{energy:sessionEnergy}:{}),...(sessionBW?{bw:sessionBW}:{}),bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
   D.adherence=(D.adherence||{});D.adherence.completed=(D.adherence.completed||0)+1;
@@ -4146,6 +4146,10 @@ function renderVO2TrendChart(){
   });
 }
 function onDayTypeChange(value){
+  // Normalize push/pull/legs → A/B/C so this function works whether called
+  // from startLoggingSession (which pre-translates) or any future direct call.
+  const _norm={push:'A',pull:'B',legs:'C'};
+  value=_norm[value]||value;
   const blocks={
     bench:document.getElementById('bench-block'),
     ohp:document.getElementById('ohp-block'),
