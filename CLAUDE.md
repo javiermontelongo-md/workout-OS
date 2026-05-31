@@ -85,7 +85,7 @@ TODAY · PROGRAM · LOG SESSION · ACTIVITY · PROGRESS · MILESTONES · RULES �
 `sessions[]` · `runs[]` · `checkins[]` · `healthLogs[]` ·
 `healthLastSync` · `stravaLastSync` ·
 `runPrescriptions{}` · `dailyPrescriptions{}` ·
-`coachingLog[]` · `bodyMetrics[]`
+`rpeConfirmations[]` · `coachingLog[]` · `bodyMetrics[]`
 
 ## Lift Keys
 `bench` · `ohp` · `pullup` · `row` · `squat` · `dl`
@@ -369,6 +369,8 @@ generateDailyPrescription(workoutType, durationMins)  ← only AI call in the ap
   └── evaluateTrainingStatus()  ← hard rules (z-score engine)
   └── compute7DayMeans()        ← 7-day biometrics + 60-day personal baseline
   └── Direct Anthropic API (claude-sonnet-4-5, 2500 tokens)
+        Prompt includes (lift days only): D.rpeConfirmations.slice(-20)
+        → AI uses actual vs predicted RPE to calibrate load recommendations
   └── Produces: todayPrescription + weekPlan[7]
   └── Writes: D.dailyPrescriptions[today]
   └── Calls: renderPrescriptionCard(), renderWeekSuggestions(),
@@ -553,7 +555,10 @@ elevationGain: feet
   all removed. Only one AI function remains: generateDailyPrescription() (Program tab button).
   coachingMemory field removed from defD and data structure entirely.
 - prog-block-badge + prog-block-desc HTML divs in PROGRAM tab
-- D.adaptivePlanCache=null in saveSession (adaptivePlanCache never populated)
+- **D.adaptivePlanCache** — removed from defD() (was only populated by the now-deleted adaptive plan system)
+- **D.recoveryLogs[]** — removed from defD() (was written by deleted AI functions, never read)
+- **D.volumeBests{}** — removed from defD() (was used by buildAthleteContext which was deleted)
+- **D.adherence{}** — removed from defD() and saveSession() write sites (was incremented but never read or displayed)
 - **Fixed % HRV/RHR thresholds**: ATHLETE.HRV_CRASH and ATHLETE.HRV_WARNING removed.
   HRV and RHR rules now use 60-day rolling z-score baseline in evaluateTrainingStatus().
 - **Shared yExercise axis for exercise+calories**: exercise minutes and active calories were

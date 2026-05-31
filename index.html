@@ -2260,7 +2260,7 @@ function lCFG(){
   try{ const k=localStorage.getItem('jm_api_key'); if(k) CFG.api=k; }catch(e){console.warn('lCFG api key load failed:',e);}
 }
 function sCFG(){ try{ localStorage.setItem('wkt_v3',JSON.stringify(CFG)); }catch(e){console.warn('sCFG save failed:',e);} }
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],recoveryLogs:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},volumeBests:{bench:'190x5x5',ohp:'90x3x5',squat:'160x5x5',deadlift:'160x3x5'},adherence:{planned:5,completed:0,missed:0},adaptivePlanCache:null,stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[]}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[]}; }
 lCFG();
 
 // ============================================================
@@ -2643,7 +2643,6 @@ async function saveSession(){
   const session={date,day,type:day,notes:document.getElementById('log-notes')?.value||'',...(sessionRpe?{rpe:sessionRpe}:{}),...(sessionEnergy?{energy:sessionEnergy}:{}),...(sessionBW?{bw:sessionBW}:{}),bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
-  D.adherence=(D.adherence||{});D.adherence.completed=(D.adherence.completed||0)+1;
   // Update e1RM (Epley formula)
   const updE=(sets,key)=>{ sets.filter(s=>s.w&&s.r).forEach(s=>{const e=Math.round(s.w*(1+s.r/30));if(e>(D.currentLifts[key]||0))D.currentLifts[key]=e;}); };
   if(session.bench.sets.length) updE(session.bench.sets,'benchE1RM');
@@ -2656,7 +2655,7 @@ async function saveSession(){
   const ok=await push('log-sbtn','log-smsg');
   if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); // D.runPrescriptions intentionally NOT touched
  renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); renderVO2TrendChart(); }
-  else { D.sessions.pop(); D.adherence.completed--; }
+  else { D.sessions.pop(); }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
 function resetLogForm(){
@@ -4317,6 +4316,8 @@ Zone 2: ALL easy runs hard-capped at ${ts.mafHR}bpm — prescribe a pace slow en
 
 RECENT SESSIONS (last 8):
 ${JSON.stringify(recentSessions)}
+${isLiftDay?`\nRPE CONFIRMATIONS (last 20 — use to calibrate load: actual > predicted → reduce weight, actual < predicted → increase):
+${JSON.stringify((D.rpeConfirmations||[]).slice(-20).map(r=>({date:r.date,lift:r.lift,predicted:r.predictedRPE,actual:r.actualRPE,weight:r.weight,sets:r.sets,reps:r.reps})))}\n`:''}
 ${runDataSection}
 BIOMETRICS (7-day means):
 Resting HR: ${means.rhr||'?'}bpm · HRV: ${means.hrv||'?'}ms · 7-day entries: ${means.count}
@@ -5271,7 +5272,7 @@ function renderAIFlowDiagram(){
           ['Block Week', bw.weekNum+' of 4', 'A 4-week progressive overload cycle. Week 4 is always a deload. Resets if fewer than 3 sessions in 14 days.'],
           ['Block Params', `${bp.sets}×${bp.reps} @ RPE ${bp.targetRPE}`, 'Sets × reps × target RPE for this block week. Week 1 = volume base. Week 3 = intensity peak.'],
           ['Last 8 sessions', (D.sessions||[]).length+' total logged', 'Sent as structured log: date, type, and per-set weight×reps@RPE for all 6 lifts + accessories.'],
-          ['RPE Confirmations', (D.rpeConfirmations||[]).length+' total', 'After each session you can confirm actual RPE vs prescribed. The AI uses the last 20 to calibrate future weight recommendations.'],
+          ['RPE Confirmations', (D.rpeConfirmations||[]).length+' total', 'After each lift session you can confirm actual RPE vs prescribed. The last 20 are sent to the AI to calibrate future load recommendations.'],
           ['Clean pullups (max)', D.currentLifts?.pullups||'—', 'Live-computed from bodyweight-only sets. Used to scale pullup prescriptions.'],
         ];
         return{title:'💪 Lift History — 6 compound movements tracked',desc:'Every logged session is stored with full per-set detail (weight × reps @ RPE). The AI receives the last 8 sessions and your current e1RM bests for all 6 lifts, plus trend direction computed deterministically before the AI sees anything.',rows};
