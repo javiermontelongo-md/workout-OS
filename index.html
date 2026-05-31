@@ -1767,7 +1767,24 @@ input[type=range]::-webkit-slider-thumb:hover {
       </div>
 
       <div id="fs-pane-mobile" style="display:none;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;line-height:1.6;">These override sizes only on screens ≤768px (phones).</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;line-height:1.6;">These override sizes only on screens ≤768px (phones). Fully independent from desktop settings.</div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:var(--fs-sm);">Base font size</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-mobile-base">14</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-mobile-base" min="11" max="20" value="14" oninput="setMobileBaseFontSize(+this.value)">
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:3px;"><span>11 compact</span><span>20 large</span></div>
+        </div>
+        <div class="ig" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <label style="margin:0;font-size:var(--fs-sm);">Small text size</label>
+            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-mobile-smalltext">12</span>px</span>
+          </div>
+          <input type="range" id="fs-rng-mobile-smalltext" min="9" max="16" value="12" oninput="setMobileSmallTextSize(+this.value)">
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:3px;"><span>9 tiny</span><span>16 large</span></div>
+        </div>
+        <div style="height:1px;background:var(--b);margin:4px 0 12px;"></div>
         <div class="ig" style="margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
             <label style="margin:0;font-size:var(--fs-sm);">Mobile logo</label>
@@ -1990,14 +2007,29 @@ function _applyComponentFontSizes(){
   el.textContent=css;
 }
 function _applyMobileComponentFontSizes(){
-  const rules=Object.entries(FS_MOBILE).map(([key,cfg])=>{
+  const basePx=+(localStorage.getItem('wos-mobile-base')||14);
+  const smPx=+(localStorage.getItem('wos-mobile-smalltext')||12);
+  const xsPx=Math.max(9,Math.round(smPx*0.85));
+  const compRules=Object.entries(FS_MOBILE).map(([key,cfg])=>{
     const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
     return `${cfg.sel}{font-size:${px}px}`;
   }).join('\n');
-  const css=`@media(max-width:768px){\n${rules}\n}`;
+  const css=`@media(max-width:768px){\nbody{font-size:${basePx}px}\n:root{--fs-sm:${smPx}px;--fs-xs:${xsPx}px}\n${compRules}\n}`;
   let el=document.getElementById('wos-fs-mobile-overrides');
   if(!el){el=document.createElement('style');el.id='wos-fs-mobile-overrides';document.head.appendChild(el);}
   el.textContent=css;
+}
+function setMobileBaseFontSize(px){
+  localStorage.setItem('wos-mobile-base',px);
+  _applyMobileComponentFontSizes();
+  const lbl=document.getElementById('fs-lbl-mobile-base');if(lbl)lbl.textContent=px;
+  const rng=document.getElementById('fs-rng-mobile-base');if(rng)rng.value=px;
+}
+function setMobileSmallTextSize(px){
+  localStorage.setItem('wos-mobile-smalltext',px);
+  _applyMobileComponentFontSizes();
+  const lbl=document.getElementById('fs-lbl-mobile-smalltext');if(lbl)lbl.textContent=px;
+  const rng=document.getElementById('fs-rng-mobile-smalltext');if(rng)rng.value=px;
 }
 function setComponentFontSize(key,px){
   localStorage.setItem('wos-fs-'+key,px);
@@ -2109,6 +2141,8 @@ function applyAppearanceChanges(){
     const el=document.getElementById('fs-rng-'+key);
     if(el) setMobileComponentFontSize(key,+el.value);
   });
+  const mbEl=document.getElementById('fs-rng-mobile-base');if(mbEl)setMobileBaseFontSize(+mbEl.value);
+  const msEl=document.getElementById('fs-rng-mobile-smalltext');if(msEl)setMobileSmallTextSize(+msEl.value);
   _syncAppearanceUI();
   const btn=document.getElementById('appearance-apply-btn');
   if(btn){
@@ -2147,6 +2181,12 @@ function _syncAppearanceUI(){
     const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=px;
     const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
   });
+  const mb=+(localStorage.getItem('wos-mobile-base')||14);
+  const mbr=document.getElementById('fs-rng-mobile-base');if(mbr)mbr.value=mb;
+  const mbl=document.getElementById('fs-lbl-mobile-base');if(mbl)mbl.textContent=mb;
+  const ms2=+(localStorage.getItem('wos-mobile-smalltext')||12);
+  const msr=document.getElementById('fs-rng-mobile-smalltext');if(msr)msr.value=ms2;
+  const msl=document.getElementById('fs-lbl-mobile-smalltext');if(msl)msl.textContent=ms2;
 }
 
 const ATHLETE = {
