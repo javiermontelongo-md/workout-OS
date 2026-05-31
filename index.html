@@ -2524,6 +2524,8 @@ function renderRulesTab(){
     {title:'HRV acute crash',desc:'HRV >1.5 SD below 60-day personal baseline blocks quality work and heavy lifts. Volume at 75%, RPE cap 6.',flag:'HRV_ACUTE_CRASH',threshold:'Trigger: HRV < '+(Math.round(ts.means.hrvBaseline60-1.5*ts.means.hrvSD60))+'ms (baseline '+Math.round(ts.means.hrvBaseline60)+'±'+Math.round(ts.means.hrvSD60)+'ms · today: '+(ts.latestHRV||'—')+'ms)'},
     {title:'HRV warning',desc:'HRV 0.75–1.5 SD below 60-day personal baseline reduces volume to 85% and caps RPE at 7.',flag:'HRV_WARNING',threshold:'Trigger: HRV '+(Math.round(ts.means.hrvBaseline60-1.5*ts.means.hrvSD60))+'–'+(Math.round(ts.means.hrvBaseline60-0.75*ts.means.hrvSD60))+'ms'},
     {title:'Resting HR spike',desc:'Resting HR >1.5 SD above 60-day personal baseline blocks quality work. Volume at 85%, RPE cap 7.',flag:'RHR_SPIKE',threshold:'Trigger: RHR > '+(Math.round(ts.means.rhrBaseline60+1.5*ts.means.rhrSD60))+'bpm (baseline '+Math.round(ts.means.rhrBaseline60)+'±'+Math.round(ts.means.rhrSD60)+'bpm · today: '+(ts.latestRHR||'—')+'bpm)'},
+    {title:'Late sleep onset',desc:'Fell asleep after 1 AM — circadian disruption. Volume at 90%, RPE capped at 7.',flag:'LATE_SLEEP',threshold:'Trigger: sleepOnset ≥ 01:00 · last night: '+(ts.sleepOnset||'—')},
+    {title:'Early wake',desc:'Woke before 5 AM — abbreviated sleep window. Volume at 90%, RPE capped at 7.',flag:'EARLY_WAKE',threshold:'Trigger: wakeTime < 05:00 · last night: '+(ts.wakeTime||'—')},
     {title:'Deload week (Week 4)',desc:'Week 4 of every block: no quality runs, volume at 60%, RPE capped at 6. Non-negotiable even with good biometrics.',flag:'DELOAD_WEEK',threshold:'Trigger: blockWeek.weekNum === 4'},
     {title:'MAF HR ceiling',desc:'All easy runs hard-capped at '+ATHLETE.mafHR+' bpm (MAF formula: 180 − '+ATHLETE.age+' − 5). Slow down or walk if exceeded.',flag:null,threshold:'Your MAF: '+ATHLETE.mafHR+' bpm. Current easy runs: 165–174 bpm (too high).'},
   ];
@@ -4159,6 +4161,28 @@ function evaluateTrainingStatus(){
     reasons.push(`Sleep ${sleepHours}h — reduced volume and RPE cap 7.`);
   }
 
+  // ── CIRCADIAN FLAGS ───────────────────────────────────────────
+  // Read from last health log (health-sync.js populates sleepOnset/wakeTime as "HH:MM").
+  const _hhToH=hhmm=>{if(!hhmm)return null;const[h,m]=hhmm.split(':').map(Number);return h+m/60;};
+  const latestSleepOnset=latest.sleepOnset||null;
+  const latestWakeTime=latest.wakeTime||null;
+  const onsetH=_hhToH(latestSleepOnset);
+  const wakeH=_hhToH(latestWakeTime);
+  // LATE_SLEEP: fell asleep after 1 AM (onsetH ≥1 and <12 excludes evening/noon edge cases)
+  if(onsetH!==null&&onsetH>=1&&onsetH<12){
+    flags.push('LATE_SLEEP');
+    liftRPECap=Math.min(liftRPECap,7);
+    volumeModifier=Math.min(volumeModifier,0.90);
+    reasons.push(`Slept after 1 AM (onset ${latestSleepOnset}) — circadian disruption. RPE capped at 7, volume 90%.`);
+  }
+  // EARLY_WAKE: woke before 5 AM
+  if(wakeH!==null&&wakeH<5){
+    flags.push('EARLY_WAKE');
+    liftRPECap=Math.min(liftRPECap,7);
+    volumeModifier=Math.min(volumeModifier,0.90);
+    reasons.push(`Woke before 5 AM (${latestWakeTime}) — abbreviated sleep window. RPE capped at 7, volume 90%.`);
+  }
+
   const bw=detectBlockWeek();
   if(bw.weekNum===4){
     flags.push('DELOAD_WEEK');
@@ -4182,12 +4206,13 @@ function evaluateTrainingStatus(){
     stressScore=3;
   } else if(flags.includes('SLEEP_WARNING')&&flags.includes('RHR_SPIKE')){
     stressScore=2;
-  } else if(flags.includes('SLEEP_WARNING')||flags.includes('RHR_SPIKE')||flags.includes('HRV_WARNING')){
+  } else if(flags.includes('SLEEP_WARNING')||flags.includes('RHR_SPIKE')||flags.includes('HRV_WARNING')||flags.includes('LATE_SLEEP')||flags.includes('EARLY_WAKE')){
     stressScore=1;
   }
 
   return{canTrain,canDoQuality,canDoHeavyLifts,liftRPECap,volumeModifier,stressScore,
-    activeFlags:flags,reasons,mafHR:ATHLETE.mafHR,latestHRV,latestRHR,sleepHours,means};
+    activeFlags:flags,reasons,mafHR:ATHLETE.mafHR,latestHRV,latestRHR,sleepHours,
+    sleepOnset:latestSleepOnset,wakeTime:latestWakeTime,means};
 }
 
 async function pushSilent(){
@@ -4321,6 +4346,7 @@ ${JSON.stringify((D.rpeConfirmations||[]).slice(-20).map(r=>({date:r.date,lift:r
 ${runDataSection}
 BIOMETRICS (7-day means):
 Resting HR: ${means.rhr||'?'}bpm · HRV: ${means.hrv||'?'}ms · 7-day entries: ${means.count}
+Sleep timing (last night): onset ${ts.sleepOnset||'unknown'} · wake ${ts.wakeTime||'unknown'}${ts.sleepOnset&&ts.wakeTime?' · flags: '+(ts.activeFlags.filter(f=>f==='LATE_SLEEP'||f==='EARLY_WAKE').join(', ')||'none'):''}
 
 NEXT 7 DAYS FOR SUGGESTIONS: ${next7Days.map(d=>d.date+'('+d.dow+')').join(', ')}
 
@@ -5208,6 +5234,8 @@ function renderAIFlowDiagram(){
           HRV_WARNING:'Today\'s HRV is 0.75–1.5 SD below your 60-day personal baseline. RPE cap 7, volume 85%.',
           RHR_SPIKE:'Resting HR >1.5 SD above your 60-day personal baseline. Quality work blocked, RPE cap 7, volume 85%.',
           SLEEP_WARNING:'Sleep 5–6.5h. RPE cap 7, volume 85%.',
+          LATE_SLEEP:'Fell asleep after 1 AM. Circadian disruption — RPE cap 7, volume 90%.',
+          EARLY_WAKE:'Woke before 5 AM. Abbreviated sleep window — RPE cap 7, volume 90%.',
           DELOAD_WEEK:'Block week 4 — automatic deload. No quality, volume at 60%, RPE cap 6.',
         };
         const rows=[

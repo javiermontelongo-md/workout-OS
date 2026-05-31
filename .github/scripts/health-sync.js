@@ -86,6 +86,33 @@ function buildEntryForDate(metrics, date) {
     ? Math.round(sleepAwakeRaw * 10) / 10
     : null;
 
+  // Sleep timing — HAE sends sleepStart / sleepEnd (ISO strings) on sleep_analysis entries.
+  // Store as "HH:MM" local time. Midpoint stored as decimal hours past midnight (handles
+  // cross-midnight correctly: if wake < onset, add 24 before averaging).
+  function isoToHHMM(isoStr) {
+    if (!isoStr) return null;
+    // Format: "2026-05-19 01:23:00 -0400" or "2026-05-19T01:23:00-04:00"
+    const m = isoStr.replace('T', ' ').match(/(\d{2}):(\d{2}):\d{2}\s[+-]/);
+    if (!m) return null;
+    return `${m[1]}:${m[2]}`;
+  }
+  function hhmmToDecimal(hhmm) {
+    if (!hhmm) return null;
+    const [h, m] = hhmm.split(':').map(Number);
+    return h + m / 60;
+  }
+  const sleepOnset = sleepEntry ? isoToHHMM(sleepEntry.sleepStart || sleepEntry.inBedStart) : null;
+  const wakeTime   = sleepEntry ? isoToHHMM(sleepEntry.sleepEnd   || sleepEntry.inBedEnd)   : null;
+  let sleepMidpoint = null;
+  if (sleepOnset && wakeTime) {
+    const onsetH = hhmmToDecimal(sleepOnset);
+    const wakeH  = hhmmToDecimal(wakeTime);
+    // If wake < onset the session crossed midnight — add 24 to wake before averaging
+    const adjustedWake = wakeH < onsetH ? wakeH + 24 : wakeH;
+    sleepMidpoint = Math.round(((onsetH + adjustedWake) / 2) * 100) / 100;
+    if (sleepMidpoint >= 24) sleepMidpoint -= 24; // normalise back to 0–24
+  }
+
   // Wrist temp: convert °F → delta °C
   const wristTempRaw = getQtyForDate(metrics, 'apple_sleeping_wrist_temperature', date);
   const wristTemp = wristTempRaw !== null
@@ -125,6 +152,9 @@ function buildEntryForDate(metrics, date) {
     sleepREM,
     sleepLight,
     sleepAwake,
+    sleepOnset,
+    wakeTime,
+    sleepMidpoint,
     steps,
     exerciseMinutes,
     activeCalories,
