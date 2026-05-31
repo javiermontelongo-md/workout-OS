@@ -2211,7 +2211,6 @@ const ATHLETE = {
   },
 
   // Hard rule thresholds
-  RHR_SPIKE:      8,
   FEVER_TEMP:     1.5,
   SLEEP_BLOCK:    5.0,
   SLEEP_WARNING:  6.5,
@@ -2538,7 +2537,7 @@ function renderRulesTab(){
     {title:'Sleep warning',desc:'Sleep 5–6.5h reduces volume to 85% and caps RPE at 7.',flag:'SLEEP_WARNING',threshold:'Trigger: sleep 5.0–6.4h'},
     {title:'HRV acute crash',desc:'HRV >1.5 SD below 60-day personal baseline blocks quality work and heavy lifts. Volume at 75%, RPE cap 6.',flag:'HRV_ACUTE_CRASH',threshold:'Trigger: HRV < '+(Math.round(ts.means.hrvBaseline60-1.5*ts.means.hrvSD60))+'ms (baseline '+Math.round(ts.means.hrvBaseline60)+'±'+Math.round(ts.means.hrvSD60)+'ms · today: '+(ts.latestHRV||'—')+'ms)'},
     {title:'HRV warning',desc:'HRV 0.75–1.5 SD below 60-day personal baseline reduces volume to 85% and caps RPE at 7.',flag:'HRV_WARNING',threshold:'Trigger: HRV '+(Math.round(ts.means.hrvBaseline60-1.5*ts.means.hrvSD60))+'–'+(Math.round(ts.means.hrvBaseline60-0.75*ts.means.hrvSD60))+'ms'},
-    {title:'Resting HR spike',desc:'Resting HR >8 bpm above 7-day mean blocks quality runs. Volume at 85%, RPE cap 7.',flag:'RHR_SPIKE',threshold:'Trigger: RHR > '+Math.round(ts.means.rhr+8)+'bpm (today: '+(ts.latestRHR||'—')+'bpm)'},
+    {title:'Resting HR spike',desc:'Resting HR >1.5 SD above 60-day personal baseline blocks quality work. Volume at 85%, RPE cap 7.',flag:'RHR_SPIKE',threshold:'Trigger: RHR > '+(Math.round(ts.means.rhrBaseline60+1.5*ts.means.rhrSD60))+'bpm (baseline '+Math.round(ts.means.rhrBaseline60)+'±'+Math.round(ts.means.rhrSD60)+'bpm · today: '+(ts.latestRHR||'—')+'bpm)'},
     {title:'Deload week (Week 4)',desc:'Week 4 of every block: no quality runs, volume at 60%, RPE capped at 6. Non-negotiable even with good biometrics.',flag:'DELOAD_WEEK',threshold:'Trigger: blockWeek.weekNum === 4'},
     {title:'MAF HR ceiling',desc:'All easy runs hard-capped at '+ATHLETE.mafHR+' bpm (MAF formula: 180 − '+ATHLETE.age+' − 5). Slow down or walk if exceeded.',flag:null,threshold:'Your MAF: '+ATHLETE.mafHR+' bpm. Current easy runs: 165–174 bpm (too high).'},
   ];
@@ -3423,7 +3422,7 @@ function detectBlockWeek(){
 
   // Reset signal: fewer than 3 lift sessions in the last 14 days → restart at Week 1
   // This prevents the cycle from advancing through gaps in training.
-  const liftDays=['push','pull','legs','A','B','C'];
+  const liftDays=['push','pull','legs','A','B','C','1','2','4','5']; // legacy numeric day formats included
   const cutoff14=new Date(); cutoff14.setDate(cutoff14.getDate()-14);
   const cutoff14Str=localDS(cutoff14);
   const recentLifts=sessions.filter(s=>s.date>=cutoff14Str&&liftDays.includes(s.day||''));
@@ -3493,7 +3492,7 @@ function estimateVO2max(run){
   if(!run||!run.heartRateAvg||run.distance<2) return null;
   const speedMs=(run.distance*1609.34)/run.duration;
   const hrAvg=run.heartRateAvg;
-  const hrMax=run.heartRateMax||180;
+  const hrMax=run.heartRateMax||(()=>{const maxSeen=Math.max(...(D.runs||[]).map(r=>r.heartRateMax||0));return maxSeen>0?maxSeen:185;})();
   const elevationFt=run.elevationGain||0;
   const hrElevationBias=(elevationFt/100)*1.5;
   const hrAvgCorrected=Math.max(hrAvg-hrElevationBias,HR_REST+10);
@@ -4307,6 +4306,15 @@ function compute7DayMeans(){
     hrvSD60=Math.sqrt(variance);
   }
 
+  // 60-day rolling personal baseline for RHR — same rationale as HRV above.
+  const rhr60=logs.filter(l=>l.date>=cutoff60Str&&l.restingHR).map(l=>l.restingHR);
+  let rhrBaseline60=ATHLETE.rhrBaseline, rhrSD60=4.5;
+  if(rhr60.length>=30){
+    rhrBaseline60=rhr60.reduce((a,b)=>a+b,0)/rhr60.length;
+    const rhrVariance=rhr60.reduce((a,b)=>a+(b-rhrBaseline60)**2,0)/rhr60.length;
+    rhrSD60=Math.sqrt(rhrVariance);
+  }
+
   return{
     hrv:hrv7d.length?hrv7d.reduce((a,b)=>a+b,0)/hrv7d.length:ATHLETE.hrvBaseline,
     rhr:rhr7d.length?rhr7d.reduce((a,b)=>a+b,0)/rhr7d.length:ATHLETE.rhrBaseline,
@@ -4315,6 +4323,10 @@ function compute7DayMeans(){
     hrvBaseline60,
     hrvSD60,
     hrv60Count:hrv60.length,
+    // Personal RHR baseline from 60-day rolling window
+    rhrBaseline60,
+    rhrSD60,
+    rhr60Count:rhr60.length,
   };
 }
 
@@ -4379,12 +4391,17 @@ function evaluateTrainingStatus(){
   }
 
   const latestRHR=latest.restingHR||null;
-  if(latestRHR&&means.rhr>0&&latestRHR>means.rhr+ATHLETE.RHR_SPIKE){
-    flags.push('RHR_SPIKE');
-    canDoQuality=false;
-    liftRPECap=Math.min(liftRPECap,7);
-    volumeModifier=Math.min(volumeModifier,0.85);
-    reasons.push(`Resting HR ${latestRHR}bpm is ${Math.round(latestRHR-means.rhr)}bpm above 7d mean. Quality blocked.`);
+  if(latestRHR&&means.rhrBaseline60>0){
+    // Z-score anchored to 60-day personal baseline — same pattern as HRV.
+    // Spike: latest > baseline + 1.5 SD
+    const _rhrZScore=(latestRHR-means.rhrBaseline60)/means.rhrSD60;
+    if(_rhrZScore>=1.5){
+      flags.push('RHR_SPIKE');
+      canDoQuality=false;
+      liftRPECap=Math.min(liftRPECap,7);
+      volumeModifier=Math.min(volumeModifier,0.85);
+      reasons.push(`Resting HR ${latestRHR}bpm is ${_rhrZScore.toFixed(1)} SD above 60-day baseline (${Math.round(means.rhrBaseline60)}±${Math.round(means.rhrSD60)}bpm). Quality blocked.`);
+    }
   }
 
   if(sleepHours!==null&&sleepHours>=ATHLETE.SLEEP_BLOCK&&sleepHours<ATHLETE.SLEEP_WARNING){
@@ -5457,7 +5474,7 @@ function renderAIFlowDiagram(){
         const rows=[
           ['HRV (today)', hl.hrv?hl.hrv.toFixed(1)+' ms':'—', `Baseline: ${ATHLETE.hrvBaseline} ms. Overnight SDNN from Apple Watch. The AI uses this vs your 7-day rolling mean to detect recovery crashes.`],
           ['HRV (7d mean)', hrv7?hrv7+' ms':'—', 'Used as the denominator for HRV crash detection. If today < 80% of this, quality and heavy work are blocked.'],
-          ['Resting HR (today)', hl.restingHR?hl.restingHR+' bpm':'—', `Baseline: ${ATHLETE.rhrBaseline} bpm. If today is >8 bpm above 7d mean, quality work is blocked.`],
+          ['Resting HR (today)', hl.restingHR?hl.restingHR+' bpm':'—', `Baseline: ${ATHLETE.rhrBaseline} bpm. Spike flag triggers at >1.5 SD above 60-day personal baseline.`],
           ['Resting HR (7d mean)', rhr7?rhr7+' bpm':'—', 'Rolling context for RHR spike detection.'],
           ['Wrist Temp', hl.wristTemp!=null?hl.wristTemp.toFixed(2)+'°C delta':'—', 'Delta from 98.6°F baseline. If ≥ +1.5°C, fever signal fires — all training blocked. Normal range: −2 to −0.5°C.'],
           ['Sleep (latest)', hl.sleepHours?hl.sleepHours+'h':'—', 'Time asleep (not in bed). If < 5h, heavy + quality work blocked. If 5–6.5h, volume reduced and RPE capped at 7.'],
@@ -5484,7 +5501,7 @@ function renderAIFlowDiagram(){
           SLEEP_BLOCK:'Sleep < 5h. No quality or heavy lifts. RPE capped at 6, volume at 80%.',
           HRV_ACUTE_CRASH:'Today\'s HRV is >1.5 SD below your 60-day personal baseline. Quality + heavy work blocked. RPE cap 6, volume 75%.',
           HRV_WARNING:'Today\'s HRV is 0.75–1.5 SD below your 60-day personal baseline. RPE cap 7, volume 85%.',
-          RHR_SPIKE:'Resting HR > 8 bpm above 7-day mean. Quality work blocked, RPE cap 7, volume 85%.',
+          RHR_SPIKE:'Resting HR >1.5 SD above your 60-day personal baseline. Quality work blocked, RPE cap 7, volume 85%.',
           SLEEP_WARNING:'Sleep 5–6.5h. RPE cap 7, volume 85%.',
           DELOAD_WEEK:'Block week 4 — automatic deload. No quality, volume at 60%, RPE cap 6.',
         };
@@ -5591,7 +5608,7 @@ function renderAIFlowDiagram(){
           ['Height', ATHLETE.heightInches+'" (5\'10")', 'Used for BMI and waist-to-height ratio.'],
           ['MAF HR', ATHLETE.mafHR+' bpm', '180 − age − mafModifier. This is the maximum HR for zone 2 / easy runs. AI is instructed to keep easy runs below this.'],
           ['HRV Baseline', ATHLETE.hrvBaseline+'ms', '95-day Apple Watch average (Feb–May 2026). The hard rules engine computes today\'s HRV as a % of this baseline.'],
-          ['RHR Baseline', ATHLETE.rhrBaseline+' bpm', '95-day average. Used as reference for RHR spike detection (+8 bpm triggers quality block).'],
+          ['RHR Baseline', ATHLETE.rhrBaseline+' bpm', '95-day average. Spike triggers at >1.5 SD above 60-day rolling personal baseline.'],
           ['Primary Goal', ATHLETE.goals.primary, 'Shapes all AI decisions — run prescriptions favor sub-20 5K pace progression.'],
           ['Secondary Goal', ATHLETE.goals.secondary, 'VO2max development through polarized training.'],
           ['Training Approach', 'Polarized 80/20', '80% of runs at easy/zone 2 intensity, 20% quality (tempo/intervals). AI applies this ratio to weekly suggestions.'],
