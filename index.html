@@ -4815,9 +4815,11 @@ function renderSnapshotCharts(){
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-sleep-chart"></canvas></div>
       <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
-        <span style="color:rgba(34,197,94,0.85);">── Actual sleep</span>
-        <span>- - Optimal 7–7.5h</span>
-        <span style="color:rgba(255,183,77,0.7);">- - 30d avg</span>
+        <span style="color:#1e40af;">▌ Deep</span>
+        <span style="color:#3b82f6;">▌ Core</span>
+        <span style="color:#93c5fd;">▌ REM</span>
+        <span style="color:rgba(148,163,184,0.5);">▌ Awake</span>
+        <span style="color:rgba(255,183,77,0.7);">- - 7h goal</span>
       </div>
     </div>
     <div style="margin-bottom:28px;">
@@ -4860,41 +4862,111 @@ function renderSnapshotCharts(){
   `;
 
   // ── SLEEP CHART ──
-  const sleepData=dates.map(date=>{
-    const ci=ciMap[date];
-    const hl=hlMap[date];
-    return ci?.sleepHours||hl?.sleepHours||null;
-  });
-  // 30-day avg for avg line
-  const sleepData30=dates30.map(date=>{const ci=ciMap[date];const hl=hlMap[date];return ci?.sleepHours||hl?.sleepHours||null;});
-  const validSleep30=sleepData30.filter(v=>v!==null);
-  const avgSleep=validSleep30.length?(validSleep30.reduce((s,v)=>s+v,0)/validSleep30.length).toFixed(1):null;
+  // Sleep header stat — 7-day avg hours (summary text only; chart uses timing data)
+  const sleepData7=dates.map(date=>{const ci=ciMap[date];const hl=hlMap[date];return ci?.sleepHours||hl?.sleepHours||null;});
+  const validSleep7=sleepData7.filter(v=>v!==null);
+  const avgSleep7=validSleep7.length?(validSleep7.reduce((s,v)=>s+v,0)/validSleep7.length).toFixed(1):null;
   const sleepAvgEl=document.getElementById('snap-sleep-avg');
-  if(sleepAvgEl&&avgSleep)sleepAvgEl.textContent=avgSleep+'h 30d avg';
+  if(sleepAvgEl&&avgSleep7)sleepAvgEl.textContent=avgSleep7+'h 7d avg';
 
+  // ── SLEEP TIMELINE CHART (iPhone-style) ──
+  // Y-axis = clock time (9 PM → 12 PM next day = 21→36 in 24h+ space).
+  // Each day gets stacked floating bars per sleep stage.
+  // Days with no timing data (no sleepOnset/wakeTime) are skipped — bar simply absent.
+  // Days with only sleepHours (legacy) also skipped per user preference.
   const sleepCtx=document.getElementById('snap-sleep-chart')?.getContext('2d');
   if(sleepCtx){
+    // Helper: "HH:MM" → decimal hour, adjusting for next-day wake (add 24 if < 12 so noon = ceiling)
+    const hhToH=s=>{if(!s)return null;const[h,m]=s.split(':').map(Number);return h<12?h+24:h;};
+    // Build per-stage floating bar datasets
+    // Each data point is [yStart, yEnd] for a floating bar, or null if no data for that day
+    // Stages: deep (#1e3a8a dark), core/light (#3b82f6 mid), REM (#93c5fd light), awake (grey)
+    // For days with full timing+stages: stack deep→core→rem→awake from sleep onset upward
+    // For days with only total sleep hours + timing: single solid bar
+    const mkNull=()=>dates.map(()=>null);
+    const deepBars=mkNull(),coreBars=mkNull(),remBars=mkNull(),awakeBars=mkNull(),solidBars=mkNull();
+    dates.forEach((date,i)=>{
+      const hl=hlMap[date];
+      if(!hl)return;
+      const onset=hhToH(hl.sleepOnset);
+      const wake=hhToH(hl.wakeTime);
+      if(onset===null||wake===null)return; // no timing data — skip this day
+      if(wake<=onset)return; // sanity check
+      const totalSpan=wake-onset;
+      // If we have stage breakdown, stack segments from onset upward
+      const deep=hl.sleepDeep||0,core=hl.sleepLight||0,rem=hl.sleepREM||0,awake=hl.sleepAwake||0;
+      const stageTotal=deep+core+rem+awake;
+      if(stageTotal>0.1){
+        // Scale stages proportionally to fill the actual sleep span
+        const scale=totalSpan/stageTotal;
+        let cursor=onset;
+        deepBars[i]=[cursor,cursor+=deep*scale];
+        coreBars[i]=[cursor,cursor+=core*scale];
+        remBars[i]=[cursor,cursor+=rem*scale];
+        awakeBars[i]=[cursor,cursor+=awake*scale];
+      } else {
+        // No stage data yet — single solid bar
+        solidBars[i]=[onset,wake];
+      }
+    });
+    // Y-axis range: 9 PM (21) to noon next day (36) — covers any realistic sleep window
+    const yMin=21,yMax=36;
+    const fmtClockH=v=>{const norm=v>=24?v-24:v;const ampm=norm<12||norm===24?'AM':'PM';const h12=norm%12||12;return h12+' '+ampm;};
+    const fmtDur=h=>{const hh=Math.floor(h);const mm=Math.round((h-hh)*60);return hh+'h'+(mm>0?' '+mm+'m':'');};
+    const barOpts={type:'bar',borderWidth:0,borderRadius:2,borderSkipped:false,categoryPercentage:0.55,barPercentage:1.0};
     new Chart(sleepCtx,{
-      type:'line',
+      type:'bar',
       data:{
         labels:dates,
         datasets:[
-          {label:'Sleep',data:sleepData,borderColor:'rgba(34,197,94,0.85)',backgroundColor:'rgba(34,197,94,0.12)',pointRadius:5,pointHoverRadius:7,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true},
-          {label:'Optimal min',data:dates.map(()=>7),borderColor:'rgba(34,197,94,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0},
-          {label:'Optimal max',data:dates.map(()=>7.5),borderColor:'rgba(34,197,94,0.3)',borderDash:[5,4],pointRadius:0,fill:'-1',backgroundColor:'rgba(34,197,94,0.06)',tension:0},
-          {label:'30d avg',data:dates.map(()=>avgSleep?parseFloat(avgSleep):null),borderColor:'rgba(255,183,77,0.65)',borderDash:[6,3],pointRadius:0,fill:false,tension:0,spanGaps:true}
+          {...barOpts,label:'Deep',data:deepBars,backgroundColor:'#1e40af'},
+          {...barOpts,label:'Core',data:coreBars,backgroundColor:'#3b82f6'},
+          {...barOpts,label:'REM',data:remBars,backgroundColor:'#93c5fd'},
+          {...barOpts,label:'Awake',data:awakeBars,backgroundColor:'rgba(148,163,184,0.45)'},
+          {...barOpts,label:'Sleep',data:solidBars,backgroundColor:'#3b82f6'},
+          // 7h goal line — shown as a scatter point across all days to fake a horizontal line
+          {type:'line',label:'7h goal',data:dates.map((_,i)=>{
+            const hl=hlMap[dates[i]];
+            const onset=hhToH(hl?.sleepOnset);
+            return onset!==null?onset+7:null;
+          }),borderColor:'rgba(255,183,77,0.6)',borderDash:[4,3],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:false}
         ]
       },
       options:{
-        responsive:true,
-        maintainAspectRatio:false,
+        responsive:true,maintainAspectRatio:false,
         plugins:{
           legend:{display:false},
-          tooltip:{filter:item=>item.raw!==null,callbacks:{label:ctx=>{if(ctx.dataset.label==='Sleep'){const v=ctx.parsed.y;const h=Math.floor(v);const m=Math.round((v-h)*60);return h+'h '+m+'m';}return null;}}}
+          tooltip:{
+            mode:'index',intersect:false,
+            callbacks:{
+              title:items=>{const d=new Date(dates[items[0].dataIndex]+'T12:00:00');return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]+' '+d.getDate();},
+              label:ctx=>{
+                const hl=hlMap[dates[ctx.dataIndex]];
+                if(ctx.datasetIndex===5)return null; // goal line — skip
+                const v=ctx.raw;
+                if(!v||!Array.isArray(v))return null;
+                const dur=fmtDur(v[1]-v[0]);
+                if(!dur||dur==='0h')return null;
+                return ctx.dataset.label+': '+dur;
+              },
+              afterBody:items=>{
+                const hl=hlMap[dates[items[0].dataIndex]];
+                if(!hl)return[];
+                const parts=[];
+                if(hl.sleepOnset&&hl.wakeTime)parts.push('⏱ '+hl.sleepOnset+' → '+hl.wakeTime);
+                if(hl.sleepHours)parts.push('Total: '+fmtDur(hl.sleepHours));
+                return parts;
+              }
+            }
+          }
         },
         scales:{
           x:{ticks:xTicks,grid:xGrid},
-          y:{min:4,max:10,ticks:{color:'#a8b4cc',font:{size:15,family:'DM Mono'},callback:function(v){return v+'h';}},grid:{color:'rgba(255,255,255,0.06)'}}
+          y:{
+            min:yMin,max:yMax,reverse:true,
+            ticks:{color:'#a8b4cc',font:{size:13,family:'DM Mono'},stepSize:2,callback:v=>fmtClockH(v)},
+            grid:{color:'rgba(255,255,255,0.06)'}
+          }
         }
       }
     });
