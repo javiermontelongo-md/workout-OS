@@ -26,18 +26,36 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run Strava sync
+      - name: Sync Strava data and push
         env:
           STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
           STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
           STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
-        run: node .github/scripts/strava-sync.js
-
-      - name: Commit and push if data changed
         run: |
           git config user.name "workout-OS bot"
           git config user.email "bot@workout-os"
-          git add data.json
-          git diff --staged --quiet || git commit -m "strava sync $(date -u +%Y-%m-%d)"
+
+          # Pull latest BEFORE processing so the script reads current data.json
+          # (prevents the script from committing stale data that omits prescriptions
+          # or other fields written by the browser between checkout and script run)
           git pull --rebase
-          git push
+          node .github/scripts/strava-sync.js
+          git add data.json
+
+          # Nothing changed — exit cleanly
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+
+          git commit -m "strava sync $(date -u +%Y-%m-%d)"
+
+          # Retry push up to 3 times in case a concurrent push lands between
+          # our pull and our push (matches health-sync.yml pattern)
+          for attempt in 1 2 3; do
+            git push && exit 0
+            echo "Push failed (attempt $attempt/3) — re-syncing and retrying..."
+            git pull --rebase
+            node .github/scripts/strava-sync.js
+            git add data.json
+            git diff --staged --quiet || git commit --amend --no-edit
+          done
+
+          echo "ERROR: all 3 push attempts failed" && exit 1
