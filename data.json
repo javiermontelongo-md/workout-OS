@@ -2674,7 +2674,10 @@
       "walkingSpeed": 2.58,
       "respiratoryRate": 17.04255319148936,
       "vo2maxApple": null,
-      "source": "apple_health"
+      "source": "apple_health",
+      "sleepOnset": "00:02",
+      "wakeTime": "06:33",
+      "sleepMidpoint": 3.29
     },
     {
       "date": "2026-05-31",
@@ -2699,7 +2702,7 @@
       "sleepMidpoint": 3.129999999999999
     }
   ],
-  "healthLastSync": "2026-05-31T21:30:27.179Z",
+  "healthLastSync": "2026-06-01T00:10:01.048Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
