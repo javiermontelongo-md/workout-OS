@@ -2689,7 +2689,7 @@
       "sleepREM": 1.3780972062548003,
       "sleepLight": 4.025795686807897,
       "sleepAwake": 0.1,
-      "steps": 3757,
+      "steps": 3830,
       "exerciseMinutes": 31,
       "activeCalories": 485,
       "walkingHR": 98,
@@ -2702,7 +2702,7 @@
       "sleepMidpoint": 3.129999999999999
     }
   ],
-  "healthLastSync": "2026-06-01T01:10:16.052Z",
+  "healthLastSync": "2026-06-01T02:46:50.434Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
