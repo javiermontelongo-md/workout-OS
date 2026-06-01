@@ -1924,20 +1924,17 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="ig"><label>Before sleep</label><input type="text" id="fuel-sig-sleep" placeholder="e.g. full, still hungry, satisfied"></div>
       <div class="ig"><label>On waking</label><input type="text" id="fuel-sig-wake" placeholder="e.g. hungry, groggy, energized"></div>
     </div>
-    <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()">Save &amp; Estimate Macros</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+      <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
+      <button class="sbtn" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;background:var(--aw);color:#0d0900;">AI: How am I doing?</button>
+    </div>
     <div class="smsg" id="fuel-save-msg"></div>
+    <div id="fuel-advice-out" style="margin-top:10px;"></div>
   </div>
 
   <div class="card" id="fuel-macros-card" style="display:none;">
     <div class="lbl">today's estimated macros</div>
     <div id="fuel-macros-out"></div>
-  </div>
-
-  <div class="card">
-    <div class="lbl" style="color:var(--aw);">ai fuel plan</div>
-    <div style="font-size:var(--fs-sm);color:var(--t2);margin-bottom:12px;line-height:1.6;">Generates meal suggestions based on today's training, your recent intake, and energy patterns. Uses your log history — no need to re-enter what you ate.</div>
-    <button class="btn bp bi" id="fuel-plan-btn" onclick="generateFuelPlan()">Plan today's meals</button>
-    <div id="fuel-plan-out" style="margin-top:12px;"></div>
   </div>
 
   <div class="card">
@@ -2665,7 +2662,7 @@ function initFuelLog(){
 
 function renderFuelRows(){
   const el=document.getElementById('fuel-meal-rows'); if(!el) return;
-  el.innerHTML=_fuelRows.map((r,i)=>`<div class="fuel-row"><input type="time" value="${esc(r.time)}" oninput="_fuelRows[${i}].time=this.value" style="flex:0 0 105px;"><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value" placeholder="e.g. 2 scrambled eggs, slice of toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`).join('');
+  el.innerHTML=_fuelRows.map((r,i)=>`<div class="fuel-row"><input type="text" value="${esc(r.time)}" oninput="_fuelRows[${i}].time=this.value" placeholder="08:30" style="flex:0 0 72px;min-width:72px;font-family:var(--mono);text-align:center;"><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value" placeholder="e.g. 2 scrambled eggs, toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`).join('');
 }
 
 function addFuelMealRow(){ _fuelRows.push({time:'',food:''}); renderFuelRows(); }
@@ -2704,7 +2701,7 @@ async function saveFuelDay(){
   D.fuelLog=D.fuelLog.filter(e=>e.date>=cutoff);
   const ok=await push(null,'fuel-save-msg');
   if(ok){ msg('fuel-save-msg','Saved — '+new Date().toLocaleTimeString()); renderFuelMacros(entry); renderFuelCalendar(); }
-  if(btn){btn.disabled=false;btn.textContent='Save & Estimate Macros';}
+  if(btn){btn.disabled=false;btn.textContent='Save to GitHub';}
 }
 
 async function estimateMacros(meals){
@@ -2740,43 +2737,81 @@ function renderFuelMacros(entry){
   if(t.protein) out.innerHTML+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:10px;">Protein target ~${proteinTarget}g (0.8\xd7${bw}lb) — <span style="color:${t.protein>=proteinTarget?'var(--a2)':'var(--aw)'};">${pct}% hit</span></div>`;
 }
 
-async function generateFuelPlan(){
+async function fuelDayAdvice(){
   const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
-  const btn=document.getElementById('fuel-plan-btn');
-  const out=document.getElementById('fuel-plan-out');
+  const btn=document.getElementById('fuel-advice-btn');
+  const out=document.getElementById('fuel-advice-out');
   if(!out) return;
   if(!apiKey){out.innerHTML='<div style="font-size:var(--fs-sm);color:var(--t3);">Add Anthropic API key in Settings first.</div>';return;}
-  if(btn){btn.disabled=true;btn.textContent='Generating...';}
-  out.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:10px 0;">Analyzing training and recent intake...</div>';
+  if(btn){btn.disabled=true;btn.textContent='Thinking...';}
+  out.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:8px 0;">Reading your history and today\'s intake...</div>';
   try{
     const ts=evaluateTrainingStatus();
     const today=localDS(new Date());
     const workoutType=D.dailyPrescriptions?.[today]?.workoutType||'unknown';
-    const recentFuel=(D.fuelLog||[]).slice(-5).map(e=>`${e.date} — ${e.totals?.kcal||'?'}kcal P${e.totals?.protein||'?'}g C${e.totals?.carbs||'?'}g F${e.totals?.fat||'?'}g${e.signals?.betweenMeals?', between: '+e.signals.betweenMeals:''}${e.signals?.onWaking?', waking: '+e.signals.onWaking:''}`).join('\n')||'No logs yet.';
+    const bw=D.profile?.bodyweight||225;
+
+    // Today's logged meals from saved entry OR current form state
+    const todayEntry=(D.fuelLog||[]).find(e=>e.date===today);
+    const todayMeals=todayEntry
+      ? todayEntry.meals.map(m=>`${m.time||'?'} — ${m.food}${m.kcal?' ('+m.kcal+'kcal, P'+m.protein+'g C'+m.carbs+'g F'+m.fat+'g)':''}`).join('\n')
+      : _fuelRows.filter(r=>r.food.trim()).map(r=>`${r.time||'?'} — ${r.food}`).join('\n')||'Nothing logged yet today.';
+    const todayTotals=todayEntry?.totals;
+    const todaySignals=todayEntry?.signals||{
+      betweenMeals:document.getElementById('fuel-sig-between')?.value.trim()||'',
+      beforeSleep:document.getElementById('fuel-sig-sleep')?.value.trim()||'',
+      onWaking:document.getElementById('fuel-sig-wake')?.value.trim()||''
+    };
+
+    // Past 7 days compact (excluding today)
+    const pastDays=(D.fuelLog||[]).filter(e=>e.date!==today).slice(-7)
+      .map(e=>`${e.date}: ${e.totals?.kcal||'?'}kcal P${e.totals?.protein||'?'}g C${e.totals?.carbs||'?'}g F${e.totals?.fat||'?'}g${e.signals?.betweenMeals?', felt: '+e.signals.betweenMeals:''}${e.signals?.onWaking?', waking: '+e.signals.onWaking:''}`).join('\n')||'No recent history.';
+
+    // Compressed long-term memory
     const memory=D.fuelMemory?.summary||'';
-    const prompt=`Athlete: IM intern starting July 2026. Limited cooking skill, very limited time. Must take lunch to hospital. Working out (${workoutType} today). Bodyweight ${D.profile?.bodyweight||225}lb. Goal: body recomp + athletic performance.
+    const memoryAge=D.fuelMemory?.lastUpdated?`(updated ${D.fuelMemory.lastUpdated})`:'';
 
-Training today: ${workoutType}. Sleep last night: ${ts.sleepHours||'?'}h. Active fatigue flags: ${ts.activeFlags?.join(', ')||'none'}.
+    const proteinTarget=Math.round(bw*0.8);
+    const todayProtein=todayTotals?.protein||null;
+    const todayKcal=todayTotals?.kcal||null;
 
-Nutrition history: ${memory||'No history yet.'}
+    const prompt=`You are a nutrition coach for Javier, an IM intern starting residency July 2026.
 
-Recent 5 days:
-${recentFuel}
+ATHLETE: 225lb, body recomp + performance goal. Limited cooking skill, very limited time. Takes lunch to hospital. Training: ${workoutType} today. Sleep: ${ts.sleepHours||'?'}h. Fatigue flags: ${ts.activeFlags?.join(', ')||'none'}.
 
-Give a specific fuel plan for today. Include: breakfast, a packable hospital lunch (assembly only, no cooking at work), dinner, and pre/post workout snack if today is a training day. For each: exact food and rough amount, estimated prep time, why it fits today. Max 20 min active cooking per meal. Also one Sunday batch prep suggestion for the week. Be direct and specific — no filler.`;
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:700,messages:[{role:'user',content:prompt}]})});
+LONG-TERM PATTERNS ${memoryAge}:
+${memory||'No pattern history yet — this is early data.'}
+
+LAST 7 DAYS:
+${pastDays}
+
+TODAY SO FAR (${today}):
+${todayMeals}
+${todayTotals?'Totals so far: '+todayKcal+'kcal, P'+todayProtein+'g (target ~'+proteinTarget+'g)':'Macros not yet estimated.'}
+${todaySignals.betweenMeals?'Between meals: '+todaySignals.betweenMeals:''}
+${todaySignals.onWaking?'On waking: '+todaySignals.onWaking:''}
+${todaySignals.beforeSleep?'Before sleep (yesterday): '+todaySignals.beforeSleep:''}
+
+Give a check-in response in two parts:
+1. ASSESSMENT (2-3 sentences): How is today's intake looking? What patterns from history are repeating? Be direct — flag protein gaps, undereating on training days, energy issues.
+2. REST OF DAY (specific): What to eat for remaining meals today. Exact foods, rough amounts. Max 15 min prep. Must be packable if during hospital shift. Base recommendations on what is actually missing today given training load and past patterns.`;
+
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:650,messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
     const text=d.content?.[0]?.text||'';
     if(text){
-      out.innerHTML=`<div style="background:var(--s2);border:1px solid rgba(184,96,53,.2);border-radius:var(--r);padding:15px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;margin-bottom:10px;">FUEL PLAN</div><div style="font-size:var(--fs-sm);color:var(--t2);line-height:1.9;">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n\n/g,'</div><div style="margin-top:10px;font-size:var(--fs-sm);color:var(--t2);line-height:1.9;">').replace(/\n/g,'<br>')}</div></div>`;
+      const rendered=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--t);">$1</strong>').replace(/\n\n/g,'</p><p style="margin-top:8px;">').replace(/\n/g,'<br>');
+      out.innerHTML=`<div style="background:var(--s2);border:1px solid rgba(184,96,53,.25);border-radius:var(--r);padding:15px;margin-top:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;margin-bottom:10px;">TODAY'S CHECK-IN</div><p style="font-size:var(--fs-sm);color:var(--t2);line-height:1.85;">${rendered}</p></div>`;
+      // Save to today's entry
       const idx=(D.fuelLog||[]).findIndex(e=>e.date===today);
       if(idx>=0){D.fuelLog[idx].fuelPlan=text;await pushSilent();}
-      await updateFuelMemory();
+      // Update fuelMemory in background
+      updateFuelMemory();
     } else {
-      out.innerHTML='<div style="font-size:var(--fs-sm);color:var(--t3);">No response — check your API key in Settings.</div>';
+      out.innerHTML='<div style="font-size:var(--fs-sm);color:var(--t3);">No response — check API key in Settings.</div>';
     }
   }catch(e){out.innerHTML=`<div style="font-size:var(--fs-sm);color:var(--a4);">Error: ${esc(e.message)}</div>`;}
-  if(btn){btn.disabled=false;btn.textContent='Plan today\'s meals';}
+  if(btn){btn.disabled=false;btn.textContent='AI: How am I doing?';}
 }
 
 async function updateFuelMemory(){
