@@ -2434,6 +2434,20 @@ function onLoad(){
     });
   }
   if(!D.dailyPrescriptions)D.dailyPrescriptions={};
+  // Restore prescriptions wiped by health-sync race condition.
+  // Health sync reads data.json at workflow start then writes minutes later,
+  // potentially overwriting a prescription the browser pushed in between.
+  // localStorage is the source of truth for prescriptions on the current device.
+  try{
+    const today=localDS(new Date());
+    const yesterday=localDS(new Date(Date.now()-86400000));
+    [today,yesterday].forEach(d=>{
+      if(!D.dailyPrescriptions[d]){
+        const saved=localStorage.getItem('wos-presc-'+d);
+        if(saved){D.dailyPrescriptions[d]=JSON.parse(saved);console.log('Restored prescription for',d,'from localStorage');}
+      }
+    });
+  }catch(e){}
   initCheckinTab();
   renderSnapshotCharts();
   rendered.today=true;
@@ -4709,6 +4723,7 @@ RULES:
     if(!parsed.todayPrescription||!parsed.weekPlan)throw new Error('Response missing required fields. Got: '+Object.keys(parsed).join(', '));
     if(!D.dailyPrescriptions)D.dailyPrescriptions={};
     D.dailyPrescriptions[today]={...parsed.todayPrescription,workoutType,durationMins,generatedAt:new Date().toISOString(),weekPlan:parsed.weekPlan};
+    try{localStorage.setItem('wos-presc-'+today,JSON.stringify(D.dailyPrescriptions[today]));}catch(e){}
     await pushSilent();
     renderPrescriptionCard(D.dailyPrescriptions[today]);
     renderWeekSuggestions(D.dailyPrescriptions[today].weekPlan);
