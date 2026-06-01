@@ -1949,6 +1949,24 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="cal-grid" id="fuel-cal-grid"></div>
     <div class="cal-week-summary" id="fuel-cal-summary"></div>
   </div>
+
+  <div class="card">
+    <div class="lbl" style="color:var(--aw);margin-bottom:14px;">how the ai works — fuel check-in</div>
+    <div style="display:grid;grid-template-columns:1fr 140px 1fr;gap:0;align-items:start;" id="ffd-grid">
+      <div style="display:flex;flex-direction:column;gap:7px;padding-right:12px;" id="ffd-inputs"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;padding-top:4px;" id="ffd-center">
+        <div id="ffd-engine" style="background:linear-gradient(135deg,rgba(184,96,53,0.22),rgba(184,96,53,0.12));border:1.5px solid rgba(184,96,53,0.55);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;width:120px;" onclick="ffdShowDetail('engine')">
+          <div style="font-size:24px;margin-bottom:6px;">🍽️</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);font-weight:600;line-height:1.3;">Claude</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">sonnet-4-6</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:4px;">650 tokens out</div>
+        </div>
+        <div id="ffd-arrows" style="position:relative;width:120px;"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;padding-left:12px;" id="ffd-outputs"></div>
+    </div>
+    <div id="ffd-detail" style="display:none;margin-top:18px;background:var(--s2);border:1px solid var(--b2);border-radius:12px;padding:16px;"></div>
+  </div>
 </div>
 
 </div><!-- v2026-05-22 -->
@@ -2622,7 +2640,7 @@ function showTab(n){
   if(n==='progress'){ }
   if(n==='rules') renderRulesTab();
   if(n==='settings') _syncAppearanceUI();
-  if(n==='fuel'){ renderFuelCalendar(); initFuelLog(); }
+  if(n==='fuel'){ renderFuelCalendar(); initFuelLog(); renderFuelFlowDiagram(); }
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
@@ -2827,6 +2845,246 @@ async function updateFuelMemory(){
       await pushSilent();
     }
   }catch(e){console.warn('updateFuelMemory failed:',e);}
+}
+
+// ============================================================
+// FUEL FLOW DIAGRAM
+// ============================================================
+function renderFuelFlowDiagram(){
+  const inputsEl=document.getElementById('ffd-inputs');
+  const outputsEl=document.getElementById('ffd-outputs');
+  if(!inputsEl||!outputsEl) return;
+
+  const inputs=[
+    {
+      id:'ffd-memory',
+      icon:'🧠',
+      label:'Fuel Memory',
+      sublabel:'compressed pattern history',
+      color:'rgba(184,96,53,0.95)',
+      bg:'rgba(184,96,53,0.09)',
+      border:'rgba(184,96,53,0.35)',
+      detail(){
+        const mem=D.fuelMemory||{};
+        const age=mem.lastUpdated?('updated '+mem.lastUpdated):'never updated yet';
+        const callCount=mem.callCount||0;
+        const rows=[
+          ['Summary', mem.summary||'(none yet — appears after first AI check-in)', 'This is a 2-3 sentence paragraph the AI rewrites after every check-in call. It absorbs the pattern from recent logs so future calls understand your habits without re-reading all history.'],
+          ['Last updated', age, 'Rewritten silently after every "AI: How am I doing?" call. The previous summary is passed in so context accumulates over time.'],
+          ['Times updated', callCount+' times', 'Each update costs ~120 tokens. The summary stays the same length regardless of how many times it is rewritten.'],
+          ['Token cost', '~80 tokens', 'Sent on every AI check-in call. Equivalent to about 3 sentences. Never grows — always replaced in full.'],
+        ];
+        return{title:'🧠 Fuel Memory — compressed long-term history',desc:'After every AI check-in, a second small call rewrites this 2-3 sentence summary incorporating the latest data. It captures patterns like "tends to undereat protein on call days" or "energy crashes mid-afternoon when skipping lunch." Weeks of history compressed to ~80 tokens — always the same size.',rows};
+      }
+    },
+    {
+      id:'ffd-recentlog',
+      icon:'📋',
+      label:'Last 7 Days',
+      sublabel:'daily totals + energy signals',
+      color:'rgba(104,112,200,0.9)',
+      bg:'rgba(104,112,200,0.08)',
+      border:'rgba(104,112,200,0.3)',
+      detail(){
+        const recent=(D.fuelLog||[]).filter(e=>e.date!==localDS(new Date())).slice(-7);
+        const rows=[
+          ...recent.map(e=>[
+            e.date,
+            e.totals?.kcal?`${e.totals.kcal}kcal · P${e.totals.protein}g C${e.totals.carbs}g F${e.totals.fat}g`:'no macros estimated',
+            [e.signals?.betweenMeals&&('Between meals: '+e.signals.betweenMeals), e.signals?.onWaking&&('Waking: '+e.signals.onWaking), e.signals?.beforeSleep&&('Before sleep: '+e.signals.beforeSleep)].filter(Boolean).join(' · ')||'No signals logged'
+          ]),
+          ['Days sent to AI', Math.min(7, recent.length)+' of last 7', 'Each day is one compact line: date, total kcal, P/C/F grams, and any energy signals you entered. Excludes today (shown separately).'],
+          ['Token cost', '~'+Math.min(7,recent.length)*18+' tokens', 'About 18 tokens per day. 7 days = ~126 tokens total.'],
+          ['Storage', (D.fuelLog||[]).length+' entries in data.json', 'Full detail (per-meal macros + signals) stored in GitHub. Only compact daily summaries sent to AI to save tokens.'],
+        ];
+        return{title:'📋 Last 7 Days — compact daily summaries',desc:'Your last 7 logged days (excluding today) are summarized as one line each and sent to the AI. The full per-meal detail stays in your data.json for the calendar view — only the totals and signals are sent to the AI to keep the prompt lean.',rows};
+      }
+    },
+    {
+      id:'ffd-today',
+      icon:'🍳',
+      label:"Today's Meals",
+      sublabel:'what you logged so far',
+      color:'rgba(42,160,112,0.9)',
+      bg:'rgba(42,160,112,0.08)',
+      border:'rgba(42,160,112,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const entry=(D.fuelLog||[]).find(e=>e.date===today);
+        const meals=entry?entry.meals:_fuelRows.filter(r=>r.food.trim());
+        const rows=[
+          ...meals.map((m,i)=>[
+            m.time||'no time',
+            m.food||(m.food)||'',
+            m.kcal?`${m.kcal}kcal · P${m.protein}g C${m.carbs}g F${m.fat}g`:'macros not estimated — save first'
+          ]),
+          ['Source', entry?'saved entry':'live form (not yet saved)', 'If you have a saved entry for today, the AI reads it. If not, it reads what is currently in the form fields.'],
+          ['Protein progress', entry?.totals?.protein?`${entry.totals.protein}g of ~${Math.round((D.profile?.bodyweight||225)*0.8)}g target`:'(save to see)', 'The AI is told explicitly how far you are from your daily protein target (0.8 × bodyweight in lb).'],
+          ['Signal fields', [entry?.signals?.betweenMeals&&('Between: '+entry.signals.betweenMeals),entry?.signals?.onWaking&&('Waking: '+entry.signals.onWaking)].filter(Boolean).join(' · ')||'None entered yet', 'The how-you-felt fields travel with today\'s meals so the AI knows if you have low energy or are still hungry.'],
+        ];
+        return{title:"🍳 Today's Meals — what you've eaten so far",desc:"Sent as the most recent data the AI has. If you already saved today's entry, the AI reads it with estimated macros. If not, it reads the live form. The AI uses this to assess what's missing and what to recommend for the rest of the day.",rows};
+      }
+    },
+    {
+      id:'ffd-training',
+      icon:'🏋️',
+      label:'Training Context',
+      sublabel:'workout + sleep + fatigue',
+      color:'rgba(56,189,248,0.85)',
+      bg:'rgba(56,189,248,0.08)',
+      border:'rgba(56,189,248,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const presc=D.dailyPrescriptions?.[today];
+        const ts=evaluateTrainingStatus();
+        const rows=[
+          ['Today\'s workout', presc?.workoutType||'(no prescription yet)', 'Pulls from today\'s generated prescription. Push/Pull/Legs = higher protein need. Run = carb timing matters. Rest = lower total calories.'],
+          ['Sleep last night', ts.sleepHours?ts.sleepHours+'h':'(not logged)', 'From your daily check-in. Informs calorie and carb recommendations — poor sleep → AI suggests easy-to-digest foods.'],
+          ['Active fatigue flags', ts.activeFlags?.length?ts.activeFlags.join(', '):'None', 'Same hard-rule flags used by the workout AI. POST_CALL, SLEEP_BLOCK etc. → AI recommends simpler foods, no heavy meal before sleep.'],
+          ['Bodyweight', (D.profile?.bodyweight||225)+'lb', 'Used to compute protein target (0.8 × lb = '+Math.round((D.profile?.bodyweight||225)*0.8)+'g/day) and total calorie range.'],
+        ];
+        return{title:'🏋️ Training Context — what your body needs today',desc:"Pulled from your existing prescription and check-in data — you don't re-enter anything. Training type drives macronutrient split (more carbs on run days, more protein on lift days). Fatigue flags shift recommendations toward simpler, faster-digesting foods.",rows};
+      }
+    },
+  ];
+
+  const outputs=[
+    {
+      id:'ffd-assessment',
+      icon:'📊',
+      label:'Assessment',
+      sublabel:'how today is tracking',
+      color:'rgba(184,96,53,0.9)',
+      bg:'rgba(184,96,53,0.08)',
+      border:'rgba(184,96,53,0.3)',
+      detail(){
+        const today=localDS(new Date());
+        const entry=(D.fuelLog||[]).find(e=>e.date===today);
+        const plan=entry?.fuelPlan||'';
+        const preview=plan?plan.split('\n').slice(0,3).join(' ').slice(0,200)+'...':'(run AI check-in to see)';
+        return{title:'📊 Assessment — how today is tracking',desc:'2-3 sentences on what your intake looks like so far. Flags protein gaps, undereating on training days, repeating patterns from your history (sourced from fuelMemory). Direct and specific — not generic advice.',rows:[
+          ['Format','2-3 sentences','Always the first section of the response. References your actual numbers, not generic advice.'],
+          ['Pattern detection','From fuelMemory','If you consistently undereat on call days, the AI flags it here because it remembers from the compressed summary.'],
+          ['Example',preview,''],
+        ]};
+      }
+    },
+    {
+      id:'ffd-restofday',
+      icon:'🥗',
+      label:'Rest of Day',
+      sublabel:'specific meals + amounts',
+      color:'rgba(42,160,112,0.9)',
+      bg:'rgba(42,160,112,0.08)',
+      border:'rgba(42,160,112,0.3)',
+      detail(){
+        return{title:'🥗 Rest of Day — specific food recommendations',desc:'Concrete meal suggestions for whatever is left today. Each meal includes exact food, rough amount, estimated prep time, and whether it can be packed for the hospital. Max 15 min prep per meal. Skips meals you have already logged.',rows:[
+          ['Hospital-packable','Always flagged','Lunch recommendations always specify if they can be packed and assembled without cooking at work.'],
+          ['Workout snack','Training days only','Pre/post workout nutrition included if today is a lift or run day — based on training type.'],
+          ['Prep time','Max 15 min active','Every suggestion is constrained to limited cooking skill and very limited time. No complex recipes.'],
+          ['Why it fits','Per meal','Each suggestion briefly explains why it fits today (e.g., "high carbs post-run to replenish glycogen").'],
+        ]};
+      }
+    },
+    {
+      id:'ffd-memupdate',
+      icon:'💾',
+      label:'Memory Update',
+      sublabel:'silent · runs after response',
+      color:'rgba(255,183,77,0.85)',
+      bg:'rgba(255,183,77,0.07)',
+      border:'rgba(255,183,77,0.28)',
+      detail(){
+        const mem=D.fuelMemory||{};
+        return{title:'💾 Memory Update — silent background call',desc:'After every check-in response, a second small AI call (~120 tokens output) rewrites fuelMemory.summary. It is given the previous summary plus your last 7 days of logs and produces an updated 2-3 sentence pattern summary. You never see this call happen.',rows:[
+          ['When it fires','After every check-in','Runs in the background after the main response renders. Does not block or delay the check-in output.'],
+          ['Input','Previous summary + last 7 day logs','~200 tokens in total. The previous summary ensures continuity — patterns do not reset.'],
+          ['Output','~120 tokens','2-3 sentences. Replaces the old summary entirely. Always the same length.'],
+          ['Stored in','D.fuelMemory.summary in data.json','Saved to GitHub via pushSilent(). Available to the next check-in call immediately.'],
+          ['Current summary', mem.summary||'(none yet)',''],
+        ]};
+      }
+    },
+  ];
+
+  function ffdNodeHTML(n,side){
+    return`<div class="afd-node" data-ffd-id="${n.id}" onclick="ffdShowDetail('${n.id}')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:all .18s;background:${n.bg};border:1px solid ${n.border};"><span style="font-size:var(--fs-sm);flex-shrink:0;">${n.icon}</span><div style="min-width:0;"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:${n.color};font-weight:600;line-height:1.3;">${n.label}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${n.sublabel}</div></div><div style="margin-left:auto;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);flex-shrink:0;">${side==='input'?'›':''}</div></div>`;
+  }
+
+  inputsEl.innerHTML=inputs.map(n=>ffdNodeHTML(n,'input')).join('');
+  outputsEl.innerHTML=outputs.map(n=>ffdNodeHTML(n,'output')).join('');
+
+  // SVG connecting lines
+  setTimeout(()=>{
+    const grid=document.getElementById('ffd-grid');
+    const engine=document.getElementById('ffd-engine');
+    const inNodes=document.querySelectorAll('#ffd-inputs .afd-node');
+    const outNodes=document.querySelectorAll('#ffd-outputs .afd-node');
+    if(!grid||!engine||!inNodes.length) return;
+    const gridR=grid.getBoundingClientRect();
+    const engR=engine.getBoundingClientRect();
+    const engCX=engR.left-gridR.left+engR.width/2;
+    const engCY=engR.top-gridR.top+engR.height/2;
+    const svgW=gridR.width, svgH=Math.max(gridR.height,200);
+    let svgLines='';
+    inNodes.forEach(node=>{
+      const r=node.getBoundingClientRect();
+      const nx=r.right-gridR.left, ny=r.top-gridR.top+r.height/2;
+      svgLines+=`<path d="M${nx},${ny} C${nx+40},${ny} ${engCX-40},${engCY} ${engCX},${engCY}" stroke="rgba(184,96,53,0.3)" stroke-width="1.5" fill="none"/>`;
+    });
+    outNodes.forEach(node=>{
+      const r=node.getBoundingClientRect();
+      const nx=r.left-gridR.left, ny=r.top-gridR.top+r.height/2;
+      svgLines+=`<path d="M${engCX},${engCY} C${engCX+40},${engCY} ${nx-40},${ny} ${nx},${ny}" stroke="rgba(184,96,53,0.3)" stroke-width="1.5" fill="none"/>`;
+    });
+    const existing=document.getElementById('ffd-svg'); if(existing) existing.remove();
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.id='ffd-svg';
+    svg.style.cssText=`position:absolute;top:0;left:0;width:${svgW}px;height:${svgH}px;pointer-events:none;z-index:0;`;
+    svg.innerHTML=svgLines;
+    const arrowsEl=document.getElementById('ffd-arrows');
+    if(arrowsEl){arrowsEl.style.cssText='position:relative;';arrowsEl.innerHTML='';}
+    const arrowContainer=document.getElementById('ffd-grid');
+    if(arrowContainer){arrowContainer.style.position='relative'; arrowContainer.appendChild(svg);}
+  },80);
+
+  window._ffdNodes=[...inputs,...outputs];
+  window._ffdNodes.push({
+    id:'engine',
+    detail(){
+      return{title:'🍽️ Claude sonnet-4-6 — the fuel AI call',desc:'One direct API call to the Anthropic API. Your API key never leaves your browser. The prompt is assembled client-side, sent over HTTPS, and the response is rendered and saved to data.json.',rows:[
+        ['Model','claude-sonnet-4-6','Current production Sonnet. Handles nutrition reasoning, pattern detection, and meal planning well within the 650-token output budget.'],
+        ['Max output','650 tokens','Enough for a 2-3 sentence assessment plus 3-4 specific meal suggestions with rationale. Not a wall of text.'],
+        ['Input tokens (approx)','~400–500 tokens total','fuelMemory ~80 + last 7 days ~126 + today\'s meals ~60 + training context ~50 + instructions ~150 = ~466 tokens.'],
+        ['Cost per call','~$0.003–0.005','At current Sonnet pricing. Memory update adds another ~$0.001.'],
+        ['Caching','None','Each call is fresh. fuelMemory.summary is the persistence layer — it replaces session-based memory.'],
+        ['API key','Stored in localStorage','Your Anthropic key (sk-ant-...) is stored only in your browser. It is sent directly to api.anthropic.com — never to any third-party server.'],
+      ]};
+    }
+  });
+}
+
+function ffdShowDetail(nodeId){
+  const node=window._ffdNodes?.find(n=>n.id===nodeId);
+  const panel=document.getElementById('ffd-detail');
+  if(!node||!panel) return;
+  document.querySelectorAll('#ffd-inputs .afd-node,#ffd-outputs .afd-node').forEach(n=>{n.style.opacity='0.45';n.style.transform='scale(0.97)';});
+  const el=document.querySelector(`[data-ffd-id="${nodeId}"]`);
+  if(el){el.style.opacity='1';el.style.transform='scale(1.02)';}
+  const eng=document.getElementById('ffd-engine');
+  if(nodeId==='engine'&&eng){eng.style.boxShadow='0 0 0 2px rgba(184,96,53,0.7)';}
+  const d=node.detail();
+  panel.style.display='block';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:600;">${d.title}</div><button onclick="ffdCloseDetail()" style="background:transparent;border:none;color:var(--t3);font-size:var(--fs-sm);cursor:pointer;padding:2px 6px;line-height:1;">✕</button></div><div style="font-size:var(--fs-sm);color:var(--t2);line-height:1.7;margin-bottom:14px;">${d.desc}</div>${d.rows?.length?`<table style="width:100%;border-collapse:collapse;">${d.rows.map(([k,v,note])=>`<tr style="border-top:1px solid var(--b);"><td style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:7px 10px 7px 0;white-space:nowrap;vertical-align:top;">${k}</td><td style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t);padding:7px 10px;vertical-align:top;">${v}</td><td style="font-size:var(--fs-xs);color:var(--t2);padding:7px 0;vertical-align:top;line-height:1.5;">${note||''}</td></tr>`).join('')}</table>`:''}`;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function ffdCloseDetail(){
+  const panel=document.getElementById('ffd-detail');
+  if(panel) panel.style.display='none';
+  document.querySelectorAll('#ffd-inputs .afd-node,#ffd-outputs .afd-node').forEach(n=>{n.style.opacity='1';n.style.transform='scale(1)';});
+  const eng=document.getElementById('ffd-engine');
+  if(eng) eng.style.boxShadow='none';
 }
 
 // ============================================================
