@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-30",
+  "lastUpdated": "2026-06-01",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -2689,7 +2689,7 @@
       "sleepREM": 1.3780972062548003,
       "sleepLight": 4.025795686807897,
       "sleepAwake": 0.1,
-      "steps": 3830,
+      "steps": 3757,
       "exerciseMinutes": 31,
       "activeCalories": 485,
       "walkingHR": 98,
@@ -2702,7 +2702,7 @@
       "sleepMidpoint": 3.129999999999999
     }
   ],
-  "healthLastSync": "2026-06-01T02:46:50.434Z",
+  "healthLastSync": "2026-06-01T01:10:16.052Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
@@ -3172,6 +3172,100 @@
           "suggestion": "Long run 60-75min Zone 2 ≤147bpm",
           "confidence": "high",
           "reason": "Aerobic volume day; 48h post-legs, 72h since last quality run maintains recovery windows"
+        }
+      ]
+    },
+    "2026-05-31": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength (HRV-Modified)",
+      "reasoning": "HRV is 1.0 SD below your 60-day baseline at ~40ms, triggering volume reduction and an RPE cap of 7. Your May 20th bench session at 205lb hit RPE 9–10 across multiple sets — a significant overshoot from the predicted 8 — so load needs to be walked back meaningfully. OHP also overshot at RPE 9 vs. predicted 7 at 90lb, so both lifts are being reset to loads that genuinely sit at or below RPE 7 today.",
+      "warmup": "5 min light cardio (bike or brisk walk). Band pull-aparts 2×15, face pull with light band 2×15. Empty bar bench press 2×10, then progressive warm-up sets: 95lb×5, 135lb×5, 165lb×3. For OHP: empty bar 2×10, then 65lb×5, 80lb×3. Total ~10 min.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "sets": 3,
+            "reps": "5–8",
+            "weight": 180,
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "coachNote": "205lb at RPE 10 two sessions ago means your true RPE-7 load is substantially lower than expected. 180lb is a deliberate recalibration — focus on controlled 2-sec descent, full pause at chest, and honest RPE logging. Do not chase top-of-range reps today; 5 clean reps per set at true RPE 7 is the goal."
+          },
+          "ohp": {
+            "sets": 2,
+            "reps": "5–8",
+            "weight": 82.5,
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "coachNote": "90lb hit RPE 9 at 5 reps — reset to 82.5lb. Keep glutes squeezed, ribs down, and bar path vertical. Stop each set 1–2 reps shy of failure. With HRV suppressed, accurate RPE data today is more valuable than hitting top-end reps."
+          }
+        },
+        "accessories": [
+          "Incline DB Press 2×10 @ light-moderate (RPE ≤6) — chest volume, not fatigue",
+          "Cable Tricep Pushdown 2×12 @ RPE 6 — elbows pinned, full extension",
+          "DB Lateral Raise 2×15 @ RPE 6 — controlled, no momentum, shoulder health"
+        ]
+      },
+      "cooldown": "5 min: chest doorway stretch 30 sec each side, cross-body shoulder stretch 30 sec each side, tricep overhead stretch 30 sec each side, thoracic foam roll 2 min. Light breathing reset before leaving the gym.",
+      "coachNote": "The most important thing today is accurate RPE data. Both bench and OHP have been loading at RPE 9–10 while being logged or predicted at 7–8 — that discrepancy is the core problem to fix. Treat this session as a calibration block: leave every set with clear reps in reserve, log honestly, and the next prescription will be dialed in precisely. HRV suppression also means recovery is compromised right now, so the reduced volume is protecting adaptation, not wasting a session.",
+      "ifTooHard": "If 180lb bench feels above RPE 7 on the first working set, drop to 170lb immediately. If OHP at 82.5lb overshoots, drop to 77.5lb. Do not complete sets that exceed RPE 7 today — cut the set and note the load.",
+      "watchOutFor": [
+        "RPE creep: if the first set feels like RPE 7, subsequent sets will be higher — reduce reps before RPE exceeds cap",
+        "Shoulder anterior capsule stress with suppressed recovery — avoid flaring elbows excessively on bench, keep 75° angle"
+      ],
+      "workoutType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-06-01T03:11:15.648Z",
+      "weekPlan": [
+        {
+          "date": "2026-06-01",
+          "dow": "Mon",
+          "suggestion": "Zone 2 Easy Run — 25–30 min, strictly ≤147bpm (target pace ~12:30–13:30/mile or slower until HR stabilizes sub-147)",
+          "confidence": "high",
+          "reason": "Active recovery day after today's push session; low-intensity aerobic work supports HRV recovery and builds sub-20 5K aerobic base without taxing the CNS"
+        },
+        {
+          "date": "2026-06-02",
+          "dow": "Tue",
+          "suggestion": "Pull — Upper Strength (Rows + Pullups, RPE ≤7, volume modifier 0.85 if HRV still suppressed)",
+          "confidence": "medium",
+          "reason": "48h+ after Sunday push satisfies quality-to-quality recovery window; HRV trend will determine whether RPE cap lifts — check morning HRV before loading"
+        },
+        {
+          "date": "2026-06-03",
+          "dow": "Wed",
+          "suggestion": "Zone 2 Easy Run — 30–35 min, strictly ≤147bpm",
+          "confidence": "high",
+          "reason": "Midweek aerobic volume day; supports 80/20 polarization ratio and VO2max development via consistent low-intensity aerobic stimulus"
+        },
+        {
+          "date": "2026-06-04",
+          "dow": "Thu",
+          "suggestion": "Legs — Squat + Deadlift (RPE ≤7, volume modifier 0.85 unless HRV fully recovered to baseline)",
+          "confidence": "medium",
+          "reason": "Lower body strength day fitting the weekly structure; 48h after Tuesday pull allows CNS recovery, and squat/DL e1RMs have room to build with correct load calibration"
+        },
+        {
+          "date": "2026-06-05",
+          "dow": "Fri",
+          "suggestion": "Rest or light walk/mobility only (10–15 min foam roll + hip flexor/thoracic work)",
+          "confidence": "high",
+          "reason": "24h buffer after legs day before any quality run; full rest here protects Saturday's quality run session and supports weekly recovery arc"
+        },
+        {
+          "date": "2026-06-06",
+          "dow": "Sat",
+          "suggestion": "Quality Run — Tempo or Interval session (20% of weekly run volume); e.g. 4×5 min at ~5K effort (sub-20 pace ~6:25/mile) with 90 sec jog recovery, total ~35 min",
+          "confidence": "medium",
+          "reason": "72h+ from Thursday legs day satisfies legs→quality run recovery window; this is the week's high-intensity run block targeting VO2max and 5K speed development"
+        },
+        {
+          "date": "2026-06-07",
+          "dow": "Sun",
+          "suggestion": "Push — Upper Strength (re-test bench and OHP at recalibrated loads from today; expect RPE data from 05-31 to guide precise prescription)",
+          "confidence": "medium",
+          "reason": "7-day push-to-push cycle; 48h+ after Saturday quality run satisfies quality-to-quality window; HRV should be more recovered allowing accurate load progression if today's session logs well"
         }
       ]
     }
