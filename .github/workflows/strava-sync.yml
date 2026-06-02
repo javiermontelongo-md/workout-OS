@@ -8,7 +8,7 @@ on:
     types: [strava-activity]  # triggered by Cloudflare webhook relay
 
 concurrency:
-  group: strava-sync
+  group: data-sync   # shared with health-sync to prevent simultaneous data.json writes
   cancel-in-progress: false  # let an in-flight sync finish; queue next
 
 jobs:

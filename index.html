@@ -2393,11 +2393,26 @@ function mergeRemoteD(remoteD){
       if(presc&&!D.dailyPrescriptions[date])D.dailyPrescriptions[date]=presc;
     });
   }
+  // Merge fuelLog: local takes precedence per date; pull in any remote dates missing locally.
+  if(remoteD.fuelLog?.length){
+    const localFuelDates=new Set((D.fuelLog||[]).map(e=>e.date));
+    const newFuel=(remoteD.fuelLog).filter(e=>e.date&&!localFuelDates.has(e.date));
+    if(newFuel.length){
+      if(!D.fuelLog)D.fuelLog=[];
+      D.fuelLog=[...D.fuelLog,...newFuel].sort((a,b)=>a.date.localeCompare(b.date));
+    }
+  }
+  // Merge fuelMemory: take whichever was updated more recently.
+  if(remoteD.fuelMemory?.lastUpdated&&(!D.fuelMemory?.lastUpdated||(remoteD.fuelMemory.lastUpdated>D.fuelMemory.lastUpdated))){
+    D.fuelMemory=remoteD.fuelMemory;
+  }
 }
 async function gitPush(commitMsg){
   const ghURL=`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`;
   const hdrs={Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'};
-  for(let i=0;i<3;i++){
+  const RETRIES=5;
+  for(let i=0;i<RETRIES;i++){
+    if(i>0) await new Promise(r=>setTimeout(r,500*i+Math.random()*300)); // exponential backoff
     const ir=await fetch(ghURL,{headers:hdrs});
     if(!ir.ok) throw new Error('Cannot read '+CFG.file+' -- check token and repo in Settings');
     const info=await ir.json();
@@ -2410,7 +2425,7 @@ async function gitPush(commitMsg){
     if(pr.status===409||err.message?.includes('does not match')) continue;
     throw new Error('Push failed -- check token has repo write permissions');
   }
-  throw new Error('Push failed after 3 retries');
+  throw new Error('Push failed after '+RETRIES+' retries');
 }
 async function push(btnId,msgId){
   if(!CFG.tok){ msg(msgId,'Add GitHub token in Settings first'); return false; }
@@ -2458,6 +2473,18 @@ function onLoad(){
     });
   }
   if(!D.dailyPrescriptions)D.dailyPrescriptions={};
+  // Warn if data.json is approaching GitHub's 1MB file limit
+  try{
+    const sizeKB=Math.round(new TextEncoder().encode(JSON.stringify(D)).length/1024);
+    if(sizeKB>600){
+      const warn=document.createElement('div');
+      warn.style.cssText='position:fixed;bottom:calc(var(--nav)+var(--safe)+8px);left:50%;transform:translateX(-50%);background:var(--aw);color:#000;font-family:var(--mono);font-size:12px;padding:8px 16px;border-radius:8px;z-index:300;max-width:320px;text-align:center;';
+      warn.textContent=`⚠️ data.json is ${sizeKB}KB — approaching GitHub's 1MB limit. Consider exporting a backup from Settings.`;
+      document.body.appendChild(warn);
+      setTimeout(()=>warn.remove(),12000);
+    }
+    console.log(`data.json size: ${sizeKB}KB`);
+  }catch(e){}
   initCheckinTab();
   renderSnapshotCharts();
   rendered.today=true;
@@ -4839,7 +4866,12 @@ function evaluateTrainingStatus(){
 
 async function pushSilent(){
   if(!CFG.tok)return;
-  try{ await gitPush('AI plan cache update'); }catch(e){console.warn('Silent push failed:',e.message);}
+  try{ await gitPush('Data update'); }catch(e){
+    console.warn('Silent push failed:',e.message);
+    // Surface failure in the sync indicator so the user knows data didn't reach GitHub
+    sync('err','Sync failed — tap Settings to check token');
+    setTimeout(()=>sync('ok',''),8000);
+  }
 }
 
 // ============================================================
