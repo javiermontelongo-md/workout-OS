@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-01",
+  "lastUpdated": "2026-06-03",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -3358,5 +3358,48 @@
         "flags": []
       }
     ]
-  }
+  },
+  "fuelLog": [
+    {
+      "date": "2026-06-03",
+      "meals": [
+        {
+          "time": "12:34PM",
+          "food": "Halo peanut butter cup half pint",
+          "protein": 8,
+          "carbs": 42,
+          "fat": 14,
+          "kcal": 320
+        },
+        {
+          "time": "8:00AM",
+          "food": "Nosa yogurt 290 calories, banana large, homemade chocolate mint cookie, ",
+          "protein": 22,
+          "carbs": 85,
+          "fat": 12,
+          "kcal": 532
+        },
+        {
+          "time": "10:00AM ",
+          "food": "Kashi cereal with 24g fair life protein shake",
+          "protein": 30,
+          "carbs": 48,
+          "fat": 4,
+          "kcal": 348
+        }
+      ],
+      "signals": {
+        "betweenMeals": "Low energy stressed",
+        "beforeSleep": "",
+        "onWaking": "Hungry"
+      },
+      "totals": {
+        "protein": 60,
+        "carbs": 175,
+        "fat": 30,
+        "kcal": 1200
+      },
+      "ts": 1780515420634
+    }
+  ]
 }
