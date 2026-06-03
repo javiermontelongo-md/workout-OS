@@ -3402,5 +3402,10 @@
       "ts": 1780515420634,
       "fuelPlan": "## Check-In — June 3, 2026 | 12:34PM\n\n---\n\n### ASSESSMENT\n\nYou're at 1,200 kcal and 60g protein at midday with an RHR spike flagged — your body is already under stress and you're running on a significant deficit heading into the afternoon. The breakfast and morning snack were carb-heavy and protein-light, which likely explains the low energy and stress you're feeling right now; you're not fueling recovery or muscle retention effectively. With no training data yet today, protein catch-up is the immediate priority — you need roughly **120g more protein** in the next three meals to hit your daily target.\n\n---\n\n### REST OF DAY\n\n**Lunch (now or within the hour) — packable ✓**\n- 2 pouches Bumble Bee tuna or salmon (~180g total) — straight from the pouch\n- 1 packet pre-made rice or a flour tortilla\n- String cheese x2\n- **~420 kcal | ~55g protein**\n\n**Afternoon hospital snack — packable ✓**\n- Fairlife protein shake (1 full bottle, 150 kcal, 30g protein)\n- Handful of almonds or a banana if hunger is high\n- **~300 kcal | ~30g protein**\n\n**Dinner (≤15 min)**\n- 2 pre-cooked chicken sausage links (Aidells or similar — microwave 90 sec)\n- 2 eggs scrambled (3 min)\n- Frozen steam bag vegetables (3 min microwave)\n- Optional: slice of bread or tortilla\n- **~500 kcal | ~45g protein**\n\n---\n\n**End of day estimate: ~2,420 kcal | ~190g protein** ✓\n\n> 🔴 **Flag:** RHR spike + undereating + stress = recovery hole. Don't skip dinner. If you only do one thing tonight, make the eggs and sausage."
     }
-  ]
+  ],
+  "fuelMemory": {
+    "summary": "Calorie intake is critically low at 1,200 kcal, well below typical athletic maintenance needs, with protein at 60g failing to meet the minimum ~1.6g/kg threshold required for muscle preservation. The combination of waking hunger and low energy with stress are clear signals of under-fueling, suggesting the body is in a chronic deficit. No sufficient data yet exists to identify what is working, but inadequate total calories and protein are the primary concerns to address immediately.",
+    "lastUpdated": "2026-06-03",
+    "callCount": 1
+  }
 }
