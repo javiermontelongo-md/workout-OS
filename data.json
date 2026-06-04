@@ -2780,17 +2780,17 @@
       "sleepOnset": "23:47",
       "wakeTime": "09:07",
       "sleepMidpoint": 4.449999999999999,
-      "steps": 465,
+      "steps": 5445,
       "exerciseMinutes": 2,
-      "activeCalories": 100,
+      "activeCalories": 112,
       "walkingHR": 82,
-      "walkingSpeed": null,
+      "walkingSpeed": 2.45,
       "respiratoryRate": 17.427272727272726,
       "vo2maxApple": null,
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-06-04T20:22:16.421Z",
+  "healthLastSync": "2026-06-04T23:23:50.857Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
