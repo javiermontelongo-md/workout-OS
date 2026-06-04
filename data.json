@@ -2748,22 +2748,22 @@
     {
       "date": "2026-06-03",
       "restingHR": 66,
-      "hrv": 31.80801349482425,
-      "wristTemp": -1.7,
-      "sleepHours": 5.1,
+      "hrv": 40.35505235440275,
+      "wristTemp": -1.25,
+      "sleepHours": 6.3,
       "sleepDeep": 0.9186395193139711,
       "sleepREM": 1.2359802627563476,
       "sleepLight": 2.906305207775699,
-      "sleepAwake": 0.1,
+      "sleepAwake": 0.3,
       "sleepOnset": "01:14",
-      "wakeTime": "06:24",
-      "sleepMidpoint": 3.82,
-      "steps": 7812,
-      "exerciseMinutes": 29,
-      "activeCalories": 410,
+      "wakeTime": "17:50",
+      "sleepMidpoint": 9.53,
+      "steps": 7980,
+      "exerciseMinutes": 49,
+      "activeCalories": 760,
       "walkingHR": 98,
       "walkingSpeed": 2.63,
-      "respiratoryRate": 18.1875,
+      "respiratoryRate": 18.20731707317073,
       "vo2maxApple": null,
       "source": "apple_health"
     },
@@ -2790,7 +2790,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-06-04T18:13:35.998Z",
+  "healthLastSync": "2026-06-04T20:22:02.011Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
