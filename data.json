@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-03",
+  "lastUpdated": "2026-06-05",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -3410,26 +3410,50 @@
         {
           "time": "12:34PM",
           "food": "Halo peanut butter cup half pint",
-          "protein": 8,
+          "protein": 7,
           "carbs": 42,
-          "fat": 14,
-          "kcal": 320
+          "fat": 12,
+          "kcal": 300
         },
         {
           "time": "8:00AM",
           "food": "Nosa yogurt 290 calories, banana large, homemade chocolate mint cookie, ",
-          "protein": 22,
+          "protein": 18,
           "carbs": 85,
-          "fat": 12,
-          "kcal": 532
+          "fat": 14,
+          "kcal": 540
         },
         {
           "time": "10:00AM ",
           "food": "Kashi cereal with 24g fair life protein shake",
-          "protein": 30,
-          "carbs": 48,
+          "protein": 32,
+          "carbs": 38,
           "fat": 4,
-          "kcal": 348
+          "kcal": 318
+        },
+        {
+          "time": "12:45 PM",
+          "food": "Big burrito with carne asada potatoes cheese, other veggies",
+          "protein": 42,
+          "carbs": 85,
+          "fat": 22,
+          "kcal": 706
+        },
+        {
+          "time": "8:00 PM",
+          "food": "10 chicken wings with ranch from a bar",
+          "protein": 55,
+          "carbs": 12,
+          "fat": 52,
+          "kcal": 748
+        },
+        {
+          "time": "9:00 PM",
+          "food": "A full pint of halo 330 calories ",
+          "protein": 8,
+          "carbs": 64,
+          "fat": 8,
+          "kcal": 330
         }
       ],
       "signals": {
@@ -3438,12 +3462,12 @@
         "onWaking": "Hungry"
       },
       "totals": {
-        "protein": 60,
-        "carbs": 175,
-        "fat": 30,
-        "kcal": 1200
+        "protein": 162,
+        "carbs": 326,
+        "fat": 112,
+        "kcal": 2942
       },
-      "ts": 1780515420634,
+      "ts": 1780636365292,
       "fuelPlan": "## Check-In — June 3, 2026 | 12:34PM\n\n---\n\n### ASSESSMENT\n\nYou're at 1,200 kcal and 60g protein at midday with an RHR spike flagged — your body is already under stress and you're running on a significant deficit heading into the afternoon. The breakfast and morning snack were carb-heavy and protein-light, which likely explains the low energy and stress you're feeling right now; you're not fueling recovery or muscle retention effectively. With no training data yet today, protein catch-up is the immediate priority — you need roughly **120g more protein** in the next three meals to hit your daily target.\n\n---\n\n### REST OF DAY\n\n**Lunch (now or within the hour) — packable ✓**\n- 2 pouches Bumble Bee tuna or salmon (~180g total) — straight from the pouch\n- 1 packet pre-made rice or a flour tortilla\n- String cheese x2\n- **~420 kcal | ~55g protein**\n\n**Afternoon hospital snack — packable ✓**\n- Fairlife protein shake (1 full bottle, 150 kcal, 30g protein)\n- Handful of almonds or a banana if hunger is high\n- **~300 kcal | ~30g protein**\n\n**Dinner (≤15 min)**\n- 2 pre-cooked chicken sausage links (Aidells or similar — microwave 90 sec)\n- 2 eggs scrambled (3 min)\n- Frozen steam bag vegetables (3 min microwave)\n- Optional: slice of bread or tortilla\n- **~500 kcal | ~45g protein**\n\n---\n\n**End of day estimate: ~2,420 kcal | ~190g protein** ✓\n\n> 🔴 **Flag:** RHR spike + undereating + stress = recovery hole. Don't skip dinner. If you only do one thing tonight, make the eggs and sausage."
     }
   ],
