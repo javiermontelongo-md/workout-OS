@@ -1372,6 +1372,19 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;" id="race-pred-chart-legend"></div>
   </div>
 </div>
+<div class="card" id="hrv-chart-card" style="display:none;margin-bottom:14px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div class="lbl" style="margin:0;">HRV trend</div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn bs bi" onclick="setHRVRange(30)" id="hrv-btn-30" style="font-size:var(--fs-xs);padding:5px 10px;">30D</button>
+      <button class="btn bs bi" onclick="setHRVRange(60)" id="hrv-btn-60" style="font-size:var(--fs-xs);padding:5px 10px;">60D</button>
+      <button class="btn bs bi" onclick="setHRVRange(90)" id="hrv-btn-90" style="font-size:var(--fs-xs);padding:5px 10px;">90D</button>
+    </div>
+  </div>
+  <div id="hrv-chart-status" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;min-height:16px;"></div>
+  <div style="position:relative;height:220px;"><canvas id="hrv-chart"></canvas></div>
+  <div id="hrv-chart-legend" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;line-height:1.6;"></div>
+</div>
 <div class="card" id="body-metrics-card" style="display:none;margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">body composition</div>
@@ -2701,7 +2714,7 @@ function showTab(n){
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
   else if(n==='week'){ }
-  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); }
+  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderHRVChart(); setHRVRange(60); }
   else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); renderAIFlowDiagram(); }
 }
 
@@ -6032,6 +6045,182 @@ function setBodyChart(type){
     if(btn)btn.style.opacity=t===type?'1':'0.5';
   });
   renderBodyChart(type);
+}
+
+// ─────────────────────────────────────────────────────────────
+// HRV TREND CHART
+// ─────────────────────────────────────────────────────────────
+let _hrvChart=null;
+let _hrvRange=60;
+
+function renderHRVChart(){
+  const card=document.getElementById('hrv-chart-card');
+  if(!card)return;
+  const logs=(D.healthLogs||[]).filter(l=>l.hrv!=null).sort((a,b)=>a.date<b.date?-1:1);
+  if(logs.length<3){card.style.display='none';return;}
+  card.style.display='';
+
+  const canvas=document.getElementById('hrv-chart');
+  if(!canvas||typeof Chart==='undefined')return;
+  if(_hrvChart){_hrvChart.destroy();_hrvChart=null;}
+
+  // Slice to requested range
+  const cutoff=new Date();
+  cutoff.setDate(cutoff.getDate()-_hrvRange);
+  const cutoffStr=cutoff.toISOString().split('T')[0];
+  const visible=logs.filter(l=>l.date>=cutoffStr);
+  if(!visible.length){card.style.display='none';return;}
+
+  // For each visible point compute rolling 60-day baseline up to that date
+  const baselineDays=60;
+  const baselineMin=10; // need at least this many points for a reliable baseline
+  const rollingBaseline=visible.map((_,i)=>{
+    // use all logs up to this date (not just visible window)
+    const anchor=visible[i].date;
+    const anchorMs=new Date(anchor).getTime();
+    const windowStart=new Date(anchorMs-baselineDays*864e5).toISOString().split('T')[0];
+    const window=logs.filter(l=>l.date>=windowStart&&l.date<=anchor&&l.hrv!=null).map(l=>l.hrv);
+    if(window.length<baselineMin)return null;
+    const mean=window.reduce((a,b)=>a+b,0)/window.length;
+    const sd=Math.sqrt(window.reduce((a,b)=>a+(b-mean)**2,0)/window.length);
+    return{mean,sd};
+  });
+
+  // Latest valid baseline for legend
+  const lastBaseline=rollingBaseline.slice().reverse().find(b=>b!=null);
+  const latestHRV=visible[visible.length-1]?.hrv;
+
+  const labels=visible.map(l=>l.date);
+  const hrvData=visible.map(l=>l.hrv);
+  const baselineData=rollingBaseline.map(b=>b?+b.mean.toFixed(1):null);
+  const warnData=rollingBaseline.map(b=>b?+(b.mean-0.75*b.sd).toFixed(1):null);
+  const crashData=rollingBaseline.map(b=>b?+(b.mean-1.5*b.sd).toFixed(1):null);
+
+  // Status line
+  const statusEl=document.getElementById('hrv-chart-status');
+  if(statusEl&&lastBaseline){
+    let statusTxt=`Baseline ${Math.round(lastBaseline.mean)}ms ± ${Math.round(lastBaseline.sd)}ms`;
+    if(latestHRV!=null){
+      const z=(lastBaseline.mean-latestHRV)/lastBaseline.sd;
+      if(z>1.5) statusTxt+=` · Today ${Math.round(latestHRV)}ms — CRASH (${z.toFixed(1)}SD below baseline)`;
+      else if(z>0.75) statusTxt+=` · Today ${Math.round(latestHRV)}ms — WARNING (${z.toFixed(1)}SD below baseline)`;
+      else statusTxt+=` · Today ${Math.round(latestHRV)}ms — OK`;
+    }
+    statusEl.textContent=statusTxt;
+  }
+
+  const gridColor='rgba(255,255,255,0.05)';
+  const tickStyle={font:{family:'monospace',size:9},color:'#888'};
+
+  try{
+    _hrvChart=new Chart(canvas.getContext('2d'),{
+      type:'line',
+      data:{
+        labels,
+        datasets:[
+          // Crash fill (crash line down to 0) — drawn first so others sit on top
+          {
+            label:'crash zone',
+            data:crashData,
+            borderColor:'transparent',
+            backgroundColor:'rgba(232,93,138,0.12)',
+            fill:{target:'origin'},
+            pointRadius:0,tension:0.3,spanGaps:true,order:4
+          },
+          // Warning fill (warning line down to crash line)
+          {
+            label:'warning zone',
+            data:warnData,
+            borderColor:'rgba(184,96,53,0.6)',
+            borderWidth:1,
+            borderDash:[4,4],
+            backgroundColor:'rgba(184,96,53,0.10)',
+            fill:'-1',
+            pointRadius:0,tension:0.3,spanGaps:true,order:3
+          },
+          // Crash line
+          {
+            label:'crash floor',
+            data:crashData,
+            borderColor:'rgba(232,93,138,0.7)',
+            borderWidth:1,
+            borderDash:[3,3],
+            backgroundColor:'transparent',
+            pointRadius:0,tension:0.3,spanGaps:true,order:2
+          },
+          // Rolling baseline
+          {
+            label:'60d baseline',
+            data:baselineData,
+            borderColor:'rgba(104,112,200,0.8)',
+            borderWidth:2,
+            backgroundColor:'transparent',
+            pointRadius:0,tension:0.3,spanGaps:true,order:1
+          },
+          // Daily HRV — on top
+          {
+            label:'HRV',
+            data:hrvData,
+            borderColor:'rgba(42,160,112,0.9)',
+            backgroundColor:'rgba(42,160,112,0.15)',
+            borderWidth:2,
+            pointRadius:3,
+            pointHoverRadius:5,
+            tension:0.3,spanGaps:true,order:0
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            callbacks:{
+              label:ctx=>{
+                if(ctx.dataset.label==='HRV') return `HRV: ${ctx.parsed.y}ms`;
+                if(ctx.dataset.label==='60d baseline') return `Baseline: ${ctx.parsed.y}ms`;
+                if(ctx.dataset.label==='warning zone') return `Warning floor: ${ctx.parsed.y}ms`;
+                if(ctx.dataset.label==='crash floor') return `Crash floor: ${ctx.parsed.y}ms`;
+                return null;
+              },
+              filter:item=>item.dataset.label!=='crash zone'
+            }
+          }
+        },
+        scales:{
+          x:{ticks:{...tickStyle,maxTicksLimit:7},grid:{color:gridColor}},
+          y:{
+            ticks:{...tickStyle,callback:v=>v+'ms'},
+            grid:{color:gridColor},
+            title:{display:false}
+          }
+        }
+      }
+    });
+  }catch(e){
+    console.warn('HRV chart error:',e);
+  }
+
+  // Legend
+  const legendEl=document.getElementById('hrv-chart-legend');
+  if(legendEl){
+    legendEl.innerHTML=
+      '<span style="color:rgba(42,160,112,0.9)">● HRV</span>' +
+      '&nbsp;&nbsp;<span style="color:rgba(104,112,200,0.8)">— 60d baseline</span>' +
+      '&nbsp;&nbsp;<span style="color:rgba(184,96,53,0.8)">-- warning (−0.75 SD)</span>' +
+      '&nbsp;&nbsp;<span style="color:rgba(232,93,138,0.8)">-- crash (−1.5 SD)</span>';
+  }
+}
+
+function setHRVRange(days){
+  _hrvRange=days;
+  [30,60,90].forEach(d=>{
+    const btn=document.getElementById('hrv-btn-'+d);
+    if(btn)btn.style.opacity=d===days?'1':'0.5';
+  });
+  renderHRVChart();
 }
 
 // ─────────────────────────────────────────────────────────────
