@@ -707,6 +707,21 @@ input[type=range]::-webkit-slider-thumb:hover {
 .macro-pill.f{background:rgba(184,96,53,.15);color:var(--aw);}
 .macro-pill.k{background:rgba(255,255,255,.07);color:var(--t2);}
 @media(max-width:768px){.fuel-row input[type=time]{width:90px;min-width:90px;}}
+.fuel-time-btn{flex:0 0 auto;width:88px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--aw);font-family:var(--mono);font-size:var(--fs-xs);padding:7px 8px;cursor:pointer;text-align:center;transition:border-color .15s;white-space:nowrap;}
+.fuel-time-btn:hover{border-color:var(--aw);}
+.fuel-tp-wrap{display:flex;gap:12px;justify-content:center;align-items:center;padding:8px 0;}
+.fuel-tp-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.fuel-tp-scroll{height:176px;overflow-y:scroll;scroll-snap-type:y mandatory;width:68px;border:1px solid var(--b2);border-radius:var(--r);-ms-overflow-style:none;scrollbar-width:none;}
+.fuel-tp-scroll::-webkit-scrollbar{display:none;}
+.fuel-tp-item{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--mono);font-size:20px;color:var(--t3);cursor:pointer;border-radius:var(--r);transition:color .1s,background .1s;}
+.fuel-tp-item:hover{color:var(--t2);}
+.fuel-tp-item.sel{color:var(--t);background:rgba(104,110,210,.2);}
+.fuel-tp-ampm{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t2);font-family:var(--mono);font-size:var(--fs-xs);padding:10px 16px;cursor:pointer;transition:all .15s;width:60px;text-align:center;}
+.fuel-tp-ampm.sel{background:rgba(184,96,53,.2);border-color:rgba(184,96,53,.5);color:var(--aw);}
+.fuel-cal-selected{border-color:var(--aw);background:rgba(184,96,53,.15);}
+.fuel-cal-clickable{cursor:pointer;}
+.fuel-date-nav{display:flex;gap:6px;}
+.fuel-date-nav button{padding:5px 11px;font-size:var(--fs-xs);}
 
 /* ── PROGRAM TAB ── */
 .prog-day-card { background: var(--s1); border: 1px solid var(--b); border-radius: 12px; overflow: hidden; transition: border-color .2s; }
@@ -930,13 +945,13 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
   <div class="tabs">
     <button class="tab on" onclick="showTab('today')">TODAY</button>
+    <button class="tab" onclick="showTab('fuel')">FUEL</button>
     <button class="tab" onclick="showTab('program')">PROGRAM</button>
     <button class="tab" onclick="showTab('log')">LOG SESSION</button>
     <button class="tab" onclick="showTab('week')">ACTIVITY</button>
     <button class="tab" onclick="showTab('progress')">PROGRESS</button>
     <button class="tab" onclick="showTab('milestones')">MILESTONES</button>
     <button class="tab" onclick="showTab('rules')">RULES</button>
-    <button class="tab" onclick="showTab('fuel')">FUEL</button>
     <button class="tab" onclick="showTab('settings')">SETTINGS</button>
   </div>
 </div>
@@ -1913,8 +1928,27 @@ input[type=range]::-webkit-slider-thumb:hover {
 <div id="panel-fuel" class="panel">
   <div class="h1">Fuel <span>log</span></div>
 
+  <div class="card">
+    <div class="cal-nav-row">
+      <button class="cal-nav-btn" id="fuel-cal-prev" onclick="fuelCalNav(-1)">&#8592;</button>
+      <div>
+        <div class="cal-week-label" id="fuel-cal-label"></div>
+        <div class="cal-week-sub">tap any day to edit</div>
+      </div>
+      <button class="cal-nav-btn" id="fuel-cal-next" onclick="fuelCalNav(1)">&#8594;</button>
+    </div>
+    <div class="cal-grid" id="fuel-cal-grid"></div>
+    <div class="cal-week-summary" id="fuel-cal-summary"></div>
+  </div>
+
   <div class="card" style="border-color:rgba(184,96,53,.3);">
-    <div class="lbl" style="color:var(--aw);">today's meals — <span id="fuel-today-date"></span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+      <div class="lbl" style="color:var(--aw);margin:0;">meals — <span id="fuel-today-date"></span></div>
+      <div class="fuel-date-nav">
+        <button class="btn bs" onclick="fuelGoYesterday()">&#8592; Yesterday</button>
+        <button class="btn bs" id="fuel-today-btn" onclick="fuelGoToday()">Today</button>
+      </div>
+    </div>
     <div id="fuel-meal-rows" style="margin-bottom:8px;"></div>
     <button class="btn bs" style="width:auto;margin-bottom:16px;" onclick="addFuelMealRow()">+ Add meal</button>
     <div class="dvdr"></div>
@@ -1924,6 +1958,10 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="ig"><label>Before sleep</label><input type="text" id="fuel-sig-sleep" placeholder="e.g. full, still hungry, satisfied"></div>
       <div class="ig"><label>On waking</label><input type="text" id="fuel-sig-wake" placeholder="e.g. hungry, groggy, energized"></div>
     </div>
+    <div id="fuel-macros-card" style="display:none;margin-bottom:4px;">
+      <div class="lbl">estimated macros</div>
+      <div id="fuel-macros-out"></div>
+    </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
       <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
       <button class="sbtn" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;background:var(--aw);color:#0d0900;">AI: How am I doing?</button>
@@ -1932,22 +1970,9 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div id="fuel-advice-out" style="margin-top:10px;"></div>
   </div>
 
-  <div class="card" id="fuel-macros-card" style="display:none;">
-    <div class="lbl">today's estimated macros</div>
-    <div id="fuel-macros-out"></div>
-  </div>
-
   <div class="card">
-    <div class="cal-nav-row">
-      <button class="cal-nav-btn" id="fuel-cal-prev" onclick="fuelCalNav(-1)">&#8592;</button>
-      <div>
-        <div class="cal-week-label" id="fuel-cal-label"></div>
-        <div class="cal-week-sub">tap a day to see your meals</div>
-      </div>
-      <button class="cal-nav-btn" id="fuel-cal-next" onclick="fuelCalNav(1)">&#8594;</button>
-    </div>
-    <div class="cal-grid" id="fuel-cal-grid"></div>
-    <div class="cal-week-summary" id="fuel-cal-summary"></div>
+    <div class="lbl" style="color:var(--aw);margin-bottom:12px;">macro trends — last 14 days</div>
+    <canvas id="fuel-trend-chart" style="width:100%;max-height:240px;"></canvas>
   </div>
 
   <div class="card">
@@ -1973,6 +1998,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 <nav class="bnav">
   <button class="ni on" onclick="showTab('today')"><span class="nicon">T</span><span class="nlbl">TODAY</span></button>
+  <button class="ni" onclick="showTab('fuel')"><span class="nicon">F</span><span class="nlbl">FUEL</span></button>
   <button class="ni" onclick="showTab('log')"><span class="nicon">L</span><span class="nlbl">LOG</span></button>
   <button class="ni" onclick="showTab('week')"><span class="nicon">W</span><span class="nlbl">ACTIVITY</span></button>
   <button class="ni" onclick="showTab('progress')"><span class="nicon">P</span><span class="nlbl">PROG</span></button>
@@ -1982,7 +2008,6 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="font-size:18px;">📋</div>
     <div>Rules</div>
   </button>
-  <button class="ni" onclick="showTab('fuel')"><span class="nicon">F</span><span class="nlbl">FUEL</span></button>
   <button class="ni" onclick="showTab('settings')"><span class="nicon">S</span><span class="nlbl">SET</span></button>
 </nav>
 </div><!-- v2026-05-22 -->
@@ -1992,6 +2017,9 @@ var SD={bench:[],ohp:[],squat:[],dl:[],pullup:[],row:[]};
 var DEF={bench:190,ohp:90,squat:160,dl:160,pullup:0,row:115};
 let fuelMonthOffset=0;
 let _fuelRows=[{time:'',food:''}];
+let _fuelEditDate='';
+let _fuelTrendChart=null;
+let _fuelTP={rowIdx:0,hour:8,min:0,ampm:'AM'};
 
 // ============================================================
 // STATE -- no data here. All data in data.json on GitHub.
@@ -2667,7 +2695,7 @@ function showTab(n){
   if(n==='progress'){ }
   if(n==='rules') renderRulesTab();
   if(n==='settings') _syncAppearanceUI();
-  if(n==='fuel'){ renderFuelCalendar(); initFuelLog(); renderFuelFlowDiagram(); }
+  if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
@@ -2681,11 +2709,21 @@ function renderTab(n){
 // FUEL
 // ============================================================
 function initFuelLog(){
-  const today=localDS(new Date());
+  _fuelEditDate=localDS(new Date());
+  fuelSelectDate(_fuelEditDate);
+  renderFuelTrendChart();
+}
+
+function fuelSelectDate(dateStr){
+  _fuelEditDate=dateStr;
+  const entry=(D.fuelLog||[]).find(e=>e.date===dateStr);
+  const dateObj=new Date(dateStr+'T12:00:00');
+  const isToday=dateStr===localDS(new Date());
   const el=document.getElementById('fuel-today-date');
-  if(el) el.textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  const entry=(D.fuelLog||[]).find(e=>e.date===today);
-  _fuelRows=entry&&entry.meals.length?entry.meals.map(m=>({time:m.time||'',food:m.food||''})):[{time:'',food:''}];
+  if(el) el.textContent=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const todayBtn=document.getElementById('fuel-today-btn');
+  if(todayBtn) todayBtn.style.opacity=isToday?'0.4':'1';
+  _fuelRows=entry&&entry.meals&&entry.meals.length?entry.meals.map(m=>({time:m.time||'',food:m.food||''})):[{time:'',food:''}];
   const sb=document.getElementById('fuel-sig-between');
   const ss=document.getElementById('fuel-sig-sleep');
   const sw=document.getElementById('fuel-sig-wake');
@@ -2694,15 +2732,18 @@ function initFuelLog(){
   if(sw) sw.value=entry?.signals?.onWaking||'';
   renderFuelRows();
   if(entry?.totals?.kcal) renderFuelMacros(entry);
-  else{ const c=document.getElementById('fuel-macros-card'); if(c) c.style.display='none'; }
-  const planOut=document.getElementById('fuel-plan-out');
-  if(planOut&&entry?.fuelPlan) planOut.innerHTML=`<div style="background:var(--s2);border:1px solid rgba(184,96,53,.2);border-radius:var(--r);padding:15px;margin-top:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;margin-bottom:10px;">LAST PLAN</div><div style="font-size:var(--fs-sm);color:var(--t2);line-height:1.8;">${esc(entry.fuelPlan).replace(/\n/g,'<br>')}</div></div>`;
-  else if(planOut) planOut.innerHTML='';
+  else{ const mc=document.getElementById('fuel-macros-card'); if(mc) mc.style.display='none'; }
+  const advOut=document.getElementById('fuel-advice-out'); if(advOut) advOut.innerHTML='';
+  const saveMsg=document.getElementById('fuel-save-msg'); if(saveMsg) saveMsg.innerHTML='';
+  renderFuelCalendar();
 }
+
+function fuelGoToday(){ fuelSelectDate(localDS(new Date())); }
+function fuelGoYesterday(){ const d=new Date(); d.setDate(d.getDate()-1); fuelSelectDate(localDS(d)); }
 
 function renderFuelRows(){
   const el=document.getElementById('fuel-meal-rows'); if(!el) return;
-  el.innerHTML=_fuelRows.map((r,i)=>`<div class="fuel-row"><input type="text" value="${esc(r.time)}" oninput="_fuelRows[${i}].time=this.value" placeholder="08:30" style="flex:0 0 72px;min-width:72px;font-family:var(--mono);text-align:center;"><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value" placeholder="e.g. 2 scrambled eggs, toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`).join('');
+  el.innerHTML=_fuelRows.map((r,i)=>`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value" placeholder="e.g. 2 scrambled eggs, toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`).join('');
 }
 
 function addFuelMealRow(){ _fuelRows.push({time:'',food:''}); renderFuelRows(); }
@@ -2712,7 +2753,7 @@ async function saveFuelDay(){
   if(!D){ msg('fuel-save-msg','Data not loaded'); return; }
   const meals=_fuelRows.filter(r=>r.food.trim());
   if(!meals.length){ msg('fuel-save-msg','Add at least one meal'); return; }
-  const today=localDS(new Date());
+  const today=_fuelEditDate||localDS(new Date());
   const signals={
     betweenMeals:document.getElementById('fuel-sig-between')?.value.trim()||'',
     beforeSleep:document.getElementById('fuel-sig-sleep')?.value.trim()||'',
@@ -2740,7 +2781,7 @@ async function saveFuelDay(){
   const cutoff=localDS(new Date(Date.now()-60*86400000));
   D.fuelLog=D.fuelLog.filter(e=>e.date>=cutoff);
   const ok=await push(null,'fuel-save-msg');
-  if(ok){ msg('fuel-save-msg','Saved — '+new Date().toLocaleTimeString()); renderFuelMacros(entry); renderFuelCalendar(); }
+  if(ok){ msg('fuel-save-msg','Saved — '+new Date().toLocaleTimeString()); renderFuelMacros(entry); renderFuelCalendar(); renderFuelTrendChart(); }
   if(btn){btn.disabled=false;btn.textContent='Save to GitHub';}
 }
 
@@ -2787,7 +2828,7 @@ async function fuelDayAdvice(){
   out.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:8px 0;">Reading your history and today\'s intake...</div>';
   try{
     const ts=evaluateTrainingStatus();
-    const today=localDS(new Date());
+    const today=_fuelEditDate||localDS(new Date());
     const workoutType=D.dailyPrescriptions?.[today]?.workoutType||'unknown';
     const bw=D.profile?.bodyweight||225;
 
@@ -2815,6 +2856,7 @@ async function fuelDayAdvice(){
     const todayProtein=todayTotals?.protein||null;
     const todayKcal=todayTotals?.kcal||null;
 
+    const isEditingPast=today!==localDS(new Date());
     const prompt=`You are a nutrition coach for Javier, an IM intern starting residency July 2026.
 
 ATHLETE: 225lb, body recomp + performance goal. Limited cooking skill, very limited time. Takes lunch to hospital. Training: ${workoutType} today. Sleep: ${ts.sleepHours||'?'}h. Fatigue flags: ${ts.activeFlags?.join(', ')||'none'}.
@@ -2825,7 +2867,7 @@ ${memory||'No pattern history yet — this is early data.'}
 LAST 7 DAYS:
 ${pastDays}
 
-TODAY SO FAR (${today}):
+${isEditingPast?'LOG FOR '+today:'TODAY SO FAR ('+today+')'}:
 ${todayMeals}
 ${todayTotals?'Totals so far: '+todayKcal+'kcal, P'+todayProtein+'g (target ~'+proteinTarget+'g)':'Macros not yet estimated.'}
 ${todaySignals.betweenMeals?'Between meals: '+todaySignals.betweenMeals:''}
@@ -3141,13 +3183,15 @@ function renderFuelCalendar(){
   for(let d=1;d<=daysInMonth;d++){
     const ds=`${tYear}-${String(tMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday=ds===todayStr;
+    const isSelected=ds===_fuelEditDate;
+    const isFuture=ds>todayStr;
     const hasFuel=fuelDates.has(ds);
     if(hasFuel) logCount++;
     const dot=hasFuel?'<div class="cal-dots"><span class="cal-dot fuel"></span></div>':'';
-    html+=`<div class="cal-cell${isToday?' today':''}${hasFuel?' style="cursor:pointer;"':''}" data-fdate="${ds}">${`<div class="cal-date">${d}</div>`}${dot}</div>`;
+    html+=`<div class="cal-cell${isToday?' today':''}${isSelected?' fuel-cal-selected':''}${!isFuture?' fuel-cal-clickable':''}" data-fdate="${ds}">${`<div class="cal-date">${d}</div>`}${dot}</div>`;
   }
   grid.innerHTML=html;
-  grid.onclick=function(e){const cell=e.target.closest('[data-fdate]');if(cell&&fuelDates.has(cell.dataset.fdate))openFuelDrawer(cell.dataset.fdate);};
+  grid.onclick=function(e){const cell=e.target.closest('[data-fdate]');if(cell&&cell.dataset.fdate<=todayStr)fuelSelectDate(cell.dataset.fdate);};
   if(sumEl) sumEl.textContent=`${logCount} day${logCount!==1?'s':''} logged this month`;
 }
 
@@ -3157,6 +3201,76 @@ function fuelCalNav(dir){
   fuelMonthOffset=next;
   renderFuelCalendar();
 }
+function openTimePicker(idx){
+  _fuelTP.rowIdx=idx;
+  const t=_fuelRows[idx]?.time||'';
+  let h=8,m=0,ap='AM';
+  const m12=/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(t.trim());
+  const m24=/^(\d{1,2}):(\d{2})$/.exec(t.trim());
+  if(m12){h=parseInt(m12[1]);m=parseInt(m12[2]);ap=m12[3].toUpperCase();}
+  else if(m24){const hh=parseInt(m24[1]);m=parseInt(m24[2]);if(hh===0){h=12;ap='AM';}else if(hh<12){h=hh;ap='AM';}else if(hh===12){h=12;ap='PM';}else{h=hh-12;ap='PM';}}
+  _fuelTP.hour=h;_fuelTP.min=m;_fuelTP.ampm=ap;
+  const modal=document.getElementById('fuel-time-modal');
+  if(!modal) return;
+  _renderTimePicker();
+  modal.style.display='flex';
+  // Scroll selected items into view
+  requestAnimationFrame(()=>{
+    const hEl=document.getElementById('fuel-tp-hours');
+    const mEl=document.getElementById('fuel-tp-mins');
+    if(hEl){const sel=hEl.querySelector('.sel');if(sel)sel.scrollIntoView({block:'center'});}
+    if(mEl){const sel=mEl.querySelector('.sel');if(sel)sel.scrollIntoView({block:'center'});}
+  });
+}
+function _renderTimePicker(){
+  const hEl=document.getElementById('fuel-tp-hours');
+  const mEl=document.getElementById('fuel-tp-mins');
+  if(!hEl||!mEl) return;
+  hEl.innerHTML=Array.from({length:12},(_,i)=>{const h=i+1;return`<div class="fuel-tp-item${h===_fuelTP.hour?' sel':''}" onclick="_fuelTP.hour=${h};_renderTimePicker()">${h}</div>`;}).join('');
+  mEl.innerHTML=['00','15','30','45'].map(mm=>{const mv=parseInt(mm);return`<div class="fuel-tp-item${mv===_fuelTP.min?' sel':''}" onclick="_fuelTP.min=${mv};_renderTimePicker()">${mm}</div>`;}).join('');
+  document.getElementById('fuel-tp-am').classList.toggle('sel',_fuelTP.ampm==='AM');
+  document.getElementById('fuel-tp-pm').classList.toggle('sel',_fuelTP.ampm==='PM');
+}
+function fuelTpSetAmPm(ap){_fuelTP.ampm=ap;_renderTimePicker();}
+function closeTimePicker(){const m=document.getElementById('fuel-time-modal');if(m)m.style.display='none';}
+function confirmTimePicker(){
+  const mm=String(_fuelTP.min).padStart(2,'0');
+  _fuelRows[_fuelTP.rowIdx].time=`${_fuelTP.hour}:${mm} ${_fuelTP.ampm}`;
+  renderFuelRows();
+  closeTimePicker();
+}
+function renderFuelTrendChart(){
+  const canvas=document.getElementById('fuel-trend-chart');
+  if(!canvas) return;
+  const today=localDS(new Date());
+  const days=[];
+  for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(localDS(d));}
+  const labels=days.map(d=>new Date(d+'T12:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric'}));
+  const byDate=Object.fromEntries((D.fuelLog||[]).map(e=>[e.date,e]));
+  const pData=days.map(d=>byDate[d]?.totals?.protein??null);
+  const cData=days.map(d=>byDate[d]?.totals?.carbs??null);
+  const fData=days.map(d=>byDate[d]?.totals?.fat??null);
+  const kData=days.map(d=>byDate[d]?.totals?.kcal??null);
+  if(_fuelTrendChart){_fuelTrendChart.destroy();_fuelTrendChart=null;}
+  _fuelTrendChart=new Chart(canvas,{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Protein (g)',data:pData,backgroundColor:'rgba(104,110,200,0.65)',stack:'macros',yAxisID:'y'},
+      {label:'Carbs (g)',data:cData,backgroundColor:'rgba(42,160,112,0.65)',stack:'macros',yAxisID:'y'},
+      {label:'Fat (g)',data:fData,backgroundColor:'rgba(184,96,53,0.65)',stack:'macros',yAxisID:'y'},
+      {label:'Calories',data:kData,type:'line',borderColor:'rgba(226,234,248,0.5)',backgroundColor:'transparent',pointBackgroundColor:'rgba(226,234,248,0.8)',pointRadius:3,yAxisID:'yk',tension:0.3,spanGaps:true}
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:'#a8b4cc',boxWidth:12,font:{size:11}}}},
+      scales:{
+        y:{stacked:true,ticks:{color:'#7e8caa',font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'},title:{display:true,text:'grams',color:'#7e8caa',font:{size:10}}},
+        yk:{position:'right',ticks:{color:'#7e8caa',font:{size:11}},grid:{display:false},title:{display:true,text:'kcal',color:'#7e8caa',font:{size:10}}},
+        x:{ticks:{color:'#7e8caa',maxRotation:45,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+}
+
 
 function openFuelDrawer(dateStr){
   const existing=document.getElementById('fuel-drawer');if(existing)existing.remove();
@@ -6341,5 +6455,29 @@ function afdCloseDetail(){
 }
 
 </script>
+
+<div id="fuel-time-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeTimePicker()">
+  <div style="background:var(--s2);border-radius:18px 18px 0 0;padding:20px 20px 32px;width:100%;max-width:480px;">
+    <div class="lbl" style="text-align:center;margin-bottom:16px;color:var(--aw);">select time</div>
+    <div class="fuel-tp-wrap">
+      <div class="fuel-tp-col">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:4px;">hour</div>
+        <div class="fuel-tp-scroll" id="fuel-tp-hours"></div>
+      </div>
+      <div style="font-size:24px;color:var(--t);padding-top:24px;">:</div>
+      <div class="fuel-tp-col">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:4px;">min</div>
+        <div class="fuel-tp-scroll" id="fuel-tp-mins"></div>
+      </div>
+      <div class="fuel-tp-col" style="padding-top:24px;">
+        <button class="fuel-tp-ampm sel" id="fuel-tp-am" onclick="fuelTpSetAmPm('AM')">AM</button>
+        <button class="fuel-tp-ampm" id="fuel-tp-pm" onclick="fuelTpSetAmPm('PM')">PM</button>
+      </div>
+    </div>
+    <button class="sbtn" style="width:100%;margin-top:12px;background:var(--aw);color:#0d0900;" onclick="confirmTimePicker()">Set Time</button>
+    <button class="btn bs" style="width:100%;margin-top:8px;" onclick="closeTimePicker()">Cancel</button>
+  </div>
+</div>
+
 </body>
 </html>
