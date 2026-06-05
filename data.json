@@ -3547,11 +3547,11 @@
       "meals": [
         {
           "time": "",
-          "food": "Big quesadilla with prawns and avocado",
-          "protein": 35,
-          "carbs": 45,
-          "fat": 28,
-          "kcal": 572
+          "food": "Big 1000 calorie quesadilla with prawns and avocado, along with chips and salsa ",
+          "protein": 52,
+          "carbs": 98,
+          "fat": 48,
+          "kcal": 1000
         }
       ],
       "signals": {
@@ -3560,12 +3560,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 35,
-        "carbs": 45,
-        "fat": 28,
-        "kcal": 572
+        "protein": 52,
+        "carbs": 98,
+        "fat": 48,
+        "kcal": 1000
       },
-      "ts": 1780702080746
+      "ts": 1780702135909
     }
   ],
   "fuelMemory": {
