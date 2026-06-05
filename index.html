@@ -2810,7 +2810,7 @@ function renderFuelMacros(entry){
   const cPct=tot?Math.round((t.carbs||0)/tot*100):34;
   const fPct=Math.max(0,100-pPct-cPct);
   out.innerHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><span class="macro-pill p">P ${t.protein||0}g</span><span class="macro-pill c">C ${t.carbs||0}g</span><span class="macro-pill f">F ${t.fat||0}g</span><span class="macro-pill k">${t.kcal||0} kcal</span></div><div class="macro-bar"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:14px;"><span style="color:var(--a);">■</span> protein &nbsp;<span style="color:var(--a2);">■</span> carbs &nbsp;<span style="color:var(--aw);">■</span> fat</div><div class="lbl">meals</div>`+
-    (entry.meals||[]).map(m=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--b);gap:8px;"><div><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);margin-right:8px;">${esc(m.time||'')}</span><span style="font-size:var(--fs-sm);color:var(--t2);">${esc(m.food)}</span>${m.protein||m.carbs?`<div style="margin-top:4px;"><span class="macro-pill p" style="padding:1px 5px;">P${m.protein}g</span><span class="macro-pill c" style="padding:1px 5px;">C${m.carbs}g</span><span class="macro-pill f" style="padding:1px 5px;">F${m.fat}g</span></div>`:''}</div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;">${m.kcal} kcal</span>`:''}</div>`).join('')+'</div>';
+    (entry.meals||[]).map(m=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--b);gap:8px;"><div><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);margin-right:8px;">${esc(m.time||'')}</span><span style="font-size:var(--fs-sm);color:var(--t2);">${esc(m.food)}</span>${m.protein||m.carbs?(()=>{const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);const _mp=_mt?Math.round((m.protein||0)/_mt*100):0;const _mc=_mt?Math.round((m.carbs||0)/_mt*100):0;const _mf=Math.max(0,100-_mp-_mc);return`<div style="margin-top:5px;display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;border-radius:3px;overflow:hidden;display:flex;"><div style="width:${_mp}%;background:var(--a);"></div><div style="width:${_mc}%;background:var(--a2);"></div><div style="width:${_mf}%;background:var(--aw);"></div></div></div>`;})():''}</div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;">${m.kcal} kcal</span>`:''}</div>`).join('')+'</div>';
   // Set a target reference if bodyweight known
   const bw=D.profile?.bodyweight||225;
   const proteinTarget=Math.round(bw*0.8);
@@ -2883,7 +2883,9 @@ Give a check-in response in two parts:
     const text=d.content?.[0]?.text||'';
     if(text){
       const rendered=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--t);">$1</strong>').replace(/\n\n/g,'</p><p style="margin-top:8px;">').replace(/\n/g,'<br>');
-      out.innerHTML=`<div style="background:var(--s2);border:1px solid rgba(184,96,53,.25);border-radius:var(--r);padding:15px;margin-top:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;margin-bottom:10px;">TODAY'S CHECK-IN</div><p style="font-size:var(--fs-sm);color:var(--t2);line-height:1.85;">${rendered}</p></div>`;
+      const ciLabel=isEditingPast?`CHECK-IN: ${new Date(today+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`:"TODAY'S CHECK-IN";
+      out.innerHTML=`<div style="background:var(--s2);border:1px solid rgba(184,96,53,.25);border-radius:var(--r);padding:15px;margin-top:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;margin-bottom:10px;">${ciLabel}</div><p style="font-size:var(--fs-sm);color:var(--t2);line-height:1.85;">${rendered}</p></div>`;
+      requestAnimationFrame(()=>{ out.scrollIntoView({behavior:'smooth',block:'nearest'}); });
       // Save to today's entry
       const idx=(D.fuelLog||[]).findIndex(e=>e.date===today);
       if(idx>=0){D.fuelLog[idx].fuelPlan=text;await pushSilent();}
@@ -3176,8 +3178,9 @@ function renderFuelCalendar(){
   const todayStr=localDS(now);
   const firstDOW=new Date(tYear,tMonth,1).getDay();
   const daysInMonth=new Date(tYear,tMonth+1,0).getDate();
-  const fuelDates=new Set((D.fuelLog||[]).map(e=>e.date));
-  let html=['SUN','MON','TUE','WED','THU','FRI','SAT'].map(h=>`<div class="cal-hdr">${h}</div>`).join('');
+  const _fuelByDate=Object.fromEntries((D.fuelLog||[]).map(e=>[e.date,e]));
+  const fuelDates=new Set(Object.keys(_fuelByDate));
+  let html=['S','M','T','W','T','F','S'].map(h=>`<div class="cal-hdr" style="font-size:11px;">${h}</div>`).join('');
   for(let i=0;i<firstDOW;i++) html+=`<div class="cal-cell cal-empty"></div>`;
   let logCount=0;
   for(let d=1;d<=daysInMonth;d++){
@@ -3185,10 +3188,17 @@ function renderFuelCalendar(){
     const isToday=ds===todayStr;
     const isSelected=ds===_fuelEditDate;
     const isFuture=ds>todayStr;
-    const hasFuel=fuelDates.has(ds);
+    const fEntry=_fuelByDate[ds];
+    const hasFuel=!!fEntry;
     if(hasFuel) logCount++;
-    const dot=hasFuel?'<div class="cal-dots"><span class="cal-dot fuel"></span></div>':'';
-    html+=`<div class="cal-cell${isToday?' today':''}${isSelected?' fuel-cal-selected':''}${!isFuture?' fuel-cal-clickable':''}" data-fdate="${ds}">${`<div class="cal-date">${d}</div>`}${dot}</div>`;
+    const kcal=fEntry?.totals?.kcal||0;
+    const fTot=(fEntry?.totals?.protein||0)+(fEntry?.totals?.carbs||0)+(fEntry?.totals?.fat||0);
+    const fPp=fTot?Math.round((fEntry?.totals?.protein||0)/fTot*100):0;
+    const fCp=fTot?Math.round((fEntry?.totals?.carbs||0)/fTot*100):0;
+    const fFp=fTot?Math.max(0,100-fPp-fCp):0;
+    const kcalHtml=kcal?`<div style="font-family:var(--mono);font-size:10px;color:var(--aw);line-height:1.1;margin-top:1px;">${kcal}</div>`:'';
+    const barHtml=kcal?`<div style="width:100%;height:4px;border-radius:2px;overflow:hidden;display:flex;margin-top:2px;"><div style="width:${fPp}%;background:var(--a);"></div><div style="width:${fCp}%;background:var(--a2);"></div><div style="width:${fFp}%;background:var(--aw);"></div></div>`:'';
+    html+=`<div class="cal-cell${isToday?' today':''}${isSelected?' fuel-cal-selected':''}${!isFuture?' fuel-cal-clickable':''}" data-fdate="${ds}" style="min-height:50px;padding:5px 3px 4px;gap:0;"><div class="cal-date" style="font-size:17px;">${d}</div>${kcalHtml}${barHtml}</div>`;
   }
   grid.innerHTML=html;
   grid.onclick=function(e){const cell=e.target.closest('[data-fdate]');if(cell&&cell.dataset.fdate<=todayStr)fuelSelectDate(cell.dataset.fdate);};
@@ -3308,7 +3318,7 @@ function buildFuelDrawerContent(entry,dateStr){
   }
   html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">meals</div>`;
   (entry.meals||[]).forEach(m=>{
-    html+=`<div style="padding:9px 0;border-bottom:1px solid var(--b);"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div>${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);margin-right:8px;">${esc(m.time)}</span>`:''}<span style="font-size:var(--fs-sm);color:var(--t);">${esc(m.food)}</span></div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;">${m.kcal} kcal</span>`:''}</div>${(m.protein||m.carbs||m.fat)?`<div style="margin-top:4px;"><span class="macro-pill p" style="padding:1px 5px;">P${m.protein}g</span><span class="macro-pill c" style="padding:1px 5px;">C${m.carbs}g</span><span class="macro-pill f" style="padding:1px 5px;">F${m.fat}g</span></div>`:''}</div>`;
+    html+=`<div style="padding:9px 0;border-bottom:1px solid var(--b);"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div>${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);margin-right:8px;">${esc(m.time)}</span>`:''}<span style="font-size:var(--fs-sm);color:var(--t);">${esc(m.food)}</span></div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;">${m.kcal} kcal</span>`:''}</div>${(m.protein||m.carbs||m.fat)?(()=>{const _bmt=(m.protein||0)+(m.carbs||0)+(m.fat||0);const _bmp=_bmt?Math.round((m.protein||0)/_bmt*100):0;const _bmc=_bmt?Math.round((m.carbs||0)/_bmt*100):0;const _bmf=Math.max(0,100-_bmp-_bmc);return`<div style="margin-top:5px;display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;border-radius:3px;overflow:hidden;display:flex;"><div style="width:${_bmp}%;background:var(--a);"></div><div style="width:${_bmc}%;background:var(--a2);"></div><div style="width:${_bmf}%;background:var(--aw);"></div></div></div>`;})():''}</div>`;
   });
   const sig=entry.signals||{};
   if(sig.betweenMeals||sig.beforeSleep||sig.onWaking){
