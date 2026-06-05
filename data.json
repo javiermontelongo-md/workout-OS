@@ -3522,8 +3522,8 @@
     }
   ],
   "fuelMemory": {
-    "summary": "Calorie intake is critically low at 1,200 kcal, well below typical athletic maintenance needs, with protein at 60g failing to meet the minimum ~1.6g/kg threshold required for muscle preservation. The combination of waking hunger and low energy with stress are clear signals of under-fueling, suggesting the body is in a chronic deficit. No sufficient data yet exists to identify what is working, but inadequate total calories and protein are the primary concerns to address immediately.",
-    "lastUpdated": "2026-06-03",
-    "callCount": 1
+    "summary": "Calorie intake remains inconsistent, ranging from a critically low 1,575 kcal to a more adequate 2,942 kcal, with protein similarly variable between 95g and 162g—the latter approaching but the former still well below the ~1.6g/kg minimum required for muscle preservation. Persistent waking hunger and low energy with stress continue as clear under-fueling signals, suggesting chronic deficit is not yet resolved despite the higher-intake day. The higher-calorie, higher-protein day (2,942 kc",
+    "lastUpdated": "2026-06-04",
+    "callCount": 2
   }
 }
