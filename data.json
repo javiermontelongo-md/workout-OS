@@ -3541,6 +3541,31 @@
       },
       "ts": 1780638102854,
       "fuelPlan": "## Check-In: June 4, 2026\n\n---\n\n### ASSESSMENT\n\nToday is tracking toward another critically low day — 1,575 kcal and 95g protein with likely several hours left, but you're already in deficit territory and 85g short of your protein minimum. This is the exact low-intake pattern from your history repeating: a solid morning, a light/opportunistic lunch, and then the evening falling apart with low-volume, low-protein choices. With an HRV warning flagging today, your body is already under stress — under-fueling on top of that accelerates recovery debt and will compound fatigue going into your first residency weeks.\n\n---\n\n### REST OF DAY\n\nYou need roughly **600–800+ kcal and 85–90g protein** before bed. Here's how to get there fast:\n\n---\n\n**Option A — At Home Tonight (10–12 min)**\n\n- **2 Fairlife protein shakes** → 340 kcal, 52g protein ✅ zero prep\n- **4 eggs scrambled** with a handful of shredded cheese → ~350 kcal, 28g protein, ~5 min\n- **One slice whole grain toast or a banana** for carbs to support overnight recovery\n\n**Total add:** ~750 kcal, ~80g protein\n\n---\n\n**Option B — If You're Too Tired to Cook**\n\n- **1 Fairlife shake** (170 kcal, 26g)\n- **Greek yogurt cup** — Chobani or Fage 2% large (150 kcal, 17g)\n- **Cottage cheese** — 1 cup (200 kcal, 25g)\n- **Handful of almonds or PB on crackers** for fat/calories\n\n**Total add:** ~650 kcal, ~70g protein, zero cooking\n\n---\n\n**Tomorrow: Pack this for hospital**\n- 2 Fairlife shakes in your bag — non-negotiable\n- Hard boiled eggs (batch 6 tonight, 10 min) or a Chobani flip\n- The pizza gap is telling you lunch needs more protein anchoring — shakes solve this with zero friction\n\n---\n\n> **Bottom line:** Get one of those options in tonight. HRV warning + low protein = don't skip this. The shakes alone get you close — use them."
+    },
+    {
+      "date": "2026-06-05",
+      "meals": [
+        {
+          "time": "",
+          "food": "Big quesadilla with prawns and avocado",
+          "protein": 35,
+          "carbs": 45,
+          "fat": 28,
+          "kcal": 572
+        }
+      ],
+      "signals": {
+        "betweenMeals": "",
+        "beforeSleep": "",
+        "onWaking": ""
+      },
+      "totals": {
+        "protein": 35,
+        "carbs": 45,
+        "fat": 28,
+        "kcal": 572
+      },
+      "ts": 1780702080746
     }
   ],
   "fuelMemory": {
