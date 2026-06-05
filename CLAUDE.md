@@ -71,10 +71,11 @@ Use conventional commit format:
   refactor: description
 
 ## Current Tabs
-TODAY · PROGRAM · LOG SESSION · ACTIVITY · PROGRESS · MILESTONES · RULES · SETTINGS
+TODAY · FUEL · PROGRAM · LOG SESSION · ACTIVITY · PROGRESS · MILESTONES · RULES · SETTINGS
 
 ## Tab Roles
 - **TODAY**: check-in sliders (energy/soreness/motivation/stress/sleep/weight) + recovery snapshot charts + system activity log
+- **FUEL**: calendar-first layout — month grid at top, click any past/present day to load it for editing; edit card shows meal rows (time picker + food field), how-you-felt signals, macro summary, Save + AI buttons; weekly trend chart (14-day stacked bar macros + calorie line); AI flow diagram. `_fuelEditDate` tracks selected date, defaults to today on tab open.
 - **PROGRAM**: workout-type dropdown (Push/Pull/Legs/Run/Cycling/Rest) + duration (30/60/90 min) + "Get Prescription" button + full prescription card + AI flow diagram
 - **LOG SESSION**: lift set blocks + run log card; planned values pre-filled from `D.dailyPrescriptions[today]`; weight input placeholders match prescription (via DEF[] mutation + renderSets re-render in updateLogTabPlanned)
 - **ACTIVITY**: monthly calendar (May 2026 floor, current month ceiling, ← → arrows) with indigo lift dots + jade run dots, clickable to open session drawer; paginated session history list (10/page, newest-first); volume records; 7-day AI suggestions from last prescription's weekPlan
@@ -302,6 +303,34 @@ All line numbers are from origin/main. Verify before editing:
 | 4723 | saveCheckin() | Save check-in to D.checkins[], then renderSnapshotCharts() |
 | 4768 | renderSnapshotCharts() | Render 4 health snapshot charts (sleep / steps+exercise+cal / walking HR+speed / RHR+resp) |
 | 5071 | initCheckinTab() | Initialize check-in tab — populate existing today values |
+
+### Fuel Log (FUEL tab)
+| Line | Function | Purpose |
+|------|----------|---------|
+| ~2683 | initFuelLog() | Tab init — resets `_fuelEditDate` to today, calls fuelSelectDate + renderFuelTrendChart |
+| ~2690 | fuelSelectDate(dateStr) | Load a date's data into the edit form; updates `_fuelEditDate`, meal rows, signals, macros, re-renders calendar with selected highlight |
+| ~2710 | fuelGoToday() | Navigate edit form to today |
+| ~2713 | fuelGoYesterday() | Navigate edit form to yesterday |
+| ~2716 | renderFuelRows() | Render meal input rows with time-picker buttons |
+| ~2720 | addFuelMealRow() | Append empty row to `_fuelRows` |
+| ~2721 | removeFuelMealRow(i) | Remove a row from `_fuelRows` |
+| ~2723 | saveFuelDay() | Save `_fuelEditDate` day to D.fuelLog[], calls estimateMacros, push, renderFuelCalendar, renderFuelTrendChart |
+| ~2761 | renderFuelMacros(entry) | Render macro pills + bar + meal breakdown inside #fuel-macros-card |
+| ~2780 | fuelDayAdvice() | AI check-in using `_fuelEditDate`; works for past days too |
+| ~2870 | updateFuelMemory() | Compress last-7-day patterns into D.fuelMemory.summary (silent, background) |
+| ~2880 | renderFuelFlowDiagram() | Render animated AI flow diagram for fuel tab |
+| ~2730 | estimateMacros(meals) | AI macro estimation per meal via Anthropic API |
+| ~3120 | renderFuelCalendar() | Month grid with amber dots for logged days; all past/present dates clickable → fuelSelectDate; selected date gets fuel-cal-selected class |
+| ~3154 | fuelCalNav(dir) | Month navigation (floor -12 months) |
+| ~3161 | openFuelDrawer(dateStr) | Legacy drawer — 0 call sites after calendar redesign (kept, not deleted yet) |
+| ~3177 | closeFuelDrawer() | Close legacy fuel drawer |
+| ~3191 | buildFuelDrawerContent(entry,dateStr) | Legacy drawer HTML builder |
+| new | openTimePicker(idx) | Open time picker modal for a meal row; parses existing time string |
+| new | _renderTimePicker() | Re-render hour/min/ampm selections inside modal |
+| new | fuelTpSetAmPm(ap) | Toggle AM/PM in time picker state |
+| new | closeTimePicker() | Hide time picker modal |
+| new | confirmTimePicker() | Write selected time to `_fuelRows[idx]`, re-render rows |
+| new | renderFuelTrendChart() | 14-day stacked bar (protein/carbs/fat in grams) + calorie line using Chart.js; stores instance in `_fuelTrendChart` |
 
 ### Calendar & Activity View (ACTIVITY tab)
 | Line | Function | Purpose |
@@ -533,6 +562,11 @@ elevationGain: feet
 |----------|---------|---------|
 | `calMonthOffset` | `0` | Months relative to current month for the ACTIVITY calendar (0 = now, -1 = last month). Floor: May 2026. |
 | `sessionListPage` | `0` | Current page index for the session history list (0 = most recent 10). |
+| `fuelMonthOffset` | `0` | Months relative to current month for the FUEL calendar. Floor: -12 months. |
+| `_fuelRows` | `[{time:'',food:''}]` | Current edit state for meal input rows. |
+| `_fuelEditDate` | `''` | Date string (YYYY-MM-DD) currently loaded in the Fuel edit form. Set by fuelSelectDate(). Defaults to today on tab open. |
+| `_fuelTrendChart` | `null` | Chart.js instance for the 14-day macro trend chart. Destroyed and recreated by renderFuelTrendChart(). |
+| `_fuelTP` | `{rowIdx,hour,min,ampm}` | Time picker transient state — which row is being edited and current selections. |
 
 ## What Has Been Removed
 - var DP, DAYS, DT, DC objects (dead vars — deleted)
