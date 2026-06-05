@@ -3469,6 +3469,55 @@
       },
       "ts": 1780636365292,
       "fuelPlan": "## Check-In — June 3, 2026 | 12:34PM\n\n---\n\n### ASSESSMENT\n\nYou're at 1,200 kcal and 60g protein at midday with an RHR spike flagged — your body is already under stress and you're running on a significant deficit heading into the afternoon. The breakfast and morning snack were carb-heavy and protein-light, which likely explains the low energy and stress you're feeling right now; you're not fueling recovery or muscle retention effectively. With no training data yet today, protein catch-up is the immediate priority — you need roughly **120g more protein** in the next three meals to hit your daily target.\n\n---\n\n### REST OF DAY\n\n**Lunch (now or within the hour) — packable ✓**\n- 2 pouches Bumble Bee tuna or salmon (~180g total) — straight from the pouch\n- 1 packet pre-made rice or a flour tortilla\n- String cheese x2\n- **~420 kcal | ~55g protein**\n\n**Afternoon hospital snack — packable ✓**\n- Fairlife protein shake (1 full bottle, 150 kcal, 30g protein)\n- Handful of almonds or a banana if hunger is high\n- **~300 kcal | ~30g protein**\n\n**Dinner (≤15 min)**\n- 2 pre-cooked chicken sausage links (Aidells or similar — microwave 90 sec)\n- 2 eggs scrambled (3 min)\n- Frozen steam bag vegetables (3 min microwave)\n- Optional: slice of bread or tortilla\n- **~500 kcal | ~45g protein**\n\n---\n\n**End of day estimate: ~2,420 kcal | ~190g protein** ✓\n\n> 🔴 **Flag:** RHR spike + undereating + stress = recovery hole. Don't skip dinner. If you only do one thing tonight, make the eggs and sausage."
+    },
+    {
+      "date": "2026-06-04",
+      "meals": [
+        {
+          "time": "10:00 AM",
+          "food": "Nosa yogurt again, banana large, kashi cereal peanut butter protein, 42 G protein fairlife",
+          "protein": 65,
+          "carbs": 85,
+          "fat": 18,
+          "kcal": 760
+        },
+        {
+          "time": "3:30 PM",
+          "food": "Kombucha, 1.5 slices of a large well topped pizza that had pepperoni and sausage",
+          "protein": 22,
+          "carbs": 58,
+          "fat": 24,
+          "kcal": 530
+        },
+        {
+          "time": "7:00 PM",
+          "food": "Remaining leftover half of a large slice of pizza",
+          "protein": 7,
+          "carbs": 19,
+          "fat": 8,
+          "kcal": 175
+        },
+        {
+          "time": "7:30 PM",
+          "food": "Two small bite sized chocolate chip cookies",
+          "protein": 1,
+          "carbs": 14,
+          "fat": 6,
+          "kcal": 110
+        }
+      ],
+      "signals": {
+        "betweenMeals": "",
+        "beforeSleep": "",
+        "onWaking": ""
+      },
+      "totals": {
+        "protein": 95,
+        "carbs": 176,
+        "fat": 56,
+        "kcal": 1575
+      },
+      "ts": 1780636680445
     }
   ],
   "fuelMemory": {
