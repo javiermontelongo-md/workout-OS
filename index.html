@@ -863,6 +863,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
+    z-index: 2;
     padding: 14px 14px calc(var(--nav) + var(--safe) + 14px);
     display: none;
   }
@@ -958,9 +959,9 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 </div>
 
-<div id="ptr-indicator" style="position:absolute;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:center;height:0;overflow:hidden;transition:height .15s ease;pointer-events:none;">
-  <div id="ptr-inner" style="display:flex;align-items:center;gap:8px;padding:0 14px;background:var(--s3);border:1px solid var(--b2);border-radius:20px;font-family:var(--mono);font-size:13px;color:var(--t3);white-space:nowrap;">
-    <span id="ptr-icon" style="display:inline-block;transition:transform .2s;">↓</span>
+<div id="ptr-indicator" style="position:absolute;top:0;left:0;right:0;z-index:1;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+  <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;color:var(--t3);">
+    <span id="ptr-icon" style="display:inline-block;transition:transform .2s;font-size:16px;">↓</span>
     <span id="ptr-label">Pull to refresh</span>
   </div>
 </div>
@@ -2542,77 +2543,86 @@ function onLoad(){
 }
 
 function initPullToRefresh(){
-  // Mobile only — skip on desktop where panels aren't touch-scrolled
   if(!('ontouchstart' in window))return;
 
-  const THRESHOLD=70;   // px of pull needed to trigger
-  const RESIST=0.38;    // elastic resistance (lower = harder to pull)
-  const INDICATOR_H=44; // indicator height in px
+  const INDICATOR_H=48; // matches #ptr-indicator height
+  const RESIST=0.42;    // elastic feel — lower = harder to pull
 
   let startY=0, dist=0, pulling=false, refreshing=false;
 
-  const indicator=document.getElementById('ptr-indicator');
   const icon=document.getElementById('ptr-icon');
   const label=document.getElementById('ptr-label');
 
-  function getActivePanel(){
-    return document.querySelector('.app .panel.on');
+  function getPanel(){ return document.querySelector('.app .panel.on'); }
+
+  function slidePanel(panel,px){
+    panel.style.transition='';
+    panel.style.transform=px>0?`translateY(${px}px)`:'';
   }
 
-  function setIndicator(d){
-    // d = pull distance in px (0 = hidden, THRESHOLD = ready)
-    const h=Math.min(d*RESIST, INDICATOR_H);
-    indicator.style.height=h+'px';
-    const ready=d*RESIST>=INDICATOR_H*0.85;
+  function springBack(panel){
+    panel.style.transition='transform .3s cubic-bezier(.2,.8,.4,1)';
+    panel.style.transform='';
+    setTimeout(()=>{panel.style.transition='';},320);
+  }
+
+  function updateHint(d){
+    const ready=d*RESIST>=INDICATOR_H*0.82;
     icon.style.transform=ready?'rotate(180deg)':'rotate(0deg)';
-    icon.textContent=refreshing?'↻':'↓';
-    label.textContent=refreshing?'Refreshing…':ready?'Release to refresh':'Pull to refresh';
+    icon.textContent='↓';
+    label.textContent=ready?'Release to refresh':'Pull to refresh';
   }
 
-  function doRefresh(){
+  function doRefresh(panel){
     if(refreshing)return;
     refreshing=true;
-    icon.textContent='↻';
-    icon.style.animation='ptr-spin 0.7s linear infinite';
+    icon.style.animation='ptr-spin 0.75s linear infinite';
+    icon.style.transform='';
     label.textContent='Refreshing…';
-    indicator.style.height=INDICATOR_H+'px';
+    // Hold panel open at indicator height while fetching
+    panel.style.transition='transform .15s ease';
+    panel.style.transform=`translateY(${INDICATOR_H}px)`;
+    setTimeout(()=>{panel.style.transition='';},160);
     fetchData().finally(()=>{
       refreshing=false;
       icon.style.animation='';
-      indicator.style.transition='height .25s ease';
-      indicator.style.height='0px';
-      setTimeout(()=>{indicator.style.transition='height .15s ease';},260);
+      icon.textContent='↓';
+      label.textContent='Pull to refresh';
+      const p=getPanel();
+      if(p)springBack(p);
     });
   }
 
   document.addEventListener('touchstart',e=>{
     if(refreshing)return;
-    const panel=getActivePanel();
+    const panel=getPanel();
     if(!panel||panel.scrollTop>0)return;
     startY=e.touches[0].clientY;
-    dist=0;
-    pulling=false;
+    dist=0; pulling=false;
   },{passive:true});
 
   document.addEventListener('touchmove',e=>{
     if(refreshing)return;
-    const panel=getActivePanel();
+    const panel=getPanel();
     if(!panel||panel.scrollTop>0){dist=0;return;}
     const dy=e.touches[0].clientY-startY;
     if(dy<=0){dist=0;return;}
     pulling=true;
     dist=dy;
-    setIndicator(dist);
+    // Slide panel down — capped slightly above indicator height for feel
+    slidePanel(panel,Math.min(dist*RESIST, INDICATOR_H*1.15));
+    updateHint(dist);
   },{passive:true});
 
   document.addEventListener('touchend',()=>{
     if(!pulling)return;
     pulling=false;
-    if(dist*RESIST>=INDICATOR_H*0.85){
-      doRefresh();
+    const panel=getPanel();
+    if(!panel)return;
+    if(dist*RESIST>=INDICATOR_H*0.82){
+      doRefresh(panel);
     }else{
-      indicator.style.transition='height .2s ease';
-      indicator.style.height='0px';
+      springBack(panel);
       dist=0;
     }
   },{passive:true});
@@ -5684,7 +5694,32 @@ function renderSnapshotCharts(){
   const xTicks={color:'#a8b4cc',font:{size:15,family:'DM Mono'},maxTicksLimit:7,maxRotation:0,callback:function(_,i){return xLabel(dates[i]);}};
   const xGrid={color:'rgba(255,255,255,0.06)'};
 
+  // ── HRV SUMMARY ROW ──
+  // Compute today's HRV status inline so it's always visible on TODAY tab
+  const todayStr=(()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
+  const recentHRVLogs=(D.healthLogs||[]).filter(l=>l.hrv!=null).sort((a,b)=>a.date<b.date?-1:1);
+  let hrvSummaryHTML='';
+  if(recentHRVLogs.length>=3){
+    const latestHRVLog=recentHRVLogs[recentHRVLogs.length-1];
+    const cutoff60=new Date();cutoff60.setDate(cutoff60.getDate()-60);
+    const cutoff60Str=cutoff60.toISOString().split('T')[0];
+    const hrv60=recentHRVLogs.filter(l=>l.date>=cutoff60Str).map(l=>l.hrv);
+    const bl=hrv60.length>=10?hrv60.reduce((a,b)=>a+b,0)/hrv60.length:ATHLETE.hrvBaseline;
+    const sd=hrv60.length>=10?Math.sqrt(hrv60.reduce((a,b)=>a+(b-bl)**2,0)/hrv60.length):10.5;
+    const z=(bl-latestHRVLog.hrv)/sd;
+    let statusColor='#2aa070',statusTxt='OK';
+    if(z>1.5){statusColor='#e85d8a';statusTxt='CRASH';}
+    else if(z>0.75){statusColor='#b86035';statusTxt='WARNING';}
+    const isToday=latestHRVLog.date===todayStr;
+    const dayLabel=isToday?'today':latestHRVLog.date.slice(5);
+    hrvSummaryHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;border-bottom:1px solid var(--b);margin-bottom:16px;">
+      <div style="font-family:var(--mono);font-size:13px;color:var(--t2);">HRV <span style="color:var(--t);">${Math.round(latestHRVLog.hrv)}ms</span> <span style="color:var(--t3);">${dayLabel} · baseline ${Math.round(bl)}±${Math.round(sd)}ms</span></div>
+      <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:${statusColor};letter-spacing:.05em;padding:2px 8px;border:1px solid ${statusColor}40;border-radius:10px;">${statusTxt}</div>
+    </div>`;
+  }
+
   container.innerHTML=`
+    ${hrvSummaryHTML}
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Sleep · 7 days</div>
@@ -5698,6 +5733,7 @@ function renderSnapshotCharts(){
         <span style="color:rgba(148,163,184,0.5);">▌ Awake</span>
         <span style="color:rgba(255,183,77,0.7);">- - 7h goal</span>
       </div>
+      <div id="snap-sleep-missing" style="font-family:var(--mono);font-size:12px;color:var(--t3);margin-top:6px;line-height:1.6;"></div>
     </div>
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -5852,6 +5888,25 @@ function renderSnapshotCharts(){
         }
       }
     });
+  }
+
+  // ── SLEEP MISSING DATA NOTE ──
+  const missingEl=document.getElementById('snap-sleep-missing');
+  if(missingEl){
+    const missingDays=dates.filter(d=>!hlMap[d]);
+    const todayDate=(()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');})();
+    if(missingDays.length){
+      const labels=missingDays.map(d=>{
+        if(d===todayDate)return'today (not synced yet)';
+        const dt=new Date(d+'T12:00:00');
+        return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]+' '+dt.getDate();
+      });
+      const hasToday=missingDays.includes(todayDate);
+      const note=hasToday&&missingDays.length===1
+        ?'No data yet for today — Apple Watch syncs overnight via Health Auto Export.'
+        :'No Watch data for: '+labels.join(', ')+'. Gaps appear when Apple Health Auto Export did not send data for that day (Watch not worn, app off, or sync not triggered).';
+      missingEl.textContent=note;
+    }
   }
 
   // ── STEPS + EXERCISE + CALORIES CHART ──
