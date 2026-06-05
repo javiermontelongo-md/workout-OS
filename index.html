@@ -128,6 +128,7 @@ body {
   50% { opacity: .5; transform: scale(.8); }
 }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+@keyframes ptr-spin { to { transform: rotate(360deg); } }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -861,6 +862,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     position: absolute; inset: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
     padding: 14px 14px calc(var(--nav) + var(--safe) + 14px);
     display: none;
   }
@@ -956,6 +958,12 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 </div>
 
+<div id="ptr-indicator" style="position:absolute;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:center;height:0;overflow:hidden;transition:height .15s ease;pointer-events:none;">
+  <div id="ptr-inner" style="display:flex;align-items:center;gap:8px;padding:0 14px;background:var(--s3);border:1px solid var(--b2);border-radius:20px;font-family:var(--mono);font-size:13px;color:var(--t3);white-space:nowrap;">
+    <span id="ptr-icon" style="display:inline-block;transition:transform .2s;">↓</span>
+    <span id="ptr-label">Pull to refresh</span>
+  </div>
+</div>
 <div class="main">
 
 <!-- v2026-05-22 -->
@@ -2530,6 +2538,84 @@ function onLoad(){
   renderSnapshotCharts();
   rendered.today=true;
   renderSystemLog();
+  initPullToRefresh();
+}
+
+function initPullToRefresh(){
+  // Mobile only — skip on desktop where panels aren't touch-scrolled
+  if(!('ontouchstart' in window))return;
+
+  const THRESHOLD=70;   // px of pull needed to trigger
+  const RESIST=0.38;    // elastic resistance (lower = harder to pull)
+  const INDICATOR_H=44; // indicator height in px
+
+  let startY=0, dist=0, pulling=false, refreshing=false;
+
+  const indicator=document.getElementById('ptr-indicator');
+  const icon=document.getElementById('ptr-icon');
+  const label=document.getElementById('ptr-label');
+
+  function getActivePanel(){
+    return document.querySelector('.app .panel.on');
+  }
+
+  function setIndicator(d){
+    // d = pull distance in px (0 = hidden, THRESHOLD = ready)
+    const h=Math.min(d*RESIST, INDICATOR_H);
+    indicator.style.height=h+'px';
+    const ready=d*RESIST>=INDICATOR_H*0.85;
+    icon.style.transform=ready?'rotate(180deg)':'rotate(0deg)';
+    icon.textContent=refreshing?'↻':'↓';
+    label.textContent=refreshing?'Refreshing…':ready?'Release to refresh':'Pull to refresh';
+  }
+
+  function doRefresh(){
+    if(refreshing)return;
+    refreshing=true;
+    icon.textContent='↻';
+    icon.style.animation='ptr-spin 0.7s linear infinite';
+    label.textContent='Refreshing…';
+    indicator.style.height=INDICATOR_H+'px';
+    fetchData().finally(()=>{
+      refreshing=false;
+      icon.style.animation='';
+      indicator.style.transition='height .25s ease';
+      indicator.style.height='0px';
+      setTimeout(()=>{indicator.style.transition='height .15s ease';},260);
+    });
+  }
+
+  document.addEventListener('touchstart',e=>{
+    if(refreshing)return;
+    const panel=getActivePanel();
+    if(!panel||panel.scrollTop>0)return;
+    startY=e.touches[0].clientY;
+    dist=0;
+    pulling=false;
+  },{passive:true});
+
+  document.addEventListener('touchmove',e=>{
+    if(refreshing)return;
+    const panel=getActivePanel();
+    if(!panel||panel.scrollTop>0){dist=0;return;}
+    const dy=e.touches[0].clientY-startY;
+    if(dy<=0){dist=0;return;}
+    pulling=true;
+    dist=dy;
+    setIndicator(dist);
+  },{passive:true});
+
+  document.addEventListener('touchend',()=>{
+    if(!pulling)return;
+    pulling=false;
+    if(dist*RESIST>=INDICATOR_H*0.85){
+      doRefresh();
+    }else{
+      indicator.style.transition='height .2s ease';
+      indicator.style.height='0px';
+      dist=0;
+    }
+  },{passive:true});
 }
 
 function renderSystemLog() {
