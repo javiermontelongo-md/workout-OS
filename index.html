@@ -5668,7 +5668,12 @@ function renderSnapshotCharts(){
       if(!hl)return;
       const onset=hhToH(hl.sleepOnset);
       const wake=hhToH(hl.wakeTime);
-      if(onset===null||wake===null)return; // no timing data — skip this day
+      // Fallback: if no sleep timing but sleepHours exists, float bar from midnight
+      if(onset===null||wake===null){
+        const sh=hl.sleepHours||(ciMap[date]?.sleepHours)||0;
+        if(sh>0) solidBars[i]=[24,24+sh];
+        return;
+      }
       if(wake<=onset)return; // sanity check
       const totalSpan=wake-onset;
       // If we have stage breakdown, stack segments from onset upward
@@ -5814,7 +5819,7 @@ function renderSnapshotCharts(){
       options:{
         responsive:true,
         maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,filter:item=>item.raw!==null&&!item.dataset.label.includes('avg'),callbacks:{label:ctx=>{if(ctx.dataset.label==='Active kcal')return ctx.parsed.y+' kcal';if(ctx.dataset.label==='Exercise min')return ctx.parsed.y+' min';return null;}}}},
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,filter:item=>item.raw!==null&&!item.dataset.label.includes('avg'),callbacks:{label:ctx=>{if(ctx.dataset.label==='Active kcal')return ctx.parsed.y+' kcal';if(ctx.dataset.label==='Exercise min')return ctx.parsed.y+' min';if(ctx.dataset.label==='Steps')return(ctx.parsed.y||0).toLocaleString()+' steps';return null;}}}},
         scales:{
           x:{ticks:xTicks,grid:xGrid},
           ySteps:{type:'linear',position:'left',ticks:{color:'rgba(0,212,255,0.85)',font:{size:15,family:'DM Mono'},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'rgba(255,255,255,0.06)'}},
