@@ -2844,29 +2844,29 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-05-30T14:53:31.004Z",
-    "vo2maxUsed": 42.605000000000004,
+    "generatedAt": "2026-06-06T06:42:52.368Z",
+    "vo2maxUsed": 41.85,
     "runCount": 24,
     "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1810,
-        "ciSeconds": 308,
+        "seconds": 1852,
+        "ciSeconds": 315,
         "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3731,
-        "ciSeconds": 825,
+        "seconds": 3815,
+        "ciSeconds": 843,
         "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 8144,
-        "ciSeconds": 2354,
+        "seconds": 8331,
+        "ciSeconds": 2408,
         "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 16874,
-        "ciSeconds": 7458,
+        "seconds": 17257,
+        "ciSeconds": 7628,
         "method": "VO2max / VDOT"
       }
     },
@@ -2894,10 +2894,10 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1678,
-        "s10k": 3476,
-        "shalf": 7635,
-        "sfull": 15972
+        "s5k": 1761,
+        "s10k": 3644,
+        "shalf": 8009,
+        "sfull": 16739
       },
       "hrPred": {
         "s5k": 1858,
@@ -3590,7 +3590,7 @@
         "kcal": 1770
       },
       "ts": 1780728041306,
-      "fuelPlan": "## Check-In: June 5\n\n---\n\n### ASSESSMENT\n\nToday's 1,770 kcal and 82g protein through what looks like a social/outing day is a familiar setup — front-loaded with a solid breakfast but now sitting at less than half your protein target with the day likely winding down. The beer and hot chocolate added ~340 kcal with near-zero protein, which isn't a crisis in isolation, but given your chronic pattern of days collapsing under 100g protein, today is trending toward repeating June 4. You need roughly **100g more protein and 400-600 more calories** before bed to avoid waking up hungry again tomorrow and perpetuating the cumulative deficit.\n\n---\n\n### REST OF DAY\n\n**Meal 1 — Next meal (no prep, grab-and-go or delivery):**\n- **Large Greek yogurt** (Chobani whole milk, 2-cup container) — ~340 kcal, 34g protein\n- **Rotisserie chicken, ~6oz pulled** (grocery store grab) — ~280 kcal, 52g protein\n- Together: ~620 kcal, **~86g protein**, done in 5 minutes\n\n**If you want one more small thing before bed:**\n- **2 hardboiled eggs + handful of nuts (1oz almonds)** — ~250 kcal, 14g protein\n\n---\n\n**End of day projection:** ~2,640 kcal | **~182g protein** ✅\n\nThat hits your target and breaks the low-day pattern. Prioritize the chicken and yogurt — that's the one move that changes today's outcome."
+      "fuelPlan": "## Check-In: June 5\n\n---\n\n### ASSESSMENT\n\nToday is tracking as a carbon copy of June 4 — you're at 1,770 kcal and only 82g protein with likely several hours left in the day, but the food choices so far have been calorie-dense without doing much protein work (the quesadilla and chowder together gave you 77g protein across 1,430 calories). This is the third day in a four-day window where you're on pace to land significantly under your protein target, which means muscle repair from any training this week is essentially stalled. The waking hunger you reported on June 3 — your *higher* day — is a direct symptom of this cycle: you're never actually catching up.\n\n---\n\n### REST OF DAY\n\nYou need roughly **100g more protein and ~600-800 more calories** to close today adequately. Hit these three things:\n\n**Meal 1 — Next 1-2 hours (packable)**\n- 2 rotisserie chicken breasts, pulled apart (grab from any grocery deli section, zero prep)\n- String cheese x2 or a Babybel pack\n- Handful of crackers or a banana\n- **~50g protein, ~450 kcal**\n\n**Meal 2 — Dinner**\n- 2 cans of tuna or salmon mixed with a packet of mayo, eaten on tortillas (2 large flour)\n- Bag of microwaved frozen edamame (5 min, zero skill)\n- **~55g protein, ~550 kcal**\n\n**Total projected end of day: ~2,770 kcal, ~187g protein** ✓\n\nThe rotisserie chicken is your highest-leverage habit to build right now — cheap, zero cooking, 50g protein per breast, works in the hospital."
     }
   ],
   "fuelMemory": {
