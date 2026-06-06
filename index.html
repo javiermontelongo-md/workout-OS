@@ -2903,7 +2903,19 @@ function fuelSelectDate(dateStr){
   renderFuelRows();
   if(entry?.totals?.kcal) renderFuelMacros(entry);
   else{ const mc=document.getElementById('fuel-macros-card'); if(mc) mc.style.display='none'; }
-  const advOut=document.getElementById('fuel-advice-out'); if(advOut) advOut.innerHTML='';
+  const advOut=document.getElementById('fuel-advice-out');
+  if(advOut){
+    const savedPlan=entry?.fuelPlan;
+    if(savedPlan){
+      const isEditingPast=dateStr!==localDS(new Date());
+      const ciLabel=isEditingPast?`CHECK-IN: ${new Date(dateStr+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`:"TODAY'S CHECK-IN";
+      const tsLine=entry.fuelPlanTs?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:6px;">generated ${new Date(entry.fuelPlanTs).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>`:'';
+      const rendered=savedPlan.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--t);">$1</strong>').replace(/\n\n/g,'</p><p style="margin-top:8px;">').replace(/\n/g,'<br>');
+      advOut.innerHTML=`<div style="background:var(--s2);border:1px solid rgba(184,96,53,.25);border-radius:var(--r);padding:15px;margin-top:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;margin-bottom:6px;">${ciLabel}</div>${tsLine}<p style="font-size:var(--fs-sm);color:var(--t2);line-height:1.85;">${rendered}</p></div>`;
+    } else {
+      advOut.innerHTML='';
+    }
+  }
   const saveMsg=document.getElementById('fuel-save-msg'); if(saveMsg) saveMsg.innerHTML='';
   renderFuelCalendar();
 }
@@ -3054,11 +3066,13 @@ Give a check-in response in two parts:
     if(text){
       const rendered=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--t);">$1</strong>').replace(/\n\n/g,'</p><p style="margin-top:8px;">').replace(/\n/g,'<br>');
       const ciLabel=isEditingPast?`CHECK-IN: ${new Date(today+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`:"TODAY'S CHECK-IN";
-      out.innerHTML=`<div style="background:var(--s2);border:1px solid rgba(184,96,53,.25);border-radius:var(--r);padding:15px;margin-top:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;margin-bottom:10px;">${ciLabel}</div><p style="font-size:var(--fs-sm);color:var(--t2);line-height:1.85;">${rendered}</p></div>`;
+      const nowTs=Date.now();
+      const tsLine=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:6px;">generated ${new Date(nowTs).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>`;
+      out.innerHTML=`<div style="background:var(--s2);border:1px solid rgba(184,96,53,.25);border-radius:var(--r);padding:15px;margin-top:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;margin-bottom:6px;">${ciLabel}</div>${tsLine}<p style="font-size:var(--fs-sm);color:var(--t2);line-height:1.85;">${rendered}</p></div>`;
       requestAnimationFrame(()=>{ out.scrollIntoView({behavior:'smooth',block:'nearest'}); });
       // Save to today's entry
       const idx=(D.fuelLog||[]).findIndex(e=>e.date===today);
-      if(idx>=0){D.fuelLog[idx].fuelPlan=text;await pushSilent();}
+      if(idx>=0){D.fuelLog[idx].fuelPlan=text;D.fuelLog[idx].fuelPlanTs=Date.now();await pushSilent();}
       // Update fuelMemory in background
       updateFuelMemory();
     } else {
