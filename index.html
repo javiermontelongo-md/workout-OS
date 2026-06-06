@@ -690,6 +690,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 .cal-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 2px;}
 .cal-dot.lift{background:var(--a);}
 .cal-dot.run{background:var(--a2);}
+.cal-dot.ride{background:var(--a5);}
 .cal-dots{text-align:center;margin-top:4px;line-height:1;}
 .cal-cell.cal-empty{background:transparent;border-color:transparent;pointer-events:none;}
 .cal-dot.fuel{background:var(--aw);}
@@ -3680,7 +3681,7 @@ function renderCalendar(){
   const DAY_HDRS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
   let html=DAY_HDRS.map(h=>`<div class="cal-hdr">${h}</div>`).join('');
   for(let i=0;i<firstDOW;i++) html+=`<div class="cal-cell cal-empty"></div>`;
-  let liftCount=0,runCount=0;
+  let liftCount=0,runCount=0,rideCount=0;
   const isRunType=d=>['run','run_easy','run_quality','run_long'].includes(d);
   for(let d=1;d<=daysInMonth;d++){
     const dateObj=new Date(tYear,tMonth,d);
@@ -3688,13 +3689,17 @@ function renderCalendar(){
     const isToday=ds===todayStr;
     const isFuture=ds>todayStr;
     const sessions=getSessionsForDate(ds);
-    const stravaRun=!isFuture?(D.runs||[]).find(r=>r.date===ds):null;
+    const stravaActivities=!isFuture?(D.runs||[]).filter(r=>r.date===ds):[];
+    const stravaRun=stravaActivities.find(r=>r.type!=='ride')||null;
+    const stravaRide=stravaActivities.find(r=>r.type==='ride')||null;
     const hasLift=sessions.some(s=>!isRunType(s.day));
     const hasRun=sessions.some(s=>isRunType(s.day))||!!stravaRun;
+    const hasRide=!!stravaRide;
     if(hasLift) liftCount++;
     if(hasRun) runCount++;
-    const dots=(hasLift?'<span class="cal-dot lift"></span>':'')+(hasRun?'<span class="cal-dot run"></span>':'');
-    const clickable=sessions.length>0||!!stravaRun;
+    if(hasRide) rideCount++;
+    const dots=(hasLift?'<span class="cal-dot lift"></span>':'')+(hasRun?'<span class="cal-dot run"></span>':'')+(hasRide?'<span class="cal-dot ride"></span>':'');
+    const clickable=sessions.length>0||!!stravaRun||!!stravaRide;
     html+=`<div class="cal-cell${isToday?' today':''}" data-date="${ds}"${clickable?' style="cursor:pointer;"':''}><div class="cal-date">${d}</div>${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
   }
   grid.innerHTML=html;
@@ -3703,31 +3708,37 @@ function renderCalendar(){
     const cell=e.target.closest('[data-date]');
     if(cell) handleDayCardClick(cell.dataset.date);
   };
-  sumEl.textContent=`${liftCount} strength \xb7 ${runCount} runs`;
+  const parts=[`${liftCount} strength`,`${runCount} runs`];
+  if(rideCount>0) parts.push(`${rideCount} ride${rideCount>1?'s':''}`);
+  sumEl.textContent=parts.join(' \xb7 ');
   sumEl.style.color='var(--t3)';
 }
 function handleDayCardClick(dateStr){
   const sessions=getSessionsForDate(dateStr);
   const today=localDS(new Date());
   if(sessions.length>0&&dateStr<=today){ openSessionDrawer(sessions[0],dateStr); return; }
-  const stravaRun=dateStr<=today?(D.runs||[]).find(r=>r.date===dateStr):null;
-  if(stravaRun){
+  const stravaActivities=dateStr<=today?(D.runs||[]).filter(r=>r.date===dateStr):[];
+  const stravaAct=stravaActivities[0]||null;
+  if(stravaAct){
     const fmtPace=s=>s?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:null;
+    const isRide=stravaAct.type==='ride';
     const fake={
-      date:stravaRun.date,
-      day:stravaRun.runType||'run',
+      date:stravaAct.date,
+      day:isRide?'cycling':stravaAct.runType||'run',
       isStrava:true,
       cardio:{
-        type:stravaRun.name||'Run',
-        runType:stravaRun.runType,
-        dur:stravaRun.duration?Math.round(stravaRun.duration/60):null,
-        dist:stravaRun.distance||stravaRun.distanceMi,
-        hr:stravaRun.heartRateAvg,
-        hrMax:stravaRun.heartRateMax,
-        pace:fmtPace(stravaRun.pace),
-        elev:stravaRun.elevationGain,
+        type:stravaAct.name||(isRide?'Ride':'Run'),
+        runType:stravaAct.runType,
+        dur:stravaAct.duration?Math.round(stravaAct.duration/60):null,
+        dist:stravaAct.distance||stravaAct.distanceMi,
+        hr:stravaAct.heartRateAvg,
+        hrMax:stravaAct.heartRateMax,
+        pace:isRide?null:fmtPace(stravaAct.pace),
+        elev:stravaAct.elevationGain,
       }
     };
+    // If multiple activities on the same day, show count in name
+    if(stravaActivities.length>1) fake.cardio.type+=` (+${stravaActivities.length-1} more)`;
     openSessionDrawer(fake,dateStr);
     return;
   }

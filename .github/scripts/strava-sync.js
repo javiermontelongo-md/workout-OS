@@ -140,31 +140,34 @@ async function main() {
 
   if (!data.runs) data.runs = [];
 
-  // 4. Process activities — only Run, skip walks and weight training
+  // 4. Process activities — Run, Ride, VirtualRide (skip walks and weight training)
+  const ALLOWED_TYPES = new Set(['Run', 'Ride', 'VirtualRide']);
   const existingIds = new Set(data.runs.map(r => r.stravaId));
   let newCount = 0;
 
   for (const activity of activities) {
     const type = activity.type || activity.sport_type || '';
-    if (type !== 'Run') continue;
+    if (!ALLOWED_TYPES.has(type)) continue;
 
     if (existingIds.has(activity.id)) continue;
 
     const distanceMiles = activity.distance / 1609.34;
     const durationSeconds = activity.moving_time;
-    const paceSecsPerMile = distanceMiles > 0 ? durationSeconds / distanceMiles : null;
     const elevationFeet = (activity.total_elevation_gain || 0) * 3.28084;
 
     const activityDate = new Date(activity.start_date_local);
     const dateStr = localDateStr(activityDate);
 
-    const runType = type === 'Run' ? classifyRunType(activity) : 'walk';
+    const isRide = type === 'Ride' || type === 'VirtualRide';
+    const runType = isRide ? 'cycling' : classifyRunType(activity);
+    // pace (sec/mi) only meaningful for runs
+    const paceSecsPerMile = (!isRide && distanceMiles > 0) ? durationSeconds / distanceMiles : null;
 
     const entry = {
       date: dateStr,
       stravaId: activity.id,
       name: activity.name,
-      type: type.toLowerCase(),
+      type: isRide ? 'ride' : type.toLowerCase(),
       distance: Math.round(distanceMiles * 100) / 100,
       duration: durationSeconds,
       pace: paceSecsPerMile ? Math.round(paceSecsPerMile) : null,
