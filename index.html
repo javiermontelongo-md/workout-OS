@@ -975,6 +975,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">recovery snapshot</div>
       <div style="display:flex;gap:6px;">
+        <button class="btn bs bi" onclick="setSnapRange(7)" id="snap-btn-7" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">7D</button>
         <button class="btn bs bi" onclick="setSnapRange(30)" id="snap-btn-30" style="font-size:var(--fs-xs);padding:5px 10px;">30D</button>
         <button class="btn bs bi" onclick="setSnapRange(60)" id="snap-btn-60" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">60D</button>
         <button class="btn bs bi" onclick="setSnapRange(90)" id="snap-btn-90" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">90D</button>
@@ -1389,6 +1390,70 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;" id="race-pred-chart-legend"></div>
   </div>
 </div>
+
+<!-- BIKE RACE PREDICTIONS -->
+<div class="card" id="bike-race-predictions-card" style="margin-bottom:14px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <div class="lbl" style="margin:0;">bike race predictions</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);" id="bike-pred-meta"></div>
+  </div>
+
+  <div id="bike-pred-nodata" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;display:none;">
+    Not enough data yet — log some rides to generate predictions
+  </div>
+
+  <div id="bike-pred-grid" style="display:none;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">20 km</div>
+        <div style="font-size:20px;font-weight:600;color:var(--a);" id="bike-pred-20k-time">--:--</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-20k-speed"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-20k-ci"></div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">40 km</div>
+        <div style="font-size:20px;font-weight:600;color:var(--a);" id="bike-pred-40k-time">--:--</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-40k-speed"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-40k-ci"></div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">90 km (Half IM)</div>
+        <div style="font-size:20px;font-weight:600;color:var(--a2);" id="bike-pred-90k-time">--:--</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-90k-speed"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-90k-ci"></div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">180 km (Full IM)</div>
+        <div style="font-size:20px;font-weight:600;color:var(--t2);" id="bike-pred-180k-time">--:--</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-180k-speed"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-180k-ci"></div>
+      </div>
+    </div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:14px;" id="bike-pred-method"></div>
+
+    <details style="margin-bottom:14px;" id="bike-pred-details">
+      <summary style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);cursor:pointer;user-select:none;list-style:none;padding:6px 0;">
+        How this is calculated ▾
+      </summary>
+      <div id="bike-pred-formula" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;padding:10px;background:var(--s2);border-radius:6px;margin-top:6px;white-space:pre-wrap;"></div>
+    </details>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;">Predicted finish time trend</div>
+      <div style="display:flex;gap:4px;">
+        <button class="btn bs bi" id="bpbtn-20k" onclick="setBikeRacePredChart('20k')" style="font-size:var(--fs-xs);padding:3px 8px;">20K</button>
+        <button class="btn bs bi" id="bpbtn-40k" onclick="setBikeRacePredChart('40k')" style="font-size:var(--fs-xs);padding:3px 8px;">40K</button>
+        <button class="btn bs bi" id="bpbtn-90k" onclick="setBikeRacePredChart('90k')" style="font-size:var(--fs-xs);padding:3px 8px;">90K</button>
+        <button class="btn bs bi" id="bpbtn-180k" onclick="setBikeRacePredChart('180k')" style="font-size:var(--fs-xs);padding:3px 8px;">180K</button>
+      </div>
+    </div>
+    <div style="position:relative;height:180px;">
+      <canvas id="bike-pred-chart"></canvas>
+    </div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;" id="bike-pred-chart-legend"></div>
+  </div>
+</div>
+
 <div class="card" id="body-metrics-card" style="display:none;margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">body composition</div>
@@ -2806,7 +2871,7 @@ function showTab(n){
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
   else if(n==='week'){ }
-  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); }
+  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); renderAIFlowDiagram(); }
 }
 
@@ -3534,7 +3599,7 @@ async function saveSession(){
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
   if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); // D.runPrescriptions intentionally NOT touched
- renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); renderVO2TrendChart(); }
+ renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); renderBikeRacePredictions(); renderVO2TrendChart(); }
   else { D.sessions.pop(); }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
@@ -4688,6 +4753,348 @@ function renderRacePredChart(dist) {
     console.warn('Chart render failed:',e);
     const ctx=canvas.getContext('2d');ctx.font='12px monospace';ctx.fillStyle='#4a5068';
     ctx.fillText('Chart unavailable — check data',10,30);
+  }
+}
+
+// ── BIKE RACE PREDICTION ENGINE ───────────────────────────────────────────────
+
+function bikeRiegelPredict(rides) {
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
+  const cutoffStr = cutoff.getFullYear()+'-'+String(cutoff.getMonth()+1).padStart(2,'0')+'-'+String(cutoff.getDate()).padStart(2,'0');
+  const recent = rides.filter(r => r.date >= cutoffStr && r.distance > 0 && r.duration > 0);
+  if (recent.length === 0) return null;
+
+  const last5 = recent.slice(-5);
+  const sorted = [...last5].sort((a,b) => (a.duration/a.distance) - (b.duration/b.distance));
+  const medianRide = sorted[Math.floor(sorted.length/2)];
+
+  const T1 = medianRide.duration;
+  const D1 = medianRide.distance * 1.60934; // miles → km
+  const riegel = (D2km) => T1 * Math.pow(D2km / D1, 1.06);
+
+  return {
+    s20k:  Math.round(riegel(20)),
+    s40k:  Math.round(riegel(40)),
+    s90k:  Math.round(riegel(90)),
+    s180k: Math.round(riegel(180)),
+    anchor: medianRide
+  };
+}
+
+function bikeHRRegressionPredict(rides) {
+  const withHR = rides.filter(r => r.heartRateAvg && r.distance > 0 && r.duration > 0);
+  if (withHR.length < 3) return null;
+
+  // speed in km/h, HR in bpm — linear regression: speed = m*HR + b
+  const pts = withHR.map(r => ({
+    hr: r.heartRateAvg,
+    speed: (r.distance * 1.60934) / (r.duration / 3600) // mph→kmh
+  }));
+
+  const n = pts.length;
+  const sumX = pts.reduce((s,p)=>s+p.hr, 0);
+  const sumY = pts.reduce((s,p)=>s+p.speed, 0);
+  const sumXY = pts.reduce((s,p)=>s+p.hr*p.speed, 0);
+  const sumX2 = pts.reduce((s,p)=>s+p.hr*p.hr, 0);
+  const denom = (n*sumX2 - sumX*sumX);
+  if (Math.abs(denom) < 0.001) return null;
+
+  const m = (n*sumXY - sumX*sumY) / denom;
+  const b = (sumY - m*sumX) / n;
+
+  // Threshold HR for cycling ~88% of 190 = ~167 bpm
+  const thresholdHR = 167;
+  const raceSpeedKmh = m * thresholdHR + b;
+  if (raceSpeedKmh <= 0) return null;
+
+  const distToSecs = (km) => Math.round((km / raceSpeedKmh) * 3600);
+  return {
+    s20k:  distToSecs(20),
+    s40k:  distToSecs(40),
+    s90k:  distToSecs(90),
+    s180k: distToSecs(180)
+  };
+}
+
+function calcBikeRacePredictions() {
+  const rides = (D.runs || []).filter(r => r.type === 'ride' && r.distance > 0 && r.duration > 0);
+  if (rides.length === 0) return null;
+
+  const riegel = bikeRiegelPredict(rides);
+  const hrReg  = bikeHRRegressionPredict(rides);
+
+  const distances = ['s20k','s40k','s90k','s180k'];
+
+  let w = { riegel: riegel ? (hrReg ? 0.7 : 1.0) : 0, hr: hrReg ? (riegel ? 0.3 : 1.0) : 0 };
+  const wSum = w.riegel + w.hr;
+  if (wSum === 0) return null;
+
+  const dominant = w.riegel >= w.hr ? 'Riegel' : 'HR regression';
+  const baseCI = rides.length < 5 ? 0.12 : rides.length < 15 ? 0.08 : 0.06;
+  const distFactors = { s20k:1.0, s40k:1.3, s90k:1.8, s180k:2.7 };
+
+  const predictions = {};
+  distances.forEach(d => {
+    const vals = [], weights = [];
+    if (riegel && riegel[d]) { vals.push(riegel[d]); weights.push(w.riegel); }
+    if (hrReg  && hrReg[d])  { vals.push(hrReg[d]);  weights.push(w.hr); }
+    if (vals.length === 0) { predictions[d] = null; return; }
+
+    const wt = vals.reduce((s,v,i)=>s+v*weights[i],0) / weights.reduce((s,w)=>s+w,0);
+    const ciSecs = Math.round(wt * baseCI * distFactors[d]);
+    predictions[d] = { seconds: Math.round(wt), ciSeconds: ciSecs };
+  });
+
+  return {
+    generatedAt: new Date().toISOString(),
+    rideCount: rides.length,
+    methodLabel: dominant,
+    predictions,
+    debugInfo: { riegelPred: riegel, hrPred: hrReg, weights: w }
+  };
+}
+
+function secsToSpeed(totalSecs, km) {
+  if (!totalSecs || !km || totalSecs <= 0) return '';
+  const mph = (km * 0.621371) / (totalSecs / 3600);
+  return `~ ${mph.toFixed(1)} mph`;
+}
+
+function renderBikeRacePredictions() {
+  const card = document.getElementById('bike-race-predictions-card');
+  if (!card) return;
+
+  const pred = calcBikeRacePredictions();
+  const noData = document.getElementById('bike-pred-nodata');
+  const grid   = document.getElementById('bike-pred-grid');
+
+  if (!pred) {
+    if (noData) noData.style.display = '';
+    if (grid) grid.style.display = 'none';
+    return;
+  }
+
+  if (noData) noData.style.display = 'none';
+  if (grid) grid.style.display = '';
+
+  const meta = document.getElementById('bike-pred-meta');
+  if (meta) meta.textContent = `Based on ${pred.rideCount} ride${pred.rideCount !== 1 ? 's' : ''}`;
+
+  const method = document.getElementById('bike-pred-method');
+  if (method) method.textContent = `Primary method: ${pred.methodLabel}`;
+
+  const display = [
+    { key:'s20k',  km:20,  elT:'bike-pred-20k-time',  elCI:'bike-pred-20k-ci',  elS:'bike-pred-20k-speed'  },
+    { key:'s40k',  km:40,  elT:'bike-pred-40k-time',  elCI:'bike-pred-40k-ci',  elS:'bike-pred-40k-speed'  },
+    { key:'s90k',  km:90,  elT:'bike-pred-90k-time',  elCI:'bike-pred-90k-ci',  elS:'bike-pred-90k-speed'  },
+    { key:'s180k', km:180, elT:'bike-pred-180k-time', elCI:'bike-pred-180k-ci', elS:'bike-pred-180k-speed' }
+  ];
+
+  display.forEach(({key, km, elT, elCI, elS}) => {
+    const p = pred.predictions[key];
+    const tEl = document.getElementById(elT);
+    const cEl = document.getElementById(elCI);
+    const sEl = document.getElementById(elS);
+    if (tEl) tEl.textContent = p ? secsToRaceTime(p.seconds) : '--:--';
+    if (sEl) sEl.textContent = p ? secsToSpeed(p.seconds, km) : '';
+    if (cEl) cEl.textContent = p ? `± ${secsToRaceTime(p.ciSeconds)}` : '';
+  });
+
+  const formulaEl = document.getElementById('bike-pred-formula');
+  if (formulaEl && pred.debugInfo) {
+    const db = pred.debugInfo;
+    const r = db.riegelPred;
+    const anchorDate = r?.anchor?.date || '?';
+    const anchorDist = r?.anchor ? (r.anchor.distance * 1.60934).toFixed(1) : '?';
+    const anchorSpd  = r?.anchor ? secsToSpeed(r.anchor.duration, r.anchor.distance * 1.60934) : '?';
+    const hrRideCount = (D.runs||[]).filter(r=>r.type==='ride'&&r.heartRateAvg&&r.distance>0).length;
+
+    formulaEl.textContent = [
+      `Riegel formula (${Math.round((db.weights.riegel||0)*100)}%): T2 = T1 × (D2/D1)^1.06`,
+      `  Anchor ride: ${anchorDate}  ${anchorDist} km @ ${anchorSpd}`,
+      ``,
+      `HR-speed regression (${Math.round((db.weights.hr||0)*100)}%): linear fit across ${hrRideCount} rides`,
+      `  Threshold HR: 167 bpm → projected race-effort speed`,
+      ``,
+      `Weighted average of available methods.`,
+      `Confidence interval widens with distance and narrows with more data.`
+    ].join('\n');
+  }
+
+  setBikeRacePredChart('20k');
+}
+
+let _bikeRacePredChart = null;
+let _bikeRacePredCurrentDist = '20k';
+
+function setBikeRacePredChart(dist) {
+  _bikeRacePredCurrentDist = dist;
+  ['20k','40k','90k','180k'].forEach(d => {
+    const btn = document.getElementById('bpbtn-'+d);
+    if (btn) btn.style.opacity = d === dist ? '1' : '0.5';
+  });
+  renderBikeRacePredChart(dist);
+}
+
+function renderBikeRacePredChart(dist) {
+  const canvas = document.getElementById('bike-pred-chart');
+  if (!canvas) return;
+  if (_bikeRacePredChart) { _bikeRacePredChart.destroy(); _bikeRacePredChart = null; }
+
+  try {
+  const rides = (D.runs||[]).filter(r=>r.type==='ride'&&r.distance>0&&r.duration>0).sort((a,b)=>a.date.localeCompare(b.date));
+  const distKey = { '20k':'s20k', '40k':'s40k', '90k':'s90k', '180k':'s180k' }[dist];
+  const distLabel = { s20k:'20 km', s40k:'40 km', s90k:'90 km', s180k:'180 km' }[distKey];
+  const distKm = { s20k:20, s40k:40, s90k:90, s180k:180 }[distKey];
+
+  const todayD = new Date();
+  const todayStr = todayD.getFullYear()+'-'+String(todayD.getMonth()+1).padStart(2,'0')+'-'+String(todayD.getDate()).padStart(2,'0');
+
+  const allLabels = [];
+  const todayIndex = 45;
+  for (let i = -45; i <= 45; i++) {
+    const d = new Date(todayD);
+    d.setDate(d.getDate() + i);
+    allLabels.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
+  }
+
+  const pastData = allLabels.map(()=>null);
+  const pastRides = rides.filter(r => r.date >= allLabels[0] && r.date <= todayStr);
+
+  pastRides.forEach(ride => {
+    const idx = allLabels.indexOf(ride.date);
+    if (idx < 0) return;
+    const subset = rides.filter(r => r.date <= ride.date);
+    const r = subset.length >= 1 ? bikeRiegelPredict(subset) : null;
+    const h = subset.length >= 3 ? bikeHRRegressionPredict(subset) : null;
+    let w = { r: r?0.7:0, h: h?0.3:0 };
+    const ws = w.r + w.h;
+    if (ws === 0) return;
+    Object.keys(w).forEach(k => w[k] /= ws);
+    const vals = [], wts = [];
+    if (r && r[distKey]) { vals.push(r[distKey]); wts.push(w.r); }
+    if (h && h[distKey]) { vals.push(h[distKey]); wts.push(w.h); }
+    if (!vals.length) return;
+    const wt = vals.reduce((s,v,i)=>s+v*wts[i],0) / wts.reduce((s,w)=>s+w,0);
+    pastData[idx] = Math.round(wt/60*10)/10;
+  });
+
+  const currentPred = calcBikeRacePredictions();
+  const currentSecs = currentPred?.predictions?.[distKey]?.seconds;
+  const currentMins = currentSecs ? currentSecs/60 : null;
+
+  const futureData = allLabels.map(()=>null);
+  const futureCIUpper = allLabels.map(()=>null);
+  const futureCILower = allLabels.map(()=>null);
+
+  if (currentMins) {
+    const improvPerDay = 0.004 / 7;
+    const coneWidenPerDay = 0.015 / 7;
+    const baseCIpct = rides.length < 5 ? 0.12 : rides.length < 15 ? 0.08 : 0.06;
+
+    for (let i = todayIndex; i < allLabels.length; i++) {
+      const daysAhead = i - todayIndex;
+      const projMins = currentMins * (1 - improvPerDay * daysAhead);
+      const ciWidth = currentMins * (baseCIpct + coneWidenPerDay * daysAhead);
+      futureData[i] = Math.round(projMins * 10) / 10;
+      futureCIUpper[i] = Math.round((projMins + ciWidth) * 10) / 10;
+      futureCILower[i] = Math.round((projMins - ciWidth) * 10) / 10;
+    }
+    if (pastData[todayIndex] === null) pastData[todayIndex] = Math.round(currentMins * 10) / 10;
+  }
+
+  const legend = document.getElementById('bike-pred-chart-legend');
+  if (legend) legend.textContent = `${distLabel} · Solid = past data · Dashed = projection`;
+
+  _bikeRacePredChart = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: allLabels,
+      datasets: [
+        {
+          label: 'Past prediction',
+          data: pastData,
+          borderColor: 'rgba(42,160,112,0.9)',
+          backgroundColor: 'transparent',
+          pointRadius: (ctx) => pastData[ctx.dataIndex] !== null ? 3 : 0,
+          tension: 0.3,
+          fill: false,
+          spanGaps: false
+        },
+        {
+          label: 'Future projection',
+          data: futureData,
+          borderColor: 'rgba(42,160,112,0.5)',
+          borderDash: [5,4],
+          pointRadius: 0,
+          tension: 0.3,
+          fill: false,
+          spanGaps: false
+        },
+        {
+          label: 'CI Upper',
+          data: futureCIUpper,
+          borderColor: 'rgba(42,160,112,0.15)',
+          borderDash: [3,3],
+          pointRadius: 0,
+          fill: false,
+          tension: 0.3,
+          spanGaps: false
+        },
+        {
+          label: 'CI Lower',
+          data: futureCILower,
+          borderColor: 'rgba(42,160,112,0.15)',
+          borderDash: [3,3],
+          pointRadius: 0,
+          fill: '-1',
+          backgroundColor: 'rgba(42,160,112,0.07)',
+          tension: 0.3,
+          spanGaps: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          filter: item => item.dataset.label === 'Past prediction' || item.dataset.label === 'Future projection',
+          callbacks: {
+            label: ctx => ctx.dataset.label+': '+secsToRaceTime(Math.round(ctx.parsed.y*60))
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color:'#4a5068', font:{size:9}, maxTicksLimit:9, maxRotation:0,
+            callback: function(val, i) {
+              const lbl = allLabels[i];
+              if (!lbl) return '';
+              if (lbl === todayStr) return 'TODAY';
+              if (i % 9 === 0) return lbl.slice(5);
+              return '';
+            }
+          },
+          grid: {
+            color: (ctx) => ctx.index === todayIndex ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.04)'
+          }
+        },
+        y: {
+          reverse: true,
+          ticks: {
+            color:'#4a5068', font:{size:9},
+            callback: v => secsToRaceTime(Math.round(v*60))
+          },
+          grid: { color:'rgba(255,255,255,0.04)' }
+        }
+      }
+    }
+  });
+  } catch(e) {
+    console.warn('Bike chart render failed:', e);
   }
 }
 
@@ -6157,7 +6564,7 @@ function renderSnapshotCharts(){
 
 function setSnapRange(days){
   _snapDays=days;
-  [30,60,90].forEach(d=>{
+  [7,30,60,90].forEach(d=>{
     const btn=document.getElementById('snap-btn-'+d);
     if(btn)btn.style.opacity=d===days?'1':'0.5';
   });
