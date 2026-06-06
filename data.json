@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-05",
+  "lastUpdated": "2026-06-06",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -3546,12 +3546,36 @@
       "date": "2026-06-05",
       "meals": [
         {
-          "time": "",
+          "time": "8:00 AM",
           "food": "Big 1000 calorie quesadilla with prawns and avocado, along with chips and salsa ",
           "protein": 52,
-          "carbs": 98,
+          "carbs": 78,
           "fat": 48,
           "kcal": 1000
+        },
+        {
+          "time": "8:45 AM",
+          "food": "Crab chowder bowl but only ate half the bread bowl",
+          "protein": 22,
+          "carbs": 45,
+          "fat": 18,
+          "kcal": 430
+        },
+        {
+          "time": "",
+          "food": "3/4 of a chilada modelo",
+          "protein": 1,
+          "carbs": 9,
+          "fat": 0,
+          "kcal": 45
+        },
+        {
+          "time": "",
+          "food": "Ghiradelli half a large hot chocolate of the salted caramel flavor",
+          "protein": 4,
+          "carbs": 38,
+          "fat": 8,
+          "kcal": 235
         }
       ],
       "signals": {
@@ -3560,12 +3584,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 52,
-        "carbs": 98,
-        "fat": 48,
-        "kcal": 1000
+        "protein": 79,
+        "carbs": 170,
+        "fat": 74,
+        "kcal": 1710
       },
-      "ts": 1780702135909
+      "ts": 1780727996828
     }
   ],
   "fuelMemory": {
