@@ -3594,8 +3594,8 @@
     }
   ],
   "fuelMemory": {
-    "summary": "Calorie intake remains critically inconsistent, cycling between a single higher day (2,942 kcal) and two consecutive low days (1,776 and 1,770 kcal), with protein collapsing to 97g and 82g on those days — well below the ~1.6g/kg minimum required to support muscle repair and adaptation. The pattern of one marginally adequate day followed by two days of significant under-fueling reinforces chronic cumulative deficit, with persistent waking hunger and low energy on the higher-intake day confir",
+    "summary": "Calorie intake remains critically inconsistent, cycling between a single higher day (2,942 kcal) and two consecutive low days (1,776 and 1,770 kcal), with protein collapsing to 97g and 82g on the low days — well below the ~1.6g/kg minimum required to support muscle repair and adaptation. The repeating pattern of one marginally adequate day followed by two days of significant under-fueling sustains a chronic cumulative deficit, and the fact that waking hunger and low energy persist",
     "lastUpdated": "2026-06-05",
-    "callCount": 4
+    "callCount": 5
   }
 }
