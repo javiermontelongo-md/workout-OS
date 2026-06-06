@@ -971,7 +971,14 @@ input[type=range]::-webkit-slider-thumb:hover {
 <div id="panel-today" class="panel on">
   <div class="h1">Today's <span>training</span></div>
   <div class="card" id="today-checkin-snapshot">
-    <div class="lbl">recovery snapshot · 7 days</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="lbl" style="margin:0;">recovery snapshot</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn bs bi" onclick="setSnapRange(30)" id="snap-btn-30" style="font-size:var(--fs-xs);padding:5px 10px;">30D</button>
+        <button class="btn bs bi" onclick="setSnapRange(60)" id="snap-btn-60" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">60D</button>
+        <button class="btn bs bi" onclick="setSnapRange(90)" id="snap-btn-90" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">90D</button>
+      </div>
+    </div>
     <div id="snapshot-charts"></div>
   </div>
   <!-- Daily Check-in Input -->
@@ -1380,19 +1387,6 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;" id="race-pred-chart-legend"></div>
   </div>
-</div>
-<div class="card" id="hrv-chart-card" style="display:none;margin-bottom:14px;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-    <div class="lbl" style="margin:0;">HRV trend</div>
-    <div style="display:flex;gap:6px;">
-      <button class="btn bs bi" onclick="setHRVRange(30)" id="hrv-btn-30" style="font-size:var(--fs-xs);padding:5px 10px;">30D</button>
-      <button class="btn bs bi" onclick="setHRVRange(60)" id="hrv-btn-60" style="font-size:var(--fs-xs);padding:5px 10px;">60D</button>
-      <button class="btn bs bi" onclick="setHRVRange(90)" id="hrv-btn-90" style="font-size:var(--fs-xs);padding:5px 10px;">90D</button>
-    </div>
-  </div>
-  <div id="hrv-chart-status" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;min-height:16px;"></div>
-  <div style="position:relative;height:220px;"><canvas id="hrv-chart"></canvas></div>
-  <div id="hrv-chart-legend" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;line-height:1.6;"></div>
 </div>
 <div class="card" id="body-metrics-card" style="display:none;margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -2042,6 +2036,7 @@ let _fuelRows=[{time:'',food:''}];
 let _fuelEditDate='';
 let _fuelTrendChart=null;
 let _fuelTP={rowIdx:0,hour:8,min:0,ampm:'AM'};
+let _snapDays=30;
 
 // ============================================================
 // STATE -- no data here. All data in data.json on GitHub.
@@ -2810,7 +2805,7 @@ function showTab(n){
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
   else if(n==='week'){ }
-  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderHRVChart(); setHRVRange(60); }
+  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); }
   else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); renderAIFlowDiagram(); }
 }
 
@@ -5661,26 +5656,19 @@ function renderSnapshotCharts(){
   const ciMap={};
   (D.checkins||[]).forEach(c=>{ciMap[c.date]=c;});
 
-  // Build last 7 calendar days (chart display window)
+  // Build display window based on _snapDays
+  const days=_snapDays||30;
   const dates=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date();
-    d.setDate(d.getDate()-i);
-    const y=d.getFullYear();
-    const mo=String(d.getMonth()+1).padStart(2,'0');
-    const dd=String(d.getDate()).padStart(2,'0');
-    dates.push(`${y}-${mo}-${dd}`);
+  for(let i=days-1;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    dates.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
   }
 
-  // Build last 30 calendar days (for average computation only)
+  // Build last 30 calendar days (fixed reference for averages regardless of display range)
   const dates30=[];
   for(let i=29;i>=0;i--){
-    const d=new Date();
-    d.setDate(d.getDate()-i);
-    const y=d.getFullYear();
-    const mo=String(d.getMonth()+1).padStart(2,'0');
-    const dd=String(d.getDate()).padStart(2,'0');
-    dates30.push(`${y}-${mo}-${dd}`);
+    const d=new Date();d.setDate(d.getDate()-i);
+    dates30.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
   }
 
   const hasData=Object.keys(hlMap).length>0||Object.keys(ciMap).length>0;
@@ -5689,9 +5677,14 @@ function renderSnapshotCharts(){
     return;
   }
 
-  // x-axis label helper — shows "Mon 26" style for each of the 7 days
-  const xLabel=ds=>{const d=new Date(ds+'T12:00:00');return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]+' '+d.getDate();};
-  const xTicks={color:'#a8b4cc',font:{size:15,family:'DM Mono'},maxTicksLimit:7,maxRotation:0,callback:function(_,i){return xLabel(dates[i]);}};
+  // x-axis: short labels for 30d ("Mon 5"), month+day for 60/90d ("Jun 5")
+  const xLabel=ds=>{
+    const d=new Date(ds+'T12:00:00');
+    if(days<=30) return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]+' '+d.getDate();
+    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getDate();
+  };
+  const ptRadius=days<=30?4:days<=60?3:2;
+  const xTicks={color:'#a8b4cc',font:{size:15,family:'DM Mono'},maxTicksLimit:8,maxRotation:0,callback:function(_,i){return xLabel(dates[i]);}};
   const xGrid={color:'rgba(255,255,255,0.06)'};
 
   // ── HRV SUMMARY ROW ──
@@ -5722,7 +5715,7 @@ function renderSnapshotCharts(){
     ${hrvSummaryHTML}
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Sleep · 7 days</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Sleep · ${days} days</div>
         <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-sleep-avg"></div>
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-sleep-chart"></canvas></div>
@@ -5737,7 +5730,7 @@ function renderSnapshotCharts(){
     </div>
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Steps + Exercise + Calories · 7 days</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Steps + Exercise + Calories · ${days} days</div>
         <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-activity-avg"></div>
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-activity-chart"></canvas></div>
@@ -5750,7 +5743,7 @@ function renderSnapshotCharts(){
     </div>
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Walking HR + Speed · 7 days</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Walking HR + Speed · ${days} days</div>
         <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-hr-avg"></div>
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-hr-chart"></canvas></div>
@@ -5760,9 +5753,9 @@ function renderSnapshotCharts(){
         <span>- - 30d avg</span>
       </div>
     </div>
-    <div style="margin-bottom:12px;">
+    <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Resting HR + Respiratory Rate · 7 days</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Resting HR + Respiratory Rate · ${days} days</div>
         <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-recovery-avg"></div>
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-recovery-chart"></canvas></div>
@@ -5770,6 +5763,19 @@ function renderSnapshotCharts(){
         <span style="color:rgba(255,99,71,0.85);">── Resting HR (L)</span>
         <span style="color:rgba(167,139,250,0.85);">── Resp Rate br/min (R)</span>
         <span>- - 30d avg</span>
+      </div>
+    </div>
+    <div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">HRV · ${days} days</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--t3);" id="snap-hrv-status"></div>
+      </div>
+      <div style="position:relative;height:220px;"><canvas id="snap-hrv-chart"></canvas></div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--t3);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;">
+        <span style="color:rgba(42,160,112,0.9);">● HRV</span>
+        <span style="color:rgba(104,112,200,0.8);">— 60d baseline</span>
+        <span style="color:rgba(184,96,53,0.8);">-- warning (−0.75 SD)</span>
+        <span style="color:rgba(232,93,138,0.8);">-- crash (−1.5 SD)</span>
       </div>
     </div>
   `;
@@ -5893,20 +5899,21 @@ function renderSnapshotCharts(){
   // ── SLEEP MISSING DATA NOTE ──
   const missingEl=document.getElementById('snap-sleep-missing');
   if(missingEl){
+    const todayDate=dates[dates.length-1];
     const missingDays=dates.filter(d=>!hlMap[d]);
-    const todayDate=(()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');})();
-    if(missingDays.length){
-      const labels=missingDays.map(d=>{
-        if(d===todayDate)return'today (not synced yet)';
-        const dt=new Date(d+'T12:00:00');
-        return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]+' '+dt.getDate();
-      });
-      const hasToday=missingDays.includes(todayDate);
-      const note=hasToday&&missingDays.length===1
-        ?'No data yet for today — Apple Watch syncs overnight via Health Auto Export.'
-        :'No Watch data for: '+labels.join(', ')+'. Gaps appear when Apple Health Auto Export did not send data for that day (Watch not worn, app off, or sync not triggered).';
-      missingEl.textContent=note;
+    const missingPast=missingDays.filter(d=>d!==todayDate);
+    const missingToday=missingDays.includes(todayDate);
+    const parts=[];
+    if(missingToday) parts.push('Today not synced yet — Watch data arrives overnight via Health Auto Export.');
+    if(missingPast.length){
+      if(days<=30){
+        const labels=missingPast.map(d=>{const dt=new Date(d+'T12:00:00');return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]+' '+dt.getDate();});
+        parts.push('No Watch data for: '+labels.join(', ')+'.');
+      } else {
+        parts.push(missingPast.length+' day'+(missingPast.length>1?'s':'')+' missing Watch data in this window.');
+      }
     }
+    missingEl.textContent=parts.join(' ');
   }
 
   // ── STEPS + EXERCISE + CALORIES CHART ──
@@ -5962,9 +5969,9 @@ function renderSnapshotCharts(){
       data:{
         labels:dates,
         datasets:[
-          {label:'Steps',data:stepsData,borderColor:'rgba(0,212,255,0.85)',backgroundColor:'rgba(0,212,255,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySteps',order:1},
+          {label:'Steps',data:stepsData,borderColor:'rgba(0,212,255,0.85)',backgroundColor:'rgba(0,212,255,0.07)',pointRadius:ptRadius,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySteps',order:1},
           {label:'Steps 30d avg',data:avgSteps?dates.map(()=>avgSteps):[],borderColor:'rgba(0,212,255,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySteps',order:1},
-          {label:'Exercise min',data:exerciseData,borderColor:'rgba(168,85,247,0.85)',backgroundColor:'rgba(168,85,247,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise',order:1},
+          {label:'Exercise min',data:exerciseData,borderColor:'rgba(168,85,247,0.85)',backgroundColor:'rgba(168,85,247,0.07)',pointRadius:ptRadius,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yExercise',order:1},
           {label:'Exercise 30d avg',data:avgExercise?dates.map(()=>avgExercise):[],borderColor:'rgba(168,85,247,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yExercise',order:1},
           {type:'bar',label:'Active kcal',data:activeCalData,backgroundColor:'rgba(251,146,60,0.25)',borderColor:'rgba(251,146,60,0.6)',borderWidth:1.5,borderRadius:3,yAxisID:'yCalories',order:2}
         ]
@@ -6011,9 +6018,9 @@ function renderSnapshotCharts(){
       data:{
         labels:dates,
         datasets:[
-          {label:'Walking HR',data:walkingHRData,borderColor:'rgba(255,183,77,0.85)',backgroundColor:'rgba(255,183,77,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yWalking'},
+          {label:'Walking HR',data:walkingHRData,borderColor:'rgba(255,183,77,0.85)',backgroundColor:'rgba(255,183,77,0.07)',pointRadius:ptRadius,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yWalking'},
           {label:'Walking HR 30d avg',data:avgWalking?dates.map(()=>avgWalking):[],borderColor:'rgba(255,183,77,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yWalking'},
-          {label:'Walking Speed',data:walkingSpeedData,borderColor:'rgba(56,189,248,0.85)',backgroundColor:'rgba(56,189,248,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySpeed'},
+          {label:'Walking Speed',data:walkingSpeedData,borderColor:'rgba(56,189,248,0.85)',backgroundColor:'rgba(56,189,248,0.07)',pointRadius:ptRadius,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'ySpeed'},
           {label:'Speed 30d avg',data:avgSpeed?dates.map(()=>avgSpeed):[],borderColor:'rgba(56,189,248,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'ySpeed'}
         ]
       },
@@ -6057,9 +6064,9 @@ function renderSnapshotCharts(){
       data:{
         labels:dates,
         datasets:[
-          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,99,71,0.85)',backgroundColor:'rgba(255,99,71,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
+          {label:'Resting HR',data:restingHRData,borderColor:'rgba(255,99,71,0.85)',backgroundColor:'rgba(255,99,71,0.07)',pointRadius:ptRadius,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResting'},
           {label:'Resting HR 30d avg',data:avgResting?dates.map(()=>avgResting):[],borderColor:'rgba(255,99,71,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResting'},
-          {label:'Resp Rate',data:respRateData,borderColor:'rgba(167,139,250,0.85)',backgroundColor:'rgba(167,139,250,0.07)',pointRadius:5,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResp'},
+          {label:'Resp Rate',data:respRateData,borderColor:'rgba(167,139,250,0.85)',backgroundColor:'rgba(167,139,250,0.07)',pointRadius:ptRadius,borderWidth:2.5,tension:0.3,fill:false,spanGaps:true,yAxisID:'yResp'},
           {label:'Resp 30d avg',data:avgResp?dates.map(()=>avgResp):[],borderColor:'rgba(167,139,250,0.3)',borderDash:[5,4],pointRadius:0,fill:false,tension:0,yAxisID:'yResp'}
         ]
       },
@@ -6075,6 +6082,75 @@ function renderSnapshotCharts(){
       }
     });
   }
+
+  // ── HRV TREND CHART ──
+  const hrvLogs=(D.healthLogs||[]).filter(l=>l.hrv!=null).sort((a,b)=>a.date<b.date?-1:1);
+  const hrvCtx=document.getElementById('snap-hrv-chart')?.getContext('2d');
+  if(hrvCtx&&hrvLogs.length>=3){
+    // Per-point rolling 60-day baseline (mean + SD)
+    const baselineDays=60, baselineMin=10;
+    const rollingBL=dates.map(date=>{
+      const anchorMs=new Date(date).getTime();
+      const winStart=new Date(anchorMs-baselineDays*864e5).toISOString().split('T')[0];
+      const win=hrvLogs.filter(l=>l.date>=winStart&&l.date<=date).map(l=>l.hrv);
+      if(win.length<baselineMin)return null;
+      const mean=win.reduce((a,b)=>a+b,0)/win.length;
+      const sd=Math.sqrt(win.reduce((a,b)=>a+(b-mean)**2,0)/win.length);
+      return{mean,sd};
+    });
+    const hrvData=dates.map(date=>{const e=hlMap[date];return e?.hrv??null;});
+    const blData=rollingBL.map(b=>b?+b.mean.toFixed(1):null);
+    const warnData=rollingBL.map(b=>b?+(b.mean-0.75*b.sd).toFixed(1):null);
+    const crashData=rollingBL.map(b=>b?+(b.mean-1.5*b.sd).toFixed(1):null);
+    // Status line
+    const lastBL=rollingBL.slice().reverse().find(b=>b!=null);
+    const latestHRVVal=hrvLogs[hrvLogs.length-1]?.hrv;
+    const statusEl=document.getElementById('snap-hrv-status');
+    if(statusEl&&lastBL){
+      const z=(lastBL.mean-latestHRVVal)/lastBL.sd;
+      let st='OK',sc='#2aa070';
+      if(z>1.5){st='CRASH';sc='#e85d8a';}else if(z>0.75){st='WARNING';sc='#b86035';}
+      statusEl.innerHTML=`<span style="color:var(--t3);">${Math.round(latestHRVVal)}ms · baseline ${Math.round(lastBL.mean)}±${Math.round(lastBL.sd)}ms</span> <span style="color:${sc};font-weight:600;">${st}</span>`;
+    }
+    const gc='rgba(255,255,255,0.05)';
+    try{
+      new Chart(hrvCtx,{
+        type:'line',
+        data:{labels:dates,datasets:[
+          {label:'crash zone',data:crashData,borderColor:'transparent',backgroundColor:'rgba(232,93,138,0.10)',fill:'origin',pointRadius:0,tension:0.3,spanGaps:true,order:4},
+          {label:'warning zone',data:warnData,borderColor:'rgba(184,96,53,0.5)',borderWidth:1,borderDash:[4,4],backgroundColor:'rgba(184,96,53,0.08)',fill:'-1',pointRadius:0,tension:0.3,spanGaps:true,order:3},
+          {label:'crash floor',data:crashData,borderColor:'rgba(232,93,138,0.65)',borderWidth:1,borderDash:[3,3],backgroundColor:'transparent',pointRadius:0,tension:0.3,spanGaps:true,order:2},
+          {label:'baseline',data:blData,borderColor:'rgba(104,112,200,0.75)',borderWidth:2,backgroundColor:'transparent',pointRadius:0,tension:0.3,spanGaps:true,order:1},
+          {label:'HRV',data:hrvData,borderColor:'rgba(42,160,112,0.9)',backgroundColor:'rgba(42,160,112,0.12)',borderWidth:2,pointRadius:ptRadius,tension:0.3,spanGaps:true,order:0}
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+          plugins:{legend:{display:false},tooltip:{callbacks:{
+            label:ctx=>{
+              if(ctx.dataset.label==='HRV')return'HRV: '+ctx.parsed.y+'ms';
+              if(ctx.dataset.label==='baseline')return'Baseline: '+ctx.parsed.y+'ms';
+              if(ctx.dataset.label==='warning zone')return'Warning floor: '+ctx.parsed.y+'ms';
+              if(ctx.dataset.label==='crash floor')return'Crash floor: '+ctx.parsed.y+'ms';
+              return null;
+            },
+            filter:item=>item.dataset.label!=='crash zone'
+          }}},
+          scales:{
+            x:{ticks:xTicks,grid:{color:gc}},
+            y:{ticks:{color:'#888',font:{size:13,family:'DM Mono'},callback:v=>v+'ms'},grid:{color:gc}}
+          }
+        }
+      });
+    }catch(e){console.warn('HRV chart err',e);}
+  }
+}
+
+function setSnapRange(days){
+  _snapDays=days;
+  [30,60,90].forEach(d=>{
+    const btn=document.getElementById('snap-btn-'+d);
+    if(btn)btn.style.opacity=d===days?'1':'0.5';
+  });
+  renderSnapshotCharts();
 }
 
 function initCheckinTab(){
@@ -6186,182 +6262,6 @@ function setBodyChart(type){
     if(btn)btn.style.opacity=t===type?'1':'0.5';
   });
   renderBodyChart(type);
-}
-
-// ─────────────────────────────────────────────────────────────
-// HRV TREND CHART
-// ─────────────────────────────────────────────────────────────
-let _hrvChart=null;
-let _hrvRange=60;
-
-function renderHRVChart(){
-  const card=document.getElementById('hrv-chart-card');
-  if(!card)return;
-  const logs=(D.healthLogs||[]).filter(l=>l.hrv!=null).sort((a,b)=>a.date<b.date?-1:1);
-  if(logs.length<3){card.style.display='none';return;}
-  card.style.display='';
-
-  const canvas=document.getElementById('hrv-chart');
-  if(!canvas||typeof Chart==='undefined')return;
-  if(_hrvChart){_hrvChart.destroy();_hrvChart=null;}
-
-  // Slice to requested range
-  const cutoff=new Date();
-  cutoff.setDate(cutoff.getDate()-_hrvRange);
-  const cutoffStr=cutoff.toISOString().split('T')[0];
-  const visible=logs.filter(l=>l.date>=cutoffStr);
-  if(!visible.length){card.style.display='none';return;}
-
-  // For each visible point compute rolling 60-day baseline up to that date
-  const baselineDays=60;
-  const baselineMin=10; // need at least this many points for a reliable baseline
-  const rollingBaseline=visible.map((_,i)=>{
-    // use all logs up to this date (not just visible window)
-    const anchor=visible[i].date;
-    const anchorMs=new Date(anchor).getTime();
-    const windowStart=new Date(anchorMs-baselineDays*864e5).toISOString().split('T')[0];
-    const window=logs.filter(l=>l.date>=windowStart&&l.date<=anchor&&l.hrv!=null).map(l=>l.hrv);
-    if(window.length<baselineMin)return null;
-    const mean=window.reduce((a,b)=>a+b,0)/window.length;
-    const sd=Math.sqrt(window.reduce((a,b)=>a+(b-mean)**2,0)/window.length);
-    return{mean,sd};
-  });
-
-  // Latest valid baseline for legend
-  const lastBaseline=rollingBaseline.slice().reverse().find(b=>b!=null);
-  const latestHRV=visible[visible.length-1]?.hrv;
-
-  const labels=visible.map(l=>l.date);
-  const hrvData=visible.map(l=>l.hrv);
-  const baselineData=rollingBaseline.map(b=>b?+b.mean.toFixed(1):null);
-  const warnData=rollingBaseline.map(b=>b?+(b.mean-0.75*b.sd).toFixed(1):null);
-  const crashData=rollingBaseline.map(b=>b?+(b.mean-1.5*b.sd).toFixed(1):null);
-
-  // Status line
-  const statusEl=document.getElementById('hrv-chart-status');
-  if(statusEl&&lastBaseline){
-    let statusTxt=`Baseline ${Math.round(lastBaseline.mean)}ms ± ${Math.round(lastBaseline.sd)}ms`;
-    if(latestHRV!=null){
-      const z=(lastBaseline.mean-latestHRV)/lastBaseline.sd;
-      if(z>1.5) statusTxt+=` · Today ${Math.round(latestHRV)}ms — CRASH (${z.toFixed(1)}SD below baseline)`;
-      else if(z>0.75) statusTxt+=` · Today ${Math.round(latestHRV)}ms — WARNING (${z.toFixed(1)}SD below baseline)`;
-      else statusTxt+=` · Today ${Math.round(latestHRV)}ms — OK`;
-    }
-    statusEl.textContent=statusTxt;
-  }
-
-  const gridColor='rgba(255,255,255,0.05)';
-  const tickStyle={font:{family:'monospace',size:9},color:'#888'};
-
-  try{
-    _hrvChart=new Chart(canvas.getContext('2d'),{
-      type:'line',
-      data:{
-        labels,
-        datasets:[
-          // Crash fill (crash line down to 0) — drawn first so others sit on top
-          {
-            label:'crash zone',
-            data:crashData,
-            borderColor:'transparent',
-            backgroundColor:'rgba(232,93,138,0.12)',
-            fill:{target:'origin'},
-            pointRadius:0,tension:0.3,spanGaps:true,order:4
-          },
-          // Warning fill (warning line down to crash line)
-          {
-            label:'warning zone',
-            data:warnData,
-            borderColor:'rgba(184,96,53,0.6)',
-            borderWidth:1,
-            borderDash:[4,4],
-            backgroundColor:'rgba(184,96,53,0.10)',
-            fill:'-1',
-            pointRadius:0,tension:0.3,spanGaps:true,order:3
-          },
-          // Crash line
-          {
-            label:'crash floor',
-            data:crashData,
-            borderColor:'rgba(232,93,138,0.7)',
-            borderWidth:1,
-            borderDash:[3,3],
-            backgroundColor:'transparent',
-            pointRadius:0,tension:0.3,spanGaps:true,order:2
-          },
-          // Rolling baseline
-          {
-            label:'60d baseline',
-            data:baselineData,
-            borderColor:'rgba(104,112,200,0.8)',
-            borderWidth:2,
-            backgroundColor:'transparent',
-            pointRadius:0,tension:0.3,spanGaps:true,order:1
-          },
-          // Daily HRV — on top
-          {
-            label:'HRV',
-            data:hrvData,
-            borderColor:'rgba(42,160,112,0.9)',
-            backgroundColor:'rgba(42,160,112,0.15)',
-            borderWidth:2,
-            pointRadius:3,
-            pointHoverRadius:5,
-            tension:0.3,spanGaps:true,order:0
-          }
-        ]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        interaction:{mode:'index',intersect:false},
-        plugins:{
-          legend:{display:false},
-          tooltip:{
-            callbacks:{
-              label:ctx=>{
-                if(ctx.dataset.label==='HRV') return `HRV: ${ctx.parsed.y}ms`;
-                if(ctx.dataset.label==='60d baseline') return `Baseline: ${ctx.parsed.y}ms`;
-                if(ctx.dataset.label==='warning zone') return `Warning floor: ${ctx.parsed.y}ms`;
-                if(ctx.dataset.label==='crash floor') return `Crash floor: ${ctx.parsed.y}ms`;
-                return null;
-              },
-              filter:item=>item.dataset.label!=='crash zone'
-            }
-          }
-        },
-        scales:{
-          x:{ticks:{...tickStyle,maxTicksLimit:7},grid:{color:gridColor}},
-          y:{
-            ticks:{...tickStyle,callback:v=>v+'ms'},
-            grid:{color:gridColor},
-            title:{display:false}
-          }
-        }
-      }
-    });
-  }catch(e){
-    console.warn('HRV chart error:',e);
-  }
-
-  // Legend
-  const legendEl=document.getElementById('hrv-chart-legend');
-  if(legendEl){
-    legendEl.innerHTML=
-      '<span style="color:rgba(42,160,112,0.9)">● HRV</span>' +
-      '&nbsp;&nbsp;<span style="color:rgba(104,112,200,0.8)">— 60d baseline</span>' +
-      '&nbsp;&nbsp;<span style="color:rgba(184,96,53,0.8)">-- warning (−0.75 SD)</span>' +
-      '&nbsp;&nbsp;<span style="color:rgba(232,93,138,0.8)">-- crash (−1.5 SD)</span>';
-  }
-}
-
-function setHRVRange(days){
-  _hrvRange=days;
-  [30,60,90].forEach(d=>{
-    const btn=document.getElementById('hrv-btn-'+d);
-    if(btn)btn.style.opacity=d===days?'1':'0.5';
-  });
-  renderHRVChart();
 }
 
 // ─────────────────────────────────────────────────────────────
