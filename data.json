@@ -3548,26 +3548,26 @@
         {
           "time": "8:00 AM",
           "food": "Big 1000 calorie quesadilla with prawns and avocado, along with chips and salsa ",
-          "protein": 52,
-          "carbs": 78,
-          "fat": 48,
+          "protein": 55,
+          "carbs": 85,
+          "fat": 52,
           "kcal": 1000
         },
         {
           "time": "8:45 AM",
           "food": "Crab chowder bowl but only ate half the bread bowl",
           "protein": 22,
-          "carbs": 45,
+          "carbs": 48,
           "fat": 18,
           "kcal": 430
         },
         {
           "time": "",
-          "food": "3/4 of a chilada modelo",
+          "food": "3/4 of a chilada modelo cerveza half liter ",
           "protein": 1,
-          "carbs": 9,
+          "carbs": 10,
           "fat": 0,
-          "kcal": 45
+          "kcal": 105
         },
         {
           "time": "",
@@ -3584,12 +3584,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 79,
-        "carbs": 170,
-        "fat": 74,
-        "kcal": 1710
+        "protein": 82,
+        "carbs": 181,
+        "fat": 78,
+        "kcal": 1770
       },
-      "ts": 1780727996828
+      "ts": 1780728041306
     }
   ],
   "fuelMemory": {
