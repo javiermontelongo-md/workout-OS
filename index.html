@@ -981,9 +981,9 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 <div class="mbar">
   <div class="mlogo">Workout <span>OS</span></div>
-  <div style="display:flex;gap:8px;align-items:center;">
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
     <div id="ms" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Loading...</div>
-    <div id="md" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></div>
+    <div id="md" style="font-family:var(--mono);font-size:10px;color:var(--t3);opacity:0.55;" title="build timestamp"></div>
   </div>
 </div>
 
@@ -2673,9 +2673,10 @@ async function push(btnId,msgId){
 // INIT
 // ============================================================
 applyAppearance(); // apply saved theme/font/size before anything renders
+const APP_BUILD='06-07 07:13'; // replaced by commit hook — shows in mobile header so you can confirm fresh code is loaded
 const now=new Date();
 if(document.getElementById('dd')) document.getElementById('dd').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-if(document.getElementById('md')) document.getElementById('md').textContent=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+if(document.getElementById('md')) document.getElementById('md').textContent='build '+APP_BUILD;
 if(CFG.tok) document.getElementById('gh-tok').value=CFG.tok;
 document.getElementById('gh-usr').value=CFG.usr;
 document.getElementById('gh-repo').value=CFG.repo;
