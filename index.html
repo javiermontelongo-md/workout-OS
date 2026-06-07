@@ -687,13 +687,22 @@ input[type=range]::-webkit-slider-thumb:hover {
 .cal-badge.run-moderate { background: rgba(192,132,252,0.12); color: var(--a5); border: 1px solid rgba(192,132,252,0.22); }
 .cal-week-summary { font-family: var(--mono); font-size: 24px; color: var(--t3); text-align: center; padding: 5px 0 2px; }
 .cal-rest { font-family: var(--mono); font-size: 22px; color: var(--t3); opacity: .4; }
-.cal-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 2px;}
-.cal-dot.lift{background:var(--a);}
-.cal-dot.run{background:var(--a2);}
-.cal-dot.ride{background:var(--a5);}
+.cal-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 2px;}
+.cal-dot.lift{background:var(--a);box-shadow:0 0 6px rgba(104,110,210,0.7);}
+.cal-dot.run{background:var(--a2);box-shadow:0 0 6px rgba(42,160,112,0.7);}
+.cal-dot.ride{background:var(--a5);box-shadow:0 0 6px rgba(160,102,212,0.7);}
 .cal-dots{text-align:center;margin-top:4px;line-height:1;}
 .cal-cell.cal-empty{background:transparent;border-color:transparent;pointer-events:none;}
 .cal-dot.fuel{background:var(--aw);}
+.cal-cell.has-lift{background:rgba(104,110,210,0.1);border-color:rgba(104,110,210,0.38);}
+.cal-cell.has-run{background:rgba(42,160,112,0.1);border-color:rgba(42,160,112,0.35);}
+.cal-cell.has-ride{background:rgba(160,102,212,0.1);border-color:rgba(160,102,212,0.35);}
+.cal-cell.has-lift.has-run{background:linear-gradient(135deg,rgba(104,110,210,0.12),rgba(42,160,112,0.08));border-color:rgba(104,110,210,0.38);}
+.cal-cell.has-lift.has-ride{background:linear-gradient(135deg,rgba(104,110,210,0.12),rgba(160,102,212,0.08));border-color:rgba(104,110,210,0.38);}
+.cal-cell.has-run.has-ride{background:linear-gradient(135deg,rgba(42,160,112,0.1),rgba(160,102,212,0.08));border-color:rgba(42,160,112,0.35);}
+.ride-stat-box{background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.25);border-radius:12px;padding:14px 12px;text-align:center;}
+.ride-act-card{background:var(--s3);border:1px solid rgba(160,102,212,0.3);border-radius:14px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden;}
+.ride-act-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.3));}
 .fuel-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
 .fuel-row input[type=time]{width:105px;min-width:105px;flex:0 0 auto;}
 .fuel-row .fuel-food{flex:1;}
@@ -3865,7 +3874,8 @@ function renderCalendar(){
     if(hasRide) rideCount++;
     const dots=(hasLift?'<span class="cal-dot lift"></span>':'')+(hasRun?'<span class="cal-dot run"></span>':'')+(hasRide?'<span class="cal-dot ride"></span>':'');
     const clickable=sessions.length>0||!!stravaRun||!!stravaRide;
-    html+=`<div class="cal-cell${isToday?' today':''}" data-date="${ds}"${clickable?' style="cursor:pointer;"':''}><div class="cal-date">${d}</div>${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
+    const actCls=(hasLift?' has-lift':'')+(hasRun?' has-run':'')+(hasRide?' has-ride':'');
+    html+=`<div class="cal-cell${isToday?' today':''}${actCls}" data-date="${ds}"${clickable?' style="cursor:pointer;"':''}><div class="cal-date">${d}</div>${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
   }
   grid.innerHTML=html;
   grid.onclick=null;
@@ -3883,30 +3893,90 @@ function handleDayCardClick(dateStr){
   const today=localDS(new Date());
   if(sessions.length>0&&dateStr<=today){ openSessionDrawer(sessions[0],dateStr); return; }
   const stravaActivities=dateStr<=today?(D.runs||[]).filter(r=>r.date===dateStr):[];
-  const stravaAct=stravaActivities[0]||null;
-  if(stravaAct){
-    const fmtPace=s=>s?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:null;
-    const isRide=stravaAct.type==='ride';
-    const fake={
-      date:stravaAct.date,
-      day:isRide?'cycling':stravaAct.runType||'run',
-      isStrava:true,
-      cardio:{
-        type:stravaAct.name||(isRide?'Ride':'Run'),
-        runType:stravaAct.runType,
-        dur:stravaAct.duration?Math.round(stravaAct.duration/60):null,
-        dist:stravaAct.distance||stravaAct.distanceMi,
-        hr:stravaAct.heartRateAvg,
-        hrMax:stravaAct.heartRateMax,
-        pace:isRide?null:fmtPace(stravaAct.pace),
-        elev:stravaAct.elevationGain,
-      }
-    };
-    // If multiple activities on the same day, show count in name
-    if(stravaActivities.length>1) fake.cardio.type+=` (+${stravaActivities.length-1} more)`;
-    openSessionDrawer(fake,dateStr);
-    return;
-  }
+  if(!stravaActivities.length) return;
+  openStravaDrawer(stravaActivities,dateStr);
+}
+function openStravaDrawer(activities,dateStr){
+  const existing=document.getElementById('session-drawer');
+  if(existing) existing.remove();
+  const existingBackdrop=document.getElementById('session-drawer-backdrop');
+  if(existingBackdrop) existingBackdrop.remove();
+  const detail=buildStravaDrawerContent(activities,dateStr);
+  const backdrop=document.createElement('div');
+  backdrop.id='session-drawer-backdrop';
+  backdrop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;opacity:0;transition:opacity 0.25s ease;';
+  backdrop.addEventListener('click',closeSessionDrawer);
+  const drawer=document.createElement('div');
+  drawer.id='session-drawer';
+  drawer.style.cssText='position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--s2);border-left:1px solid var(--b2);z-index:201;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(var(--nav) + var(--safe)) 0;';
+  drawer.innerHTML=detail;
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{backdrop.style.opacity='1';drawer.style.transform='translateX(0)';}));
+}
+function buildStravaDrawerContent(activities,dateStr){
+  const fmtDur=m=>m==null?null:m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`;
+  const fmtPace=s=>s?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:null;
+  const dateObj=new Date(dateStr+'T12:00:00');
+  const dateDisplay=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+  const rideCount=activities.filter(a=>a.type==='ride').length;
+  const runCount=activities.filter(a=>a.type!=='ride').length;
+  const parts=[];
+  if(rideCount) parts.push(`${rideCount} ride${rideCount>1?'s':''}`);
+  if(runCount) parts.push(`${runCount} run${runCount>1?'s':''}`);
+  const summary=parts.join(' · ');
+  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);z-index:1;">`;
+  html+=`<div style="padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;">`;
+  html+=`<div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div>`;
+  html+=`<div style="font-size:17px;font-weight:600;color:var(--t);">${summary}</div></div>`;
+  html+=`<button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">×</button></div>`;
+  html+=`<div style="display:flex;gap:6px;padding:0 20px 16px;">`
+  html+=`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 10px;border-radius:5px;letter-spacing:.04em;">STRAVA</span>`;
+  html+=`</div></div>`;
+  html+=`<div style="padding:20px;">`;
+  activities.forEach((act,idx)=>{
+    const isRide=act.type==='ride';
+    const dur=act.duration?Math.round(act.duration/60):null;
+    const dist=act.distance||act.distanceMi||null;
+    const speedMph=(dist&&dur)?((dist/(dur/60)).toFixed(1)+' mph'):null;
+    const pace=!isRide?fmtPace(act.pace):null;
+    const name=act.name||(isRide?'Ride':'Run');
+    const accentColor=isRide?'var(--a5)':'var(--a2)';
+    const accentRgb=isRide?'160,102,212':'42,160,112';
+    const icon=isRide?'🚴':'🏃';
+    const statBg=isRide?'rgba(160,102,212,0.1)':'rgba(42,160,112,0.1)';
+    const statBorder=isRide?'rgba(160,102,212,0.25)':'rgba(42,160,112,0.25)';
+    const stats=[
+      dist?{lbl:'Distance',val:`${Number(dist).toFixed(2)} mi`}:null,
+      dur?{lbl:'Duration',val:fmtDur(dur)}:null,
+      speedMph&&isRide?{lbl:'Avg Speed',val:speedMph}:null,
+      pace&&!isRide?{lbl:'Pace',val:`${pace}/mi`}:null,
+      act.heartRateAvg?{lbl:'Avg HR',val:`${act.heartRateAvg} bpm`}:null,
+      act.heartRateMax?{lbl:'Max HR',val:`${act.heartRateMax} bpm`}:null,
+      act.elevationGain?{lbl:'Elevation',val:`${Math.round(act.elevationGain)} ft`}:null,
+    ].filter(Boolean);
+    html+=`<div style="background:var(--s3);border:1px solid rgba(${accentRgb},0.3);border-radius:16px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden;">`;
+    html+=`<div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,${accentColor},rgba(${accentRgb},0.2));"></div>`;
+    html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">`;
+    html+=`<div style="width:36px;height:36px;border-radius:10px;background:rgba(${accentRgb},0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">${icon}</div>`;
+    html+=`<div><div style="font-size:15px;font-weight:600;color:var(--t);">${name}</div>`;
+    if(act.runType) html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:${accentColor};text-transform:uppercase;letter-spacing:.05em;margin-top:1px;">${act.runType}</div>`;
+    html+=`</div></div>`;
+    if(stats.length){
+      const cols=stats.length<=3?stats.length:Math.min(3,stats.length);
+      html+=`<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px;">`;
+      stats.forEach(s=>{
+        html+=`<div style="background:rgba(${accentRgb},0.1);border:1px solid rgba(${accentRgb},0.22);border-radius:10px;padding:10px 8px;text-align:center;">`;
+        html+=`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div>`;
+        html+=`<div style="font-family:var(--mono);font-size:13px;color:var(--t);font-weight:600;">${s.val}</div>`;
+        html+=`</div>`;
+      });
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+  return html;
 }
 function openSessionDrawer(session,dateStr){
   const existing=document.getElementById('session-drawer');
@@ -3973,22 +4043,41 @@ function buildSessionDrawerContent(session,dateStr){
   }
   const _runTypes=['run','run_easy','run_quality','run_long','easy','long','intervals','tempo','moderate'];
   const _isRunDay=_runTypes.includes(String(session.day||'').toLowerCase());
+  const _isCyclingDay=String(session.day||'').toLowerCase()==='cycling';
+  const _fmtDurInner=m=>m==null?null:m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`;
   if(session.cardio&&_isRunDay){
     const c=session.cardio;
-    const fmtDur=m=>m==null?null:m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`;
     const stats=[
       c.dist?{lbl:'Distance',val:`${Number(c.dist).toFixed(2)} mi`}:null,
-      c.dur?{lbl:'Duration',val:fmtDur(c.dur)}:null,
+      c.dur?{lbl:'Duration',val:_fmtDurInner(c.dur)}:null,
       c.pace?{lbl:'Pace',val:`${c.pace}/mi`}:null,
       c.hr?{lbl:'Avg HR',val:`${c.hr} bpm`}:null,
       c.hrMax?{lbl:'Max HR',val:`${c.hrMax} bpm`}:null,
       c.elev?{lbl:'Elevation',val:`${Math.round(c.elev)} ft`}:null,
     ].filter(Boolean);
-    const statBoxes=stats.map(s=>`<div style="background:var(--s3);border:1px solid var(--b);border-radius:10px;padding:10px 14px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:14px;color:var(--t);font-weight:500;">${s.val}</div></div>`).join('');
+    const statBoxes=stats.map(s=>`<div style="background:rgba(42,160,112,0.1);border:1px solid rgba(42,160,112,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:13px;color:var(--t);font-weight:600;">${s.val}</div></div>`).join('');
     const runTypeBadge=c.runType?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(42,160,112,0.15);color:var(--a2);padding:3px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.06em;margin-right:6px;">${c.runType}</span>`:'';
     const stravaBadge=session.isStrava?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">Strava</span>`:'';
     const actName=(c.type&&c.type!=='Run')?`<div style="font-size:15px;color:var(--t);font-weight:500;margin-bottom:10px;">${c.type}</div>`:'';
-    html+=`<div style="margin-bottom:20px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Run</div>${actName}<div style="margin-bottom:10px;">${runTypeBadge}${stravaBadge}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">${statBoxes}</div></div>`;
+    html+=`<div style="background:var(--s3);border:1px solid rgba(42,160,112,0.3);border-radius:16px;padding:18px;margin-bottom:20px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a2),rgba(42,160,112,0.2));"></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:10px;background:rgba(42,160,112,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🏃</div><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;letter-spacing:.08em;">Run</div>${actName?`<div style="font-size:14px;color:var(--t);font-weight:500;">${c.type}</div>`:''}</div></div><div style="display:flex;gap:6px;margin-bottom:14px;">${runTypeBadge}${stravaBadge}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">${statBoxes}</div></div>`;
+  } else if(session.cardio&&_isCyclingDay){
+    const c=session.cardio;
+    const dur=c.dur;
+    const dist=c.dist;
+    const speedMph=(dist&&dur)?((dist/(dur/60)).toFixed(1)+' mph'):null;
+    const stats=[
+      dist?{lbl:'Distance',val:`${Number(dist).toFixed(2)} mi`}:null,
+      dur?{lbl:'Duration',val:_fmtDurInner(dur)}:null,
+      speedMph?{lbl:'Avg Speed',val:speedMph}:null,
+      c.hr?{lbl:'Avg HR',val:`${c.hr} bpm`}:null,
+      c.hrMax?{lbl:'Max HR',val:`${c.hrMax} bpm`}:null,
+      c.elev?{lbl:'Elevation',val:`${Math.round(c.elev)} ft`}:null,
+    ].filter(Boolean);
+    const statBoxes=stats.map(s=>`<div style="background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:13px;color:var(--t);font-weight:600;">${s.val}</div></div>`).join('');
+    const actName=(c.type&&c.type!=='Ride')?c.type:'Cycling';
+    const stravaBadge=session.isStrava?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">Strava</span>`:'';
+    const cols=stats.length<=2?stats.length:Math.min(3,stats.length);
+    html+=`<div style="background:var(--s3);border:1px solid rgba(160,102,212,0.3);border-radius:16px;padding:18px;margin-bottom:20px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.2));"></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:10px;background:rgba(160,102,212,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🚴</div><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);text-transform:uppercase;letter-spacing:.08em;">Cycling</div><div style="font-size:14px;color:var(--t);font-weight:500;margin-top:1px;">${actName}</div></div><div style="margin-left:auto;">${stravaBadge}</div></div><div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px;">${statBoxes}</div></div>`;
   } else if(session.cardio&&(session.cardio.dur>0||session.cardio.dist>0)){
     const c=session.cardio;
     const cardioMeta=[c.type,c.dur?`${c.dur} min`:null,c.dist?`${c.dist} mi`:null,c.pace?`${c.pace}/mi`:null,c.hr?`HR ${c.hr} bpm`:null,c.rpe?`RPE ${c.rpe}`:null].filter(Boolean).join(' · ');
@@ -4014,33 +4103,62 @@ function openSessionDrawerByTs(ts){
   const s=(D.sessions||[]).find(x=>x.ts===ts);
   if(s) openSessionDrawer(s,s.date);
 }
+function _buildActivityRow(item){
+  const dateObj=new Date(item.date+'T12:00:00');
+  const ds=dateObj.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  if(item._kind==='session'){
+    const s=item._raw;
+    const isRunType=d=>['run','run_easy','run_quality','run_long'].includes(d);
+    const DAY_LBL={A:'Push',B:'Pull',C:'Legs',push:'Push',pull:'Pull',legs:'Legs',run:'Run',run_easy:'Easy Run',run_quality:'Quality Run',run_long:'Long Run',rest:'Rest',1:'Lift A',2:'Lift B',3:'Easy Run',4:'Lift C',5:'Quality Run'};
+    const label=DAY_LBL[s.day]||s.day||'Session';
+    const pts=[];
+    ['bench','ohp','squat','dl'].forEach(k=>{if(s[k]?.sets?.length){const b=s[k].sets.filter(x=>x.w).sort((a,b)=>b.w-a.w)[0];if(b)pts.push(k.toUpperCase()+' '+b.w+'\xd7'+b.r);}});
+    if(s.cardio?.dist) pts.push(Number(s.cardio.dist).toFixed(1)+'mi');
+    const isCycling=String(s.day||'').toLowerCase()==='cycling';
+    const dotClr=isCycling?'var(--a5)':isRunType(s.day)?'var(--a2)':'var(--a)';
+    const dotGlow=isCycling?'0 0 6px rgba(160,102,212,0.7)':isRunType(s.day)?'0 0 6px rgba(42,160,112,0.7)':'0 0 6px rgba(104,110,210,0.7)';
+    const icon=isCycling?'🚴':isRunType(s.day)?'🏃':'🏋️';
+    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:10px;height:10px;border-radius:50%;background:${dotClr};box-shadow:${dotGlow};flex-shrink:0;display:inline-block;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><span style="font-size:12px;">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${ds}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
+  } else {
+    // Strava activity (run or ride)
+    const r=item._raw;
+    const isRide=r.type==='ride';
+    const dotClr=isRide?'var(--a5)':'var(--a2)';
+    const dotGlow=isRide?'0 0 6px rgba(160,102,212,0.7)':'0 0 6px rgba(42,160,112,0.7)';
+    const icon=isRide?'🚴':'🏃';
+    const label=r.name||(isRide?'Ride':r.runType||'Run');
+    const pts=[];
+    const dist=r.distance||r.distanceMi;
+    if(dist) pts.push(Number(dist).toFixed(1)+' mi');
+    if(r.duration) pts.push(Math.round(r.duration/60)+' min');
+    if(isRide&&dist&&r.duration) pts.push((dist/(r.duration/3600)).toFixed(1)+' mph');
+    if(!isRide&&r.pace){const p=r.pace;pts.push(`${Math.floor(p/60)}:${String(p%60).padStart(2,'0')}/mi`);}
+    if(r.heartRateAvg) pts.push('HR '+r.heartRateAvg+' bpm');
+    const stravaBadge=`<span style="font-family:var(--mono);font-size:9px;background:rgba(252,76,2,0.12);color:#fc4c02;padding:1px 5px;border-radius:3px;letter-spacing:.03em;vertical-align:middle;">STR</span>`;
+    return `<div onclick="openStravaDrawer([${JSON.stringify(r)}],'${item.date}')" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:10px;height:10px;border-radius:50%;background:${dotClr};box-shadow:${dotGlow};flex-shrink:0;display:inline-block;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><span style="font-size:12px;">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span>${stravaBadge}<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${ds}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
+  }
+}
 function renderSessionList(){
   const el=document.getElementById('sess-list-rows');
   const navEl=document.getElementById('sess-list-nav');
   const cntEl=document.getElementById('sess-list-count');
   if(!el||!D) return;
-  const isRunType=d=>['run','run_easy','run_quality','run_long'].includes(d);
-  const DAY_LBL={A:'Push',B:'Pull',C:'Legs',push:'Push',pull:'Pull',legs:'Legs',run:'Run',run_easy:'Easy Run',run_quality:'Quality Run',run_long:'Long Run',rest:'Rest',1:'Lift A',2:'Lift B',3:'Easy Run',4:'Lift C',5:'Quality Run'};
-  const acts=[...(D.sessions||[])].sort((a,b)=>b.date.localeCompare(a.date)||(b.ts||0)-(a.ts||0));
-  const total=acts.length;
+  // Build unified timeline: logged sessions + all Strava activities
+  const sessionDates=new Set((D.sessions||[]).map(s=>s.date));
+  const allItems=[
+    ...(D.sessions||[]).map(s=>({date:s.date,_sort:s.date+(s.ts||0),_kind:'session',_raw:s})),
+    ...(D.runs||[]).map(r=>({date:r.date,_sort:r.date,_kind:'strava',_raw:r})),
+  ].sort((a,b)=>b._sort.localeCompare(a._sort)||(b._raw.ts||0)-(a._raw.ts||0));
+  const total=allItems.length;
   if(cntEl) cntEl.textContent=total?total+' total':'';
   const start=sessionListPage*10;
-  const slice=acts.slice(start,start+10);
+  const slice=allItems.slice(start,start+10);
   if(!total){
-    el.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">No sessions logged yet.</div>';
+    el.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">No activity logged yet.</div>';
     if(navEl) navEl.innerHTML='';
     return;
   }
-  el.innerHTML=slice.map(s=>{
-    const dateObj=new Date(s.date+'T12:00:00');
-    const ds=dateObj.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    const label=DAY_LBL[s.day]||s.day||'Session';
-    const pts=[];
-    ['bench','ohp','squat','dl'].forEach(k=>{if(s[k]?.sets?.length){const b=s[k].sets.filter(x=>x.w).sort((a,b)=>b.w-a.w)[0];if(b)pts.push(k.toUpperCase()+' '+b.w+'\xd7'+b.r);}});
-    if(s.cardio?.dist) pts.push(s.cardio.dist+'mi');
-    const dotClr=isRunType(s.day)?'var(--a2)':'var(--a)';
-    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:9px;height:9px;border-radius:50%;background:${dotClr};flex-shrink:0;display:inline-block;margin-top:1px;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:8px;"><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">${ds}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
-  }).join('');
+  el.innerHTML=slice.map(_buildActivityRow).join('');
   if(navEl){
     const hasPrev=start>0,hasNext=start+10<total;
     navEl.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);"><button onclick="sessionListPage--;renderSessionList()" ${hasPrev?'':'disabled'} style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasPrev?'':'opacity:0.35;'}">&#8592; Older</button><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${start+1}–${Math.min(start+10,total)} of ${total}</span><button onclick="sessionListPage++;renderSessionList()" ${hasNext?'':'disabled'} style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);padding:5px 12px;border-radius:6px;cursor:pointer;${hasNext?'':'opacity:0.35;'}">Newer &#8594;</button></div>`;
