@@ -2522,7 +2522,11 @@ async function gitPush(commitMsg){
     const info=await ir.json();
     mergeRemoteD(JSON.parse(new TextDecoder('utf-8').decode(Uint8Array.from(atob(info.content.replace(/\n/g,'')),c=>c.charCodeAt(0)))));
     D.lastUpdated=new Date().toISOString().split('T')[0];
-    const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));
+    // Chunk the encode to avoid "Maximum call stack size exceeded" on large data
+    const bytes=new TextEncoder().encode(JSON.stringify(D,null,2));
+    let bin='';const CHUNK=0x8000;
+    for(let j=0;j<bytes.length;j+=CHUNK) bin+=String.fromCharCode(...bytes.subarray(j,j+CHUNK));
+    const enc=btoa(bin);
     const pr=await fetch(ghURL,{method:'PUT',headers:{...hdrs,'Content-Type':'application/json'},body:JSON.stringify({message:commitMsg,content:enc,sha:info.sha})});
     if(pr.ok) return;
     const err=await pr.json().catch(()=>({}));
@@ -5831,7 +5835,7 @@ async function confirmRPE(lift,actualRPE){
   if(CFG.tok){
     try{
       const ir=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json'}});
-      if(ir.ok){const info=await ir.json();D.lastUpdated=new Date().toISOString().split('T')[0];const enc=btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(D,null,2))));const pr=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'RPE confirmation',content:enc,sha:info.sha})});if(!pr.ok)console.warn('confirmRPE push failed:',pr.status);}
+      if(ir.ok){const info=await ir.json();D.lastUpdated=new Date().toISOString().split('T')[0];const _b=new TextEncoder().encode(JSON.stringify(D,null,2));let _s='';const _C=0x8000;for(let _i=0;_i<_b.length;_i+=_C)_s+=String.fromCharCode(..._b.subarray(_i,_i+_C));const enc=btoa(_s);const pr=await fetch(`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/contents/${CFG.file}`,{method:'PUT',headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({message:'RPE confirmation',content:enc,sha:info.sha})});if(!pr.ok)console.warn('confirmRPE push failed:',pr.status);}
     }catch(e){console.warn('confirmRPE save failed:',e);}
   }
 }
