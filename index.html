@@ -4324,7 +4324,10 @@ function renderAIUsage(){
   }
   if(_aiUsageChart){_aiUsageChart.destroy();_aiUsageChart=null;}
   if(typeof Chart!=='undefined'){
-    _aiUsageChart=new Chart(canvasEl,{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{color:'var(--t3)',font:{size:11},boxWidth:12,padding:10}}},scales:{x:{stacked:true,ticks:{color:'var(--t3)',maxRotation:45,font:{size:10}},grid:{color:'rgba(104,110,210,0.08)'}},y:{stacked:true,ticks:{color:'var(--t3)',font:{size:10},callback:v=>'$'+v.toFixed(4)},grid:{color:'rgba(104,110,210,0.08)'}}}}});
+    // Resolve CSS vars to real values — Chart.js cannot read var(--x) strings
+    const cT3=getComputedStyle(document.documentElement).getPropertyValue('--t3').trim()||'#7e8caa';
+    const cGrid='rgba(104,110,210,0.1)';
+    _aiUsageChart=new Chart(canvasEl,{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{color:cT3,font:{size:11},boxWidth:12,padding:10}}},scales:{x:{stacked:true,ticks:{color:cT3,maxRotation:45,font:{size:10}},grid:{color:cGrid}},y:{stacked:true,ticks:{color:cT3,font:{size:10},callback:v=>'$'+v.toFixed(4)},grid:{color:cGrid}}}}});
   }
 
   // Per-type breakdown table
