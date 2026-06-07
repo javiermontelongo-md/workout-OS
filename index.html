@@ -1713,6 +1713,14 @@ input[type=range]::-webkit-slider-thumb:hover {
 <div id="panel-settings" class="panel">
   <div class="h1">Settings &amp; <span>sync</span></div>
 
+  <!-- AI USAGE & COST -->
+  <div class="card" style="margin-bottom:18px;">
+    <div class="lbl" style="margin-bottom:14px;">AI usage &amp; cost</div>
+    <div id="ai-usage-summary" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;"></div>
+    <canvas id="ai-usage-chart" style="width:100%;max-height:180px;margin-bottom:14px;"></canvas>
+    <div id="ai-usage-breakdown"></div>
+  </div>
+
   <!-- APPEARANCE -->
   <div class="card" style="margin-bottom:18px;">
     <div class="lbl">appearance</div>
@@ -2491,7 +2499,7 @@ function lCFG(){
   try{ const k=localStorage.getItem('jm_api_key'); if(k) CFG.api=k; }catch(e){console.warn('lCFG api key load failed:',e);}
 }
 function sCFG(){ try{ localStorage.setItem('wkt_v3',JSON.stringify(CFG)); }catch(e){console.warn('sCFG save failed:',e);} }
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[],fuelLog:[],fuelMemory:{summary:null,lastUpdated:null,callCount:0}}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[],fuelLog:[],fuelMemory:{summary:null,lastUpdated:null,callCount:0},aiUsage:[]}; }
 lCFG();
 
 // ============================================================
@@ -2556,6 +2564,15 @@ function mergeRemoteD(remoteD){
   // Merge fuelMemory: take whichever was updated more recently.
   if(remoteD.fuelMemory?.lastUpdated&&(!D.fuelMemory?.lastUpdated||(remoteD.fuelMemory.lastUpdated>D.fuelMemory.lastUpdated))){
     D.fuelMemory=remoteD.fuelMemory;
+  }
+  // Merge aiUsage: union by ts (timestamp is unique per call)
+  if(remoteD.aiUsage?.length){
+    const localTs=new Set((D.aiUsage||[]).map(u=>u.ts));
+    const newEntries=(remoteD.aiUsage).filter(u=>u.ts&&!localTs.has(u.ts));
+    if(newEntries.length){
+      if(!D.aiUsage)D.aiUsage=[];
+      D.aiUsage=[...D.aiUsage,...newEntries].sort((a,b)=>a.ts-b.ts);
+    }
   }
 }
 async function gitPush(commitMsg){
@@ -2914,7 +2931,7 @@ function showTab(n){
   if(n==='week'){ renderCalendar(); renderSessionList(); renderProgressSessions(); }
   if(n==='progress'){ }
   if(n==='rules') renderRulesTab();
-  if(n==='settings') _syncAppearanceUI();
+  if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
@@ -3017,6 +3034,22 @@ async function saveFuelDay(){
   if(btn){btn.disabled=false;btn.textContent='Save to GitHub';}
 }
 
+// AI_INPUT_PRICE and AI_OUTPUT_PRICE in $ per token (claude-sonnet-4-6 as of Jun 2026)
+const AI_IN_PRICE=3/1e6;
+const AI_OUT_PRICE=15/1e6;
+const AI_CALL_LABELS={macros:'Fuel: estimate macros',checkin:'Fuel: AI check-in',memory:'Fuel: memory update',prescription:'Program: get prescription'};
+
+function recordAIUsage(type,usage){
+  if(!D||!usage)return;
+  if(!D.aiUsage)D.aiUsage=[];
+  const inp=usage.input_tokens||0;
+  const out=usage.output_tokens||0;
+  D.aiUsage.push({ts:Date.now(),type,inp,out,cost:+(inp*AI_IN_PRICE+out*AI_OUT_PRICE).toFixed(6)});
+  // Prune to last 365 days
+  const cutoff=Date.now()-365*86400000;
+  D.aiUsage=D.aiUsage.filter(u=>u.ts>=cutoff);
+}
+
 async function estimateMacros(meals){
   const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
   if(!apiKey) return null;
@@ -3024,6 +3057,7 @@ async function estimateMacros(meals){
     const list=meals.map((m,i)=>`${i+1}. ${m.time?m.time+' — ':''}${m.food}`).join('\n');
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:350,system:'Estimate macros for meals. Return ONLY valid JSON, no other text. Format: {"meals":[{"protein":N,"carbs":N,"fat":N,"kcal":N},...], "totals":{"protein":N,"carbs":N,"fat":N,"kcal":N}}. Use integers. Realistic portion sizes.',messages:[{role:'user',content:'Estimate macros:\n'+list}]})});
     const d=await r.json();
+    recordAIUsage('macros',d.usage);
     const text=d.content?.[0]?.text||'';
     const s=text.indexOf('{'),e=text.lastIndexOf('}');
     if(s>=0&&e>s) return JSON.parse(text.slice(s,e+1));
@@ -3112,6 +3146,7 @@ Give a check-in response in two parts:
 
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:650,messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
+    recordAIUsage('checkin',d.usage);
     const text=d.content?.[0]?.text||'';
     if(text){
       const rendered=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--t);">$1</strong>').replace(/\n\n/g,'</p><p style="margin-top:8px;">').replace(/\n/g,'<br>');
@@ -3141,6 +3176,7 @@ async function updateFuelMemory(){
     const existing=D.fuelMemory?.summary||'';
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:120,system:'Write a 2-3 sentence nutrition pattern summary for an athlete. Be specific and factual. Focus on: calorie/protein trends, energy signals, what works vs what does not. Output only the summary, nothing else.',messages:[{role:'user',content:`Previous: ${existing||'none'}\n\nRecent logs:\n${recent}\n\nRewrite incorporating new data.`}]})});
     const d=await r.json();
+    recordAIUsage('memory',d.usage);
     const text=d.content?.[0]?.text?.trim()||'';
     if(text){
       if(!D.fuelMemory) D.fuelMemory={summary:null,lastUpdated:null,callCount:0};
@@ -4127,6 +4163,77 @@ function recalcE1RMs(){
 // ============================================================
 // SETTINGS
 // ============================================================
+let _aiUsageChart=null;
+function renderAIUsage(){
+  if(!D) return;
+  const usage=D.aiUsage||[];
+  const summaryEl=document.getElementById('ai-usage-summary');
+  const breakdownEl=document.getElementById('ai-usage-breakdown');
+  const canvasEl=document.getElementById('ai-usage-chart');
+  if(!summaryEl||!breakdownEl||!canvasEl) return;
+
+  const TYPES=['macros','checkin','memory','prescription'];
+  const COLORS={macros:'rgba(104,110,210,0.8)',checkin:'rgba(184,96,53,0.8)',memory:'rgba(166,102,212,0.8)',prescription:'rgba(42,160,112,0.8)'};
+
+  // Summary pills: this month + all time
+  const now=new Date();
+  const monthStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const monthUsage=usage.filter(u=>new Date(u.ts).toISOString().slice(0,7)===monthStr);
+  const totalCost=usage.reduce((s,u)=>s+u.cost,0);
+  const monthCost=monthUsage.reduce((s,u)=>s+u.cost,0);
+  const totalCalls=usage.length;
+
+  summaryEl.innerHTML=`
+    <div style="flex:1;min-width:130px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:12px 14px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:4px;">THIS MONTH</div>
+      <div style="font-family:var(--mono);font-size:22px;color:var(--a);">$${monthCost.toFixed(4)}</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">${monthUsage.length} call${monthUsage.length!==1?'s':''}</div>
+    </div>
+    <div style="flex:1;min-width:130px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:12px 14px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:4px;">ALL TIME</div>
+      <div style="font-family:var(--mono);font-size:22px;color:var(--t);">$${totalCost.toFixed(4)}</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">${totalCalls} call${totalCalls!==1?'s':''}</div>
+    </div>`;
+
+  // Chart: last 30 days daily cost stacked by type
+  const days=30;
+  const labels=[];
+  const datasets=TYPES.map(t=>({label:AI_CALL_LABELS[t],data:[],backgroundColor:COLORS[t],borderWidth:0}));
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    labels.push(i===0?'today':d.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+    const dayEntries=usage.filter(u=>{const ud=new Date(u.ts);return`${ud.getFullYear()}-${String(ud.getMonth()+1).padStart(2,'0')}-${String(ud.getDate()).padStart(2,'0')}`===ds;});
+    TYPES.forEach((t,ti)=>{ datasets[ti].data.push(+(dayEntries.filter(u=>u.type===t).reduce((s,u)=>s+u.cost,0).toFixed(6))); });
+  }
+  if(_aiUsageChart){_aiUsageChart.destroy();_aiUsageChart=null;}
+  if(typeof Chart!=='undefined'){
+    _aiUsageChart=new Chart(canvasEl,{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{color:'var(--t3)',font:{size:11},boxWidth:12,padding:10}}},scales:{x:{stacked:true,ticks:{color:'var(--t3)',maxRotation:45,font:{size:10}},grid:{color:'rgba(104,110,210,0.08)'}},y:{stacked:true,ticks:{color:'var(--t3)',font:{size:10},callback:v=>'$'+v.toFixed(4)},grid:{color:'rgba(104,110,210,0.08)'}}}}});
+  }
+
+  // Per-type breakdown table
+  let rows='';
+  TYPES.forEach(t=>{
+    const entries=usage.filter(u=>u.type===t);
+    if(!entries.length) return;
+    const totalC=entries.reduce((s,u)=>s+u.cost,0);
+    const avgInp=Math.round(entries.reduce((s,u)=>s+(u.inp||0),0)/entries.length);
+    const avgOut=Math.round(entries.reduce((s,u)=>s+(u.out||0),0)/entries.length);
+    rows+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:10px;height:10px;border-radius:2px;background:${COLORS[t]};flex-shrink:0;"></div>
+        <div style="font-size:var(--fs-sm);color:var(--t2);">${AI_CALL_LABELS[t]}</div>
+      </div>
+      <div style="display:flex;gap:14px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">
+        <span>${entries.length}×</span>
+        <span>~${avgInp}↑ ${avgOut}↓ tok</span>
+        <span style="color:var(--a);">$${totalC.toFixed(4)}</span>
+      </div>
+    </div>`;
+  });
+  breakdownEl.innerHTML=rows||`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:8px 0;">No AI calls recorded yet — usage tracked going forward.</div>`;
+}
+
 function saveCFG(){
   CFG.tok=document.getElementById('gh-tok').value.trim();
   CFG.usr=document.getElementById('gh-usr').value.trim();
@@ -5815,6 +5922,7 @@ RULES:
 - confidence: high=data clearly supports, medium=reasonable given patterns, low=depends on recovery`;
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2500,system:'You are a strength and running coach. Output only valid JSON. No text outside the JSON object.',messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
+    recordAIUsage('prescription',d.usage);
     if(d.error)throw new Error('API error: '+d.error.message);
     const responseText=d.content?.[0]?.text||'';
     const clean=responseText.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
