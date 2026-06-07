@@ -2716,18 +2716,16 @@ function initPullToRefresh(){
     icon.style.transform='';
     label.textContent='Refreshing…';
     showInd();
-    // Hold panel open at indicator height while fetching
+    // Hold panel open at indicator height while navigating
     panel.style.transition='transform .15s ease';
     panel.style.transform=`translateY(${INDICATOR_H}px)`;
     setTimeout(()=>{panel.style.transition='';},160);
-    fetchData().finally(()=>{
-      refreshing=false;
-      icon.style.animation='';
-      icon.textContent='↓';
-      label.textContent='Pull to refresh';
-      const p=getPanel();
-      if(p)springBack(p); else hideInd();
-    });
+    // Hard reload via cache-busting URL so iOS PWA always fetches fresh HTML/JS.
+    // onLoad() re-fetches data automatically on boot, so no separate fetchData() needed.
+    setTimeout(()=>{
+      const url=location.pathname+'?v='+Date.now();
+      location.replace(url);
+    },300);
   }
 
   document.addEventListener('touchstart',e=>{
