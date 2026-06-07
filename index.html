@@ -960,13 +960,13 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 </div>
 
-<div id="ptr-indicator" style="position:absolute;top:0;left:0;right:0;z-index:1;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+<div class="main">
+<div id="ptr-indicator" style="position:absolute;top:0;left:0;right:0;z-index:1;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .15s;">
   <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;color:var(--t3);">
     <span id="ptr-icon" style="display:inline-block;transition:transform .2s;font-size:16px;">↓</span>
     <span id="ptr-label">Pull to refresh</span>
   </div>
 </div>
-<div class="main">
 
 <!-- v2026-05-22 -->
 <div id="panel-today" class="panel on">
@@ -2611,10 +2611,14 @@ function initPullToRefresh(){
 
   let startY=0, dist=0, pulling=false, refreshing=false;
 
+  const ind=document.getElementById('ptr-indicator');
   const icon=document.getElementById('ptr-icon');
   const label=document.getElementById('ptr-label');
 
   function getPanel(){ return document.querySelector('.app .panel.on'); }
+
+  function showInd(){ if(ind) ind.style.opacity='1'; }
+  function hideInd(){ if(ind){ ind.style.transition='opacity .25s'; ind.style.opacity='0'; } }
 
   function slidePanel(panel,px){
     panel.style.transition='';
@@ -2624,7 +2628,7 @@ function initPullToRefresh(){
   function springBack(panel){
     panel.style.transition='transform .3s cubic-bezier(.2,.8,.4,1)';
     panel.style.transform='';
-    setTimeout(()=>{panel.style.transition='';},320);
+    setTimeout(()=>{ panel.style.transition=''; hideInd(); },320);
   }
 
   function updateHint(d){
@@ -2632,6 +2636,7 @@ function initPullToRefresh(){
     icon.style.transform=ready?'rotate(180deg)':'rotate(0deg)';
     icon.textContent='↓';
     label.textContent=ready?'Release to refresh':'Pull to refresh';
+    showInd();
   }
 
   function doRefresh(panel){
@@ -2640,6 +2645,7 @@ function initPullToRefresh(){
     icon.style.animation='ptr-spin 0.75s linear infinite';
     icon.style.transform='';
     label.textContent='Refreshing…';
+    showInd();
     // Hold panel open at indicator height while fetching
     panel.style.transition='transform .15s ease';
     panel.style.transform=`translateY(${INDICATOR_H}px)`;
@@ -2650,7 +2656,7 @@ function initPullToRefresh(){
       icon.textContent='↓';
       label.textContent='Pull to refresh';
       const p=getPanel();
-      if(p)springBack(p);
+      if(p)springBack(p); else hideInd();
     });
   }
 
