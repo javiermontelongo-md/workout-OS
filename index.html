@@ -975,8 +975,8 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">recovery snapshot</div>
       <div style="display:flex;gap:6px;">
-        <button class="btn bs bi" onclick="setSnapRange(7)" id="snap-btn-7" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">7D</button>
-        <button class="btn bs bi" onclick="setSnapRange(30)" id="snap-btn-30" style="font-size:var(--fs-xs);padding:5px 10px;">30D</button>
+        <button class="btn bs bi" onclick="setSnapRange(7)" id="snap-btn-7" style="font-size:var(--fs-xs);padding:5px 10px;">7D</button>
+        <button class="btn bs bi" onclick="setSnapRange(30)" id="snap-btn-30" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">30D</button>
         <button class="btn bs bi" onclick="setSnapRange(60)" id="snap-btn-60" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">60D</button>
         <button class="btn bs bi" onclick="setSnapRange(90)" id="snap-btn-90" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">90D</button>
       </div>
@@ -1017,13 +1017,6 @@ input[type=range]::-webkit-slider-thumb:hover {
       </div>
       <input type="range" id="ci-stress" min="1" max="10" value="5"
         oninput="document.getElementById('ci-stress-val').textContent=this.value;updateFatiguePreview()">
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">SLEEP</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">HH:MM format</div>
-      </div>
-      <input type="text" id="ci-sleep-input" placeholder="7:30" style="font-family:var(--mono);font-size:14px;text-align:center;letter-spacing:2px;" maxlength="5" oninput="formatSleepInput(this)">
     </div>
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
@@ -2102,7 +2095,7 @@ let _fuelRows=[{time:'',food:''}];
 let _fuelEditDate='';
 let _fuelTrendChart=null;
 let _fuelTP={rowIdx:0,hour:8,min:0,ampm:'AM'};
-let _snapDays=30;
+let _snapDays=7;
 
 // ============================================================
 // STATE -- no data here. All data in data.json on GitHub.
