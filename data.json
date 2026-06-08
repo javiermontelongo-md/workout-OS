@@ -3723,7 +3723,9 @@
         "fat": 68,
         "kcal": 1196
       },
-      "ts": 1780937251380
+      "ts": 1780937251380,
+      "fuelPlan": "## Check-In: June 8\n\n---\n\n### ASSESSMENT\n\nThat breakfast was a solid calorie start but protein is already behind — 48g toward a 180g target with likely 2+ meals left means you need to average roughly **65-70g protein per remaining meal**, which is aggressive. This is the same pattern repeating: a higher-calorie meal that's fat/carb-heavy with protein lagging, and given your HRV warning today, your body is already signaling it's not recovered — under-fueling on top of that will dig the hole deeper. You have roughly **1,600-1,800 kcal and ~130g protein left to hit** before bed, and with residency starting in weeks, building the habit of closing that gap *today* matters.\n\n---\n\n### REST OF DAY\n\n**Lunch (pack for hospital) — ~15 min or less**\n- 2 pre-cooked rotisserie chicken breasts, pulled (~8-10oz) — grab from grocery deli\n- 1 packet microwaveable rice (90-sec Uncle Ben's)\n- Baby spinach handful + olive oil packet or pre-made dressing\n- **~600 kcal | ~65g P | ~45g C | ~15g F**\n\n**Afternoon snack (pocket it)**\n- 2 Fairlife Core Power protein shakes (42g P each) OR 1 shake + 1 Greek yogurt (Chobani 0% large cup)\n- **~300-400 kcal | ~45-55g P**\n\n**Dinner**\n- 2 whole eggs + 6oz egg whites scrambled (3 min)\n- 1 can chunk chicken or tuna mixed in\n- 1 slice whole grain toast or second rice packet\n- **~450 kcal | ~55g P | ~30g C | ~12g F**\n\n---\n\n**End-of-day projected: ~2,450 kcal | ~210g P** ✅\nHRV warning means prioritize hitting protein and don't skip the afternoon shake even if busy.",
+      "fuelPlanTs": 1780937424084
     }
   ],
   "fuelMemory": {
@@ -3738,6 +3740,13 @@
       "inp": 130,
       "out": 98,
       "cost": 0.00186
+    },
+    {
+      "ts": 1780937424082,
+      "type": "checkin",
+      "inp": 511,
+      "out": 486,
+      "cost": 0.008823
     }
   ]
 }
