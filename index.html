@@ -48,6 +48,11 @@
   /* Small UI text — controls all inline tiny text; overridden by small-text slider */
   --fs-xs: 19px;
   --fs-sm: 22px;
+  /* Inline text tiers — defaults match existing desktop values; mobile preset overrides via JS */
+  --fs-micro: 10px;   /* stat box headers, calendar day headers */
+  --fs-body: 14px;    /* drawer body text, notes, secondary descriptions */
+  --fs-title: 17px;   /* drawer titles, card section headers */
+  --fs-data: 20px;    /* race times, big stat values */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -276,8 +281,8 @@ body {
 .icon-badge.muted{background:rgba(168,180,204,0.12);}
 /* Colored stat box — used in drawer & prescription */
 .cstat{border-radius:10px;padding:10px 8px;text-align:center;}
-.cstat-lbl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;color:var(--t3);}
-.cstat-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--t);}
+.cstat-lbl{font-family:var(--mono);font-size:var(--fs-micro);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;color:var(--t3);}
+.cstat-val{font-family:var(--mono);font-size:var(--fs-sm);font-weight:600;color:var(--t);}
 .cstat.indigo{background:rgba(104,110,210,0.1);border:1px solid rgba(104,110,210,0.22);}
 .cstat.jade{background:rgba(42,160,112,0.1);border:1px solid rgba(42,160,112,0.22);}
 .cstat.violet{background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);}
@@ -983,7 +988,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div class="mlogo">Workout <span>OS</span></div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
     <div id="ms" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Loading...</div>
-    <div id="md" style="font-family:var(--mono);font-size:10px;color:var(--t3);opacity:0.55;" title="build timestamp"></div>
+    <div id="md" style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);opacity:0.55;" title="build timestamp"></div>
   </div>
 </div>
 
@@ -1013,7 +1018,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 <div class="main">
 <div id="ptr-indicator" style="position:absolute;top:0;left:0;right:0;z-index:1;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .15s;">
-  <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;color:var(--t3);">
+  <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">
     <span id="ptr-icon" style="display:inline-block;transition:transform .2s;font-size:16px;">↓</span>
     <span id="ptr-label">Pull to refresh</span>
   </div>
@@ -1091,7 +1096,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px;">
       <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">FATIGUE SCORE</div>
-      <div style="font-family:var(--mono);font-size:15px;font-weight:500;" id="ci-fatigue-preview">--</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-body);font-weight:500;" id="ci-fatigue-preview">--</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:10px;margin-bottom:4px;">
       <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Post-call / no sleep</div>
@@ -1122,7 +1127,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <!-- shown when there is no prescription for today -->
   <div id="log-no-plan" class="card" style="text-align:center;padding:48px 24px;">
     <div style="font-size:32px;margin-bottom:16px;">📋</div>
-    <div style="font-size:17px;font-weight:600;color:var(--t);margin-bottom:10px;">No plan for today</div>
+    <div style="font-size:var(--fs-title);font-weight:600;color:var(--t);margin-bottom:10px;">No plan for today</div>
     <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);line-height:1.7;margin-bottom:20px;">Go to the <strong style="color:var(--t2);">Program</strong> tab, select a workout type and duration,<br>then tap <strong style="color:var(--t2);">"Get Prescription"</strong> to generate today's plan.</div>
     <button class="btn bp" onclick="showTab('program')" style="margin:0 auto;">Go to Program →</button>
   </div>
@@ -1131,7 +1136,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.1em;">Run Prescription</div>
-        <div id="run-presc-day-label" style="font-size:15px;font-weight:500;color:var(--t);margin-top:4px;"></div>
+        <div id="run-presc-day-label" style="font-size:var(--fs-body);font-weight:500;color:var(--t);margin-top:4px;"></div>
       </div>
       <button class="btn bp" id="run-presc-btn" onclick="renderRunLogCard()" style="font-size:var(--fs-sm);padding:8px 16px;">Refresh Prescription</button>
     </div>
@@ -1395,25 +1400,25 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">5K</div>
-        <div style="font-size:20px;font-weight:600;color:var(--a);" id="pred-5k-time">--:--</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="pred-5k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-5k-pace"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-5k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">10K</div>
-        <div style="font-size:20px;font-weight:600;color:var(--a);" id="pred-10k-time">--:--</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="pred-10k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-10k-pace"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-10k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Half Marathon</div>
-        <div style="font-size:20px;font-weight:600;color:var(--a2);" id="pred-half-time">--:--</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a2);" id="pred-half-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-half-pace"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-half-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Marathon</div>
-        <div style="font-size:20px;font-weight:600;color:var(--t2);" id="pred-full-time">--:--</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--t2);" id="pred-full-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-full-pace"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-full-ci"></div>
       </div>
@@ -1459,25 +1464,25 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">20 km</div>
-        <div style="font-size:20px;font-weight:600;color:var(--a);" id="bike-pred-20k-time">--:--</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="bike-pred-20k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-20k-speed"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-20k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">40 km</div>
-        <div style="font-size:20px;font-weight:600;color:var(--a);" id="bike-pred-40k-time">--:--</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="bike-pred-40k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-40k-speed"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-40k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">90 km (Half IM)</div>
-        <div style="font-size:20px;font-weight:600;color:var(--a2);" id="bike-pred-90k-time">--:--</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a2);" id="bike-pred-90k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-90k-speed"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-90k-ci"></div>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">180 km (Full IM)</div>
-        <div style="font-size:20px;font-weight:600;color:var(--t2);" id="bike-pred-180k-time">--:--</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--t2);" id="bike-pred-180k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-180k-speed"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-180k-ci"></div>
       </div>
@@ -2051,17 +2056,27 @@ function _applyMobileComponentFontSizes(){
   const basePx=+(localStorage.getItem('wos-mobile-base')||14);
   const smPx=+(localStorage.getItem('wos-mobile-smalltext')||12);
   const xsPx=Math.max(9,Math.round(smPx*0.85));
+  const preset=+(localStorage.getItem('wos-mobile-preset')||19);
+  const tiers=MOBILE_FS_TIERS[preset]||MOBILE_FS_TIERS[19];
   const compRules=Object.entries(FS_MOBILE).map(([key,cfg])=>{
     const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
     return `${cfg.sel}{font-size:${px}px}`;
   }).join('\n');
-  const css=`@media(max-width:768px){\nbody{font-size:${basePx}px}\n:root{--fs-sm:${smPx}px;--fs-xs:${xsPx}px}\n${compRules}\n}`;
+  const rootVars=`--fs-sm:${smPx}px;--fs-xs:${xsPx}px;--fs-micro:${tiers.micro}px;--fs-body:${tiers.body}px;--fs-title:${tiers.title}px;--fs-data:${tiers.data}px`;
+  const css=`@media(max-width:768px){\nbody{font-size:${basePx}px}\n:root{${rootVars}}\n${compRules}\n.cstat-lbl{font-size:var(--fs-micro)}\n.cstat-val{font-size:var(--fs-sm)}\n}`;
   let el=document.getElementById('wos-fs-mobile-overrides');
   if(!el){el=document.createElement('style');el.id='wos-fs-mobile-overrides';document.head.appendChild(el);}
   el.textContent=css;
 }
 const MOBILE_BASE_MAP={14:11,17:13,19:14,22:16,26:18};
 const MOBILE_SMALLTEXT_MAP={14:9,17:11,19:12,22:14,26:16};
+const MOBILE_FS_TIERS={
+  14:{micro:8, body:11, title:13, data:15},
+  17:{micro:9, body:12, title:14, data:16},
+  19:{micro:10,body:13, title:15, data:17},
+  22:{micro:10,body:14, title:16, data:19},
+  26:{micro:11,body:16, title:18, data:21}
+};
 function applyDesktopFontPreset(px){
   const preset=FONT_PRESETS[px];if(!preset)return;
   Object.entries(preset).forEach(([key,val])=>{
@@ -2386,7 +2401,7 @@ function onLoad(){
     const sizeKB=Math.round(new TextEncoder().encode(JSON.stringify(D)).length/1024);
     if(sizeKB>600){
       const warn=document.createElement('div');
-      warn.style.cssText='position:fixed;bottom:calc(var(--nav)+var(--safe)+8px);left:50%;transform:translateX(-50%);background:var(--aw);color:#000;font-family:var(--mono);font-size:12px;padding:8px 16px;border-radius:8px;z-index:300;max-width:320px;text-align:center;';
+      warn.style.cssText='position:fixed;bottom:calc(var(--nav)+var(--safe)+8px);left:50%;transform:translateX(-50%);background:var(--aw);color:#000;font-family:var(--mono);font-size:var(--fs-xs);padding:8px 16px;border-radius:8px;z-index:300;max-width:320px;text-align:center;';
       warn.textContent=`⚠️ data.json is ${sizeKB}KB — approaching GitHub's 1MB limit. Consider exporting a backup from Settings.`;
       document.body.appendChild(warn);
       setTimeout(()=>warn.remove(),12000);
@@ -2625,7 +2640,7 @@ function renderSystemLog() {
     el.innerHTML = '<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;">No activity in the last 7 days.</div>';
     return;
   }
-  el.innerHTML = events.map(e => `<div style="display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--b);align-items:flex-start;"><div style="width:36px;height:36px;border-radius:10px;background:${e.bg||'rgba(168,180,204,0.12)'};display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">${e.icon}</div><div style="flex:1;min-width:0;padding-top:2px;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><div style="font-size:var(--fs-sm);color:var(--t);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(e.title)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);flex-shrink:0;">${fmtTs(e.ts)}</div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(e.detail)}</div></div></div>`).join('');
+  el.innerHTML = events.map(e => `<div style="display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--b);align-items:flex-start;"><div style="width:36px;height:36px;border-radius:10px;background:${e.bg||'rgba(168,180,204,0.12)'};display:flex;align-items:center;justify-content:center;font-size:var(--fs-title);flex-shrink:0;">${e.icon}</div><div style="flex:1;min-width:0;padding-top:2px;"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><div style="font-size:var(--fs-sm);color:var(--t);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(e.title)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);flex-shrink:0;">${fmtTs(e.ts)}</div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(e.detail)}</div></div></div>`).join('');
 }
 
 // ============================================================
@@ -2661,7 +2676,7 @@ function renderRulesTab(){
       '<div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,'+accent+',transparent);"></div>'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:10px;">'+
       '<div style="display:flex;align-items:center;gap:8px;">'+
-      '<div style="font-size:13px;">'+( active?'🔴':'🟢')+'</div>'+
+      '<div style="font-size:var(--fs-sm);">'+( active?'🔴':'🟢')+'</div>'+
       '<div style="font-family:var(--mono);font-size:var(--fs-sm);color:'+accent+';font-weight:500;">'+rule.title+'</div>'+
       '</div>'+
       '<div style="font-family:var(--mono);font-size:var(--fs-xs);color:'+accent+';white-space:nowrap;background:'+statusBg+';padding:2px 8px;border-radius:4px;">'+statusIcon+' '+statusText+'</div>'+
@@ -2824,10 +2839,10 @@ function renderFuelMacros(entry){
   const cPct=tot?Math.round((t.carbs||0)/tot*100):34;
   const fPct=Math.max(0,100-pPct-cPct);
   out.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
-<div style="background:rgba(104,110,210,0.1);border:1px solid rgba(104,110,210,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Protein</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);font-weight:600;">${t.protein||0}g</div></div>
-<div style="background:rgba(42,160,112,0.1);border:1px solid rgba(42,160,112,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Carbs</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);font-weight:600;">${t.carbs||0}g</div></div>
-<div style="background:rgba(184,96,53,0.1);border:1px solid rgba(184,96,53,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Fat</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);font-weight:600;">${t.fat||0}g</div></div>
-<div style="background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">kcal</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);font-weight:600;">${t.kcal||0}</div></div>
+<div style="background:rgba(104,110,210,0.1);border:1px solid rgba(104,110,210,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Protein</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);font-weight:600;">${t.protein||0}g</div></div>
+<div style="background:rgba(42,160,112,0.1);border:1px solid rgba(42,160,112,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Carbs</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);font-weight:600;">${t.carbs||0}g</div></div>
+<div style="background:rgba(184,96,53,0.1);border:1px solid rgba(184,96,53,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Fat</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);font-weight:600;">${t.fat||0}g</div></div>
+<div style="background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">kcal</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);font-weight:600;">${t.kcal||0}</div></div>
 </div><div class="macro-bar" style="margin-bottom:6px;"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:14px;"><span style="color:var(--a);">■</span> protein &nbsp;<span style="color:var(--a2);">■</span> carbs &nbsp;<span style="color:var(--aw);">■</span> fat</div><div class="lbl">meals</div>`+
     (entry.meals||[]).map(m=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--b);gap:8px;"><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(184,96,53,0.12);color:var(--aw);padding:2px 7px;border-radius:5px;white-space:nowrap;">${esc(m.time)}</span>`:''}<span style="font-size:var(--fs-sm);color:var(--t2);">${esc(m.food)}</span></div>${m.protein||m.carbs?(()=>{const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);const _mp=_mt?Math.round((m.protein||0)/_mt*100):0;const _mc=_mt?Math.round((m.carbs||0)/_mt*100):0;const _mf=Math.max(0,100-_mp-_mc);return`<div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:4px;border-radius:2px;overflow:hidden;display:flex;"><div style="width:${_mp}%;background:var(--a);"></div><div style="width:${_mc}%;background:var(--a2);"></div><div style="width:${_mf}%;background:var(--aw);"></div></div></div>`;})():''}</div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;background:var(--s3);padding:2px 6px;border-radius:4px;">${m.kcal} kcal</span>`:''}</div>`).join('')+'</div>';
   // Set a target reference if bodyweight known
@@ -3203,7 +3218,7 @@ function renderFuelCalendar(){
   const daysInMonth=new Date(tYear,tMonth+1,0).getDate();
   const _fuelByDate=Object.fromEntries((D.fuelLog||[]).map(e=>[e.date,e]));
   const fuelDates=new Set(Object.keys(_fuelByDate));
-  let html=['S','M','T','W','T','F','S'].map(h=>`<div class="cal-hdr" style="font-size:11px;">${h}</div>`).join('');
+  let html=['S','M','T','W','T','F','S'].map(h=>`<div class="cal-hdr" style="font-size:var(--fs-micro);">${h}</div>`).join('');
   for(let i=0;i<firstDOW;i++) html+=`<div class="cal-cell cal-empty"></div>`;
   let logCount=0;
   for(let d=1;d<=daysInMonth;d++){
@@ -3219,9 +3234,9 @@ function renderFuelCalendar(){
     const fPp=fTot?Math.round((fEntry?.totals?.protein||0)/fTot*100):0;
     const fCp=fTot?Math.round((fEntry?.totals?.carbs||0)/fTot*100):0;
     const fFp=fTot?Math.max(0,100-fPp-fCp):0;
-    const kcalHtml=kcal?`<div style="font-family:var(--mono);font-size:10px;color:var(--aw);line-height:1.1;margin-top:1px;">${kcal}</div>`:'';
+    const kcalHtml=kcal?`<div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--aw);line-height:1.1;margin-top:1px;">${kcal}</div>`:'';
     const barHtml=kcal?`<div style="width:100%;height:4px;border-radius:2px;overflow:hidden;display:flex;margin-top:2px;"><div style="width:${fPp}%;background:var(--a);"></div><div style="width:${fCp}%;background:var(--a2);"></div><div style="width:${fFp}%;background:var(--aw);"></div></div>`:'';
-    html+=`<div class="cal-cell${isToday?' today':''}${isSelected?' fuel-cal-selected':''}${!isFuture?' fuel-cal-clickable':''}" data-fdate="${ds}" style="min-height:50px;padding:5px 3px 4px;gap:0;"><div class="cal-date" style="font-size:17px;">${d}</div>${kcalHtml}${barHtml}</div>`;
+    html+=`<div class="cal-cell${isToday?' today':''}${isSelected?' fuel-cal-selected':''}${!isFuture?' fuel-cal-clickable':''}" data-fdate="${ds}" style="min-height:50px;padding:5px 3px 4px;gap:0;"><div class="cal-date" style="font-size:var(--fs-title);">${d}</div>${kcalHtml}${barHtml}</div>`;
   }
   grid.innerHTML=html;
   grid.onclick=function(e){const cell=e.target.closest('[data-fdate]');if(cell&&cell.dataset.fdate<=todayStr)fuelSelectDate(cell.dataset.fdate);};
@@ -3335,7 +3350,7 @@ function buildFuelDrawerContent(entry,dateStr){
   const pPct=tot?Math.round((t.protein||0)/tot*100):33;
   const cPct=tot?Math.round((t.carbs||0)/tot*100):34;
   const fPct=Math.max(0,100-pPct-cPct);
-  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;z-index:1;"><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div><div style="font-size:17px;font-weight:600;color:var(--t);">Fuel Log</div></div><button onclick="closeFuelDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">\xd7</button></div><div style="padding:20px;">`;
+  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;z-index:1;"><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div><div style="font-size:var(--fs-title);font-weight:600;color:var(--t);">Fuel Log</div></div><button onclick="closeFuelDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">\xd7</button></div><div style="padding:20px;">`;
   if(t.kcal){
     html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><span class="macro-pill p">P ${t.protein||0}g</span><span class="macro-pill c">C ${t.carbs||0}g</span><span class="macro-pill f">F ${t.fat||0}g</span><span class="macro-pill k">${t.kcal} kcal</span></div><div class="macro-bar"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:16px;"><span style="color:var(--a);">■</span> protein &nbsp;<span style="color:var(--a2);">■</span> carbs &nbsp;<span style="color:var(--aw);">■</span> fat</div>`;
   }
@@ -3671,7 +3686,7 @@ function buildStravaDrawerContent(activities,dateStr){
   let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);z-index:1;">`;
   html+=`<div style="padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;">`;
   html+=`<div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div>`;
-  html+=`<div style="font-size:17px;font-weight:600;color:var(--t);">${summary}</div></div>`;
+  html+=`<div style="font-size:var(--fs-title);font-weight:600;color:var(--t);">${summary}</div></div>`;
   html+=`<button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">×</button></div>`;
   html+=`<div style="display:flex;gap:6px;padding:0 20px 16px;">`
   html+=`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 10px;border-radius:5px;letter-spacing:.04em;">STRAVA</span>`;
@@ -3702,7 +3717,7 @@ function buildStravaDrawerContent(activities,dateStr){
     html+=`<div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,${accentColor},rgba(${accentRgb},0.2));"></div>`;
     html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">`;
     html+=`<div style="width:36px;height:36px;border-radius:10px;background:rgba(${accentRgb},0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">${icon}</div>`;
-    html+=`<div><div style="font-size:15px;font-weight:600;color:var(--t);">${name}</div>`;
+    html+=`<div><div style="font-size:var(--fs-body);font-weight:600;color:var(--t);">${name}</div>`;
     if(act.runType) html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:${accentColor};text-transform:uppercase;letter-spacing:.05em;margin-top:1px;">${act.runType}</div>`;
     html+=`</div></div>`;
     if(stats.length){
@@ -3710,8 +3725,8 @@ function buildStravaDrawerContent(activities,dateStr){
       html+=`<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px;">`;
       stats.forEach(s=>{
         html+=`<div style="background:rgba(${accentRgb},0.1);border:1px solid rgba(${accentRgb},0.22);border-radius:10px;padding:10px 8px;text-align:center;">`;
-        html+=`<div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div>`;
-        html+=`<div style="font-family:var(--mono);font-size:13px;color:var(--t);font-weight:600;">${s.val}</div>`;
+        html+=`<div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div>`;
+        html+=`<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:600;">${s.val}</div>`;
         html+=`</div>`;
       });
       html+=`</div>`;
@@ -3758,7 +3773,7 @@ function buildSessionDrawerContent(session,dateStr){
   const dateObj=new Date(dateStr+'T12:00:00');
   const dateDisplay=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const dayLabel=dayLabels[String(session.day)]||session.day||'Workout';
-  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;z-index:1;"><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div><div style="font-size:17px;font-weight:600;color:var(--t);">${dayLabel}</div></div><button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">×</button></div><div style="padding:20px;">`;
+  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;z-index:1;"><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div><div style="font-size:var(--fs-title);font-weight:600;color:var(--t);">${dayLabel}</div></div><button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">×</button></div><div style="padding:20px;">`;
   const meta=[];
   if(session.duration) meta.push(`${session.duration} min`);
   if(session.rpe)      meta.push(`RPE ${session.rpe}`);
@@ -3798,11 +3813,11 @@ function buildSessionDrawerContent(session,dateStr){
       c.hrMax?{lbl:'Max HR',val:`${c.hrMax} bpm`}:null,
       c.elev?{lbl:'Elevation',val:`${Math.round(c.elev)} ft`}:null,
     ].filter(Boolean);
-    const statBoxes=stats.map(s=>`<div style="background:rgba(42,160,112,0.1);border:1px solid rgba(42,160,112,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:13px;color:var(--t);font-weight:600;">${s.val}</div></div>`).join('');
+    const statBoxes=stats.map(s=>`<div style="background:rgba(42,160,112,0.1);border:1px solid rgba(42,160,112,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:600;">${s.val}</div></div>`).join('');
     const runTypeBadge=c.runType?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(42,160,112,0.15);color:var(--a2);padding:3px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.06em;margin-right:6px;">${c.runType}</span>`:'';
     const stravaBadge=session.isStrava?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">Strava</span>`:'';
-    const actName=(c.type&&c.type!=='Run')?`<div style="font-size:15px;color:var(--t);font-weight:500;margin-bottom:10px;">${c.type}</div>`:'';
-    html+=`<div style="background:var(--s3);border:1px solid rgba(42,160,112,0.3);border-radius:16px;padding:18px;margin-bottom:20px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a2),rgba(42,160,112,0.2));"></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:10px;background:rgba(42,160,112,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🏃</div><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;letter-spacing:.08em;">Run</div>${actName?`<div style="font-size:14px;color:var(--t);font-weight:500;">${c.type}</div>`:''}</div></div><div style="display:flex;gap:6px;margin-bottom:14px;">${runTypeBadge}${stravaBadge}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">${statBoxes}</div></div>`;
+    const actName=(c.type&&c.type!=='Run')?`<div style="font-size:var(--fs-body);color:var(--t);font-weight:500;margin-bottom:10px;">${c.type}</div>`:'';
+    html+=`<div style="background:var(--s3);border:1px solid rgba(42,160,112,0.3);border-radius:16px;padding:18px;margin-bottom:20px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a2),rgba(42,160,112,0.2));"></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:10px;background:rgba(42,160,112,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🏃</div><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;letter-spacing:.08em;">Run</div>${actName?`<div style="font-size:var(--fs-body);color:var(--t);font-weight:500;">${c.type}</div>`:''}</div></div><div style="display:flex;gap:6px;margin-bottom:14px;">${runTypeBadge}${stravaBadge}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">${statBoxes}</div></div>`;
   } else if(session.cardio&&_isCyclingDay){
     const c=session.cardio;
     const dur=c.dur;
@@ -3816,11 +3831,11 @@ function buildSessionDrawerContent(session,dateStr){
       c.hrMax?{lbl:'Max HR',val:`${c.hrMax} bpm`}:null,
       c.elev?{lbl:'Elevation',val:`${Math.round(c.elev)} ft`}:null,
     ].filter(Boolean);
-    const statBoxes=stats.map(s=>`<div style="background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:13px;color:var(--t);font-weight:600;">${s.val}</div></div>`).join('');
+    const statBoxes=stats.map(s=>`<div style="background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:600;">${s.val}</div></div>`).join('');
     const actName=(c.type&&c.type!=='Ride')?c.type:'Cycling';
     const stravaBadge=session.isStrava?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(252,76,2,0.12);color:#fc4c02;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">Strava</span>`:'';
     const cols=stats.length<=2?stats.length:Math.min(3,stats.length);
-    html+=`<div style="background:var(--s3);border:1px solid rgba(160,102,212,0.3);border-radius:16px;padding:18px;margin-bottom:20px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.2));"></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:10px;background:rgba(160,102,212,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🚴</div><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);text-transform:uppercase;letter-spacing:.08em;">Cycling</div><div style="font-size:14px;color:var(--t);font-weight:500;margin-top:1px;">${actName}</div></div><div style="margin-left:auto;">${stravaBadge}</div></div><div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px;">${statBoxes}</div></div>`;
+    html+=`<div style="background:var(--s3);border:1px solid rgba(160,102,212,0.3);border-radius:16px;padding:18px;margin-bottom:20px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.2));"></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><div style="width:36px;height:36px;border-radius:10px;background:rgba(160,102,212,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🚴</div><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);text-transform:uppercase;letter-spacing:.08em;">Cycling</div><div style="font-size:var(--fs-body);color:var(--t);font-weight:500;margin-top:1px;">${actName}</div></div><div style="margin-left:auto;">${stravaBadge}</div></div><div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px;">${statBoxes}</div></div>`;
   } else if(session.cardio&&(session.cardio.dur>0||session.cardio.dist>0)){
     const c=session.cardio;
     const cardioMeta=[c.type,c.dur?`${c.dur} min`:null,c.dist?`${c.dist} mi`:null,c.pace?`${c.pace}/mi`:null,c.hr?`HR ${c.hr} bpm`:null,c.rpe?`RPE ${c.rpe}`:null].filter(Boolean).join(' · ');
@@ -3834,7 +3849,7 @@ function buildSessionDrawerContent(session,dateStr){
     html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Accessories</div>${accRows}</div>`;
   }
   if(session.notes){
-    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Notes</div><div style="font-size:14px;color:var(--t2);line-height:1.5;">${session.notes}</div></div>`;
+    html+=`<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Notes</div><div style="font-size:var(--fs-body);color:var(--t2);line-height:1.5;">${session.notes}</div></div>`;
   }
   if(session.ts){
     html+=`<div style="margin-top:8px;padding-top:16px;border-top:1px solid var(--b);"><button onclick="editSession(${session.ts})" style="width:100%;font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:8px;padding:10px;cursor:pointer;letter-spacing:.04em;">Edit session</button></div>`;
@@ -3865,7 +3880,7 @@ function _buildActivityRow(item){
     const dotClr=isCycling?'var(--a5)':isRunType(s.day)?'var(--a2)':'var(--a)';
     const dotGlow=isCycling?'0 0 6px rgba(160,102,212,0.7)':isRunType(s.day)?'0 0 6px rgba(42,160,112,0.7)':'0 0 6px rgba(104,110,210,0.7)';
     const icon=isCycling?'🚴':isRunType(s.day)?'🏃':'🏋️';
-    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:10px;height:10px;border-radius:50%;background:${dotClr};box-shadow:${dotGlow};flex-shrink:0;display:inline-block;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><span style="font-size:12px;">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${ds}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
+    return `<div onclick="openSessionDrawerByTs(${s.ts})" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:10px;height:10px;border-radius:50%;background:${dotClr};box-shadow:${dotGlow};flex-shrink:0;display:inline-block;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><span style="font-size:var(--fs-xs);">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${ds}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
   } else {
     // Strava activity (run or ride)
     const r=item._raw;
@@ -3883,7 +3898,7 @@ function _buildActivityRow(item){
     if(r.heartRateAvg) pts.push('HR '+r.heartRateAvg+' bpm');
     const stravaBadge=`<span style="font-family:var(--mono);font-size:9px;background:rgba(252,76,2,0.12);color:#fc4c02;padding:1px 5px;border-radius:3px;letter-spacing:.03em;vertical-align:middle;">STR</span>`;
     const key=item._key||('str_'+item.date);
-    return `<div onclick="openStravaByKey('${key}','${item.date}')" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:10px;height:10px;border-radius:50%;background:${dotClr};box-shadow:${dotGlow};flex-shrink:0;display:inline-block;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><span style="font-size:12px;">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span>${stravaBadge}<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${ds}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
+    return `<div onclick="openStravaByKey('${key}','${item.date}')" style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;"><span style="width:10px;height:10px;border-radius:50%;background:${dotClr};box-shadow:${dotGlow};flex-shrink:0;display:inline-block;"></span><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><span style="font-size:var(--fs-xs);">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:500;">${label}</span>${stravaBadge}<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${ds}</span></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pts.join(' \xb7 ')||'—'}</div></div><span style="font-family:var(--mono);font-size:16px;color:var(--t3);">›</span></div>`;
   }
 }
 window._stravaRowCache={};
@@ -5834,17 +5849,17 @@ function renderPrescriptionCard(prescription){
     const liftRows=liftOrder.filter(k=>lifts[k]).map(k=>{
       const l=lifts[k];
       const w=l.weight>0?l.weight+' lb':'Bodyweight';
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(104,110,210,0.15);"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">${liftIcons[k]||'•'}</span><div><div style="font-size:var(--fs-presc-lift);color:var(--t);">${l.variation||liftNames[k]||k}</div>${l.coachNote?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">${l.coachNote}</div>`:''}</div></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:var(--fs-presc-lift);color:${color};font-weight:600;">${l.sets}×${l.reps} @ ${w}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">RPE ${l.targetRPE}</div></div></div>`;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(104,110,210,0.15);"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:var(--fs-body);">${liftIcons[k]||'•'}</span><div><div style="font-size:var(--fs-presc-lift);color:var(--t);">${l.variation||liftNames[k]||k}</div>${l.coachNote?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">${l.coachNote}</div>`:''}</div></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:var(--fs-presc-lift);color:${color};font-weight:600;">${l.sets}×${l.reps} @ ${w}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">RPE ${l.targetRPE}</div></div></div>`;
     }).join('');
     const accessories=(mw.accessories||[]);
-    const accessHtml=accessories.length?`<div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(104,110,210,0.15);"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="font-size:13px;">➕</span><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;text-transform:uppercase;">Accessories</div></div>${accessories.map(a=>`<div style="font-size:var(--fs-presc-text);color:var(--t2);padding:3px 0;">· ${esc(a)}</div>`).join('')}</div>`:'';
+    const accessHtml=accessories.length?`<div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(104,110,210,0.15);"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="font-size:var(--fs-sm);">➕</span><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;text-transform:uppercase;">Accessories</div></div>${accessories.map(a=>`<div style="font-size:var(--fs-presc-text);color:var(--t2);padding:3px 0;">· ${esc(a)}</div>`).join('')}</div>`:'';
     mainHtml=`<div style="background:rgba(104,110,210,0.07);border:1px solid rgba(104,110,210,0.25);border-radius:12px;padding:16px;margin-bottom:2px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${color},transparent);"></div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="font-size:16px;">🏋️</span><div style="font-family:var(--mono);font-size:var(--fs-xs);color:${color};letter-spacing:.15em;text-transform:uppercase;">Main Work</div></div>${liftRows}${accessHtml}</div>`;
   }
   const watchHtml=(prescription.watchOutFor||[]).length?`<div style="margin-top:14px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;">WATCH: ${prescription.watchOutFor.map(esc).join(' · ')}</div>`:'';
   const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:12px;padding:10px 14px;background:rgba(184,96,53,.07);border:1px solid rgba(184,96,53,.2);border-radius:8px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">If too hard</span>${esc(prescription.ifTooHard)}</div>`:'';
   el.className='prog-day-card prog-today';
   el.style.borderColor=color;
-  const secHdr=(icon,lbl,clr)=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><span style="font-size:13px;">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:${clr||'var(--t3)'};letter-spacing:.1em;text-transform:uppercase;">${lbl}</span></div>`;
+  const secHdr=(icon,lbl,clr)=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><span style="font-size:var(--fs-sm);">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:${clr||'var(--t3)'};letter-spacing:.1em;text-transform:uppercase;">${lbl}</span></div>`;
   el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${esc(label)}</div><div class="prog-day-title">${esc(prescription.summary||'')}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div style="padding:16px 18px;">${prescription.reasoning?`<div style="font-size:var(--fs-presc-text);color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:rgba(104,110,210,0.06);border:1px solid rgba(104,110,210,0.15);border-radius:10px;">💭 ${esc(prescription.reasoning)}</div>`:''}${prescription.warmup?`<div style="margin-bottom:14px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;padding:12px 14px;background:rgba(61,136,212,0.07);border:1px solid rgba(61,136,212,0.2);border-radius:10px;">${secHdr('🔥','Warmup','var(--a3)')}${esc(prescription.warmup)}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;padding:12px 14px;background:rgba(42,160,112,0.07);border:1px solid rgba(42,160,112,0.2);border-radius:10px;">${secHdr('🧊','Cooldown','var(--a2)')}${esc(prescription.cooldown)}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:rgba(104,110,210,0.07);border-left:3px solid ${color};border-radius:0 10px 10px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">📌 ${esc(prescription.coachNote)}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
   renderCustomExercises();
 }
@@ -5856,9 +5871,9 @@ function renderCustomExercises(){
   if(!presc){el.style.display='none';return;}
   el.style.display='';
   const customs=presc.customExercises||[];
-  const inp=(id,ph,type='text')=>`<input id="${id}" type="${type}" placeholder="${ph}" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;text-align:center;">`;
+  const inp=(id,ph,type='text')=>`<input id="${id}" type="${type}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;text-align:center;">`;
   const listHtml=customs.map((ex,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b);"><div><div style="font-size:var(--fs-presc-text);color:var(--t);">${esc(ex.name)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${[ex.sets&&ex.reps?ex.sets+'×'+ex.reps:null,ex.weight?ex.weight+' lb':null,ex.note?esc(ex.note):null].filter(Boolean).join(' · ')}</div></div><button onclick="removeCustomExercise(${i})" style="background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:0 6px;line-height:1;flex-shrink:0;">×</button></div>`).join('');
-  el.innerHTML=`<div class="card" style="margin-bottom:0;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;margin-bottom:${customs.length?'10px':'0'};">${customs.length?'CUSTOM EXERCISES':''}</div>${listHtml}<div style="margin-top:${customs.length?'12px':'0'};"><input id="cex-name" type="text" placeholder="Exercise name" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">${inp('cex-sets','Sets','number')}${inp('cex-reps','Reps','number')}${inp('cex-weight','lb','number')}</div><input id="cex-note" type="text" placeholder="Note (optional)" style="font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;"><button onclick="addCustomExercise()" style="width:100%;font-family:var(--mono);font-size:12px;background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:8px;padding:10px;cursor:pointer;letter-spacing:.04em;">+ Add exercise</button></div></div>`;
+  el.innerHTML=`<div class="card" style="margin-bottom:0;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;margin-bottom:${customs.length?'10px':'0'};">${customs.length?'CUSTOM EXERCISES':''}</div>${listHtml}<div style="margin-top:${customs.length?'12px':'0'};"><input id="cex-name" type="text" placeholder="Exercise name" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">${inp('cex-sets','Sets','number')}${inp('cex-reps','Reps','number')}${inp('cex-weight','lb','number')}</div><input id="cex-note" type="text" placeholder="Note (optional)" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;"><button onclick="addCustomExercise()" style="width:100%;font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:8px;padding:10px;cursor:pointer;letter-spacing:.04em;">+ Add exercise</button></div></div>`;
 }
 function addCustomExercise(){
   const name=document.getElementById('cex-name')?.value?.trim();
@@ -5914,7 +5929,7 @@ ${isToday?`<div style="position:absolute;top:0;left:0;right:0;height:2px;backgro
   <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${(day.date||'').slice(5)||''}</div>
   <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);opacity:.7;">${day.dow||''}</div>
 </div>
-<div style="width:30px;height:30px;border-radius:8px;background:${m.border};display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">${m.icon}</div>
+<div style="width:30px;height:30px;border-radius:8px;background:${m.border};display:flex;align-items:center;justify-content:center;font-size:var(--fs-body);flex-shrink:0;">${m.icon}</div>
 <div style="flex:1;min-width:0;">
   <div style="font-size:var(--fs-presc-lift);color:${m.color};font-weight:600;">${day.suggestion||''}</div>
   <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${day.reason||''}</div>
@@ -6241,8 +6256,8 @@ function renderSnapshotCharts(){
     const isToday=latestHRVLog.date===todayStr;
     const dayLabel=isToday?'today':latestHRVLog.date.slice(5);
     hrvSummaryHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;border-bottom:1px solid var(--b);margin-bottom:16px;">
-      <div style="font-family:var(--mono);font-size:13px;color:var(--t2);">HRV <span style="color:var(--t);">${Math.round(latestHRVLog.hrv)}ms</span> <span style="color:var(--t3);">${dayLabel} · baseline ${Math.round(bl)}±${Math.round(sd)}ms</span></div>
-      <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:${statusColor};letter-spacing:.05em;padding:2px 8px;border:1px solid ${statusColor}40;border-radius:10px;">${statusTxt}</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">HRV <span style="color:var(--t);">${Math.round(latestHRVLog.hrv)}ms</span> <span style="color:var(--t3);">${dayLabel} · baseline ${Math.round(bl)}±${Math.round(sd)}ms</span></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);font-weight:600;color:${statusColor};letter-spacing:.05em;padding:2px 8px;border:1px solid ${statusColor}40;border-radius:10px;">${statusTxt}</div>
     </div>`;
   }
 
@@ -6250,26 +6265,26 @@ function renderSnapshotCharts(){
     ${hrvSummaryHTML}
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Sleep · ${days} days</div>
-        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-sleep-avg"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Sleep · ${days} days</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-body);font-weight:500;color:var(--t);" id="snap-sleep-avg"></div>
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-sleep-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:#1e40af;">▌ Deep</span>
         <span style="color:#3b82f6;">▌ Core</span>
         <span style="color:#93c5fd;">▌ REM</span>
         <span style="color:rgba(148,163,184,0.5);">▌ Awake</span>
         <span style="color:rgba(255,183,77,0.7);">- - 7h goal</span>
       </div>
-      <div id="snap-sleep-missing" style="font-family:var(--mono);font-size:12px;color:var(--t3);margin-top:6px;line-height:1.6;"></div>
+      <div id="snap-sleep-missing" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;line-height:1.6;"></div>
     </div>
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Steps + Exercise + Calories · ${days} days</div>
-        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-activity-avg"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Steps + Exercise + Calories · ${days} days</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-body);font-weight:500;color:var(--t);" id="snap-activity-avg"></div>
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-activity-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(0,212,255,0.85);">── Steps (L)</span>
         <span style="color:rgba(168,85,247,0.85);">── Exercise min (R)</span>
         <span style="color:rgba(251,146,60,0.6);">▌ Active kcal</span>
@@ -6278,11 +6293,11 @@ function renderSnapshotCharts(){
     </div>
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Walking HR + Speed · ${days} days</div>
-        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-hr-avg"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Walking HR + Speed · ${days} days</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-body);font-weight:500;color:var(--t);" id="snap-hr-avg"></div>
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-hr-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(255,183,77,0.85);">── Walking HR (L)</span>
         <span style="color:rgba(56,189,248,0.85);">── Walking Speed mph (R)</span>
         <span>- - 30d avg</span>
@@ -6290,11 +6305,11 @@ function renderSnapshotCharts(){
     </div>
     <div style="margin-bottom:28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Resting HR + Respiratory Rate · ${days} days</div>
-        <div style="font-family:var(--mono);font-size:15px;font-weight:500;color:var(--t);" id="snap-recovery-avg"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Resting HR + Respiratory Rate · ${days} days</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-body);font-weight:500;color:var(--t);" id="snap-recovery-avg"></div>
       </div>
       <div style="position:relative;height:300px;"><canvas id="snap-recovery-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:13px;color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
         <span style="color:rgba(255,99,71,0.85);">── Resting HR (L)</span>
         <span style="color:rgba(167,139,250,0.85);">── Resp Rate br/min (R)</span>
         <span>- - 30d avg</span>
@@ -6302,11 +6317,11 @@ function renderSnapshotCharts(){
     </div>
     <div style="margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">HRV · ${days} days</div>
-        <div style="font-family:var(--mono);font-size:13px;color:var(--t3);" id="snap-hrv-status"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">HRV · ${days} days</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);" id="snap-hrv-status"></div>
       </div>
       <div style="position:relative;height:220px;"><canvas id="snap-hrv-chart"></canvas></div>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--t3);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;">
         <span style="color:rgba(42,160,112,0.9);">● HRV</span>
         <span style="color:rgba(104,112,200,0.8);">— 60d baseline</span>
         <span style="color:rgba(184,96,53,0.8);">-- warning (−0.75 SD)</span>
