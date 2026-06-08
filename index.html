@@ -1314,16 +1314,16 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="stat"><div class="sv a" id="vol-ohp" style="font-size:22px;">—</div><div class="sl">OHP vol best</div></div>
   </div>
   <div class="card" style="margin-bottom:14px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div class="lbl" style="margin:0;">strength trajectory</div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn bs bi chart-lift-btn" id="chart-bench" onclick="setChartLift('bench')" style="font-size:var(--fs-xs);padding:5px 10px;">BENCH</button>
-        <button class="btn bs bi chart-lift-btn" id="chart-squat" onclick="setChartLift('squat')" style="font-size:var(--fs-xs);padding:5px 10px;">SQUAT</button>
-        <button class="btn bs bi chart-lift-btn" id="chart-dl" onclick="setChartLift('dl')" style="font-size:var(--fs-xs);padding:5px 10px;">DL</button>
-        <button class="btn bs bi chart-lift-btn" id="chart-ohp" onclick="setChartLift('ohp')" style="font-size:var(--fs-xs);padding:5px 10px;">OHP</button>
-        <button class="btn bs bi chart-lift-btn" id="chart-pullup" onclick="setChartLift('pullup')" style="font-size:var(--fs-xs);padding:5px 10px;">PULLUP</button>
-        <button class="btn bs bi chart-lift-btn" id="chart-row" onclick="setChartLift('row')" style="font-size:var(--fs-xs);padding:5px 10px;">ROW</button>
-        <button class="btn bs bi" id="chart-eq-btn" onclick="toggleEquationDrawer()" title="Show formula" style="font-size:var(--fs-xs);padding:5px 10px;">ƒ(x)</button>
+    <div style="margin-bottom:12px;">
+      <div class="lbl" style="margin:0 0 8px;">strength trajectory</div>
+      <div style="display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+        <button class="btn bs bi chart-lift-btn" id="chart-bench" onclick="setChartLift('bench')" style="font-size:var(--fs-xs);padding:5px 10px;flex-shrink:0;">BENCH</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-squat" onclick="setChartLift('squat')" style="font-size:var(--fs-xs);padding:5px 10px;flex-shrink:0;">SQUAT</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-dl" onclick="setChartLift('dl')" style="font-size:var(--fs-xs);padding:5px 10px;flex-shrink:0;">DL</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-ohp" onclick="setChartLift('ohp')" style="font-size:var(--fs-xs);padding:5px 10px;flex-shrink:0;">OHP</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-pullup" onclick="setChartLift('pullup')" style="font-size:var(--fs-xs);padding:5px 10px;flex-shrink:0;">PULLUP</button>
+        <button class="btn bs bi chart-lift-btn" id="chart-row" onclick="setChartLift('row')" style="font-size:var(--fs-xs);padding:5px 10px;flex-shrink:0;">ROW</button>
+        <button class="btn bs bi" id="chart-eq-btn" onclick="toggleEquationDrawer()" title="Show formula" style="font-size:var(--fs-xs);padding:5px 10px;flex-shrink:0;">ƒ(x)</button>
       </div>
     </div>
     <div style="position:relative;height:220px;">
@@ -2172,10 +2172,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <button class="ni" onclick="showTab('progress')"><span class="nicon">P</span><span class="nlbl">PROG</span></button>
   <button class="ni" onclick="showTab('program')"><span class="nicon">Pg</span><span class="nlbl">PGRM</span></button>
   <button class="ni" onclick="showTab('milestones')"><span class="nicon">G</span><span class="nlbl">GOALS</span></button>
-  <button class="ni" onclick="showTab('rules')">
-    <div style="font-size:18px;">📋</div>
-    <div>Rules</div>
-  </button>
+  <button class="ni" onclick="showTab('rules')"><span class="nicon">R</span><span class="nlbl">RULES</span></button>
   <button class="ni" onclick="showTab('settings')"><span class="nicon">S</span><span class="nlbl">SET</span></button>
 </nav>
 </div><!-- v2026-05-22 -->
