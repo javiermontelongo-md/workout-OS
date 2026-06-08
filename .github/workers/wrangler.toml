@@ -1,3 +1,4 @@
 name = "strava-webhook"
 main = "strava-webhook.js"
 compatibility_date = "2024-01-01"
+account_id = "37662535e9d402f3ee546736082275b7"

@@ -99,6 +99,7 @@ async function main() {
   }
 
   // 1. Get fresh access token using refresh token
+  // Note: oauth endpoint stays on www.strava.com — only the API base URL changes June 2027
   console.log('Getting fresh Strava access token...');
   const tokenRes = await httpsPost('https://www.strava.com/oauth/token', {
     client_id: clientId,
@@ -115,8 +116,10 @@ async function main() {
   console.log('Access token obtained.');
 
   // 2. Fetch activities from last 60 days
+  // TODO June 1 2027: change base URL to https://www.api-v3.strava.com
+  const STRAVA_API_BASE = 'https://www.strava.com/api/v3';
   const sixtyDaysAgo = Math.floor(Date.now() / 1000) - (60 * 24 * 60 * 60);
-  const activitiesUrl = `https://www.strava.com/api/v3/athlete/activities?after=${sixtyDaysAgo}&per_page=100`;
+  const activitiesUrl = `${STRAVA_API_BASE}/athlete/activities?after=${sixtyDaysAgo}&per_page=100`;
 
   console.log('Fetching Strava activities...');
   const activities = await httpsGet(activitiesUrl, {
