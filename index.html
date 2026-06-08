@@ -1788,265 +1788,29 @@ input[type=range]::-webkit-slider-thumb:hover {
       </div>
     </div>
 
-    <div style="margin-bottom:8px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);letter-spacing:.06em;flex:1;">TYPOGRAPHY &amp; FONT SIZES</div>
-        <button id="fs-tab-desktop" onclick="showFsTab('desktop')" style="font-family:var(--mono);font-size:var(--fs-xs);padding:3px 10px;border-radius:5px;border:1px solid var(--a);background:var(--a);color:var(--bg);cursor:pointer;transition:all .15s;">Desktop</button>
-        <button id="fs-tab-mobile" onclick="showFsTab('mobile')" style="font-family:var(--mono);font-size:var(--fs-xs);padding:3px 10px;border-radius:5px;border:1px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;">Mobile</button>
-      </div>
-
-      <div id="fs-pane-desktop">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:10px;line-height:1.6;">Settings below apply on screens &gt; 768px (desktop / tablet).</div>
-        <div class="ig" style="margin-bottom:14px;">
-          <label style="font-size:var(--fs-sm);">Font style</label>
-          <select id="font-pair-select" onchange="setFontPair(this.value)" style="margin-top:6px;">
-            <optgroup label="── Clean &amp; Modern ──">
-              <option value="dm">DM Sans + DM Mono + Fraunces (default)</option>
-              <option value="system">System UI — no loading, fastest</option>
-              <option value="inter">Inter + JetBrains Mono + Lora</option>
-              <option value="urbanist">Urbanist + Fira Code + Playfair Display</option>
-              <option value="manrope">Manrope + Fira Mono + Cormorant Garamond</option>
-            </optgroup>
-            <optgroup label="── Friendly &amp; Rounded ──">
-              <option value="nunito">Nunito + Source Code Pro + Spectral</option>
-              <option value="outfit">Outfit + Inconsolata + Libre Baskerville</option>
-              <option value="jakarta">Plus Jakarta Sans + Fira Code + Cormorant Garamond</option>
-            </optgroup>
-            <optgroup label="── Technical &amp; Sporty ──">
-              <option value="space">Space Grotesk + Space Mono + Playfair Display</option>
-              <option value="sora">Sora + IBM Plex Mono + EB Garamond</option>
-              <option value="exo">Exo 2 + Anonymous Pro + Abril Fatface</option>
-              <option value="worksans">Work Sans + Overpass Mono + Vollkorn</option>
-            </optgroup>
-            <optgroup label="── Classic ──">
-              <option value="roboto">Roboto + Roboto Mono + Merriweather</option>
-            </optgroup>
-          </select>
-        </div>
-        <div class="ig" style="margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Base font size</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="font-size-lbl">19</span>px</span>
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:10px;">
-            <button id="fsp-xs" onclick="applyFontPreset(14)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XS<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">compact</div></button>
-            <button id="fsp-s" onclick="applyFontPreset(17)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">S<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">small</div></button>
-            <button id="fsp-m" onclick="applyFontPreset(19)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">M<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">default</div></button>
-            <button id="fsp-l" onclick="applyFontPreset(22)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">L<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">readable</div></button>
-            <button id="fsp-xl" onclick="applyFontPreset(26)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:7px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XL<div style="font-size:var(--fs-xs);color:var(--t3);margin-top:2px;">large</div></button>
-          </div>
-          <input type="range" id="font-size-range" min="14" max="30" value="19" oninput="setFontSize(this.value)">
-          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:5px;"><span>14 compact</span><span>30 large</span></div>
-        </div>
-        <div class="ig" style="margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Small text size</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="small-text-lbl">12</span>px</span>
-          </div>
-          <input type="range" id="small-text-range" min="22" max="30" value="22" oninput="setSmallTextSize(this.value)">
-          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:5px;"><span>22 min</span><span>30 large</span></div>
-        </div>
-        <div style="height:1px;background:var(--b);margin:4px 0 12px;"></div>
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:10px;">Component sizes — fine-tune individual elements:</div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Logo / wordmark</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-logo">28</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-logo" min="14" max="42" value="28" oninput="setComponentFontSize('logo',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Nav tabs</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-nav">25</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-nav" min="10" max="36" value="25" oninput="setComponentFontSize('nav',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Page headings</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-heading">29</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-heading" min="16" max="52" value="29" oninput="setComponentFontSize('heading',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Section labels</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-sublabel">20</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-sublabel" min="10" max="28" value="20" oninput="setComponentFontSize('sublabel',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Badges &amp; tags</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-badge">24</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-badge" min="10" max="28" value="24" oninput="setComponentFontSize('badge',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Form inputs</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-input">23</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-input" min="12" max="34" value="23" oninput="setComponentFontSize('input',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Buttons</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-btn">25</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-btn" min="10" max="34" value="25" oninput="setComponentFontSize('btn',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Card body text</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-cardtext">23</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-cardtext" min="12" max="34" value="23" oninput="setComponentFontSize('cardtext',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Exercise &amp; program</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-exercise">23</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-exercise" min="12" max="34" value="23" oninput="setComponentFontSize('exercise',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Stat numbers</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-dataval">32</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-dataval" min="16" max="52" value="32" oninput="setComponentFontSize('dataval',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Calendar text</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-caltext">22</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-caltext" min="10" max="28" value="22" oninput="setComponentFontSize('caltext',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Timestamps &amp; meta</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-mono">24</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-mono" min="10" max="28" value="24" oninput="setComponentFontSize('mono',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:2px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Prescription text</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-presctext">13</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-presctext" min="10" max="24" value="13" oninput="setComponentFontSize('presctext',+this.value)">
+    <div style="margin-bottom:8px;padding:14px 16px;background:var(--s2);border:1px solid var(--b);border-radius:var(--r);">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.06em;margin-bottom:14px;">FONT SIZE</div>
+      <div style="margin-bottom:16px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);margin-bottom:8px;">Desktop</div>
+        <div style="display:flex;gap:8px;">
+          <button id="dfsp-xs" onclick="applyDesktopFontPreset(14)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XS</button>
+          <button id="dfsp-s"  onclick="applyDesktopFontPreset(17)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">S</button>
+          <button id="dfsp-m"  onclick="applyDesktopFontPreset(19)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">M</button>
+          <button id="dfsp-l"  onclick="applyDesktopFontPreset(22)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">L</button>
+          <button id="dfsp-xl" onclick="applyDesktopFontPreset(26)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XL</button>
         </div>
       </div>
-
-      <div id="fs-pane-mobile" style="display:none;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;line-height:1.6;">All settings here are fully independent from desktop — they only apply on screens ≤768px (phones).</div>
-        <div class="ig" style="margin-bottom:14px;">
-          <label style="font-size:var(--fs-sm);">Font style (mobile)</label>
-          <select id="font-pair-select-mobile" onchange="setFontPairMobile(this.value)" style="margin-top:6px;">
-            <optgroup label="── Clean &amp; Modern ──">
-              <option value="dm">DM Sans + DM Mono + Fraunces (default)</option>
-              <option value="system">System UI — no loading, fastest</option>
-              <option value="inter">Inter + JetBrains Mono + Lora</option>
-              <option value="urbanist">Urbanist + Fira Code + Playfair Display</option>
-              <option value="manrope">Manrope + Fira Mono + Cormorant Garamond</option>
-            </optgroup>
-            <optgroup label="── Friendly &amp; Rounded ──">
-              <option value="nunito">Nunito + Source Code Pro + Spectral</option>
-              <option value="outfit">Outfit + Inconsolata + Libre Baskerville</option>
-              <option value="jakarta">Plus Jakarta Sans + Fira Code + Cormorant Garamond</option>
-            </optgroup>
-            <optgroup label="── Technical &amp; Sporty ──">
-              <option value="space">Space Grotesk + Space Mono + Playfair Display</option>
-              <option value="sora">Sora + IBM Plex Mono + EB Garamond</option>
-              <option value="exo">Exo 2 + Anonymous Pro + Abril Fatface</option>
-              <option value="worksans">Work Sans + Overpass Mono + Vollkorn</option>
-            </optgroup>
-            <optgroup label="── Classic ──">
-              <option value="roboto">Roboto + Roboto Mono + Merriweather</option>
-            </optgroup>
-          </select>
-        </div>
-        <div style="height:1px;background:var(--b);margin:4px 0 12px;"></div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Base font size</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-mobile-base">14</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-mobile-base" min="11" max="20" value="14" oninput="setMobileBaseFontSize(+this.value)">
-          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:3px;"><span>11 compact</span><span>20 large</span></div>
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Small text size</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-mobile-smalltext">12</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-mobile-smalltext" min="9" max="16" value="12" oninput="setMobileSmallTextSize(+this.value)">
-          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:3px;"><span>9 tiny</span><span>16 large</span></div>
-        </div>
-        <div style="height:1px;background:var(--b);margin:4px 0 12px;"></div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Mobile logo</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_mlogo">20</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-m_mlogo" min="12" max="28" value="20" oninput="setMobileComponentFontSize('m_mlogo',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Nav icons</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_nav">14</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-m_nav" min="8" max="20" value="14" oninput="setMobileComponentFontSize('m_nav',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Nav labels</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_navlbl">8</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-m_navlbl" min="6" max="12" value="8" oninput="setMobileComponentFontSize('m_navlbl',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Page headings</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_heading">22</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-m_heading" min="14" max="32" value="22" oninput="setMobileComponentFontSize('m_heading',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Labels</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_label">13</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-m_label" min="9" max="20" value="13" oninput="setMobileComponentFontSize('m_label',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Form inputs</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_input">16</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-m_input" min="12" max="22" value="16" oninput="setMobileComponentFontSize('m_input',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Buttons</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_btn">12</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-m_btn" min="10" max="22" value="12" oninput="setMobileComponentFontSize('m_btn',+this.value)">
-        </div>
-        <div class="ig" style="margin-bottom:2px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-            <label style="margin:0;font-size:var(--fs-sm);">Card text</label>
-            <span style="font-family:var(--mono);color:var(--a);font-size:var(--fs-sm);"><span id="fs-lbl-m_cardtext">14</span>px</span>
-          </div>
-          <input type="range" id="fs-rng-m_cardtext" min="11" max="20" value="14" oninput="setMobileComponentFontSize('m_cardtext',+this.value)">
+      <div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);margin-bottom:8px;">Mobile</div>
+        <div style="display:flex;gap:8px;">
+          <button id="mfsp-xs" onclick="applyMobileFontPreset(14)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XS</button>
+          <button id="mfsp-s"  onclick="applyMobileFontPreset(17)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">S</button>
+          <button id="mfsp-m"  onclick="applyMobileFontPreset(19)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">M</button>
+          <button id="mfsp-l"  onclick="applyMobileFontPreset(22)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">L</button>
+          <button id="mfsp-xl" onclick="applyMobileFontPreset(26)" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);padding:9px 0;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;">XL</button>
         </div>
       </div>
     </div>
-
-    <button id="appearance-apply-btn" class="btn bp" style="width:100%;transition:all .2s;" onclick="applyAppearanceChanges()">Apply Changes</button>
   </div>
 
   <div class="g2">
@@ -2296,54 +2060,49 @@ function _applyMobileComponentFontSizes(){
   if(!el){el=document.createElement('style');el.id='wos-fs-mobile-overrides';document.head.appendChild(el);}
   el.textContent=css;
 }
-function setMobileBaseFontSize(px){
-  localStorage.setItem('wos-mobile-base',px);
-  _applyMobileComponentFontSizes();
-  const lbl=document.getElementById('fs-lbl-mobile-base');if(lbl)lbl.textContent=px;
-  const rng=document.getElementById('fs-rng-mobile-base');if(rng)rng.value=px;
-}
-function setMobileSmallTextSize(px){
-  localStorage.setItem('wos-mobile-smalltext',px);
-  _applyMobileComponentFontSizes();
-  const lbl=document.getElementById('fs-lbl-mobile-smalltext');if(lbl)lbl.textContent=px;
-  const rng=document.getElementById('fs-rng-mobile-smalltext');if(rng)rng.value=px;
-}
-function setComponentFontSize(key,px){
-  localStorage.setItem('wos-fs-'+key,px);
+const MOBILE_BASE_MAP={14:11,17:13,19:14,22:16,26:18};
+const MOBILE_SMALLTEXT_MAP={14:9,17:11,19:12,22:14,26:16};
+function applyDesktopFontPreset(px){
+  const preset=FONT_PRESETS[px];if(!preset)return;
+  Object.entries(preset).forEach(([key,val])=>{
+    if(key.startsWith('m_'))return;
+    if(key==='base'){localStorage.setItem('wos-fontsize',val);_applyFontSize(val);}
+    else localStorage.setItem('wos-fs-'+key,val);
+  });
+  const smallPx=Math.round(12*(+px/19));
+  const clampedSmall=Math.max(22,Math.min(30,smallPx));
+  localStorage.setItem('wos-smalltext',clampedSmall);
+  _applySmallTextSize(clampedSmall);
   _applyComponentFontSizes();
-  const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
+  _syncDesktopFontPresetBtns(px);
 }
-function setMobileComponentFontSize(key,px){
-  localStorage.setItem('wos-fs-'+key,px);
+function applyMobileFontPreset(px){
+  const preset=FONT_PRESETS[px];if(!preset)return;
+  localStorage.setItem('wos-mobile-preset',px);
+  Object.entries(preset).forEach(([key,val])=>{
+    if(!key.startsWith('m_'))return;
+    localStorage.setItem('wos-fs-'+key,val);
+  });
+  const mbase=MOBILE_BASE_MAP[px]||14;
+  const msmall=MOBILE_SMALLTEXT_MAP[px]||12;
+  localStorage.setItem('wos-mobile-base',mbase);
+  localStorage.setItem('wos-mobile-smalltext',msmall);
   _applyMobileComponentFontSizes();
-  const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
-}
-function showFsTab(pane){
-  document.getElementById('fs-pane-desktop').style.display=pane==='desktop'?'block':'none';
-  document.getElementById('fs-pane-mobile').style.display=pane==='mobile'?'block':'none';
-  const db=document.getElementById('fs-tab-desktop');
-  const mb=document.getElementById('fs-tab-mobile');
-  if(db){db.style.background=pane==='desktop'?'var(--a)':'transparent';db.style.color=pane==='desktop'?'var(--bg)':'var(--t3)';db.style.borderColor=pane==='desktop'?'var(--a)':'var(--b2)';}
-  if(mb){mb.style.background=pane==='mobile'?'var(--a)':'transparent';mb.style.color=pane==='mobile'?'var(--bg)':'var(--t3)';mb.style.borderColor=pane==='mobile'?'var(--a)':'var(--b2)';}
+  if(window.innerWidth<=768) _applyFontSize(mbase);
+  _syncMobileFontPresetBtns(px);
 }
 function applyAppearance(){
   _applyTheme(localStorage.getItem('wos-theme')||'dark');
-  // Apply per-platform font: mobile gets its own setting if set
   const isMobileViewport=window.innerWidth<=768;
   const fontKey=isMobileViewport&&localStorage.getItem('wos-font-mobile')?'wos-font-mobile':'wos-font';
   _applyFont(localStorage.getItem(fontKey)||'dm');
   const savedSize=localStorage.getItem('wos-fontsize')||'19';
   _applyFontSize(savedSize);
-  _syncFontPresetBtns(+savedSize);
+  _syncDesktopFontPresetBtns(+savedSize);
+  _syncMobileFontPresetBtns(+(localStorage.getItem('wos-mobile-preset')||19));
   _applySmallTextSize(Math.max(22,+(localStorage.getItem('wos-smalltext')||'22')));
   _applyComponentFontSizes();
   _applyMobileComponentFontSizes();
-}
-function setFontPairMobile(name){
-  localStorage.setItem('wos-font-mobile',name);
-  // Apply immediately if we're on mobile
-  if(window.innerWidth<=768) _applyFont(name);
-  _syncAppearanceUI();
 }
 function _applyTheme(name){
   const t=THEMES[name]||THEMES.dark;
@@ -2359,20 +2118,12 @@ function _applyFont(name){
   document.documentElement.style.setProperty('--serif',fp.serif);
 }
 function _applyFontSize(px){document.body.style.fontSize=px+'px';}
-function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
-function setFontPair(name){localStorage.setItem('wos-font',name);_applyFont(name);_syncAppearanceUI();}
-function setFontSize(px){localStorage.setItem('wos-fontsize',px);_applyFontSize(px);const e=document.getElementById('font-size-lbl');if(e)e.textContent=px;_syncFontPresetBtns(+px);}
-function setSmallTextSize(px){
-  localStorage.setItem('wos-smalltext',px);
-  _applySmallTextSize(px);
-  const lbl=document.getElementById('small-text-lbl');if(lbl)lbl.textContent=px;
-  const rng=document.getElementById('small-text-range');if(rng)rng.value=px;
-}
 function _applySmallTextSize(px){
   const xs=Math.max(18,Math.round(+px*0.85));
   document.documentElement.style.setProperty('--fs-xs',xs+'px');
   document.documentElement.style.setProperty('--fs-sm',px+'px');
 }
+function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
 const FONT_PRESETS={
   14:{base:14,logo:21,nav:18,heading:21,sublabel:15,badge:18,input:17,btn:18,cardtext:17,exercise:17,dataval:24,caltext:16,mono:18,presctext:10,m_mlogo:15,m_nav:10,m_navlbl:6,m_heading:16,m_label:10,m_input:12,m_btn:9,m_cardtext:10},
   17:{base:17,logo:25,nav:22,heading:26,sublabel:18,badge:21,input:21,btn:22,cardtext:21,exercise:21,dataval:29,caltext:20,mono:21,presctext:12,m_mlogo:18,m_nav:13,m_navlbl:7,m_heading:20,m_label:12,m_input:14,m_btn:11,m_cardtext:13},
@@ -2380,30 +2131,8 @@ const FONT_PRESETS={
   22:{base:22,logo:32,nav:29,heading:34,sublabel:23,badge:28,input:27,btn:29,cardtext:27,exercise:27,dataval:37,caltext:26,mono:28,presctext:15,m_mlogo:23,m_nav:16,m_navlbl:9,m_heading:25,m_label:15,m_input:19,m_btn:14,m_cardtext:16},
   26:{base:26,logo:38,nav:34,heading:40,sublabel:27,badge:28,input:31,btn:34,cardtext:31,exercise:31,dataval:44,caltext:28,mono:28,presctext:18,m_mlogo:27,m_nav:19,m_navlbl:11,m_heading:30,m_label:18,m_input:22,m_btn:16,m_cardtext:19}
 };
-function applyFontPreset(px){
-  const preset=FONT_PRESETS[px];if(!preset) return;
-  // save and apply all values
-  Object.entries(preset).forEach(([key,val])=>{
-    if(key==='base'){
-      localStorage.setItem('wos-fontsize',val);
-      _applyFontSize(val);
-      const lbl=document.getElementById('font-size-lbl');if(lbl)lbl.textContent=val;
-      const rng=document.getElementById('font-size-range');if(rng)rng.value=val;
-    } else {
-      localStorage.setItem('wos-fs-'+key,val);
-      const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=val;
-      const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=val;
-    }
-  });
-  // scale small text proportionally with the preset
-  const smallPx=Math.round(12*(+px/19));
-  setSmallTextSize(Math.max(22,Math.min(30,smallPx)));
-  _applyComponentFontSizes();
-  _applyMobileComponentFontSizes();
-  _syncFontPresetBtns(px);
-}
-function _syncFontPresetBtns(px){
-  const map={14:'fsp-xs',17:'fsp-s',19:'fsp-m',22:'fsp-l',26:'fsp-xl'};
+function _syncDesktopFontPresetBtns(px){
+  const map={14:'dfsp-xs',17:'dfsp-s',19:'dfsp-m',22:'dfsp-l',26:'dfsp-xl'};
   Object.entries(map).forEach(([size,id])=>{
     const btn=document.getElementById(id);if(!btn)return;
     const active=+size===+px;
@@ -2412,70 +2141,26 @@ function _syncFontPresetBtns(px){
     btn.style.borderColor=active?'var(--a)':'var(--b2)';
   });
 }
-function applyAppearanceChanges(){
-  const font=document.getElementById('font-pair-select')?.value||localStorage.getItem('wos-font')||'dm';
-  const fontMob=document.getElementById('font-pair-select-mobile')?.value||localStorage.getItem('wos-font-mobile')||font;
-  const size=document.getElementById('font-size-range')?.value||localStorage.getItem('wos-fontsize')||'19';
-  localStorage.setItem('wos-font',font);
-  localStorage.setItem('wos-font-mobile',fontMob);
-  localStorage.setItem('wos-fontsize',size);
-  _applyFont(window.innerWidth<=768?fontMob:font);
-  _applyFontSize(size);
-  Object.keys(FS_COMPONENTS).forEach(key=>{
-    const el=document.getElementById('fs-rng-'+key);
-    if(el) setComponentFontSize(key,+el.value);
+function _syncMobileFontPresetBtns(px){
+  const map={14:'mfsp-xs',17:'mfsp-s',19:'mfsp-m',22:'mfsp-l',26:'mfsp-xl'};
+  Object.entries(map).forEach(([size,id])=>{
+    const btn=document.getElementById(id);if(!btn)return;
+    const active=+size===+px;
+    btn.style.background=active?'var(--a)':'var(--s3)';
+    btn.style.color=active?'var(--bg)':'var(--t2)';
+    btn.style.borderColor=active?'var(--a)':'var(--b2)';
   });
-  Object.keys(FS_MOBILE).forEach(key=>{
-    const el=document.getElementById('fs-rng-'+key);
-    if(el) setMobileComponentFontSize(key,+el.value);
-  });
-  const mbEl=document.getElementById('fs-rng-mobile-base');if(mbEl)setMobileBaseFontSize(+mbEl.value);
-  const msEl=document.getElementById('fs-rng-mobile-smalltext');if(msEl)setMobileSmallTextSize(+msEl.value);
-  _syncAppearanceUI();
-  const btn=document.getElementById('appearance-apply-btn');
-  if(btn){
-    const orig=btn.textContent;
-    btn.textContent='✓ Applied!';
-    btn.style.background='var(--a2)';
-    btn.style.color='#06080f';
-    btn.style.transform='scale(1.04)';
-    setTimeout(()=>{btn.textContent=orig;btn.style.background='';btn.style.color='';btn.style.transform='';},2000);
-  }
 }
 function _syncAppearanceUI(){
   const theme=localStorage.getItem('wos-theme')||'dark';
-  const font=localStorage.getItem('wos-font')||'dm';
-  const size=localStorage.getItem('wos-fontsize')||'19';
   document.querySelectorAll('[data-theme]').forEach(b=>{
     const on=b.dataset.theme===theme;
     b.style.borderColor=on?'var(--a)':'var(--b2)';
     b.style.color=on?'var(--a)':'var(--t2)';
     b.style.background=on?'var(--s3)':'var(--s2)';
   });
-  const fs=document.getElementById('font-pair-select');if(fs)fs.value=font;
-  const fsmob=document.getElementById('font-pair-select-mobile');if(fsmob)fsmob.value=localStorage.getItem('wos-font-mobile')||font;
-  const fr=document.getElementById('font-size-range');if(fr)fr.value=size;
-  const fl=document.getElementById('font-size-lbl');if(fl)fl.textContent=size;
-  const smallPx=localStorage.getItem('wos-smalltext')||'12';
-  const sr=document.getElementById('small-text-range');if(sr)sr.value=smallPx;
-  const sl=document.getElementById('small-text-lbl');if(sl)sl.textContent=smallPx;
-  _syncFontPresetBtns(+size);
-  Object.entries(FS_COMPONENTS).forEach(([key,cfg])=>{
-    const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
-    const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=px;
-    const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
-  });
-  Object.entries(FS_MOBILE).forEach(([key,cfg])=>{
-    const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
-    const rng=document.getElementById('fs-rng-'+key);if(rng)rng.value=px;
-    const lbl=document.getElementById('fs-lbl-'+key);if(lbl)lbl.textContent=px;
-  });
-  const mb=+(localStorage.getItem('wos-mobile-base')||14);
-  const mbr=document.getElementById('fs-rng-mobile-base');if(mbr)mbr.value=mb;
-  const mbl=document.getElementById('fs-lbl-mobile-base');if(mbl)mbl.textContent=mb;
-  const ms2=+(localStorage.getItem('wos-mobile-smalltext')||12);
-  const msr=document.getElementById('fs-rng-mobile-smalltext');if(msr)msr.value=ms2;
-  const msl=document.getElementById('fs-lbl-mobile-smalltext');if(msl)msl.textContent=ms2;
+  _syncDesktopFontPresetBtns(+(localStorage.getItem('wos-fontsize')||19));
+  _syncMobileFontPresetBtns(+(localStorage.getItem('wos-mobile-preset')||19));
 }
 
 const ATHLETE = {
