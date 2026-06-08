@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-06",
+  "lastUpdated": "2026-06-08",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -3699,11 +3699,45 @@
       },
       "ts": 1780728041306,
       "fuelPlan": "## Check-In: June 5\n\n---\n\n### ASSESSMENT\n\nToday is tracking as a carbon copy of June 4 — you're at 1,770 kcal and only 82g protein with likely several hours left in the day, but the food choices so far have been calorie-dense without doing much protein work (the quesadilla and chowder together gave you 77g protein across 1,430 calories). This is the third day in a four-day window where you're on pace to land significantly under your protein target, which means muscle repair from any training this week is essentially stalled. The waking hunger you reported on June 3 — your *higher* day — is a direct symptom of this cycle: you're never actually catching up.\n\n---\n\n### REST OF DAY\n\nYou need roughly **100g more protein and ~600-800 more calories** to close today adequately. Hit these three things:\n\n**Meal 1 — Next 1-2 hours (packable)**\n- 2 rotisserie chicken breasts, pulled apart (grab from any grocery deli section, zero prep)\n- String cheese x2 or a Babybel pack\n- Handful of crackers or a banana\n- **~50g protein, ~450 kcal**\n\n**Meal 2 — Dinner**\n- 2 cans of tuna or salmon mixed with a packet of mayo, eaten on tortillas (2 large flour)\n- Bag of microwaved frozen edamame (5 min, zero skill)\n- **~55g protein, ~550 kcal**\n\n**Total projected end of day: ~2,770 kcal, ~187g protein** ✓\n\nThe rotisserie chicken is your highest-leverage habit to build right now — cheap, zero cooking, 50g protein per breast, works in the hospital."
+    },
+    {
+      "date": "2026-06-08",
+      "meals": [
+        {
+          "time": "",
+          "food": "Freid chicken patties eggs Benedict  with waffle for the base and side of hashbowns and small side salad w it h vinaigrette dreessing",
+          "protein": 42,
+          "carbs": 68,
+          "fat": 52,
+          "kcal": 898
+        }
+      ],
+      "signals": {
+        "betweenMeals": "",
+        "beforeSleep": "",
+        "onWaking": ""
+      },
+      "totals": {
+        "protein": 48,
+        "carbs": 102,
+        "fat": 68,
+        "kcal": 1196
+      },
+      "ts": 1780937251380
     }
   ],
   "fuelMemory": {
     "summary": "Calorie intake remains critically inconsistent, cycling between a single higher day (2,942 kcal) and two consecutive low days (1,776 and 1,770 kcal), with protein collapsing to 97g and 82g on the low days — well below the ~1.6g/kg minimum required to support muscle repair and adaptation. The repeating pattern of one marginally adequate day followed by two days of significant under-fueling sustains a chronic cumulative deficit, and the fact that waking hunger and low energy persist",
     "lastUpdated": "2026-06-05",
     "callCount": 5
-  }
+  },
+  "aiUsage": [
+    {
+      "ts": 1780937251379,
+      "type": "macros",
+      "inp": 130,
+      "out": 98,
+      "cost": 0.00186
+    }
+  ]
 }
