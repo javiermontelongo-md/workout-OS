@@ -2892,7 +2892,7 @@
       "exerciseMinutes": 72,
       "activeCalories": 1310,
       "walkingHR": 86,
-      "walkingSpeed": 2.44,
+      "walkingSpeed": 2.49,
       "respiratoryRate": 17.774509803921568,
       "vo2maxApple": 41.91,
       "source": "apple_health"
@@ -2920,7 +2920,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-06-08T17:49:59.482Z",
+  "healthLastSync": "2026-06-08T18:50:20.957Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
