@@ -4203,6 +4203,22 @@ function renderAIUsage(){
   breakdownEl.innerHTML=rows||`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:8px 0;">No AI calls recorded yet — usage tracked going forward.</div>`;
 }
 
+function renderSystemHealth(){
+  if(!D) return;
+  const fmtSync = iso => {
+    if(!iso) return '<span style="color:var(--t3);">never</span>';
+    const d = new Date(iso);
+    const diff = Date.now() - d.getTime();
+    const hrs = Math.floor(diff/3600000);
+    const age = hrs < 1 ? 'just now' : hrs < 24 ? `${hrs}h ago` : `${Math.floor(hrs/24)}d ago`;
+    return `<span style="color:var(--a2);">${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})} <span style="color:var(--t3);font-weight:400;">(${age})</span></span>`;
+  };
+  const stravaEl = document.getElementById('sh-strava-sync');
+  const healthEl = document.getElementById('sh-health-sync');
+  if(stravaEl) stravaEl.innerHTML = fmtSync(D.stravaLastSync);
+  if(healthEl) healthEl.innerHTML = fmtSync(D.healthLastSync);
+}
+
 function saveCFG(){
   CFG.tok=document.getElementById('gh-tok').value.trim();
   CFG.usr=document.getElementById('gh-usr').value.trim();
@@ -4229,20 +4245,6 @@ function debugAPI(){
 }
 
 // ============================================================
-// FIELD MIGRATION TOOL
-// ============================================================
-async function runMig(){
-  const oldK=document.getElementById('mig-old').value.trim(),newK=document.getElementById('mig-new').value.trim();
-  if(!oldK||!newK){msg('mig-st','Enter both old and new field names');return;}
-  if(!D){msg('mig-st','Data not loaded yet');return;}
-  if(!(oldK in D)){msg('mig-st','Field "'+oldK+'" not found in data.json');return;}
-  if(newK in D && Array.isArray(D[newK]) && D[newK].length>0){msg('mig-st','Field "'+newK+'" already has data -- skipped to prevent overwrite');return;}
-  if(!confirm('Migrate "'+oldK+'" to "'+newK+'"? This will push to GitHub immediately.'))return;
-  D[newK]=D[oldK]; delete D[oldK];
-  const ok=await push(null,'mig-st');
-  if(ok) msg('mig-st','Migration complete -- "'+oldK+'" moved to "'+newK+'"');
-}
-
 // ============================================================
 // DATA
 // ============================================================
