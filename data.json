@@ -3774,9 +3774,9 @@
     }
   ],
   "fuelMemory": {
-    "summary": "Calorie intake has deteriorated further, with June 8th recording a critically low 1,196 kcal and only 48g protein — levels insufficient to cover basic metabolic needs, let alone support athletic adaptation. The established pattern of one marginally adequate day followed by consecutive under-fueled days has now extended into a third low day, deepening the cumulative deficit and pushing protein intake to levels that guarantee active muscle tissue breakdown. The single higher day (2,942 kcal, 162g protein) continues to be the only intake approaching adequacy",
-    "lastUpdated": "2026-06-08",
-    "callCount": 6
+    "summary": "Calorie and protein intake showed a notable recovery on June 8th, rising to 2,836 kcal and 146g protein after two consecutive under-fueled days averaging 1,773 kcal and 90g protein — a pattern that continues to reflect an irregular one-higher-day-followed-by-low-days cycle rather than consistent daily adequacy. Protein remains chronically insufficient on low days (82–97g) to prevent muscle tissue breakdown, while only the two higher days (June 3rd: 2,942",
+    "lastUpdated": "2026-06-09",
+    "callCount": 7
   },
   "aiUsage": [
     {
@@ -3806,6 +3806,20 @@
       "inp": 259,
       "out": 265,
       "cost": 0.004752
+    },
+    {
+      "ts": 1781017528275,
+      "type": "checkin",
+      "inp": 466,
+      "out": 404,
+      "cost": 0.007458
+    },
+    {
+      "ts": 1781017532996,
+      "type": "memory",
+      "inp": 282,
+      "out": 120,
+      "cost": 0.002646
     }
   ],
   "checkins": [
