@@ -1420,7 +1420,8 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
     <div style="position:relative;height:220px;overflow:hidden;"><canvas id="vo2-chart"></canvas></div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
-      <span style="color:rgba(0,212,255,0.8);">── App estimate</span>
+      <span style="color:rgba(0,212,255,0.8);">── Run estimate</span>
+      <span style="color:rgba(160,102,212,0.9);">── Bike estimate</span>
       <span style="color:rgba(200,255,0,0.85);">● Apple Watch</span>
     </div>
   </div>
@@ -4378,7 +4379,26 @@ function getRestingHR(){
 }
 function estimateVO2max(run){
   const HR_REST=getRestingHR();
-  if(!run||!run.heartRateAvg||run.distance<2) return null;
+  if(!run||!run.heartRateAvg) return null;
+
+  // Cycling: use power-based estimate (Coggan formula)
+  // VO2max (ml/kg/min) = (watts × 10.8 / weightKg) + 7
+  if(run.type==='ride'||run.runType==='cycling'){
+    const watts=run.weightedAvgWatts||run.averageWatts||null;
+    if(!watts||!run.heartRateAvg) return null;
+    const weightKg=(ATHLETE.weightLbs||225)*0.453592;
+    const hrAvg=run.heartRateAvg;
+    const hrMax=run.heartRateMax||(()=>{const maxSeen=Math.max(...(D.runs||[]).filter(r=>r.heartRateMax).map(r=>r.heartRateMax));return maxSeen>0?maxSeen:185;})();
+    const hrReserve=(hrAvg-HR_REST)/(hrMax-HR_REST);
+    if(hrReserve<=0.3) return null; // easy spin — not a meaningful VO2 effort
+    // Scale by HR: at 100% HRR effort watts ≈ VO2max power; correct for sub-max
+    const scaledWatts=watts/hrReserve;
+    const vo2max=(scaledWatts*10.8/weightKg)+7;
+    return Math.round(Math.max(20,Math.min(90,vo2max))*10)/10;
+  }
+
+  // Running: Jack Daniels HR-reserve formula
+  if(!run.distance||run.distance<2) return null;
   const speedMs=(run.distance*1609.34)/run.duration;
   const hrAvg=run.heartRateAvg;
   const hrMax=run.heartRateMax||(()=>{const maxSeen=Math.max(...(D.runs||[]).map(r=>r.heartRateMax||0));return maxSeen>0?maxSeen:185;})();
@@ -5446,8 +5466,9 @@ function renderVO2TrendChart(){
   if(!canvas||typeof Chart==='undefined') return;
   if(window._vo2Chart){window._vo2Chart.destroy();window._vo2Chart=null;}
 
-  // Per-run app estimates — only runs with HR + distance ≥ 2mi
+  // Per-activity estimates — runs (≥2 mi + HR) and rides (power + HR)
   let hrRuns=(D.runs||[]).filter(r=>r.type==='run'&&r.heartRateAvg&&r.distance>=2);
+  let hrRides=(D.runs||[]).filter(r=>(r.type==='ride'||r.runType==='cycling')&&r.heartRateAvg&&(r.averageWatts||r.weightedAvgWatts));
   let appleAll=(D.healthLogs||[]).filter(h=>h.vo2maxApple);
 
   // Apply date window filter
@@ -5455,46 +5476,64 @@ function renderVO2TrendChart(){
     const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-_vo2Days);
     const cutoffStr=cutoff.getFullYear()+'-'+String(cutoff.getMonth()+1).padStart(2,'0')+'-'+String(cutoff.getDate()).padStart(2,'0');
     hrRuns=hrRuns.filter(r=>r.date>=cutoffStr);
+    hrRides=hrRides.filter(r=>r.date>=cutoffStr);
     appleAll=appleAll.filter(h=>h.date>=cutoffStr);
   }
 
-  const appPoints=hrRuns.map(r=>({date:r.date,vo2:estimateVO2max(r)})).filter(p=>p.vo2!=null);
+  const runPoints=hrRuns.map(r=>({date:r.date,vo2:estimateVO2max(r)})).filter(p=>p.vo2!=null);
+  const ridePoints=hrRides.map(r=>({date:r.date,vo2:estimateVO2max(r)})).filter(p=>p.vo2!=null);
   const applePoints=appleAll.map(h=>({date:h.date,vo2:Math.round(h.vo2maxApple*10)/10}));
 
   const metaEl=document.getElementById('vo2-trend-meta');
-  if(!appPoints.length&&!applePoints.length){
-    canvas.parentElement.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:20px 0;">Need runs with HR data (≥2 mi) to estimate VO2max</div>';
+  if(!runPoints.length&&!ridePoints.length&&!applePoints.length){
+    canvas.parentElement.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:20px 0;">Need runs (≥2 mi + HR) or rides (power + HR) to estimate VO2max</div>';
     if(metaEl)metaEl.textContent='';
     return;
   }
 
   // Build unified date axis
-  const allDates=[...new Set([...appPoints.map(p=>p.date),...applePoints.map(p=>p.date)])].sort();
-  const appMap=Object.fromEntries(appPoints.map(p=>[p.date,p.vo2]));
+  const allDates=[...new Set([...runPoints.map(p=>p.date),...ridePoints.map(p=>p.date),...applePoints.map(p=>p.date)])].sort();
+  const runMap=Object.fromEntries(runPoints.map(p=>[p.date,p.vo2]));
+  const rideMap=Object.fromEntries(ridePoints.map(p=>[p.date,p.vo2]));
   const appleMap=Object.fromEntries(applePoints.map(p=>[p.date,p.vo2]));
-  const appData=allDates.map(d=>appMap[d]??null);
+  const runData=allDates.map(d=>runMap[d]??null);
+  const rideData=allDates.map(d=>rideMap[d]??null);
   const appleData=allDates.map(d=>appleMap[d]??null);
   const labels=allDates.map(d=>d.slice(5));
 
-  // Y range — include both datasets
-  const allVals=[...appPoints.map(p=>p.vo2),...applePoints.map(p=>p.vo2)];
+  // Y range — include all datasets
+  const allVals=[...runPoints,...ridePoints,...applePoints].map(p=>p.vo2);
   const yMin=Math.max(25,Math.floor(Math.min(...allVals))-2);
   const yMax=Math.ceil(Math.max(...allVals))+2;
 
   // Meta line: latest values
-  const latestApp=appPoints.slice(-1)[0]?.vo2;
+  const latestRun=runPoints.slice(-1)[0]?.vo2;
+  const latestRide=ridePoints.slice(-1)[0]?.vo2;
   const latestApple=(D.healthLogs||[]).filter(h=>h.vo2maxApple).slice(-1)[0]?.vo2maxApple;
-  if(metaEl)metaEl.textContent=[latestApp?`App: ${latestApp}`:null,latestApple?`Watch: ${Math.round(latestApple*10)/10}`:null].filter(Boolean).join(' · ');
+  const metaParts=[];
+  if(latestRun) metaParts.push(`Run: ${latestRun}`);
+  if(latestRide) metaParts.push(`Bike: ${latestRide}`);
+  if(latestApple) metaParts.push(`Watch: ${Math.round(latestApple*10)/10}`);
+  if(metaEl) metaEl.textContent=metaParts.join(' · ');
+
+  // Update legend
+  const legendEl=canvas.parentElement.nextElementSibling;
+  if(legendEl){
+    const parts=['<span style="color:rgba(0,212,255,0.8);">── Run est.</span>'];
+    if(ridePoints.length) parts.push('<span style="color:rgba(160,102,212,0.9);">── Bike est.</span>');
+    parts.push('<span style="color:rgba(200,255,0,0.85);">● Apple Watch</span>');
+    legendEl.innerHTML=`<div style="display:flex;gap:16px;flex-wrap:wrap;">${parts.join('')}</div>`;
+  }
 
   const maxTicks=_vo2Days===7?7:_vo2Days===30?8:10;
 
   window._vo2Chart=new Chart(canvas,{
     type:'line',
     data:{labels,datasets:[
-      // App estimate: smooth line only, no individual dots
+      // Run estimate line
       {
-        label:'App estimate',
-        data:appData,
+        label:'Run estimate',
+        data:runData,
         borderColor:'rgba(0,212,255,0.75)',
         backgroundColor:'rgba(0,212,255,0.06)',
         borderWidth:2,
@@ -5505,7 +5544,21 @@ function renderVO2TrendChart(){
         spanGaps:false,
         fill:true
       },
-      // Apple Watch: clean circles, NO connecting line
+      // Bike estimate line (violet)
+      {
+        label:'Bike estimate',
+        data:rideData,
+        borderColor:'rgba(160,102,212,0.85)',
+        backgroundColor:'rgba(160,102,212,0.05)',
+        borderWidth:2,
+        pointRadius:rideData.map(v=>v!=null?5:0),
+        pointHoverRadius:7,
+        pointBackgroundColor:'rgba(160,102,212,0.9)',
+        tension:0.3,
+        spanGaps:false,
+        fill:false
+      },
+      // Apple Watch dots
       {
         label:'Apple Watch',
         data:appleData,

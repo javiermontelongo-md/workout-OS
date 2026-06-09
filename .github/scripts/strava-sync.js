@@ -177,6 +177,8 @@ async function main() {
       elevationGain: Math.round(elevationFeet),
       heartRateAvg: activity.average_heartrate || null,
       heartRateMax: activity.max_heartrate || null,
+      averageWatts: isRide ? (activity.average_watts || null) : null,
+      weightedAvgWatts: isRide ? (activity.weighted_average_watts || null) : null,
       source: 'strava',
       runType: runType
     };
