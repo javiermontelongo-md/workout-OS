@@ -1398,6 +1398,14 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div id="run-chart-legend"></div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
   </div>
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="lbl" style="margin:0;">cycling trajectory</div>
+    </div>
+    <div style="position:relative;height:340px;"><canvas id="bike-chart"></canvas></div>
+    <div id="bike-chart-legend"></div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="bike-last-sync">--</span></div>
+  </div>
   <div class="card ca ba" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div>
@@ -1887,20 +1895,83 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="brow"><button class="btn bp bi" onclick="saveAPI()">Save key</button><button class="btn bd bi" onclick="clearAPI()">Clear</button><button class="btn bs bi" onclick="debugAPI()">Test API key</button></div>
       <div id="api-st" style="margin-top:8px;font-size:var(--fs-sm);color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
       <div class="dvdr"></div>
-      <div class="lbl">field migration tool</div>
-      <div style="font-size:var(--fs-presc-text);color:var(--t2);margin-bottom:10px;line-height:1.6;">If you rename a data field, use this to safely move your data to the new field name.</div>
-      <div class="g2 k2" style="gap:8px;margin-bottom:8px;">
-        <div class="ig"><label>Old field name</label><input type="text" id="mig-old" placeholder="e.g. sessions"></div>
-        <div class="ig"><label>New field name</label><input type="text" id="mig-new" placeholder="e.g. workoutSessions"></div>
-      </div>
-      <button class="btn bs bi" onclick="runMig()">Run migration</button>
-      <div id="mig-st" style="margin-top:8px;font-size:var(--fs-sm);color:var(--t3);font-family:var(--mono);min-height:16px;"></div>
-      <div class="dvdr"></div>
       <div class="lbl">data</div>
       <div class="brow"><button class="btn bs bi" onclick="exportData()">Export data.json</button><button class="btn bd bi" onclick="clrCFG()">Clear local settings</button></div>
       <div style="margin-top:10px;padding:10px;background:rgba(255,183,77,.04);border:1px solid rgba(255,183,77,.1);border-radius:var(--r);font-size:var(--fs-sm);color:var(--t3);line-height:1.6;">Your data lives in <strong style="color:var(--t);">data.json</strong> on GitHub -- separate from this UI file. Update index.html freely. Your logged data is always safe.</div>
     </div>
   </div>
+
+  <!-- SYSTEM HEALTH -->
+  <div class="card ca aa" style="margin-top:18px;" id="system-health-card">
+    <div class="lbl" style="margin-bottom:16px;">🔧 system health</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;" id="sh-stat-grid">
+      <div style="background:rgba(42,160,112,0.08);border:1px solid rgba(42,160,112,0.25);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:3px;">STRAVA SYNC</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);font-weight:600;" id="sh-strava-sync">--</div>
+      </div>
+      <div style="background:rgba(42,160,112,0.08);border:1px solid rgba(42,160,112,0.25);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:3px;">HEALTH SYNC</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);font-weight:600;" id="sh-health-sync">--</div>
+      </div>
+      <div style="background:rgba(104,110,210,0.08);border:1px solid rgba(104,110,210,0.25);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:3px;">AI MODEL</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);font-weight:600;">claude-sonnet-4-6</div>
+      </div>
+      <div style="background:rgba(61,136,212,0.08);border:1px solid rgba(61,136,212,0.25);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:3px;">CHART.JS</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a3);font-weight:600;">4.4.0</div>
+      </div>
+      <div style="background:rgba(61,136,212,0.08);border:1px solid rgba(61,136,212,0.25);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:3px;">ACTIONS NODE.JS</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a3);font-weight:600;">v24</div>
+      </div>
+      <div style="background:rgba(61,136,212,0.08);border:1px solid rgba(61,136,212,0.25);border-radius:8px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:3px;">ACTIONS VERSION</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a3);font-weight:600;">checkout@v4 · setup-node@v4</div>
+      </div>
+    </div>
+
+    <div class="lbl" style="font-size:var(--fs-xs);margin-bottom:10px;color:var(--t2);">watch list — things that may need updating</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:8px;">
+        <span style="font-size:16px;flex-shrink:0;">🤖</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);margin-bottom:2px;">AI model — claude-sonnet-4-6</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.6;">Anthropic deprecates old model versions with ~3 months notice. If "Get Prescription" starts erroring, the model name in the JS needs updating. Check: console.anthropic.com</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:8px;">
+        <span style="font-size:16px;flex-shrink:0;">⚙️</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);margin-bottom:2px;">GitHub Actions — Node.js runtime</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.6;">Currently v24. GitHub drops Node versions every ~2 years. You'll see a deprecation warning in your Actions run logs before it breaks. Next: Node 24 EOL ≈ Apr 2028.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:8px;">
+        <span style="font-size:16px;flex-shrink:0;">🚴</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);margin-bottom:2px;">Strava API — refresh token</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.6;">Strava refresh tokens don't expire as long as the app stays authorized. If sync stops working, re-authorize at developers.strava.com and update the STRAVA_REFRESH_TOKEN secret in GitHub.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:8px;">
+        <span style="font-size:16px;flex-shrink:0;">📊</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);margin-bottom:2px;">Chart.js — v4.4.0</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.6;">Loaded from CDN. No auto-updates — only breaks if the CDN URL goes dead (very rare). Check github.com/chartjs/Chart.js/releases if charts stop rendering.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:8px;">
+        <span style="font-size:16px;flex-shrink:0;">🔑</span>
+        <div>
+          <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);margin-bottom:2px;">GitHub token — stored in browser</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.6;">If set to no expiration it lasts indefinitely. If saves start failing with auth errors, regenerate at github.com → Settings → Developer settings → Personal access tokens.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 
@@ -2734,14 +2805,14 @@ function showTab(n){
   if(n==='week'){ renderCalendar(); renderSessionList(); }
   if(n==='progress'){ }
   if(n==='rules') renderRulesTab();
-  if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); }
+  if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
   else if(n==='week'){ }
-  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
+  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); renderAIFlowDiagram(); }
 }
 
@@ -3507,7 +3578,7 @@ async function saveSession(){
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
   if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); // D.runPrescriptions intentionally NOT touched
- renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); renderBikeRacePredictions(); renderVO2TrendChart(); }
+ renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); renderBikeRacePredictions(); renderCyclingChart(); renderVO2TrendChart(); }
   else { D.sessions.pop(); }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
@@ -5257,6 +5328,67 @@ function renderRunChart(){
   }
 }
 function setRunChart(){renderRunChart();}
+
+function renderCyclingChart(){
+  const canvas=document.getElementById('bike-chart');
+  if(!canvas||typeof Chart==='undefined') return;
+  if(window._bikeChart){window._bikeChart.destroy();window._bikeChart=null;}
+  const rides=(D.runs||[]).filter(r=>r.type==='ride'&&r.distance>=0.5&&r.duration>0).slice(-10);
+  const legendEl=document.getElementById('bike-chart-legend');
+  if(!rides.length){
+    const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(legendEl)legendEl.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:20px 0;">No ride data yet — sync rides from Strava</div>';
+    return;
+  }
+  try{
+    const labels=rides.map(r=>r.date.slice(5));
+    const speedData=rides.map(r=>r.duration>0?+((r.distance/(r.duration/3600)).toFixed(2)):null);
+    const distData=rides.map(r=>r.distance||null);
+    const hrData=rides.map(r=>r.heartRateAvg||null);
+    const vSolid='rgba(160,102,212,0.9)';
+    const vMid='rgba(160,102,212,0.55)';
+    const vLight='rgba(160,102,212,0.22)';
+    const validSpeeds=speedData.filter(v=>v!=null);
+    const sMin=validSpeeds.length?Math.max(5,Math.floor(Math.min(...validSpeeds))-2):5;
+    const sMax=validSpeeds.length?Math.ceil(Math.max(...validSpeeds))+2:30;
+    const validHR=hrData.filter(v=>v!=null);
+    const hrMin=validHR.length?Math.max(100,Math.floor(Math.min(...validHR)/10)*10-10):100;
+    const hrMax=validHR.length?Math.ceil(Math.max(...validHR)/10)*10+10:200;
+    const maxDist=Math.max(...distData.filter(v=>v!=null));
+    window._bikeChart=new Chart(canvas,{
+      type:'bar',
+      data:{labels,datasets:[
+        {type:'bar',label:'Distance (mi)',data:distData,backgroundColor:vLight,borderColor:vMid,borderWidth:1,borderRadius:4,yAxisID:'yDist',order:3},
+        {type:'line',label:'Speed (mph)',data:speedData,borderColor:vSolid,backgroundColor:'transparent',borderWidth:2.5,pointRadius:5,pointBackgroundColor:vSolid,pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'ySpeed',order:1},
+        {type:'line',label:'Avg HR (bpm)',data:hrData,borderColor:'rgba(232,93,138,0.85)',backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:'rgba(232,93,138,0.85)',pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'yHR',order:2}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
+          label:c=>{
+            if(c.dataset.label==='Speed (mph)') return c.raw!=null?'Speed: '+c.raw.toFixed(1)+' mph':null;
+            if(c.dataset.label==='Avg HR (bpm)') return c.raw!=null?'HR: '+c.raw+' bpm':null;
+            if(c.dataset.label==='Distance (mi)') return c.raw!=null?'Dist: '+c.raw.toFixed(1)+' mi':null;
+            return null;
+          }
+        }}},
+        scales:{
+          x:{ticks:{color:'#a8b4cc',font:{family:'DM Mono',size:13},maxRotation:0},grid:{color:'rgba(255,255,255,0.05)'}},
+          ySpeed:{type:'linear',position:'left',min:sMin,max:sMax,ticks:{color:'rgba(160,102,212,0.9)',font:{family:'DM Mono',size:13},callback:v=>v+' mph'},grid:{color:'rgba(255,255,255,0.05)'}},
+          yHR:{type:'linear',position:'right',min:hrMin,max:hrMax,ticks:{color:'rgba(232,93,138,0.85)',font:{family:'DM Mono',size:13},callback:v=>v+' bpm'},grid:{display:false}},
+          yDist:{type:'linear',display:false,min:0,max:maxDist*3}
+        }
+      }
+    });
+    const syncEl=document.getElementById('bike-last-sync');
+    if(syncEl)syncEl.textContent=D.stravaLastSync?new Date(D.stravaLastSync).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'never';
+    if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"><span style="color:rgba(160,102,212,0.9);">── Speed</span><span style="color:rgba(232,93,138,0.9);">── Avg HR</span><span>▪ Bars = distance</span></div>';
+  }catch(e){
+    console.warn('Bike chart render failed:',e);
+    const ctx=canvas.getContext('2d');ctx.font='12px monospace';ctx.fillStyle='#4a5068';
+    ctx.fillText('Chart unavailable — check data',10,30);
+  }
+}
+
 function setVO2Range(days){
   _vo2Days=days;
   [7,30,0].forEach(d=>{
