@@ -3807,5 +3807,16 @@
       "out": 265,
       "cost": 0.004752
     }
+  ],
+  "checkins": [
+    {
+      "date": "2026-06-09",
+      "energy": 7,
+      "soreness": 3,
+      "motivation": 7,
+      "stress": 5,
+      "fatigueScore": 3,
+      "postCall": false
+    }
   ]
 }
