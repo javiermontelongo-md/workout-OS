@@ -3816,6 +3816,7 @@ function buildStravaDrawerContent(activities,dateStr){
     const icon=isRide?'🚴':'🏃';
     const statBg=isRide?'rgba(160,102,212,0.1)':'rgba(42,160,112,0.1)';
     const statBorder=isRide?'rgba(160,102,212,0.25)':'rgba(42,160,112,0.25)';
+    const watts=act.weightedAvgWatts||act.averageWatts||null;
     const stats=[
       dist?{lbl:'Distance',val:`${Number(dist).toFixed(2)} mi`}:null,
       dur?{lbl:'Duration',val:fmtDur(dur)}:null,
@@ -3823,6 +3824,7 @@ function buildStravaDrawerContent(activities,dateStr){
       pace&&!isRide?{lbl:'Pace',val:`${pace}/mi`}:null,
       act.heartRateAvg?{lbl:'Avg HR',val:`${act.heartRateAvg} bpm`}:null,
       act.heartRateMax?{lbl:'Max HR',val:`${act.heartRateMax} bpm`}:null,
+      isRide&&watts?{lbl:act.weightedAvgWatts?'NP Watts':'Avg Watts',val:`${Math.round(watts)} W`}:null,
       act.elevationGain?{lbl:'Elevation',val:`${Math.round(act.elevationGain)} ft`}:null,
     ].filter(Boolean);
     html+=`<div style="background:var(--s3);border:1px solid rgba(${accentRgb},0.3);border-radius:16px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden;">`;
@@ -5918,11 +5920,20 @@ async function generateDailyPrescription(workoutType,durationMins){
       dl:s.dl?.sets?.filter(x=>x.w).map(x=>`${x.w}×${x.r}@${x.rpe||'?'}`).join(',')||null,
       pullups:s.pullups||null
     }));
-    const recentRuns=(D.runs||[]).slice(-15).map(r=>({
-      date:r.date,type:r.runType,
+    const recentRuns=(D.runs||[]).filter(r=>r.type==='run'||r.runType==='run'||(!r.type&&!r.runType)).slice(-10).map(r=>({
+      date:r.date,type:r.runType||'run',
       dist:parseFloat((r.distanceMi||r.distance||0).toFixed(1)),
       pace:r.pace?`${Math.floor(r.pace/60)}:${String(r.pace%60).padStart(2,'0')}`:null,
       hrAvg:r.heartRateAvg,name:r.name
+    }));
+    const recentRides=(D.runs||[]).filter(r=>r.type==='ride'||r.runType==='cycling').slice(-10).map(r=>({
+      date:r.date,name:r.name,
+      dist:parseFloat((r.distance||0).toFixed(1)),
+      durationMin:r.duration?Math.round(r.duration/60):null,
+      hrAvg:r.heartRateAvg,hrMax:r.heartRateMax,
+      avgWatts:r.averageWatts||null,
+      npWatts:r.weightedAvgWatts||null,
+      elevFt:r.elevationGain||null
     }));
     const liftBests={bench:0,ohp:0,squat:0,dl:0};
     (D.sessions||[]).forEach(s=>{['bench','ohp','squat','dl'].forEach(lift=>{(s[lift]?.sets||[]).forEach(set=>{if(set.w&&set.r){const e=calcE1RM(set.w,set.r);if(e>liftBests[lift])liftBests[lift]=e;}});});});
@@ -5975,7 +5986,10 @@ async function generateDailyPrescription(workoutType,durationMins){
       ? `{\n      "summary": "e.g. 4 main lifts · 3 accessories",\n      ${liftSchemaByType[workoutType]||liftSchemaByType.push}\n    }`
       : `{\n      "summary": "e.g. Zone 2 easy run · 4 miles",\n      ${runSchema}\n    }`;
     // Only include run data sections for run/cycling days
-    const runDataSection=isRunDay?`\nRECENT RUNS (last 15):\n${JSON.stringify(recentRuns)}\n\nZONE 2 NOTE: Javier's Zone 2 is HR 130-145bpm. Recent easy runs show HR 165-171 — that is threshold, NOT Zone 2. Cap all easy run prescriptions at ${ts.mafHR}bpm. Prescribe a pace slow enough to actually stay under this ceiling.\n`:'';
+    const runDataSection=isRunDay?(workoutType==='cycling'
+      ?`\nRECENT RIDES (last 10):\n${JSON.stringify(recentRides)}\n\nRECENT RUNS (last 10):\n${JSON.stringify(recentRuns)}\n\nCYCLING CONTEXT: Use ride HR, avg/NP watts, and duration to gauge current aerobic load. Prescribe intensity by HR zone (Zone 2 = 130-145bpm for Javier). If watts are available use them to set effort targets.\n`
+      :`\nRECENT RUNS (last 10):\n${JSON.stringify(recentRuns)}\n\nRECENT RIDES (last 10, for context):\n${JSON.stringify(recentRides)}\n\nZONE 2 NOTE: Javier's Zone 2 is HR 130-145bpm. Recent easy runs show HR 165-171 — that is threshold, NOT Zone 2. Cap all easy run prescriptions at ${ts.mafHR}bpm. Prescribe a pace slow enough to actually stay under this ceiling.\n`)
+    :'';
     const prompt=`You are Javier's personal strength and running coach. PGY-1 IM resident in Philadelphia. Generate today's complete workout prescription AND 7-day suggestions in one JSON response.
 
 TODAY: ${today} (${dowNames[todayDOW]})
