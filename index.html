@@ -270,6 +270,31 @@ body {
 .accent-card.rose::before{background:linear-gradient(90deg,var(--a4),rgba(194,77,114,0.2));}
 .accent-card.amber{background:rgba(184,96,53,0.09);border:1px solid rgba(184,96,53,0.28);}
 .accent-card.amber::before{background:linear-gradient(90deg,var(--aw),rgba(184,96,53,0.2));}
+/* card.ca — gradient top accent bar on standard .card elements */
+.card.ca{position:relative;overflow:hidden;padding-top:22px;}
+.card.ca::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;}
+.card.ca.ia{background:rgba(104,110,210,0.06);border-color:rgba(104,110,210,0.32);}
+.card.ca.ia::before{background:linear-gradient(90deg,var(--a),rgba(104,110,210,0.1));}
+.card.ca.ga{background:rgba(42,160,112,0.06);border-color:rgba(42,160,112,0.3);}
+.card.ca.ga::before{background:linear-gradient(90deg,var(--a2),rgba(42,160,112,0.1));}
+.card.ca.ba{background:rgba(61,136,212,0.06);border-color:rgba(61,136,212,0.28);}
+.card.ca.ba::before{background:linear-gradient(90deg,var(--a3),rgba(61,136,212,0.1));}
+.card.ca.va{background:rgba(160,102,212,0.06);border-color:rgba(160,102,212,0.3);}
+.card.ca.va::before{background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.1));}
+.card.ca.ra{background:rgba(194,77,114,0.06);border-color:rgba(194,77,114,0.28);}
+.card.ca.ra::before{background:linear-gradient(90deg,var(--a4),rgba(194,77,114,0.1));}
+.card.ca.aa{background:rgba(184,96,53,0.06);border-color:rgba(184,96,53,0.28);}
+.card.ca.aa::before{background:linear-gradient(90deg,var(--aw),rgba(184,96,53,0.1));}
+/* ci-row — colored check-in slider row */
+.ci-row{margin-bottom:14px;padding:10px 12px;border-radius:8px;border:1px solid transparent;}
+.ci-row.er{background:rgba(104,110,210,0.06);border-color:rgba(104,110,210,0.2);}
+.ci-row.sr{background:rgba(194,77,114,0.06);border-color:rgba(194,77,114,0.18);}
+.ci-row.mr{background:rgba(42,160,112,0.06);border-color:rgba(42,160,112,0.18);}
+.ci-row.str{background:rgba(184,96,53,0.06);border-color:rgba(184,96,53,0.18);}
+.ci-row.wr{background:rgba(61,136,212,0.06);border-color:rgba(61,136,212,0.18);}
+/* lift-block card colors */
+.card.lift-ia{position:relative;overflow:hidden;background:rgba(104,110,210,0.06);border-color:rgba(104,110,210,0.28);padding-top:22px;}
+.card.lift-ia::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--a),rgba(104,110,210,0.1));}
 /* Icon badge — colored rounded square */
 .icon-badge{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 .icon-badge.indigo{background:rgba(104,110,210,0.18);}
@@ -1034,7 +1059,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 <!-- v2026-05-22 -->
 <div id="panel-today" class="panel on">
   <div class="h1">Today's <span>training</span></div>
-  <div class="card" id="today-checkin-snapshot">
+  <div class="card ca ia" id="today-checkin-snapshot">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">recovery snapshot</div>
       <div style="display:flex;gap:6px;">
@@ -1047,58 +1072,58 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div id="snapshot-charts"></div>
   </div>
   <!-- Daily Check-in Input -->
-  <div class="card">
+  <div class="card ca ba">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div class="lbl" style="margin:0;">daily check-in</div>
       <div id="checkin-date-label" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></div>
     </div>
-    <div style="margin-bottom:14px;">
+    <div class="ci-row er">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">ENERGY</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);" id="ci-energy-val">7</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">⚡ ENERGY</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);font-weight:600;" id="ci-energy-val">7</div>
       </div>
       <input type="range" id="ci-energy" min="1" max="10" value="7" oninput="document.getElementById('ci-energy-val').textContent=this.value;updateFatiguePreview()">
     </div>
-    <div style="margin-bottom:14px;">
+    <div class="ci-row sr">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">SORENESS</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);" id="ci-soreness-val">3</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);">🔥 SORENESS</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);font-weight:600;" id="ci-soreness-val">3</div>
       </div>
       <input type="range" id="ci-soreness" min="1" max="10" value="3" oninput="document.getElementById('ci-soreness-val').textContent=this.value;updateFatiguePreview()">
     </div>
-    <div style="margin-bottom:14px;">
+    <div class="ci-row mr">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">MOTIVATION</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);" id="ci-motivation-val">7</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);">💪 MOTIVATION</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);font-weight:600;" id="ci-motivation-val">7</div>
       </div>
       <input type="range" id="ci-motivation" min="1" max="10" value="7" oninput="document.getElementById('ci-motivation-val').textContent=this.value;updateFatiguePreview()">
     </div>
-    <div style="margin-bottom:14px;">
+    <div class="ci-row str">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">STRESS</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);" id="ci-stress-val">5</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);">😤 STRESS</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);font-weight:600;" id="ci-stress-val">5</div>
       </div>
       <input type="range" id="ci-stress" min="1" max="10" value="5"
         oninput="document.getElementById('ci-stress-val').textContent=this.value;updateFatiguePreview()">
     </div>
-    <div style="margin-bottom:14px;">
+    <div class="ci-row wr">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">WEIGHT</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a3);">⚖️ WEIGHT</div>
         <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">lbs</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <input type="number" id="ci-weight" placeholder="225" step="0.5" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);white-space:nowrap;">BMI: <span id="ci-bmi-display" style="color:var(--t2);">--</span></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);white-space:nowrap;">BMI: <span id="ci-bmi-display" style="color:var(--a3);">--</span></div>
       </div>
     </div>
-    <div style="margin-bottom:14px;">
+    <div class="ci-row wr">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">WAIST</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a3);">📏 WAIST</div>
         <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">inches</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <input type="number" id="ci-waist" placeholder="34.0" step="0.25" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);white-space:nowrap;">W/H: <span id="ci-whr-display" style="color:var(--t2);">--</span></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);white-space:nowrap;">W/H: <span id="ci-whr-display" style="color:var(--a3);">--</span></div>
       </div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px;">
@@ -1117,7 +1142,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <button class="btn bp" style="width:100%;" onclick="saveCheckin()">Save Check-in to GitHub</button>
     <div id="checkin-save-msg" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);text-align:center;margin-top:8px;min-height:16px;"></div>
   </div>
-  <div class="card" id="system-log-card">
+  <div class="card ca ia" id="system-log-card">
     <div class="lbl">system log · last 7 days</div>
     <div id="system-log-feed">
       <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:8px 0;">
@@ -1170,8 +1195,8 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- v2026-05-22 -->
-  <div class="card" id="bench-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BENCH PRESS</span><span id="planned-bench" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ 190</span></div>
+  <div class="card lift-ia" id="bench-block">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">🏋️ BENCH PRESS</span><span id="planned-bench" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ 190</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="bench-sets"></div>
     <button class="addbtn" onclick="addSet('bench')">+ Add set</button>
@@ -1183,8 +1208,8 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- v2026-05-22 -->
-  <div class="card" id="ohp-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">OVERHEAD PRESS</span><span id="planned-ohp" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 3x5 @ 90</span></div>
+  <div class="card lift-ia" id="ohp-block">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">⬆️ OVERHEAD PRESS</span><span id="planned-ohp" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 3x5 @ 90</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="ohp-sets"></div>
     <button class="addbtn" onclick="addSet('ohp')">+ Add set</button>
@@ -1196,8 +1221,8 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- v2026-05-22 -->
-  <div class="card" id="squat-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BACK SQUAT</span><span id="planned-squat" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ 160</span></div>
+  <div class="card lift-ia" id="squat-block">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">🦵 BACK SQUAT</span><span id="planned-squat" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="squat-sets"></div>
     <button class="addbtn" onclick="addSet('squat')">+ Add set</button>
@@ -1209,8 +1234,8 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- v2026-05-22 -->
-  <div class="card" id="deadlift-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">DEADLIFT</span><span id="planned-dl" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 3x5 @ 160</span></div>
+  <div class="card lift-ia" id="deadlift-block">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">💀 DEADLIFT</span><span id="planned-dl" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 3x5 @ 160</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="dl-sets"></div>
     <button class="addbtn" onclick="addSet('dl')">+ Add set</button>
@@ -1222,8 +1247,8 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- v2026-05-22 -->
-  <div class="card" id="pullup-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">WEIGHTED PULL-UPS</span><span id="planned-pullup" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ BW</span></div>
+  <div class="card lift-ia" id="pullup-block">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg g">💪 WEIGHTED PULL-UPS</span><span id="planned-pullup" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ BW</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:-6px;margin-bottom:6px;">lb added to harness (0 = bodyweight)</div>
     <div id="pullup-sets"></div>
@@ -1236,8 +1261,8 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- v2026-05-22 -->
-  <div class="card" id="row-block">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">BARBELL ROW</span><span id="planned-row" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 4x8 @ 115</span></div>
+  <div class="card lift-ia" id="row-block">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">🚣 BARBELL ROW</span><span id="planned-row" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 4x8 @ 115</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
     <div id="row-sets"></div>
     <button class="addbtn" onclick="addSet('row')">+ Add set</button>
@@ -1296,7 +1321,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-week-summary" id="cal-week-summary"></div>
   </div>
-  <div class="card" style="margin-bottom:14px;">
+  <div class="card ca ga" style="margin-bottom:14px;">
     <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
       <div class="lbl" style="margin:0;">activity history</div>
       <span id="sess-list-count" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></span>
@@ -1327,7 +1352,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="stat"><div class="sv a" id="vol-dl" style="font-size:22px;">—</div><div class="sl">DL vol best</div></div>
     <div class="stat"><div class="sv a" id="vol-ohp" style="font-size:22px;">—</div><div class="sl">OHP vol best</div></div>
   </div>
-  <div class="card" style="margin-bottom:14px;">
+  <div class="card ca ia" style="margin-bottom:14px;">
     <div style="margin-bottom:12px;">
       <div class="lbl" style="margin:0 0 8px;">strength trajectory</div>
       <div style="display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
@@ -1365,7 +1390,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       </div>
     </div>
   </div>
-  <div class="card" style="margin-bottom:14px;">
+  <div class="card ca ga" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">running trajectory</div>
     </div>
@@ -1373,7 +1398,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div id="run-chart-legend"></div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;">Data synced nightly from Strava · <span id="run-last-sync">--</span></div>
   </div>
-  <div class="card" style="margin-bottom:14px;">
+  <div class="card ca ba" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div>
         <div class="lbl" style="margin:0;">VO2max trend</div>
@@ -1391,7 +1416,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       <span style="color:rgba(200,255,0,0.85);">● Apple Watch</span>
     </div>
   </div>
-<div class="card" id="race-predictions-card" style="margin-bottom:14px;">
+<div class="card ca ba" id="race-predictions-card" style="margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">race predictions</div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);" id="race-pred-meta"></div>
@@ -1405,27 +1430,31 @@ input[type=range]::-webkit-slider-thumb:hover {
   <!-- 2x2 prediction grid -->
   <div id="race-pred-grid" style="display:none;">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">5K</div>
-        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="pred-5k-time">--:--</div>
+      <div style="background:rgba(61,136,212,0.09);border:1px solid rgba(61,136,212,0.3);border-radius:8px;padding:12px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a3),rgba(61,136,212,0.2));"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);text-transform:uppercase;margin-bottom:4px;">🏃 5K</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a3);" id="pred-5k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-5k-pace"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-5k-ci"></div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">10K</div>
-        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="pred-10k-time">--:--</div>
+      <div style="background:rgba(61,136,212,0.09);border:1px solid rgba(61,136,212,0.3);border-radius:8px;padding:12px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a3),rgba(61,136,212,0.2));"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);text-transform:uppercase;margin-bottom:4px;">🏃 10K</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a3);" id="pred-10k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-10k-pace"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-10k-ci"></div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Half Marathon</div>
+      <div style="background:rgba(42,160,112,0.09);border:1px solid rgba(42,160,112,0.3);border-radius:8px;padding:12px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a2),rgba(42,160,112,0.2));"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;margin-bottom:4px;">🏃 Half Marathon</div>
         <div style="font-size:var(--fs-data);font-weight:600;color:var(--a2);" id="pred-half-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-half-pace"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-half-ci"></div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Marathon</div>
-        <div style="font-size:var(--fs-data);font-weight:600;color:var(--t2);" id="pred-full-time">--:--</div>
+      <div style="background:rgba(160,102,212,0.09);border:1px solid rgba(160,102,212,0.3);border-radius:8px;padding:12px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.2));"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);text-transform:uppercase;margin-bottom:4px;">🏃 Marathon</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a5);" id="pred-full-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="pred-full-pace"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="pred-full-ci"></div>
       </div>
@@ -1457,7 +1486,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 </div>
 
 <!-- BIKE RACE PREDICTIONS -->
-<div class="card" id="bike-race-predictions-card" style="margin-bottom:14px;">
+<div class="card ca va" id="bike-race-predictions-card" style="margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">bike race predictions</div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);" id="bike-pred-meta"></div>
@@ -1469,27 +1498,31 @@ input[type=range]::-webkit-slider-thumb:hover {
 
   <div id="bike-pred-grid" style="display:none;">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">20 km</div>
-        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="bike-pred-20k-time">--:--</div>
+      <div style="background:rgba(160,102,212,0.09);border:1px solid rgba(160,102,212,0.3);border-radius:8px;padding:12px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.2));"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);text-transform:uppercase;margin-bottom:4px;">🚴 20 km</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a5);" id="bike-pred-20k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-20k-speed"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-20k-ci"></div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">40 km</div>
-        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="bike-pred-40k-time">--:--</div>
+      <div style="background:rgba(160,102,212,0.09);border:1px solid rgba(160,102,212,0.3);border-radius:8px;padding:12px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.2));"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);text-transform:uppercase;margin-bottom:4px;">🚴 40 km</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a5);" id="bike-pred-40k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-40k-speed"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-40k-ci"></div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">90 km (Half IM)</div>
-        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a2);" id="bike-pred-90k-time">--:--</div>
+      <div style="background:rgba(104,110,210,0.09);border:1px solid rgba(104,110,210,0.3);border-radius:8px;padding:12px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a),rgba(104,110,210,0.2));"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;margin-bottom:4px;">🚴 90 km (Half IM)</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a);" id="bike-pred-90k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-90k-speed"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-90k-ci"></div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;margin-bottom:4px;">180 km (Full IM)</div>
-        <div style="font-size:var(--fs-data);font-weight:600;color:var(--t2);" id="bike-pred-180k-time">--:--</div>
+      <div style="background:rgba(42,160,112,0.09);border:1px solid rgba(42,160,112,0.3);border-radius:8px;padding:12px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a2),rgba(42,160,112,0.2));"></div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;margin-bottom:4px;">🚴 180 km (Full IM)</div>
+        <div style="font-size:var(--fs-data);font-weight:600;color:var(--a2);" id="bike-pred-180k-time">--:--</div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:1px;" id="bike-pred-180k-speed"></div>
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;" id="bike-pred-180k-ci"></div>
       </div>
@@ -1519,7 +1552,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 </div>
 
-<div class="card" id="body-metrics-card" style="display:none;margin-bottom:14px;">
+<div class="card ca ia" id="body-metrics-card" style="display:none;margin-bottom:14px;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">body composition</div>
     <div style="display:flex;gap:6px;">
@@ -1536,7 +1569,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 <!-- v2026-05-22 -->
 <div id="panel-program" class="panel">
   <div class="h1">Today's <span>prescription</span></div>
-  <div class="card" style="margin-bottom:18px;">
+  <div class="card ca ia" style="margin-bottom:18px;">
     <div class="lbl">generate prescription</div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
       <select id="presc-workout-type" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;flex:1;min-width:160px;">
