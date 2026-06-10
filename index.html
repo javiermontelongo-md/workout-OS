@@ -804,6 +804,17 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:178px;display:block;}
 .fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;min-width:60px;}
 .fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
+.groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
+.groc-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b);cursor:pointer;transition:opacity .15s;}
+.groc-item.checked{opacity:0.45;}
+.groc-item input[type=checkbox]{width:17px;height:17px;accent-color:var(--a2);flex-shrink:0;cursor:pointer;}
+.groc-item-name{flex:1;font-size:var(--fs-sm);color:var(--t2);transition:text-decoration .15s;}
+.groc-item.checked .groc-item-name{text-decoration:line-through;color:var(--t3);}
+.groc-store{font-family:var(--mono);font-size:var(--fs-micro);padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.groc-store.TJ{background:rgba(194,77,114,0.15);color:var(--a4);}
+.groc-store.WF{background:rgba(42,160,112,0.12);color:var(--a2);}
+.groc-store.Target{background:rgba(61,136,212,0.12);color:var(--a3);}
+.groc-checked-when{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);white-space:nowrap;}
 .fuel-tp-wrap{display:flex;gap:12px;justify-content:center;align-items:center;padding:8px 0;}
 .fuel-tp-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .fuel-tp-scroll{height:176px;overflow-y:scroll;scroll-snap-type:y mandatory;width:68px;border:1px solid var(--b2);border-radius:var(--r);-ms-overflow-style:none;scrollbar-width:none;}
@@ -2089,6 +2100,21 @@ input[type=range]::-webkit-slider-thumb:hover {
     <canvas id="fuel-trend-chart" style="width:100%;max-height:240px;"></canvas>
   </div>
 
+  <div class="card" style="border-color:rgba(42,160,112,0.3);">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div>
+        <div class="lbl" style="color:var(--a2);margin:0;">🛒 grocery list</div>
+        <div id="grocery-meta" style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);margin-top:3px;"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn bs" id="grocery-gen-btn" onclick="generateGroceryList()" style="width:auto;">✨ Generate list</button>
+        <button class="btn bs" id="grocery-clear-btn" onclick="clearCheckedGrocery()" style="width:auto;display:none;">Clear checked</button>
+      </div>
+    </div>
+    <div id="grocery-list-out"></div>
+    <div class="smsg" id="grocery-msg"></div>
+  </div>
+
   <div class="card desktop-only" style="overflow:hidden;">
     <div class="lbl" style="color:var(--aw);margin-bottom:14px;">how the ai works — fuel check-in</div>
     <div style="display:grid;grid-template-columns:1fr minmax(0,120px) 1fr;gap:0;align-items:start;" id="ffd-grid">
@@ -2422,7 +2448,7 @@ function lCFG(){
   try{ const k=localStorage.getItem('jm_api_key'); if(k) CFG.api=k; }catch(e){console.warn('lCFG api key load failed:',e);}
 }
 function sCFG(){ try{ localStorage.setItem('wkt_v3',JSON.stringify(CFG)); }catch(e){console.warn('sCFG save failed:',e);} }
-function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[],fuelLog:[],fuelMemory:{summary:null,lastUpdated:null,callCount:0},aiUsage:[]}; }
+function defD(){ return{schemaVersion:2,lastUpdated:new Date().toISOString().split('T')[0],sessions:[],checks:{},restDays:['Sun'],runs:[],runBaseline:{estimatedPace5K:null,estimatedPace10K:null,vo2maxEstimate:null,lastCalculated:null},profile:{bodyweight:225,phase:'Fat loss + strength base',blockWeek:1,mode:'NORMAL'},currentLifts:{benchE1RM:255,squatE1RM:215,deadliftE1RM:215,ohpE1RM:120,pullupE1RM:0,rowE1RM:135,pullups:5},cardioBaseline:{pace:'10:30',distance:4.0,avgHR:165},stravaLastSync:null,runPrescriptions:{},dailyPrescriptions:{},rpeConfirmations:[],checkins:[],healthLogs:[],healthLastSync:null,bodyMetrics:[],racePredictions:null,coachingLog:[],fuelLog:[],fuelMemory:{summary:null,lastUpdated:null,callCount:0},aiUsage:[],groceryList:{generatedAt:null,items:[]}}; }
 lCFG();
 
 // ============================================================
@@ -2896,6 +2922,7 @@ function initFuelLog(){
   _fuelEditDate=localDS(new Date());
   fuelSelectDate(_fuelEditDate);
   renderFuelTrendChart();
+  renderGroceryList();
 }
 
 function fuelSelectDate(dateStr){
@@ -2943,7 +2970,7 @@ function renderFuelRows(){
   el.innerHTML=_fuelRows.map((r,i)=>{
     const cached=r.kcal&&(r.protein||r.carbs||r.fat);
     const dot=cached?`<span class="fuel-cached-dot" title="${r.protein}g P · ${r.carbs}g C · ${r.fat}g F · ${r.kcal} kcal"></span>`:'';
-    return`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value;_fuelRows[${i}].protein=0;_fuelRows[${i}].carbs=0;_fuelRows[${i}].fat=0;_fuelRows[${i}].kcal=0;renderFuelRows();" placeholder="e.g. 2 scrambled eggs, toast, coffee">${dot}<button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`;
+    return`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value;if(_fuelRows[${i}].kcal){_fuelRows[${i}].protein=0;_fuelRows[${i}].carbs=0;_fuelRows[${i}].fat=0;_fuelRows[${i}].kcal=0;var _d=this.parentNode.querySelector('.fuel-cached-dot');if(_d)_d.remove();}" placeholder="e.g. 2 scrambled eggs, toast, coffee">${dot}<button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`;
   }).join('');
 }
 
@@ -3609,6 +3636,119 @@ function confirmTimePicker(){
   renderFuelRows();
   closeTimePicker();
 }
+// ============================================================
+// GROCERY LIST
+// ============================================================
+const GROC_CAT_ICON={Produce:'🥦',Protein:'🥩',Dairy:'🥛',Pantry:'🫙',Snacks:'🍫',Drinks:'🧃',Frozen:'🧊',Other:'🛒'};
+
+function renderGroceryList(){
+  const out=document.getElementById('grocery-list-out');
+  const meta=document.getElementById('grocery-meta');
+  const clearBtn=document.getElementById('grocery-clear-btn');
+  if(!out) return;
+  if(!D.groceryList) D.groceryList={generatedAt:null,items:[]};
+  const items=D.groceryList.items||[];
+  if(!items.length){out.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:8px 0;">Hit "Generate list" to get a smart grocery list based on your meal history.</div>';if(clearBtn)clearBtn.style.display='none';return;}
+  if(meta&&D.groceryList.generatedAt){const d=new Date(D.groceryList.generatedAt);meta.textContent='Generated '+d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
+  // Group by category
+  const groups={};
+  const ORDER=['Produce','Protein','Dairy','Pantry','Snacks','Drinks','Frozen','Other'];
+  items.forEach((item,idx)=>{const cat=item.category||'Other';if(!groups[cat])groups[cat]=[];groups[cat].push({item,idx});});
+  let html='';
+  ORDER.forEach(cat=>{
+    if(!groups[cat]) return;
+    html+=`<div class="groc-cat-lbl">${GROC_CAT_ICON[cat]||'•'} ${cat}</div>`;
+    html+=groups[cat].map(({item,idx})=>{
+      const checkedWhen=item.checkedAt?`<span class="groc-checked-when">✓ ${relDays(item.checkedAt)}</span>`:'';
+      return`<div class="groc-item${item.checked?' checked':''}" onclick="toggleGroceryItem(${idx})">
+        <input type="checkbox" ${item.checked?'checked':''} onclick="event.stopPropagation();toggleGroceryItem(${idx})">
+        <span class="groc-item-name">${esc(item.name)}</span>
+        ${checkedWhen}
+        <span class="groc-store ${esc(item.store)}">${esc(item.store)}</span>
+      </div>`;
+    }).join('');
+  });
+  out.innerHTML=html;
+  if(clearBtn) clearBtn.style.display=items.some(i=>i.checked)?'':'none';
+}
+
+function relDays(isoStr){
+  const d=Math.floor((Date.now()-new Date(isoStr))/86400000);
+  return d===0?'today':d===1?'yesterday':d+'d ago';
+}
+
+function toggleGroceryItem(idx){
+  if(!D.groceryList?.items) return;
+  const item=D.groceryList.items[idx];
+  if(!item) return;
+  item.checked=!item.checked;
+  item.checkedAt=item.checked?new Date().toISOString():null;
+  renderGroceryList();
+  pushSilent();
+}
+
+function clearCheckedGrocery(){
+  if(!D.groceryList?.items) return;
+  D.groceryList.items=D.groceryList.items.filter(i=>!i.checked);
+  renderGroceryList();
+  pushSilent();
+}
+
+async function generateGroceryList(){
+  const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
+  const btn=document.getElementById('grocery-gen-btn');
+  const msgEl=document.getElementById('grocery-msg');
+  if(!apiKey){if(msgEl)msgEl.textContent='Add API key in Settings first.';return;}
+  if(btn){btn.disabled=true;btn.textContent='Thinking...';}
+  if(msgEl) msgEl.textContent='';
+  if(!D.groceryList) D.groceryList={generatedAt:null,items:[]};
+  // Collect recent foods from last 21 days
+  const recentFoods=[...(D.fuelLog||[])].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,21)
+    .flatMap(e=>(e.meals||[]).map(m=>m.food)).filter(Boolean);
+  const uniqueFoods=[...new Set(recentFoods)].slice(0,40);
+  // Summarize previous checked items with timestamps
+  const prevChecked=(D.groceryList.items||[]).filter(i=>i.checked&&i.checkedAt)
+    .map(i=>`${i.name} (checked ${relDays(i.checkedAt)}, lasts ~${i.shelfDays||3}d)`).join('\n')||'None';
+  const today=localDS(new Date());
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,system:`You are a grocery assistant. Generate a practical grocery list. Return ONLY valid JSON with this exact format: {"items":[{"name":"...","category":"Produce|Protein|Dairy|Pantry|Snacks|Drinks|Frozen","store":"TJ|WF|Target","shelfDays":N}]}. Use integers for shelfDays. 15-20 items max.`,messages:[{role:'user',content:`Athlete: 225lb male, body recomp + performance. Limited cooking time (starting medical residency). Nearby stores: Trader Joe's (TJ), Whole Foods (WF), Target.
+
+RECENT FOODS EATEN (last 3 weeks):
+${uniqueFoods.join('\n')||'No history yet.'}
+
+RECENTLY PURCHASED (skip if still fresh):
+${prevChecked}
+
+TODAY: ${today}
+
+Generate a smart grocery list that:
+- Includes items he regularly eats and will run out of
+- Skips items bought recently that are still within their shelf life
+- Adds high-protein convenient items for hospital shifts
+- Assigns the best store for each (TJ=best value/unique items, WF=quality produce/meat, Target=bulk/staples)
+- Estimates realistic shelf life in days per item`}]})});
+    const d=await r.json();
+    recordAIUsage('grocery',d.usage);
+    const text=d.content?.[0]?.text||'';
+    const s=text.indexOf('{'),e=text.lastIndexOf('}');
+    if(s<0||e<=s) throw new Error('No JSON in response');
+    const parsed=JSON.parse(text.slice(s,e+1));
+    if(!Array.isArray(parsed.items)) throw new Error('Bad format');
+    // Preserve checked status for items that are still fresh
+    const oldMap=new Map((D.groceryList.items||[]).filter(i=>i.checked&&i.checkedAt).map(i=>[i.name.toLowerCase(),i]));
+    D.groceryList.generatedAt=new Date().toISOString();
+    D.groceryList.items=parsed.items.map(item=>{
+      const old=oldMap.get(item.name.toLowerCase());
+      if(old){const daysAgo=(Date.now()-new Date(old.checkedAt))/86400000;if(daysAgo<(item.shelfDays||3))return{...item,checked:true,checkedAt:old.checkedAt};}
+      return{...item,checked:false,checkedAt:null};
+    });
+    await push(null,'grocery-msg');
+    renderGroceryList();
+    if(msgEl) msgEl.textContent='';
+  }catch(err){console.error('Grocery list error:',err);if(msgEl)msgEl.textContent='Error generating list. Try again.';}
+  if(btn){btn.disabled=false;btn.textContent='✨ Generate list';}
+}
+
 function renderFuelTrendChart(){
   const canvas=document.getElementById('fuel-trend-chart');
   if(!canvas) return;
