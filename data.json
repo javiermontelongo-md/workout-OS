@@ -118,6 +118,97 @@
         "rpe": null
       },
       "ts": 1779309550700
+    },
+    {
+      "date": "2026-06-09",
+      "day": "A",
+      "type": "A",
+      "notes": "Been a while since I lifted, didn’t really feel too tired today though due to 6.4 hours asleep. Probably since I have been resting well the days before. ",
+      "energy": 7,
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 195,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 195,
+            "r": 4,
+            "rpe": 9
+          },
+          {
+            "w": 185,
+            "r": 5,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 85,
+            "r": 8,
+            "rpe": 7
+          },
+          {
+            "w": 85,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 85,
+            "r": 5,
+            "rpe": 8
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "Incline DB Press",
+          "prescribed": "3×10",
+          "weight": 110,
+          "sets": 3,
+          "reps": 8,
+          "notes": "130 was down for 8 reps at 10 rpe, dropped down to 110 for last 2 sets"
+        },
+        {
+          "name": "Cable Tricep Pushdown (rope)",
+          "prescribed": "3×12",
+          "weight": 57.5,
+          "sets": 3,
+          "reps": 12,
+          "notes": "Used a straight bar"
+        },
+        {
+          "name": "DB Lateral Raise",
+          "prescribed": "2×15",
+          "weight": 30,
+          "sets": 2,
+          "reps": 15,
+          "notes": ""
+        }
+      ],
+      "ts": 1781069352257
     }
   ],
   "recoveryLogs": [],
@@ -126,7 +217,7 @@
     "Sat"
   ],
   "profile": {
-    "bodyweight": 225,
+    "bodyweight": 227,
     "phase": "Fat loss + strength base",
     "blockWeek": 1,
     "mode": "NORMAL"
