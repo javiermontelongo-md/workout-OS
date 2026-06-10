@@ -4072,6 +4072,31 @@
         "kcal": 2920
       },
       "ts": 1781073492009
+    },
+    {
+      "date": "2026-06-10",
+      "meals": [
+        {
+          "time": "8:15 AM",
+          "food": "42 g protien fairlife with kashi cereal 10 G protein per serving,",
+          "protein": 52,
+          "carbs": 45,
+          "fat": 6,
+          "kcal": 446
+        }
+      ],
+      "signals": {
+        "betweenMeals": "",
+        "beforeSleep": "",
+        "onWaking": ""
+      },
+      "totals": {
+        "protein": 52,
+        "carbs": 45,
+        "fat": 6,
+        "kcal": 446
+      },
+      "ts": 1781124599354
     }
   ],
   "fuelMemory": {
@@ -4149,6 +4174,13 @@
       "inp": 192,
       "out": 227,
       "cost": 0.003981
+    },
+    {
+      "ts": 1781124599354,
+      "type": "macros",
+      "inp": 122,
+      "out": 57,
+      "cost": 0.001221
     }
   ],
   "checkins": [
