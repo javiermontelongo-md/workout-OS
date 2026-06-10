@@ -1466,6 +1466,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
     <div class="lbl" style="margin:0;">race predictions</div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);" id="race-pred-meta"></div>
+  <div id="race-pred-stale" style="display:none;font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);margin-top:4px;"></div>
   </div>
 
   <!-- No data state -->
@@ -4034,10 +4035,17 @@ function computeVolumeBests(){
 function updProgressStats(){
   if(!D||!D.currentLifts) return;
   const e=id=>document.getElementById(id);
-  if(e('pr-bench'))e('pr-bench').textContent=D.currentLifts.benchE1RM||255;
-  if(e('pr-squat'))e('pr-squat').textContent=D.currentLifts.squatE1RM||215;
-  if(e('pr-dl'))e('pr-dl').textContent=D.currentLifts.deadliftE1RM||215;
-  if(e('pr-ohp'))e('pr-ohp').textContent=D.currentLifts.ohpE1RM||120;
+  ['bench','squat','dl','ohp'].forEach(lift=>{
+    const map={bench:'pr-bench',squat:'pr-squat',dl:'pr-dl',ohp:'pr-ohp'};
+    const el=e(map[lift]);if(!el)return;
+    const dk=getDecayedE1RM(lift);
+    const isDecayed=dk.decayFactor<0.99;
+    el.textContent=dk.decayed||dk.peak;
+    el.title=isDecayed?`Peak: ${dk.peak} lb · ${dk.daysInactive}d inactive · ${Math.round((1-dk.decayFactor)*100)}% decay applied`:``;
+    el.style.color=isDecayed?(dk.decayFactor<0.85?'var(--a4)':'var(--aw)'):'';
+    const slEl=el.closest('.stat')?.querySelector('.sl');
+    if(slEl&&isDecayed) slEl.textContent=`${lift==='dl'?'Deadlift':lift.charAt(0).toUpperCase()+lift.slice(1)} e1RM · peak ${dk.peak}`;
+  });
 
   // Max clean pullups — max bodyweight-only reps across all logged sessions
   const maxPU=(()=>{
@@ -4682,6 +4690,68 @@ function liftTrend(key, sessions, weeks = 4) {
 
 function calcE1RM(weight,reps){return Math.round((weight*(1+reps/30))/2.5)*2.5;}
 
+function fitnessDecayFactor(lastDateStr,type){
+  if(!lastDateStr) return type==='cardio'?0.70:0.80;
+  const days=Math.floor((new Date()-new Date(lastDateStr+'T12:00:00'))/86400000);
+  if(type==='cardio'){const k=0.007,g=14;return Math.max(0.65,Math.exp(-k*Math.max(0,days-g)));}
+  const k=0.003,g=21;return Math.max(0.60,Math.exp(-k*Math.max(0,days-g)));
+}
+
+function getDecayedVO2max(){
+  const allActs=(D.runs||[]).filter(r=>r.date&&r.duration>0);
+  const runs=allActs.filter(r=>r.type!=='ride'&&r.runType!=='cycling');
+  const rides=allActs.filter(r=>r.type==='ride'||r.runType==='cycling');
+  const appleEntry=(D.healthLogs||[]).filter(h=>h.vo2maxApple).slice(-1)[0];
+  const appleVO2=appleEntry?.vo2maxApple||null;
+  const appleDate=appleEntry?.date||null;
+  const runEsts=runs.slice(-10).map(r=>estimateVO2max(r)).filter(v=>v!=null);
+  runEsts.sort((a,b)=>a-b);
+  const runVO2=runEsts.length?runEsts[Math.round(runEsts.length*0.7)-1]||runEsts[runEsts.length-1]:null;
+  const rideEsts=rides.slice(-10).map(r=>estimateVO2max(r)).filter(v=>v!=null);
+  rideEsts.sort((a,b)=>a-b);
+  const rideVO2=rideEsts.length?rideEsts[Math.round(rideEsts.length*0.7)-1]||rideEsts[rideEsts.length-1]:null;
+  const lastRunDate=runs.slice(-1)[0]?.date||null;
+  const lastRideDate=rides.slice(-1)[0]?.date||null;
+  const lastActivityDate=[lastRunDate,lastRideDate].filter(Boolean).sort().slice(-1)[0]||null;
+  const rawVO2=appleVO2||runVO2||rideVO2;
+  if(!rawVO2) return{vo2max:null,decayed:null,daysInactive:null,decayFactor:1.0,lastActivityDate:null,source:null};
+  const decayFactor=fitnessDecayFactor(lastActivityDate,'cardio');
+  const decayed=Math.round(rawVO2*decayFactor*10)/10;
+  const daysInactive=lastActivityDate?Math.floor((new Date()-new Date(lastActivityDate+'T12:00:00'))/86400000):null;
+  const source=appleVO2?'Apple Watch':(runVO2?'run HR calc':'ride power calc');
+  return{vo2max:rawVO2,decayed,daysInactive,decayFactor,lastActivityDate,source};
+}
+
+function getDecayedE1RM(liftKey){
+  const map={bench:'benchE1RM',ohp:'ohpE1RM',squat:'squatE1RM',dl:'deadliftE1RM',pullup:'pullupE1RM',row:'rowE1RM'};
+  const key=map[liftKey]||(liftKey+'E1RM');
+  const peak=D.currentLifts?.[key]||0;
+  if(!peak) return{peak:0,decayed:0,daysInactive:0,decayFactor:1.0,lastDate:null};
+  const sessions=(D.sessions||[]).filter(s=>s[liftKey]?.sets?.some(x=>x.w&&x.r));
+  const lastDate=sessions.slice(-1)[0]?.date||null;
+  const decayFactor=fitnessDecayFactor(lastDate,'strength');
+  const decayed=Math.round(peak*decayFactor/2.5)*2.5;
+  const daysInactive=lastDate?Math.floor((new Date()-new Date(lastDate+'T12:00:00'))/86400000):999;
+  return{peak,decayed,daysInactive,decayFactor,lastDate};
+}
+
+function buildStrengthDecayCurve(lastDate,peakE1RM){
+  if(!lastDate||!peakE1RM) return [];
+  const pts=[];
+  const start=new Date(lastDate+'T12:00:00');
+  const end=new Date(); end.setDate(end.getDate()+30);
+  let d=new Date(start); d.setDate(d.getDate()+7);
+  while(d<=end){
+    const dateStr=d.toISOString().split('T')[0];
+    const days=Math.floor((d-start)/86400000);
+    const k=0.003,g=21;
+    const factor=Math.max(0.60,Math.exp(-k*Math.max(0,days-g)));
+    pts.push({date:dateStr,value:Math.round(peakE1RM*factor/2.5)*2.5});
+    d.setDate(d.getDate()+7);
+  }
+  return pts;
+}
+
 function getLiftHistory(liftKey,daysBack=60){
   if(!D||!D.sessions) return [];
   const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-daysBack);
@@ -4925,15 +4995,13 @@ function calcRacePredictions() {
   const runCount = runs.length;
 
   // Need at least 1 run or VO2max data
-  const latestVO2 = (D.healthLogs||[]).filter(h=>h.vo2maxApple).slice(-1)[0]?.vo2maxApple;
-  const calcVO2 = (() => {
-    const recent = runs.slice(-10);
-    const estimates = recent.map(r => estimateVO2max(r)).filter(v => v !== null);
-    if (estimates.length === 0) return null;
-    estimates.sort((a,b)=>a-b);
-    return estimates[Math.round(estimates.length * 0.7)] || estimates[estimates.length-1];
-  })();
-  const vo2max = latestVO2 || calcVO2;
+  const _dvo2=getDecayedVO2max();
+  const vo2max=_dvo2.decayed;
+  const _cardioDecayFactor=_dvo2.decayFactor;
+  const _cardioDaysInactive=_dvo2.daysInactive;
+  const _cardioLastDate=_dvo2.lastActivityDate;
+  const _vo2maxSource=_dvo2.source;
+  const _rawVO2=_dvo2.vo2max;
 
   if (runCount === 0 && !vo2max) return null;
 
@@ -5010,12 +5078,16 @@ function calcRacePredictions() {
     methodLabel,
     predictions,
     medianTrainingPace,
+    decayFactor: _cardioDecayFactor,
+    daysInactive: _cardioDaysInactive,
+    lastActivityDate: _cardioLastDate,
+    rawVO2: _rawVO2,
     debugInfo: {
       riegelPred: riegel,
       vdotPred: vdot,
       hrPred: hrReg,
       weights: w,
-      vo2maxSource: latestVO2 ? 'Apple Watch' : (calcVO2 ? 'HR reserve calc' : null),
+      vo2maxSource: _vo2maxSource,
       medianPace: medianTrainingPace
     }
   };
@@ -5059,7 +5131,20 @@ function renderRacePredictions() {
   D.racePredictions = pred;
 
   const meta = document.getElementById('race-pred-meta');
-  if (meta) meta.textContent = `Based on ${pred.runCount} runs · VO2max ~${pred.vo2maxUsed ? Math.round(pred.vo2maxUsed) : '?'}`;
+  if(meta){
+    let metaStr=`Based on ${pred.runCount} runs · VO2max ~${pred.vo2maxUsed?Math.round(pred.vo2maxUsed):'?'}`;
+    if(pred.rawVO2&&pred.decayFactor<0.99) metaStr+=` (raw ~${Math.round(pred.rawVO2)}, ${Math.round((1-pred.decayFactor)*100)}% decay)`;
+    meta.textContent=metaStr;
+  }
+  const staleEl=document.getElementById('race-pred-stale');
+  if(staleEl){
+    if(pred.daysInactive!=null&&pred.daysInactive>14){
+      staleEl.style.display='';
+      staleEl.textContent=`⚡ Last cardio ${pred.daysInactive}d ago — predictions adjusted for deconditioning`;
+    } else {
+      staleEl.style.display='none';
+    }
+  }
 
   const method = document.getElementById('race-pred-method');
   if (method) method.textContent = `Primary method: ${pred.methodLabel}`;
@@ -6663,7 +6748,17 @@ function renderPredictionChart(lift='bench'){
       const bi=labels.indexOf(history[history.length-1].date);
       if(bi>=0){if(optPadded[bi]===null)optPadded[bi]=actualPadded[bi];if(conPadded[bi]===null)conPadded[bi]=actualPadded[bi];}
     }
-    const datasets=[{label:'Actual e1RM',data:actualPadded,borderColor:'#ffb74d',backgroundColor:'rgba(255,183,77,0.08)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#ffb74d',tension:0.3,spanGaps:false}];
+    // Build decay curve from last actual data point
+    const lastActual=history.length?history[history.length-1]:null;
+    const decayCurveRaw=lastActual?buildStrengthDecayCurve(lastActual.date,lastActual.e1RM):[];
+    const decayCurveLabels=decayCurveRaw.map(p=>p.date);
+    decayCurveLabels.filter(l=>!labels.includes(l)).forEach(l=>labels.push(l));
+    const decayPadded=labels.map(l=>{const i=decayCurveRaw.findIndex(p=>p.date===l);return i>=0?decayCurveRaw[i].value:null;});
+    if(lastActual&&decayCurveRaw.length){const bi=labels.indexOf(lastActual.date);if(bi>=0&&decayPadded[bi]===null)decayPadded[bi]=lastActual.e1RM;}
+    const datasets=[
+      {label:'Actual e1RM',data:actualPadded,borderColor:'#ffb74d',backgroundColor:'rgba(255,183,77,0.08)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#ffb74d',tension:0.3,spanGaps:false},
+      ...(decayCurveRaw.length?[{label:'Est. current (decay)',data:decayPadded,borderColor:'rgba(232,93,138,0.7)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:false}]:[])
+    ];
     if(planData?.predictedE1RMs){
       datasets.push({label:'Optimistic',data:optPadded,borderColor:'rgba(255,183,77,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:'+1',backgroundColor:'rgba(255,183,77,0.08)',tension:0.3,spanGaps:false},{label:'Conservative',data:conPadded,borderColor:'rgba(79,195,247,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:false});
     }
