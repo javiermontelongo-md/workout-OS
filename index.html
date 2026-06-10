@@ -792,6 +792,10 @@ input[type=range]::-webkit-slider-thumb:hover {
 @media(max-width:768px){.fuel-row input[type=time]{width:90px;min-width:90px;}}
 .fuel-time-btn{flex:0 0 auto;width:88px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--aw);font-family:var(--mono);font-size:var(--fs-xs);padding:7px 8px;cursor:pointer;text-align:center;transition:border-color .15s;white-space:nowrap;}
 .fuel-time-btn:hover{border-color:var(--aw);}
+.fuel-chips-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.fuel-chip{background:rgba(42,160,112,0.08);border:1px solid rgba(42,160,112,0.22);color:var(--a2);font-size:var(--fs-xs);font-family:var(--mono);padding:4px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;max-width:240px;overflow:hidden;text-overflow:ellipsis;}
+.fuel-chip:hover{background:rgba(42,160,112,0.18);border-color:rgba(42,160,112,0.45);}
+.fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
 .fuel-tp-wrap{display:flex;gap:12px;justify-content:center;align-items:center;padding:8px 0;}
 .fuel-tp-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .fuel-tp-scroll{height:176px;overflow-y:scroll;scroll-snap-type:y mandatory;width:68px;border:1px solid var(--b2);border-radius:var(--r);-ms-overflow-style:none;scrollbar-width:none;}
@@ -2002,7 +2006,14 @@ input[type=range]::-webkit-slider-thumb:hover {
       </div>
     </div>
     <div id="fuel-meal-rows" style="margin-bottom:8px;"></div>
-    <button class="btn bs" style="width:auto;margin-bottom:16px;" onclick="addFuelMealRow()">+ Add meal</button>
+    <div id="fuel-chips-section" style="display:none;margin-bottom:10px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">recent foods</div>
+      <div class="fuel-chips-wrap" id="fuel-chips"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="btn bs" style="width:auto;" onclick="addFuelMealRow()">+ Add meal</button>
+      <button class="btn bs" style="width:auto;" onclick="copyYesterdayMeals()">📋 Copy yesterday</button>
+    </div>
     <div class="dvdr"></div>
     <div class="lbl" style="margin-top:14px;">how you felt</div>
     <div class="g3" style="margin-bottom:14px;">
@@ -2836,7 +2847,7 @@ function fuelSelectDate(dateStr){
   if(el) el.textContent=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const todayBtn=document.getElementById('fuel-today-btn');
   if(todayBtn) todayBtn.style.opacity=isToday?'0.4':'1';
-  _fuelRows=entry&&entry.meals&&entry.meals.length?entry.meals.map(m=>({time:m.time||'',food:m.food||''})):[{time:'',food:''}];
+  _fuelRows=entry&&entry.meals&&entry.meals.length?entry.meals.map(m=>({time:m.time||'',food:m.food||'',protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0})):[{time:'',food:''}];
   const sb=document.getElementById('fuel-sig-between');
   const ss=document.getElementById('fuel-sig-sleep');
   const sw=document.getElementById('fuel-sig-wake');
@@ -2844,6 +2855,7 @@ function fuelSelectDate(dateStr){
   if(ss) ss.value=entry?.signals?.beforeSleep||'';
   if(sw) sw.value=entry?.signals?.onWaking||'';
   renderFuelRows();
+  renderFuelChips();
   if(entry?.totals?.kcal) renderFuelMacros(entry);
   else{ const mc=document.getElementById('fuel-macros-card'); if(mc) mc.style.display='none'; }
   const advOut=document.getElementById('fuel-advice-out');
@@ -2868,7 +2880,11 @@ function fuelGoYesterday(){ const d=new Date(); d.setDate(d.getDate()-1); fuelSe
 
 function renderFuelRows(){
   const el=document.getElementById('fuel-meal-rows'); if(!el) return;
-  el.innerHTML=_fuelRows.map((r,i)=>`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value" placeholder="e.g. 2 scrambled eggs, toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`).join('');
+  el.innerHTML=_fuelRows.map((r,i)=>{
+    const cached=r.kcal&&(r.protein||r.carbs||r.fat);
+    const dot=cached?`<span class="fuel-cached-dot" title="${r.protein}g P · ${r.carbs}g C · ${r.fat}g F · ${r.kcal} kcal"></span>`:'';
+    return`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value;_fuelRows[${i}].protein=0;_fuelRows[${i}].carbs=0;_fuelRows[${i}].fat=0;_fuelRows[${i}].kcal=0;renderFuelRows();" placeholder="e.g. 2 scrambled eggs, toast, coffee">${dot}<button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`;
+  }).join('');
 }
 
 function addFuelMealRow(){
@@ -2882,6 +2898,62 @@ function addFuelMealRow(){
 }
 function removeFuelMealRow(i){ if(_fuelRows.length<=1) return; _fuelRows.splice(i,1); renderFuelRows(); }
 
+function buildFoodLookup(){
+  const map=new Map();
+  if(!D?.fuelLog) return map;
+  const entries=[...(D.fuelLog||[])].sort((a,b)=>b.date.localeCompare(a.date));
+  for(const entry of entries){
+    for(const m of (entry.meals||[])){
+      const key=(m.food||'').trim();
+      if(key&&!map.has(key)&&m.kcal){
+        map.set(key,{protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0});
+      }
+    }
+    if(map.size>=30) break;
+  }
+  return map;
+}
+
+function renderFuelChips(){
+  const section=document.getElementById('fuel-chips-section');
+  const el=document.getElementById('fuel-chips');
+  if(!section||!el) return;
+  const lookup=buildFoodLookup();
+  if(!lookup.size){section.style.display='none';return;}
+  section.style.display='';
+  el.innerHTML=[...lookup.entries()].slice(0,20).map(([food,m])=>
+    `<button class="fuel-chip" title="P:${m.protein}g C:${m.carbs}g F:${m.fat}g · ${m.kcal}kcal" onclick="addFuelChipRow(${JSON.stringify(food).replace(/'/g,"\\'")})">${esc(food)}</button>`
+  ).join('');
+}
+
+function addFuelChipRow(food){
+  const lookup=buildFoodLookup();
+  const macros=lookup.get(food)||{protein:0,carbs:0,fat:0,kcal:0};
+  const now=new Date();
+  let h=now.getHours(),mi=now.getMinutes();
+  const ampm=h>=12?'PM':'AM';
+  h=h%12||12;
+  const timeStr=`${h}:${String(mi).padStart(2,'0')} ${ampm}`;
+  // If last row is empty, fill it; otherwise add new row
+  const last=_fuelRows[_fuelRows.length-1];
+  if(last&&!last.food.trim()){
+    _fuelRows[_fuelRows.length-1]={time:last.time||timeStr,food,...macros};
+  } else {
+    _fuelRows.push({time:timeStr,food,...macros});
+  }
+  renderFuelRows();
+}
+
+function copyYesterdayMeals(){
+  if(!D){msg('fuel-save-msg','Data not loaded');return;}
+  const yesterday=localDS(new Date(Date.now()-86400000));
+  const entry=(D.fuelLog||[]).find(e=>e.date===yesterday);
+  if(!entry?.meals?.length){msg('fuel-save-msg','No meals logged yesterday');return;}
+  _fuelRows=entry.meals.map(m=>({time:m.time||'',food:m.food||'',protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0}));
+  renderFuelRows();
+  msg('fuel-save-msg','Copied from yesterday — edit as needed, then Save');
+}
+
 async function saveFuelDay(){
   if(!D){ msg('fuel-save-msg','Data not loaded'); return; }
   const meals=_fuelRows.filter(r=>r.food.trim());
@@ -2893,9 +2965,20 @@ async function saveFuelDay(){
     onWaking:document.getElementById('fuel-sig-wake')?.value.trim()||''
   };
   const btn=document.getElementById('fuel-save-btn');
-  if(btn){btn.disabled=true;btn.textContent='Estimating macros...';}
   msg('fuel-save-msg','');
-  const macroData=await estimateMacros(meals);
+  // If every meal already has cached macros, skip AI call entirely
+  const allCached=meals.every(m=>m.kcal&&(m.protein||m.carbs||m.fat));
+  let macroData=null;
+  if(allCached){
+    if(btn){btn.disabled=true;btn.textContent='Saving...';}
+    macroData={
+      meals:meals.map(m=>({protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0})),
+      totals:meals.reduce((a,m)=>({protein:a.protein+(m.protein||0),carbs:a.carbs+(m.carbs||0),fat:a.fat+(m.fat||0),kcal:a.kcal+(m.kcal||0)}),{protein:0,carbs:0,fat:0,kcal:0})
+    };
+  } else {
+    if(btn){btn.disabled=true;btn.textContent='Estimating macros...';}
+    macroData=await estimateMacros(meals);
+  }
   const mealsFull=meals.map((m,i)=>({
     time:m.time, food:m.food,
     protein:macroData?.meals?.[i]?.protein||0,
