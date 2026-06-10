@@ -4181,6 +4181,13 @@
       "inp": 122,
       "out": 57,
       "cost": 0.001221
+    },
+    {
+      "ts": 1781129066190,
+      "type": "grocery",
+      "inp": 736,
+      "out": 662,
+      "cost": 0.012138
     }
   ],
   "checkins": [
@@ -4211,5 +4218,162 @@
       "bmi": 33,
       "waistHeightRatio": 0.6
     }
-  ]
+  ],
+  "groceryList": {
+    "generatedAt": "2026-06-10T22:04:26.190Z",
+    "items": [
+      {
+        "name": "Fairlife 42g Protein Shakes (multipack)",
+        "category": "Drinks",
+        "store": "Target",
+        "shelfDays": 90,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Kashi Peanut Butter Protein Cereal",
+        "category": "Pantry",
+        "store": "Target",
+        "shelfDays": 60,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Nosa Whole Milk Yogurt",
+        "category": "Dairy",
+        "store": "WF",
+        "shelfDays": 14,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Bananas",
+        "category": "Produce",
+        "store": "TJ",
+        "shelfDays": 6,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Chocolate Covered Almonds",
+        "category": "Snacks",
+        "store": "TJ",
+        "shelfDays": 60,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Halo Top Peanut Butter Cup Pints (2-pack)",
+        "category": "Frozen",
+        "store": "Target",
+        "shelfDays": 60,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Trader Joe's Mandarin Orange Chicken",
+        "category": "Frozen",
+        "store": "TJ",
+        "shelfDays": 90,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Trader Joe's Palak Paneer",
+        "category": "Frozen",
+        "store": "TJ",
+        "shelfDays": 90,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Hard Boiled Eggs (pre-cooked, 6-pack)",
+        "category": "Protein",
+        "store": "TJ",
+        "shelfDays": 7,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Rotisserie Chicken",
+        "category": "Protein",
+        "store": "WF",
+        "shelfDays": 4,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "String Cheese (multipack)",
+        "category": "Dairy",
+        "store": "Target",
+        "shelfDays": 28,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "RX Bars or Quest Bars (box)",
+        "category": "Snacks",
+        "store": "Target",
+        "shelfDays": 120,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Cottage Cheese 2% Large Tub",
+        "category": "Dairy",
+        "store": "TJ",
+        "shelfDays": 14,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Baby Carrots",
+        "category": "Produce",
+        "store": "TJ",
+        "shelfDays": 14,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Avocados (3-pack)",
+        "category": "Produce",
+        "store": "TJ",
+        "shelfDays": 5,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Grass-Fed Ground Beef 93/7 (1 lb)",
+        "category": "Protein",
+        "store": "WF",
+        "shelfDays": 3,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Kombucha (4-pack GT's)",
+        "category": "Drinks",
+        "store": "WF",
+        "shelfDays": 30,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Frozen Cauliflower Rice",
+        "category": "Frozen",
+        "store": "TJ",
+        "shelfDays": 90,
+        "checked": false,
+        "checkedAt": null
+      },
+      {
+        "name": "Salted Caramel Hot Chocolate Mix (Ghirardelli)",
+        "category": "Pantry",
+        "store": "Target",
+        "shelfDays": 180,
+        "checked": false,
+        "checkedAt": null
+      }
+    ]
+  }
 }
