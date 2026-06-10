@@ -2984,6 +2984,15 @@
       "weight": 207.5,
       "sets": 5,
       "reps": 5
+    },
+    {
+      "date": "2026-06-10",
+      "lift": "ohp",
+      "predictedRPE": 7,
+      "actualRPE": 8,
+      "weight": 102.5,
+      "sets": 5,
+      "reps": 5
     }
   ],
   "scheduleOverrides": {
@@ -2997,29 +3006,29 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-06-06T06:42:52.368Z",
-    "vo2maxUsed": 41.85,
+    "generatedAt": "2026-06-10T04:58:49.011Z",
+    "vo2maxUsed": 41.91,
     "runCount": 24,
     "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1852,
+        "seconds": 1850,
         "ciSeconds": 315,
         "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3815,
+        "seconds": 3812,
         "ciSeconds": 843,
         "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 8331,
-        "ciSeconds": 2408,
+        "seconds": 8326,
+        "ciSeconds": 2406,
         "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 17257,
-        "ciSeconds": 7628,
+        "seconds": 17245,
+        "ciSeconds": 7622,
         "method": "VO2max / VDOT"
       }
     },
@@ -3047,10 +3056,10 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1761,
-        "s10k": 3644,
-        "shalf": 8009,
-        "sfull": 16739
+        "s5k": 1758,
+        "s10k": 3638,
+        "shalf": 7998,
+        "sfull": 16715
       },
       "hrPred": {
         "s5k": 1858,
