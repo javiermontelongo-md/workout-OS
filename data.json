@@ -3522,6 +3522,100 @@
           "reason": "7-day push-to-push cycle; 48h+ after Saturday quality run satisfies quality-to-quality window; HRV should be more recovered allowing accurate load progression if today's session logs well"
         }
       ]
+    },
+    "2026-06-09": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength (Sleep-Modified)",
+      "reasoning": "RPE confirmations show bench is running significantly hotter than predicted — 205lb produced RPE 10 across multiple sets, indicating true e1RM is closer to 215-220lb range and the 190lb working weight should be revisited downward to respect the RPE 7 cap today. OHP similarly ran 2 points above predicted at 90lb, so load stays conservative. With only 6.4h sleep and the SLEEP_WARNING flag active, volume is reduced via the 0.85 modifier and the RPE cap is hard-locked at 7 — protecting adaptation without skipping stimulus.",
+      "warmup": "5 min general: arm circles, band pull-aparts 2×15, scapular push-ups 2×10. Bench ramp: empty bar 2×10, 95lb×6, 135lb×4, 155lb×3 — stop here, do not exceed 155lb in warmup. OHP ramp: empty bar 2×10, 65lb×5, 80lb×3. Total ~8-10 min.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories (volume-modified for sleep flag)",
+        "lifts": {
+          "bench": {
+            "sets": 3,
+            "reps": "5–8",
+            "weight": 175,
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "coachNote": "Load dropped to 175lb — your last confirmed bench session showed RPE 10 at 205lb, which means 190lb would already be RPE 9+. At 175lb you should find crisp, controlled reps at true RPE 6-7 with sleep-depleted CNS. Drive feet into floor, full leg drive, retract and depress scapulae before unracking. Do not chase reps — stop each set when bar speed drops noticeably, even if you're within range."
+          },
+          "ohp": {
+            "sets": 2,
+            "reps": "5–8",
+            "weight": 82.5,
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "coachNote": "OHP ran RPE 9 at 90lb last session — dropping to 82.5lb keeps you honest at RPE 7 under sleep deficit. Brace hard before each rep: full-exhale brace, ribs down, squeeze glutes. Press in a slight back-arc path and lock out completely overhead. Minimum 2 sets after applying 0.85 modifier — treat this as a technique quality day."
+          }
+        },
+        "accessories": [
+          "Incline DB Press 3×10 @ RPE 6-7 — moderate weight, full stretch at bottom, controlled tempo 2-1-2",
+          "Cable Tricep Pushdown (rope) 3×12 @ RPE 6 — elbows pinned, full extension, squeeze at lockout",
+          "DB Lateral Raise 2×15 @ RPE 6 — slight forward lean, lead with elbow, no shrug"
+        ]
+      },
+      "cooldown": "5 min: doorway pec stretch 60s per side, overhead tricep stretch 30s per side, thoracic foam roll 2 min. Deep breathing 1 min to down-regulate before leaving gym.",
+      "coachNote": "Today is a load recalibration day, not a step backward. Your RPE data from May 20 is telling you the previous weights were beyond what the prescription intended — dialing back to 175/82.5 is the correct coaching response, not a deload. Hit clean reps at honest RPE 7 and you build the foundation to progress systematically via double progression from here.",
+      "ifTooHard": "If even 175lb bench feels above RPE 7 after the first set (common with sleep deficit), drop to 165lb and complete your sets there — data point is still valuable. OHP: drop to 77.5lb.",
+      "watchOutFor": [
+        "RPE creep — sleep deprivation numbs perceived effort initially then spikes it mid-set; if rep 4 suddenly feels like a grind, rack it and log the actual RPE honestly",
+        "Shoulder impingement on OHP: if you feel pinching at the top of the press, check that your elbows are not flared excessively wide — bring grip in 1-2 finger widths and ensure full overhead lockout with ear-to-bicep position"
+      ],
+      "workoutType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-06-10T04:44:26.803Z",
+      "weekPlan": [
+        {
+          "date": "2026-06-10",
+          "dow": "Wed",
+          "suggestion": "Zone 2 Easy Run — 25–30 min",
+          "confidence": "high",
+          "reason": "48h+ after today's push session; Zone 2 (≤147bpm) aerobic work fits 80/20 polarization and supports VO2max base without taxing CNS recovery from sleep deficit"
+        },
+        {
+          "date": "2026-06-11",
+          "dow": "Thu",
+          "suggestion": "Pull — Upper Strength (Rows + Pullups)",
+          "confidence": "high",
+          "reason": "48h after Wednesday's easy run and 48h+ from Tuesday push; pull session balances push volume and maintains weekly upper frequency"
+        },
+        {
+          "date": "2026-06-12",
+          "dow": "Fri",
+          "suggestion": "Legs — Squat Focus",
+          "confidence": "medium",
+          "reason": "48h after Thursday pull; squat and accessory lower body work; keep RPE ≤8 and monitor weekly squat set ceiling (16 max)"
+        },
+        {
+          "date": "2026-06-13",
+          "dow": "Sat",
+          "suggestion": "Zone 2 Long Run — 35–45 min",
+          "confidence": "medium",
+          "reason": "48h after Friday legs session satisfies legs→long run recovery window; long run at ≤147bpm; keep ≤35% of weekly run total; this is the aerobic volume anchor of the week"
+        },
+        {
+          "date": "2026-06-14",
+          "dow": "Sun",
+          "suggestion": "Full Rest or Light Mobility (10–15 min)",
+          "confidence": "high",
+          "reason": "After back-to-back lift and long run days, full rest protects recovery and HRV; active recovery stretching only if feeling good"
+        },
+        {
+          "date": "2026-06-15",
+          "dow": "Mon",
+          "suggestion": "Zone 2 Easy Run — 20–25 min",
+          "confidence": "medium",
+          "reason": "72h+ after Saturday long run; short easy aerobic session to accumulate Zone 2 volume toward 80% weekly target without pre-fatiguing Tuesday push"
+        },
+        {
+          "date": "2026-06-16",
+          "dow": "Tue",
+          "suggestion": "Push — Upper Strength (Progress from today)",
+          "confidence": "high",
+          "reason": "168h cycle repeat; 48h+ from Monday easy run; if today's sets all hit top of rep range at RPE ≤7, apply double progression and add 2.5lb to bench and OHP next week"
+        }
+      ]
     }
   },
   "coachingMemory": {
@@ -3842,6 +3936,13 @@
       "inp": 282,
       "out": 120,
       "cost": 0.002646
+    },
+    {
+      "ts": 1781066666797,
+      "type": "prescription",
+      "inp": 1680,
+      "out": 1859,
+      "cost": 0.032925
     }
   ],
   "checkins": [
