@@ -1413,9 +1413,10 @@ input[type=range]::-webkit-slider-thumb:hover {
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:3px;" id="vo2-trend-meta"></div>
       </div>
       <div style="display:flex;gap:4px;">
-        <button class="btn bs bi" id="vo2btn-7" onclick="setVO2Range(7)" style="font-size:var(--fs-xs);padding:5px 10px;">7D</button>
+        <button class="btn bs bi" id="vo2btn-14" onclick="setVO2Range(14)" style="font-size:var(--fs-xs);padding:5px 10px;">14D</button>
         <button class="btn bs bi" id="vo2btn-30" onclick="setVO2Range(30)" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">30D</button>
-        <button class="btn bs bi" id="vo2btn-0" onclick="setVO2Range(0)" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">ALL</button>
+        <button class="btn bs bi" id="vo2btn-60" onclick="setVO2Range(60)" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">60D</button>
+        <button class="btn bs bi" id="vo2btn-90" onclick="setVO2Range(90)" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">90D</button>
       </div>
     </div>
     <div style="position:relative;height:220px;overflow:hidden;"><canvas id="vo2-chart"></canvas></div>
@@ -2069,7 +2070,7 @@ let _fuelEditDate='';
 let _fuelTrendChart=null;
 let _fuelTP={rowIdx:0,hour:8,min:0,ampm:'AM'};
 let _snapDays=7;
-let _vo2Days=7;
+let _vo2Days=14;
 
 // ============================================================
 // STATE -- no data here. All data in data.json on GitHub.
@@ -2870,7 +2871,15 @@ function renderFuelRows(){
   el.innerHTML=_fuelRows.map((r,i)=>`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value" placeholder="e.g. 2 scrambled eggs, toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`).join('');
 }
 
-function addFuelMealRow(){ _fuelRows.push({time:'',food:''}); renderFuelRows(); }
+function addFuelMealRow(){
+  const now=new Date();
+  let h=now.getHours(),mi=now.getMinutes();
+  const ampm=h>=12?'PM':'AM';
+  h=h%12||12;
+  const timeStr=`${h}:${String(mi).padStart(2,'0')} ${ampm}`;
+  _fuelRows.push({time:timeStr,food:''});
+  renderFuelRows();
+}
 function removeFuelMealRow(i){ if(_fuelRows.length<=1) return; _fuelRows.splice(i,1); renderFuelRows(); }
 
 async function saveFuelDay(){
@@ -2956,7 +2965,27 @@ function renderFuelMacros(entry){
 <div style="background:rgba(184,96,53,0.1);border:1px solid rgba(184,96,53,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Fat</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);font-weight:600;">${t.fat||0}g</div></div>
 <div style="background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">kcal</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);font-weight:600;">${t.kcal||0}</div></div>
 </div><div class="macro-bar" style="margin-bottom:6px;"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:14px;"><span style="color:var(--a);">■</span> protein &nbsp;<span style="color:var(--a2);">■</span> carbs &nbsp;<span style="color:var(--aw);">■</span> fat</div><div class="lbl">meals</div>`+
-    (entry.meals||[]).map(m=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--b);gap:8px;"><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(184,96,53,0.12);color:var(--aw);padding:2px 7px;border-radius:5px;white-space:nowrap;">${esc(m.time)}</span>`:''}<span style="font-size:var(--fs-sm);color:var(--t2);">${esc(m.food)}</span></div>${m.protein||m.carbs?(()=>{const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);const _mp=_mt?Math.round((m.protein||0)/_mt*100):0;const _mc=_mt?Math.round((m.carbs||0)/_mt*100):0;const _mf=Math.max(0,100-_mp-_mc);return`<div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;height:4px;border-radius:2px;overflow:hidden;display:flex;"><div style="width:${_mp}%;background:var(--a);"></div><div style="width:${_mc}%;background:var(--a2);"></div><div style="width:${_mf}%;background:var(--aw);"></div></div></div>`;})():''}</div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;background:var(--s3);padding:2px 6px;border-radius:4px;">${m.kcal} kcal</span>`:''}</div>`).join('')+'</div>';
+    (entry.meals||[]).map(m=>{
+      const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);
+      const _mp=_mt?Math.round((m.protein||0)/_mt*100):0;
+      const _mc=_mt?Math.round((m.carbs||0)/_mt*100):0;
+      const _mf=Math.max(0,100-_mp-_mc);
+      const hasMacros=m.protein||m.carbs||m.fat;
+      const macroBar=hasMacros?`<div style="display:flex;align-items:center;gap:6px;margin-top:5px;"><div style="flex:1;height:4px;border-radius:2px;overflow:hidden;display:flex;"><div style="width:${_mp}%;background:var(--a);"></div><div style="width:${_mc}%;background:var(--a2);"></div><div style="width:${_mf}%;background:var(--aw);"></div></div></div>`:'';
+      const macroNums=hasMacros?`<div style="display:flex;gap:10px;margin-top:5px;flex-wrap:wrap;">
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);">P: ${m.protein||0}g</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);">C: ${m.carbs||0}g</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);">F: ${m.fat||0}g</span>
+        ${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);">${m.kcal} kcal</span>`:''}
+      </div>`:(m.kcal?`<div style="margin-top:4px;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);background:var(--s3);padding:2px 6px;border-radius:4px;">${m.kcal} kcal</span></div>`:'');
+      return`<div style="padding:9px 0;border-bottom:1px solid var(--b);">
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(184,96,53,0.12);color:var(--aw);padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;">${esc(m.time)}</span>`:''}
+          <span style="font-size:var(--fs-sm);color:var(--t2);">${esc(m.food)}</span>
+        </div>
+        ${macroNums}${macroBar}
+      </div>`;
+    }).join('')+'</div>';
   // Set a target reference if bodyweight known
   const bw=D.profile?.bodyweight||225;
   const proteinTarget=Math.round(bw*0.8);
@@ -5456,7 +5485,7 @@ function renderCyclingChart(){
 
 function setVO2Range(days){
   _vo2Days=days;
-  [7,30,0].forEach(d=>{
+  [14,30,60,90].forEach(d=>{
     const btn=document.getElementById('vo2btn-'+d);
     if(btn) btn.style.opacity=d===days?'1':'0.5';
   });
@@ -5527,7 +5556,7 @@ function renderVO2TrendChart(){
     legendEl.innerHTML=`<div style="display:flex;gap:16px;flex-wrap:wrap;">${parts.join('')}</div>`;
   }
 
-  const maxTicks=_vo2Days===7?7:_vo2Days===30?8:10;
+  const maxTicks=_vo2Days<=14?7:_vo2Days<=30?8:10;
 
   window._vo2Chart=new Chart(canvas,{
     type:'line',
