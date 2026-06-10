@@ -2914,6 +2914,7 @@ function buildFoodLookup(){
   return map;
 }
 
+let _chipData=[];
 function renderFuelChips(){
   const section=document.getElementById('fuel-chips-section');
   const el=document.getElementById('fuel-chips');
@@ -2921,14 +2922,14 @@ function renderFuelChips(){
   const lookup=buildFoodLookup();
   if(!lookup.size){section.style.display='none';return;}
   section.style.display='';
-  el.innerHTML=[...lookup.entries()].slice(0,20).map(([food,m])=>
-    `<button class="fuel-chip" title="P:${m.protein}g C:${m.carbs}g F:${m.fat}g · ${m.kcal}kcal" onclick="addFuelChipRow(${JSON.stringify(food).replace(/'/g,"\\'")})">${esc(food)}</button>`
+  _chipData=[...lookup.entries()].slice(0,20);
+  el.innerHTML=_chipData.map(([food,m],i)=>
+    `<button class="fuel-chip" title="P:${m.protein}g C:${m.carbs}g F:${m.fat}g · ${m.kcal}kcal" onclick="addFuelChipRow(${i})">${esc(food)}</button>`
   ).join('');
 }
 
-function addFuelChipRow(food){
-  const lookup=buildFoodLookup();
-  const macros=lookup.get(food)||{protein:0,carbs:0,fat:0,kcal:0};
+function addFuelChipRow(idx){
+  const [food,macros]=_chipData[idx]||['',{protein:0,carbs:0,fat:0,kcal:0}];
   const now=new Date();
   let h=now.getHours(),mi=now.getMinutes();
   const ampm=h>=12?'PM':'AM';
