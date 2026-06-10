@@ -29,6 +29,10 @@
   --a4: #c24d72;
   --a5: #a066d4;
   --aw: #b86035;
+  /* Macro bar colors — shared by chart, calendar bars, chip bars, breakdown bars */
+  --mp: rgba(104,110,200,0.82);
+  --mc: rgba(42,160,112,0.75);
+  --mf: rgba(184,96,53,0.82);
   --t: #e2eaf8;
   --t2: #a8b4cc;
   --t3: #7e8caa;
@@ -781,9 +785,9 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-rm{background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;transition:color .15s;}
 .fuel-rm:hover{color:var(--a4);}
 .macro-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:8px 0;}
-.macro-bar-p{background:var(--a);}
-.macro-bar-c{background:var(--a2);}
-.macro-bar-f{background:var(--aw);}
+.macro-bar-p{background:var(--mp);}
+.macro-bar-c{background:var(--mc);}
+.macro-bar-f{background:var(--mf);}
 .macro-pill{display:inline-block;font-family:var(--mono);font-size:var(--fs-xs);padding:2px 8px;border-radius:4px;margin:2px;}
 .macro-pill.p{background:rgba(104,110,200,.15);color:var(--a);}
 .macro-pill.c{background:rgba(42,160,112,.15);color:var(--a2);}
@@ -1050,8 +1054,6 @@ input[type=range]::-webkit-slider-thumb:hover {
     <button class="tab" onclick="showTab('log')">LOG SESSION</button>
     <button class="tab" onclick="showTab('week')">ACTIVITY</button>
     <button class="tab" onclick="showTab('progress')">PROGRESS</button>
-    <button class="tab" onclick="showTab('milestones')">MILESTONES</button>
-    <button class="tab" onclick="showTab('rules')">RULES</button>
     <button class="tab" onclick="showTab('settings')">SETTINGS</button>
   </div>
 </div>
@@ -1626,7 +1628,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- ── AI FLOW DIAGRAM ── -->
-  <div class="card" id="ai-flow-card" style="margin-top:8px;overflow:hidden;">
+  <div class="card desktop-only" id="ai-flow-card" style="margin-top:8px;overflow:hidden;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
       <div class="lbl" style="margin:0;">how prescriptions work</div>
       <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">tap any node to explore</div>
@@ -1696,8 +1698,8 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 </div>
 
-<!-- v2026-05-22 -->
-<div id="panel-rules" class="panel">
+<!-- rules content embedded in settings — panel-rules is hidden but kept for DOM IDs -->
+<div id="panel-rules" style="display:none;">
   <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Training <span style="color:var(--a);">rules</span></h2>
   <p style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-bottom:24px;">How the app decides what to prescribe — and what it won't let you do.</p>
 
@@ -1828,6 +1830,45 @@ input[type=range]::-webkit-slider-thumb:hover {
 </div>
 <div id="panel-settings" class="panel">
   <div class="h1">Settings &amp; <span>sync</span></div>
+
+  <!-- TRAINING RULES ACCORDION -->
+  <div class="card" style="margin-bottom:18px;padding:0;overflow:hidden;">
+    <button onclick="toggleRulesDrawer()" id="rules-drawer-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:transparent;border:none;cursor:pointer;text-align:left;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Training rules</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">hard rules · soft rules · AI role</span>
+      </div>
+      <span id="rules-drawer-caret" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);transition:transform .2s;">▸</span>
+    </button>
+    <div id="rules-drawer-body" style="display:none;padding:0 20px 18px;">
+      <p style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-bottom:18px;line-height:1.6;">How the app decides what to prescribe — and what it won't let you do.</p>
+      <div style="margin-bottom:16px;">
+        <div class="lbl">Hard rules — enforced in code</div>
+        <p style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-bottom:16px;line-height:1.6;">These run before every AI call. The AI cannot override them. They protect against injury, overreaching, and training in a physiologically unsafe state.</p>
+        <div id="rules-hard-list-settings"></div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div class="lbl">Soft rules — AI judgment within bounds</div>
+        <p style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-bottom:16px;line-height:1.6;">These are evidence-based guidelines the AI follows when prescribing. They can be adjusted by context — your history, block phase, and recovery state all influence how the AI applies them.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Progressive overload</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Double progression: reps first, then load. Add weight only when all sets reach the top of the rep range at RPE ≤8.</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Rep ranges</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Deadlift 3–5 · Squat 4–6 · Bench/OHP 5–8 · Row/Pullup 6–10. Weighted pullups 4–6.</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Load increments</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Lower body: +5lb when earned. Upper body: +2.5lb. Pullup belt: +5lb.</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Stall detection</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">2 consecutive sessions below rep range minimum → auto-deload to 90% of working weight.</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Zone 2 pacing</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">All easy runs at HR ≤147 bpm (MAF formula: 180 − 28 − 5). Current easy runs at 165–174 are threshold, not aerobic.</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">80/20 polarization</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">~80% of weekly run volume at easy/Zone 2 pace. ~20% at quality intensity. Source: Seiler (2009).</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">4-week block structure</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Week 1: accumulate. Week 2: build (+33% sets). Week 3: peak (+67% sets). Week 4: deload (−40% volume, no quality).</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Volume ceilings</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Resident-adjusted MRV: Squat 16 sets/wk · Deadlift 10 · Bench 18 · OHP 14 · Row 16 · Pullup 16.</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Run volume</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Max 10% weekly mileage increase. Long run ≤35% of weekly total. Deload week: 50% of peak mileage.</div></div>
+          <div style="padding:10px 14px;background:var(--s3);border-radius:8px;border:1px solid var(--b);"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);margin-bottom:4px;">Recovery windows</div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;">Quality → quality: 48h min. Long run → quality: 72h. Legs → quality run: 24h. Legs → long run: 48h.</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="lbl">Evidence base</div>
+        <p style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;">Maffetone (2010) · Seiler &amp; Tønnessen (2009) · Daniels (2013) · NSCA Essentials 4th ed. · Zourdos et al. (2016) · Israetel/Renaissance Periodization · Milewski et al. (2014) · Dawson &amp; Reid (1997) · Leveritt &amp; Abernethy (1999) · Schumann et al. (2014) · Plews et al. (2013) · Foster et al. (2001) · Besedovsky et al. (2019) · Blumert et al. (2007)</p>
+      </div>
+    </div>
+  </div>
 
   <!-- AI USAGE & COST -->
   <div class="card" style="margin-bottom:18px;">
@@ -2041,7 +2082,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <canvas id="fuel-trend-chart" style="width:100%;max-height:240px;"></canvas>
   </div>
 
-  <div class="card" style="overflow:hidden;">
+  <div class="card desktop-only" style="overflow:hidden;">
     <div class="lbl" style="color:var(--aw);margin-bottom:14px;">how the ai works — fuel check-in</div>
     <div style="display:grid;grid-template-columns:1fr minmax(0,120px) 1fr;gap:0;align-items:start;" id="ffd-grid">
       <div style="display:flex;flex-direction:column;gap:7px;padding-right:12px;" id="ffd-inputs"></div>
@@ -2774,9 +2815,19 @@ function renderSystemLog() {
 // NAV
 // ============================================================
 const rendered={};
+function toggleRulesDrawer(){
+  const body=document.getElementById('rules-drawer-body');
+  const caret=document.getElementById('rules-drawer-caret');
+  if(!body)return;
+  const open=body.style.display==='none'||body.style.display==='';
+  body.style.display=open?'block':'none';
+  if(caret)caret.style.transform=open?'rotate(90deg)':'rotate(0deg)';
+  if(open) renderRulesTab();
+}
 function renderRulesTab(){
   const el=document.getElementById('rules-hard-list');
-  if(!el)return;
+  const elS=document.getElementById('rules-hard-list-settings');
+  if(!el&&!elS)return;
   const ts=evaluateTrainingStatus();
   const rules=[
     {title:'Post-call / sleep deprivation',desc:'After a call shift or <5h sleep: no structured training. Walk ≤30 min at HR <100 only.',flag:'POST_CALL',threshold:'Trigger: post-call toggle = Yes'},
@@ -2791,7 +2842,7 @@ function renderRulesTab(){
     {title:'Deload week (Week 4)',desc:'Week 4 of every block: no quality runs, volume at 60%, RPE capped at 6. Non-negotiable even with good biometrics.',flag:'DELOAD_WEEK',threshold:'Trigger: blockWeek.weekNum === 4'},
     {title:'MAF HR ceiling',desc:'All easy runs hard-capped at '+ATHLETE.mafHR+' bpm (MAF formula: 180 − '+ATHLETE.age+' − 5). Slow down or walk if exceeded.',flag:null,threshold:'Your MAF: '+ATHLETE.mafHR+' bpm. Current easy runs: 165–174 bpm (too high).'},
   ];
-  el.innerHTML=rules.map(rule=>{
+  const html=rules.map(rule=>{
     const active=rule.flag&&ts.activeFlags.includes(rule.flag);
     const bg=active?'rgba(194,77,114,0.09)':'rgba(42,160,112,0.06)';
     const border=active?'rgba(194,77,114,0.3)':'rgba(42,160,112,0.22)';
@@ -2812,6 +2863,8 @@ function renderRulesTab(){
       '<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:6px 8px;background:rgba(0,0,0,0.2);border-radius:6px;">'+rule.threshold+'</div>'+
       '</div>';
   }).join('');
+  if(el) el.innerHTML=html;
+  if(elS) elS.innerHTML=html;
 }
 function showTab(n){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
@@ -2820,7 +2873,6 @@ function showTab(n){
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='week'){ renderCalendar(); renderSessionList(); }
   if(n==='progress'){ }
-  if(n==='rules') renderRulesTab();
   if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
@@ -2966,7 +3018,7 @@ function renderFuelChips(){
       const _pp=_mt?Math.round((m.protein||0)/_mt*100):0;
       const _cp=_mt?Math.round((m.carbs||0)/_mt*100):0;
       const _fp=Math.max(0,100-_pp-_cp);
-      return`<button class="fuel-chip" title="P:${m.protein}g · C:${m.carbs}g · F:${m.fat}g · ${m.kcal}kcal" onclick="addFuelChipRow(${i})"><span class="fuel-chip-lbl">${esc(food)}</span><span class="fuel-chip-bar"><span style="width:${_pp}%;background:var(--a);display:block;height:100%;"></span><span style="width:${_cp}%;background:var(--a2);display:block;height:100%;"></span><span style="width:${_fp}%;background:var(--aw);display:block;height:100%;"></span></span></button>`;
+      return`<button class="fuel-chip" title="P:${m.protein}g · C:${m.carbs}g · F:${m.fat}g · ${m.kcal}kcal" onclick="addFuelChipRow(${i})"><span class="fuel-chip-lbl">${esc(food)}</span><span class="fuel-chip-bar"><span style="flex:0 0 ${_pp}%;background:var(--mp);"></span><span style="flex:0 0 ${_cp}%;background:var(--mc);"></span><span style="flex:0 0 ${_fp}%;background:var(--mf);"></span></span></button>`;
     }).join('');
     html+='</div></div>';
   });
@@ -3088,14 +3140,14 @@ function renderFuelMacros(entry){
 <div style="background:rgba(42,160,112,0.1);border:1px solid rgba(42,160,112,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Carbs</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);font-weight:600;">${t.carbs||0}g</div></div>
 <div style="background:rgba(184,96,53,0.1);border:1px solid rgba(184,96,53,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Fat</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);font-weight:600;">${t.fat||0}g</div></div>
 <div style="background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">kcal</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);font-weight:600;">${t.kcal||0}</div></div>
-</div><div class="macro-bar" style="margin-bottom:6px;"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:14px;"><span style="color:var(--a);">■</span> protein &nbsp;<span style="color:var(--a2);">■</span> carbs &nbsp;<span style="color:var(--aw);">■</span> fat</div><div class="lbl">meals</div>`+
+</div><div class="macro-bar" style="margin-bottom:6px;"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:14px;"><span style="color:var(--mp);">■</span> protein &nbsp;<span style="color:var(--mc);">■</span> carbs &nbsp;<span style="color:var(--mf);">■</span> fat</div><div class="lbl">meals</div>`+
     (entry.meals||[]).map(m=>{
       const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);
       const _mp=_mt?Math.round((m.protein||0)/_mt*100):0;
       const _mc=_mt?Math.round((m.carbs||0)/_mt*100):0;
       const _mf=Math.max(0,100-_mp-_mc);
       const hasMacros=m.protein||m.carbs||m.fat;
-      const macroBar=hasMacros?`<div style="display:flex;align-items:center;gap:6px;margin-top:5px;"><div style="flex:1;height:4px;border-radius:2px;overflow:hidden;display:flex;"><div style="width:${_mp}%;background:var(--a);"></div><div style="width:${_mc}%;background:var(--a2);"></div><div style="width:${_mf}%;background:var(--aw);"></div></div></div>`:'';
+      const macroBar=hasMacros?`<div style="display:flex;align-items:center;gap:6px;margin-top:5px;"><div style="flex:1;height:4px;border-radius:2px;overflow:hidden;display:flex;"><div style="width:${_mp}%;background:var(--mp);"></div><div style="width:${_mc}%;background:var(--mc);"></div><div style="width:${_mf}%;background:var(--mf);"></div></div></div>`:'';
       const macroNums=hasMacros?`<div style="display:flex;gap:10px;margin-top:5px;flex-wrap:wrap;">
         <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);">P: ${m.protein||0}g</span>
         <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);">C: ${m.carbs||0}g</span>
@@ -3500,7 +3552,7 @@ function renderFuelCalendar(){
     const fCp=fTot?Math.round((fEntry?.totals?.carbs||0)/fTot*100):0;
     const fFp=fTot?Math.max(0,100-fPp-fCp):0;
     const kcalHtml=kcal?`<div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--aw);line-height:1.1;margin-top:1px;">${kcal}</div>`:'';
-    const barHtml=kcal?`<div style="width:100%;height:4px;border-radius:2px;overflow:hidden;display:flex;margin-top:2px;"><div style="width:${fPp}%;background:var(--a);"></div><div style="width:${fCp}%;background:var(--a2);"></div><div style="width:${fFp}%;background:var(--aw);"></div></div>`:'';
+    const barHtml=kcal?`<div style="width:100%;height:4px;border-radius:2px;overflow:hidden;display:flex;margin-top:2px;"><div style="width:${fPp}%;background:var(--mp);"></div><div style="width:${fCp}%;background:var(--mc);"></div><div style="width:${fFp}%;background:var(--mf);"></div></div>`:'';
     html+=`<div class="cal-cell${isToday?' today':''}${isSelected?' fuel-cal-selected':''}${!isFuture?' fuel-cal-clickable':''}" data-fdate="${ds}" style="min-height:50px;padding:5px 3px 4px;gap:0;"><div class="cal-date" style="font-size:var(--fs-title);">${d}</div>${kcalHtml}${barHtml}</div>`;
   }
   grid.innerHTML=html;
@@ -3568,9 +3620,9 @@ function renderFuelTrendChart(){
   _fuelTrendChart=new Chart(canvas,{
     type:'bar',
     data:{labels,datasets:[
-      {label:'Protein (g)',data:pData,backgroundColor:'rgba(104,110,200,0.65)',stack:'macros',yAxisID:'y'},
-      {label:'Carbs (g)',data:cData,backgroundColor:'rgba(42,160,112,0.65)',stack:'macros',yAxisID:'y'},
-      {label:'Fat (g)',data:fData,backgroundColor:'rgba(184,96,53,0.65)',stack:'macros',yAxisID:'y'},
+      {label:'Protein (g)',data:pData,backgroundColor:'rgba(104,110,200,0.82)',stack:'macros',yAxisID:'y'},
+      {label:'Carbs (g)',data:cData,backgroundColor:'rgba(42,160,112,0.75)',stack:'macros',yAxisID:'y'},
+      {label:'Fat (g)',data:fData,backgroundColor:'rgba(184,96,53,0.82)',stack:'macros',yAxisID:'y'},
       {label:'Calories',data:kData,type:'line',borderColor:'rgba(226,234,248,0.5)',backgroundColor:'transparent',pointBackgroundColor:'rgba(226,234,248,0.8)',pointRadius:3,yAxisID:'yk',tension:0.3,spanGaps:true}
     ]},
     options:{responsive:true,maintainAspectRatio:true,
@@ -3617,11 +3669,11 @@ function buildFuelDrawerContent(entry,dateStr){
   const fPct=Math.max(0,100-pPct-cPct);
   let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;z-index:1;"><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div><div style="font-size:var(--fs-title);font-weight:600;color:var(--t);">Fuel Log</div></div><button onclick="closeFuelDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">\xd7</button></div><div style="padding:20px;">`;
   if(t.kcal){
-    html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><span class="macro-pill p">P ${t.protein||0}g</span><span class="macro-pill c">C ${t.carbs||0}g</span><span class="macro-pill f">F ${t.fat||0}g</span><span class="macro-pill k">${t.kcal} kcal</span></div><div class="macro-bar"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:16px;"><span style="color:var(--a);">■</span> protein &nbsp;<span style="color:var(--a2);">■</span> carbs &nbsp;<span style="color:var(--aw);">■</span> fat</div>`;
+    html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><span class="macro-pill p">P ${t.protein||0}g</span><span class="macro-pill c">C ${t.carbs||0}g</span><span class="macro-pill f">F ${t.fat||0}g</span><span class="macro-pill k">${t.kcal} kcal</span></div><div class="macro-bar"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:16px;"><span style="color:var(--mp);">■</span> protein &nbsp;<span style="color:var(--mc);">■</span> carbs &nbsp;<span style="color:var(--mf);">■</span> fat</div>`;
   }
   html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">meals</div>`;
   (entry.meals||[]).forEach(m=>{
-    html+=`<div style="padding:9px 0;border-bottom:1px solid var(--b);"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div>${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);margin-right:8px;">${esc(m.time)}</span>`:''}<span style="font-size:var(--fs-sm);color:var(--t);">${esc(m.food)}</span></div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;">${m.kcal} kcal</span>`:''}</div>${(m.protein||m.carbs||m.fat)?(()=>{const _bmt=(m.protein||0)+(m.carbs||0)+(m.fat||0);const _bmp=_bmt?Math.round((m.protein||0)/_bmt*100):0;const _bmc=_bmt?Math.round((m.carbs||0)/_bmt*100):0;const _bmf=Math.max(0,100-_bmp-_bmc);return`<div style="margin-top:5px;display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;border-radius:3px;overflow:hidden;display:flex;"><div style="width:${_bmp}%;background:var(--a);"></div><div style="width:${_bmc}%;background:var(--a2);"></div><div style="width:${_bmf}%;background:var(--aw);"></div></div></div>`;})():''}</div>`;
+    html+=`<div style="padding:9px 0;border-bottom:1px solid var(--b);"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div>${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);margin-right:8px;">${esc(m.time)}</span>`:''}<span style="font-size:var(--fs-sm);color:var(--t);">${esc(m.food)}</span></div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;">${m.kcal} kcal</span>`:''}</div>${(m.protein||m.carbs||m.fat)?(()=>{const _bmt=(m.protein||0)+(m.carbs||0)+(m.fat||0);const _bmp=_bmt?Math.round((m.protein||0)/_bmt*100):0;const _bmc=_bmt?Math.round((m.carbs||0)/_bmt*100):0;const _bmf=Math.max(0,100-_bmp-_bmc);return`<div style="margin-top:5px;display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;border-radius:3px;overflow:hidden;display:flex;"><div style="width:${_bmp}%;background:var(--mp);"></div><div style="width:${_bmc}%;background:var(--mc);"></div><div style="width:${_bmf}%;background:var(--mf);"></div></div></div>`;})():''}</div>`;
   });
   const sig=entry.signals||{};
   if(sig.betweenMeals||sig.beforeSleep||sig.onWaking){
