@@ -792,9 +792,13 @@ input[type=range]::-webkit-slider-thumb:hover {
 @media(max-width:768px){.fuel-row input[type=time]{width:90px;min-width:90px;}}
 .fuel-time-btn{flex:0 0 auto;width:88px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--aw);font-family:var(--mono);font-size:var(--fs-xs);padding:7px 8px;cursor:pointer;text-align:center;transition:border-color .15s;white-space:nowrap;}
 .fuel-time-btn:hover{border-color:var(--aw);}
-.fuel-chips-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
-.fuel-chip{background:rgba(42,160,112,0.08);border:1px solid rgba(42,160,112,0.22);color:var(--a2);font-size:var(--fs-xs);font-family:var(--mono);padding:4px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;max-width:240px;overflow:hidden;text-overflow:ellipsis;}
-.fuel-chip:hover{background:rgba(42,160,112,0.18);border-color:rgba(42,160,112,0.45);}
+.fuel-chips-group{margin-bottom:10px;}
+.fuel-chips-group-lbl{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.fuel-chips-wrap{display:flex;flex-wrap:wrap;gap:5px;}
+.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-xs);font-family:var(--mono);padding:5px 9px 4px;border-radius:8px;cursor:pointer;transition:background .15s,border-color .15s;max-width:200px;text-align:left;display:inline-flex;flex-direction:column;gap:3px;vertical-align:top;}
+.fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
+.fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:178px;display:block;}
+.fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;min-width:60px;}
 .fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
 .fuel-tp-wrap{display:flex;gap:12px;justify-content:center;align-items:center;padding:8px 0;}
 .fuel-tp-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
@@ -2007,8 +2011,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
     <div id="fuel-meal-rows" style="margin-bottom:8px;"></div>
     <div id="fuel-chips-section" style="display:none;margin-bottom:10px;">
-      <div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">recent foods</div>
-      <div class="fuel-chips-wrap" id="fuel-chips"></div>
+      <div id="fuel-chips"></div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
       <button class="btn bs" style="width:auto;" onclick="addFuelMealRow()">+ Add meal</button>
@@ -2847,7 +2850,7 @@ function fuelSelectDate(dateStr){
   if(el) el.textContent=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const todayBtn=document.getElementById('fuel-today-btn');
   if(todayBtn) todayBtn.style.opacity=isToday?'0.4':'1';
-  _fuelRows=entry&&entry.meals&&entry.meals.length?entry.meals.map(m=>({time:m.time||'',food:m.food||'',protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0})):[{time:'',food:''}];
+  _fuelRows=entry&&entry.meals&&entry.meals.length?entry.meals.map(m=>({time:m.time||'',food:m.food||'',protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0})):[{time:currentTimeStr(),food:''}];
   const sb=document.getElementById('fuel-sig-between');
   const ss=document.getElementById('fuel-sig-sleep');
   const sw=document.getElementById('fuel-sig-wake');
@@ -2887,17 +2890,37 @@ function renderFuelRows(){
   }).join('');
 }
 
-function addFuelMealRow(){
+function currentTimeStr(){
   const now=new Date();
   let h=now.getHours(),mi=now.getMinutes();
   const ampm=h>=12?'PM':'AM';
   h=h%12||12;
-  const timeStr=`${h}:${String(mi).padStart(2,'0')} ${ampm}`;
-  _fuelRows.push({time:timeStr,food:''});
+  return`${h}:${String(mi).padStart(2,'0')} ${ampm}`;
+}
+function addFuelMealRow(){
+  _fuelRows.push({time:currentTimeStr(),food:''});
   renderFuelRows();
 }
 function removeFuelMealRow(i){ if(_fuelRows.length<=1) return; _fuelRows.splice(i,1); renderFuelRows(); }
 
+function parseMealHour(timeStr){
+  if(!timeStr) return 12;
+  const match=timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if(!match) return 12;
+  let h=parseInt(match[1]);
+  const ap=match[3].toUpperCase();
+  if(ap==='PM'&&h!==12) h+=12;
+  if(ap==='AM'&&h===12) h=0;
+  return h;
+}
+function getMealCategory(h){
+  if(h>=5&&h<10) return 'Breakfast';
+  if(h>=10&&h<12) return 'Morning';
+  if(h>=12&&h<15) return 'Lunch';
+  if(h>=15&&h<18) return 'Afternoon';
+  if(h>=18&&h<21) return 'Dinner';
+  return 'Evening';
+}
 function buildFoodLookup(){
   const map=new Map();
   if(!D?.fuelLog) return map;
@@ -2906,7 +2929,8 @@ function buildFoodLookup(){
     for(const m of (entry.meals||[])){
       const key=(m.food||'').trim();
       if(key&&!map.has(key)&&m.kcal){
-        map.set(key,{protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0});
+        const cat=getMealCategory(parseMealHour(m.time||''));
+        map.set(key,{protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0,cat});
       }
     }
     if(map.size>=30) break;
@@ -2914,6 +2938,8 @@ function buildFoodLookup(){
   return map;
 }
 
+const _CHIP_CAT_ORDER=['Breakfast','Morning','Lunch','Afternoon','Dinner','Evening'];
+const _CHIP_CAT_ICON={Breakfast:'🌅',Morning:'☕',Lunch:'🥗',Afternoon:'🍎',Dinner:'🍽️',Evening:'🌙'};
 let _chipData=[];
 function renderFuelChips(){
   const section=document.getElementById('fuel-chips-section');
@@ -2922,20 +2948,34 @@ function renderFuelChips(){
   const lookup=buildFoodLookup();
   if(!lookup.size){section.style.display='none';return;}
   section.style.display='';
-  _chipData=[...lookup.entries()].slice(0,20);
-  el.innerHTML=_chipData.map(([food,m],i)=>
-    `<button class="fuel-chip" title="P:${m.protein}g C:${m.carbs}g F:${m.fat}g · ${m.kcal}kcal" onclick="addFuelChipRow(${i})">${esc(food)}</button>`
-  ).join('');
+  _chipData=[...lookup.entries()].slice(0,24);
+  // Group by category
+  const groups={};
+  _chipData.forEach(([food,m],i)=>{
+    const cat=m.cat||'Evening';
+    if(!groups[cat]) groups[cat]=[];
+    groups[cat].push(i);
+  });
+  let html='';
+  _CHIP_CAT_ORDER.forEach(cat=>{
+    if(!groups[cat]) return;
+    html+=`<div class="fuel-chips-group"><div class="fuel-chips-group-lbl">${_CHIP_CAT_ICON[cat]} ${cat}</div><div class="fuel-chips-wrap">`;
+    html+=groups[cat].map(i=>{
+      const [food,m]=_chipData[i];
+      const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);
+      const _pp=_mt?Math.round((m.protein||0)/_mt*100):0;
+      const _cp=_mt?Math.round((m.carbs||0)/_mt*100):0;
+      const _fp=Math.max(0,100-_pp-_cp);
+      return`<button class="fuel-chip" title="P:${m.protein}g · C:${m.carbs}g · F:${m.fat}g · ${m.kcal}kcal" onclick="addFuelChipRow(${i})"><span class="fuel-chip-lbl">${esc(food)}</span><span class="fuel-chip-bar"><span style="width:${_pp}%;background:var(--a);display:block;height:100%;"></span><span style="width:${_cp}%;background:var(--a2);display:block;height:100%;"></span><span style="width:${_fp}%;background:var(--aw);display:block;height:100%;"></span></span></button>`;
+    }).join('');
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
 }
 
 function addFuelChipRow(idx){
   const [food,macros]=_chipData[idx]||['',{protein:0,carbs:0,fat:0,kcal:0}];
-  const now=new Date();
-  let h=now.getHours(),mi=now.getMinutes();
-  const ampm=h>=12?'PM':'AM';
-  h=h%12||12;
-  const timeStr=`${h}:${String(mi).padStart(2,'0')} ${ampm}`;
-  // If last row is empty, fill it; otherwise add new row
+  const timeStr=currentTimeStr();
   const last=_fuelRows[_fuelRows.length-1];
   if(last&&!last.food.trim()){
     _fuelRows[_fuelRows.length-1]={time:last.time||timeStr,food,...macros};
