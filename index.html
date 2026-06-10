@@ -1200,6 +1200,18 @@ input[type=range]::-webkit-slider-thumb:hover {
     <button class="btn bp" onclick="showTab('program')" style="margin:0 auto;">Go to Program →</button>
   </div>
 
+  <!-- Post-workout AI feedback card — persists between sessions -->
+  <div id="log-feedback-card" class="card" style="display:none;border-color:rgba(160,102,212,0.3);">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;">
+      <div>
+        <div class="lbl" style="color:var(--a5);margin:0;">💬 session feedback</div>
+        <div id="log-feedback-meta" style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);margin-top:3px;"></div>
+      </div>
+      <button class="btn bs" id="log-feedback-btn" onclick="generateSessionFeedback()" style="width:auto;font-size:var(--fs-xs);">Get feedback</button>
+    </div>
+    <div id="log-feedback-out" style="font-size:var(--fs-sm);color:var(--t2);line-height:1.75;"></div>
+  </div>
+
   <div id="run-prescription-card" style="display:none;" class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div>
@@ -2918,10 +2930,10 @@ function showTab(n){
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
-  if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
+  if(n==='log'){ renderSessHist(); updateLogTabPlanned(); renderLogFeedback(); }
   else if(n==='week'){ }
   else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
-  else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||null; renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); renderAIFlowDiagram(); }
+  else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||getLatestPrescription(); renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); renderAIFlowDiagram(); }
 }
 
 // ============================================================
@@ -3981,7 +3993,8 @@ async function saveSession(){
   if(session.bw) D.profile.bodyweight=session.bw;
   const ok=await push('log-sbtn','log-smsg');
   if(ok){ renderSessHist(); updProgressStats(); resetLogForm(); // D.runPrescriptions intentionally NOT touched
- renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); renderBikeRacePredictions(); renderCyclingChart(); renderVO2TrendChart(); }
+ renderPredictionChart(); updateLogTabPlanned(); renderRacePredictions(); renderBikeRacePredictions(); renderCyclingChart(); renderVO2TrendChart();
+ generateSessionFeedback(session.ts); }
   else { D.sessions.pop(); }
   }catch(e){ msg('log-smsg','Error: '+e.message+' -- check console'); console.error(e); }
 }
@@ -6705,6 +6718,90 @@ ${isToday?`<div style="position:absolute;top:0;left:0;right:0;height:2px;backgro
 <div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:var(--fs-xs);padding:3px 8px;border-radius:5px;border:1px solid ${CONF_COLORS[conf]}60;white-space:nowrap;">${conf.toUpperCase()}</div>
 </div>`;
   }).join('');
+}
+
+// ── PRESCRIPTION PERSISTENCE HELPER ─────────────────────────────────────────
+function getLatestPrescription(){
+  if(!D?.dailyPrescriptions) return null;
+  const dates=Object.keys(D.dailyPrescriptions).sort();
+  if(!dates.length) return null;
+  return D.dailyPrescriptions[dates[dates.length-1]];
+}
+
+// ── POST-WORKOUT SESSION FEEDBACK ────────────────────────────────────────────
+function renderLogFeedback(){
+  const card=document.getElementById('log-feedback-card');
+  const out=document.getElementById('log-feedback-out');
+  const meta=document.getElementById('log-feedback-meta');
+  const btn=document.getElementById('log-feedback-btn');
+  if(!card) return;
+  // Find the most recent session with aiFeedback
+  const sessions=[...(D.sessions||[])].reverse();
+  const withFb=sessions.find(s=>s.aiFeedback);
+  const latest=sessions[0];
+  if(withFb){
+    card.style.display='';
+    if(meta) meta.textContent=withFb.date+(withFb.day?' · '+withFb.day:'');
+    if(out) out.innerHTML=withFb.aiFeedback.replace(/\n/g,'<br>');
+    // Show re-evaluate button if latest session doesn't have feedback yet
+    if(btn) btn.textContent=latest&&!latest.aiFeedback?'Evaluate latest':'Re-evaluate';
+  } else if(latest){
+    card.style.display='';
+    if(meta) meta.textContent='No feedback yet for '+latest.date;
+    if(out) out.innerHTML='<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Tap "Get feedback" to get AI analysis of your last session.</span>';
+    if(btn) btn.textContent='Get feedback';
+  } else {
+    card.style.display='none';
+  }
+}
+
+async function generateSessionFeedback(ts){
+  const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
+  const btn=document.getElementById('log-feedback-btn');
+  const out=document.getElementById('log-feedback-out');
+  if(!apiKey){if(out)out.innerHTML='<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Add API key in Settings first.</span>';renderLogFeedback();return;}
+  // Find the target session
+  const sessions=D.sessions||[];
+  const session=ts?sessions.find(s=>s.ts===ts):sessions[sessions.length-1];
+  if(!session){renderLogFeedback();return;}
+  if(btn){btn.disabled=true;btn.textContent='Analyzing...';}
+  const card=document.getElementById('log-feedback-card');
+  if(card) card.style.display='';
+  if(out) out.innerHTML='<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Reading your session data...</span>';
+  // Get prescription for that day
+  const presc=D.dailyPrescriptions?.[session.date]||null;
+  // Format session data
+  const liftLines=[];
+  const LIFT_NAMES={bench:'Bench Press',ohp:'Overhead Press',squat:'Squat',dl:'Deadlift',pullup:'Pull-ups',row:'Barbell Row'};
+  Object.entries(LIFT_NAMES).forEach(([k,name])=>{
+    const l=session[k];if(!l?.sets?.length)return;
+    const sets=l.sets.map((s,i)=>`S${i+1}: ${s.w||'BW'}lb × ${s.r} reps${s.rpe?` @ RPE ${s.rpe}`:''}`).join(', ');
+    const prescribed=presc?.mainWork?.lifts?.[k];
+    const target=prescribed?` [target: ${prescribed.sets}×${prescribed.reps} @ ${prescribed.weight}lb]`:'';
+    liftLines.push(`${name}${target}: ${sets}${l.notes?' — '+l.notes:''}`);
+  });
+  const accLines=(session.accessories||[]).map(a=>`${a.name}: ${a.sets||'?'}×${a.reps||'?'}${a.weight?' @ '+a.weight+'lb':''}${a.notes?' — '+a.notes:''}`);
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a strength coach giving concise post-workout feedback. Be direct, specific, and encouraging. 3-5 sentences max. Focus on: did they hit targets? RPE trends? What to watch next session? No filler phrases.',messages:[{role:'user',content:`Athlete: ${session.bw||225}lb, ${session.energy?'energy '+session.energy+'/10':''}, session RPE ${session.rpe||'not logged'}.
+
+DATE: ${session.date} | TYPE: ${session.day||session.type}
+${presc?.reasoning?'PLAN CONTEXT: '+presc.reasoning:''}
+
+LIFTS:
+${liftLines.join('\n')||'No lift data.'}
+${accLines.length?'\nACCESSORIES:\n'+accLines.join('\n'):''}
+${session.notes?'\nNOTES: '+session.notes:''}
+
+Give me honest, specific feedback on this session.`}]})});
+    const d=await r.json();
+    recordAIUsage('sessionFeedback',d.usage);
+    const text=d.content?.[0]?.text||'';
+    session.aiFeedback=text;
+    session.aiFeedbackAt=new Date().toISOString();
+    pushSilent();
+    renderLogFeedback();
+  }catch(err){console.error('Session feedback error:',err);if(out)out.innerHTML='<span style="color:var(--a4);">Error — try again.</span>';}
+  if(btn){btn.disabled=false;btn.textContent='Re-evaluate';}
 }
 
 async function confirmRPE(lift,actualRPE){
