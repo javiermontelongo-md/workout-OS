@@ -779,9 +779,9 @@ input[type=range]::-webkit-slider-thumb:hover {
 .ride-stat-box{background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.25);border-radius:12px;padding:14px 12px;text-align:center;}
 .ride-act-card{background:var(--s3);border:1px solid rgba(160,102,212,0.3);border-radius:14px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden;}
 .ride-act-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.3));}
-.fuel-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.fuel-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;min-width:0;overflow:hidden;}
 .fuel-row input[type=time]{width:105px;min-width:105px;flex:0 0 auto;}
-.fuel-row .fuel-food{flex:1;}
+.fuel-row .fuel-food{flex:1;min-width:0;}
 .fuel-rm{background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;transition:color .15s;}
 .fuel-rm:hover{color:var(--a4);}
 .macro-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:8px 0;}
@@ -798,7 +798,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-time-btn:hover{border-color:var(--aw);}
 .fuel-chips-group{margin-bottom:12px;}
 .fuel-chips-group-lbl{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
-.fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;}
+.fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;}
 .fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-xs);font-family:var(--mono);padding:8px 11px 7px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:5px;width:100%;}
 .fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
 .fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;}
@@ -988,6 +988,8 @@ input[type=range]::-webkit-slider-thumb:hover {
     background: rgba(15,18,25,0.95);
     border-top: 1px solid var(--b);
     padding-bottom: var(--safe);
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
     z-index: 100;
     height: calc(var(--nav) + var(--safe));
     overflow-x: auto;
@@ -1037,8 +1039,11 @@ input[type=range]::-webkit-slider-thumb:hover {
   .cal-week-label { font-size: var(--fs-xs); }
   .spark-label { font-size: var(--fs-xs); width: 52px; }
   /* bigger tap targets with 7 tabs instead of 9 */
-  :root { --nav: 72px; }
+  :root { --nav: 72px; --fs-presc-text: 15px; --fs-presc-lift: 15px; }
   .ni { min-width: 48px; padding: 10px 4px; gap: 5px; }
+  /* prescription card: less horizontal padding, more breathing room */
+  .prog-day-header { padding: 12px 14px 10px; }
+  .prog-day-card > div:not(.prog-day-header) { padding: 12px 14px !important; }
   .nicon { font-size: 16px; }
   .nlbl { font-size: 9px; }
   /* hide AI explanation diagrams on mobile */
@@ -2089,8 +2094,8 @@ input[type=range]::-webkit-slider-thumb:hover {
         <button class="btn bs" id="fuel-today-btn" onclick="fuelGoToday()">Today</button>
       </div>
     </div>
-    <div id="fuel-meal-rows" style="margin-bottom:8px;"></div>
-    <div id="fuel-chips-section" style="display:none;margin-bottom:10px;">
+    <div id="fuel-meal-rows" style="margin-bottom:8px;overflow:hidden;"></div>
+    <div id="fuel-chips-section" style="display:none;margin-bottom:10px;overflow:hidden;">
       <div id="fuel-chips"></div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
