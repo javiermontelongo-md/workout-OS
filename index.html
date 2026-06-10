@@ -1017,6 +1017,13 @@ input[type=range]::-webkit-slider-thumb:hover {
   .info-row-label { font-size: var(--fs-xs); }
   .cal-week-label { font-size: var(--fs-xs); }
   .spark-label { font-size: var(--fs-xs); width: 52px; }
+  /* bigger tap targets with 7 tabs instead of 9 */
+  :root { --nav: 72px; }
+  .ni { min-width: 48px; padding: 10px 4px; gap: 5px; }
+  .nicon { font-size: 16px; }
+  .nlbl { font-size: 9px; }
+  /* hide AI explanation diagrams on mobile */
+  .desktop-only { display: none; }
 }
 </style>
 </head>
@@ -2106,12 +2113,10 @@ input[type=range]::-webkit-slider-thumb:hover {
 <nav class="bnav">
   <button class="ni on" onclick="showTab('today')"><span class="nicon">T</span><span class="nlbl">TODAY</span></button>
   <button class="ni" onclick="showTab('fuel')"><span class="nicon">F</span><span class="nlbl">FUEL</span></button>
+  <button class="ni" onclick="showTab('program')"><span class="nicon">Pg</span><span class="nlbl">PGRM</span></button>
   <button class="ni" onclick="showTab('log')"><span class="nicon">L</span><span class="nlbl">LOG</span></button>
   <button class="ni" onclick="showTab('week')"><span class="nicon">W</span><span class="nlbl">ACTIVITY</span></button>
   <button class="ni" onclick="showTab('progress')"><span class="nicon">P</span><span class="nlbl">PROG</span></button>
-  <button class="ni" onclick="showTab('program')"><span class="nicon">Pg</span><span class="nlbl">PGRM</span></button>
-  <button class="ni" onclick="showTab('milestones')"><span class="nicon">G</span><span class="nlbl">GOALS</span></button>
-  <button class="ni" onclick="showTab('rules')"><span class="nicon">R</span><span class="nlbl">RULES</span></button>
   <button class="ni" onclick="showTab('settings')"><span class="nicon">S</span><span class="nlbl">SET</span></button>
 </nav>
 </div><!-- v2026-05-22 -->

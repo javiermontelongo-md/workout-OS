@@ -71,7 +71,8 @@ Use conventional commit format:
   refactor: description
 
 ## Current Tabs
-TODAY · FUEL · PROGRAM · LOG SESSION · ACTIVITY · PROGRESS · MILESTONES · RULES · SETTINGS
+TODAY · FUEL · PROGRAM · LOG SESSION · ACTIVITY · PROGRESS · SETTINGS
+(MILESTONES and RULES removed from nav. Rules content lives as collapsible drawer in SETTINGS.)
 
 ## Tab Roles
 - **TODAY**: check-in sliders (energy/soreness/motivation/stress/sleep/weight) + recovery snapshot charts + system activity log
