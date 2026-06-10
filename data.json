@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-09",
+  "lastUpdated": "2026-06-10",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -3853,6 +3853,24 @@
       "stress": 5,
       "fatigueScore": 3,
       "postCall": false
+    },
+    {
+      "date": "2026-06-10",
+      "energy": 7,
+      "soreness": 3,
+      "motivation": 7,
+      "stress": 5,
+      "fatigueScore": 3,
+      "postCall": false
+    }
+  ],
+  "bodyMetrics": [
+    {
+      "date": "2026-06-10",
+      "weightLbs": 227,
+      "waistInches": null,
+      "bmi": 33,
+      "waistHeightRatio": null
     }
   ]
 }
