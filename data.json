@@ -4081,16 +4081,24 @@
           "food": "42 g protien fairlife with kashi cereal 10 G protein per serving,",
           "protein": 52,
           "carbs": 45,
-          "fat": 8,
-          "kcal": 468
+          "fat": 4,
+          "kcal": 420
         },
         {
           "time": "9:13 PM",
           "food": "Double quarter pound with cheese and mcdouble",
-          "protein": 65,
-          "carbs": 75,
-          "fat": 72,
-          "kcal": 1212
+          "protein": 72,
+          "carbs": 62,
+          "fat": 68,
+          "kcal": 1140
+        },
+        {
+          "time": "11:00 AM",
+          "food": "Uncured Pepperoni Pizza from TJ, 15 dark chocolate almonds from TJ, 2 servings of TJ hummus, 3 servings of TJ pita chips, 2 banana",
+          "protein": 38,
+          "carbs": 145,
+          "fat": 48,
+          "kcal": 1160
         }
       ],
       "signals": {
@@ -4099,12 +4107,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 117,
-        "carbs": 120,
-        "fat": 80,
-        "kcal": 1680
+        "protein": 162,
+        "carbs": 252,
+        "fat": 120,
+        "kcal": 2720
       },
-      "ts": 1781151236755
+      "ts": 1781161869099
     }
   ],
   "fuelMemory": {
@@ -4203,6 +4211,13 @@
       "inp": 142,
       "out": 79,
       "cost": 0.001611
+    },
+    {
+      "ts": 1781161869099,
+      "type": "macros",
+      "inp": 202,
+      "out": 187,
+      "cost": 0.003411
     }
   ],
   "checkins": [
