@@ -4183,7 +4183,9 @@
         "fat": 64,
         "kcal": 1424
       },
-      "ts": 1781207926326
+      "ts": 1781207926326,
+      "fuelPlan": "## Check-In: June 11\n\n**ASSESSMENT**\n\nYou're at 1,424 kcal and 120g protein by 1pm, which is a decent start — but you still need ~62g protein and likely 800–1,000+ kcal to hit your targets, and your fatigue flags (HRV warning, RHR spike, late sleep) mean today is not the day to let this slide into another 1,770 kcal crash day. The spike-and-crash pattern is showing up again: you had three solid days June 8–10, and the risk right now is coasting on that and under-eating into the weekend. Protein especially needs to be front-loaded into your next meal — don't let it pile up to dinner.\n\n---\n\n**REST OF DAY**\n\n**Afternoon snack (pack for hospital, ~5 min)**\n- 1 Fairlife Core Power 42g shake (if you have another) OR 2 hard-boiled eggs + 1 string cheese\n- 1 banana or handful of crackers\n- **~300 kcal, ~42–45g protein**\n\n**Dinner (~10–15 min)**\n- 6 oz rotisserie chicken breast (grab from any grocery store, zero cooking)\n- 1 pouch microwaveable rice (Uncle Ben's, 90 sec)\n- 1 cup frozen broccoli (microwave 3 min)\n- Drizzle of olive oil or butter on the veg\n- **~650 kcal, ~50g protein**\n\n**Before bed (optional but recommended given RHR spike + poor sleep)**\n- 1 cup cottage cheese or another Fairlife shake\n- **~150–200 kcal, ~25g protein**\n\n---\n\n**End of day total: ~2,500–2,600 kcal | ~235–240g protein**\nSlightly above your protein target — intentional given the fatigue flags and history of crashes. Keep it simple tonight.",
+      "fuelPlanTs": 1781207944448
     }
   ],
   "fuelMemory": {
@@ -4310,6 +4312,13 @@
       "inp": 141,
       "out": 78,
       "cost": 0.001593
+    },
+    {
+      "ts": 1781207944447,
+      "type": "checkin",
+      "inp": 616,
+      "out": 467,
+      "cost": 0.008853
     }
   ],
   "checkins": [
