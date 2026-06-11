@@ -3879,58 +3879,6 @@ function renderFuelTrendChart(){
 }
 
 
-function openFuelDrawer(dateStr){
-  const existing=document.getElementById('fuel-drawer');if(existing)existing.remove();
-  const existingBd=document.getElementById('fuel-drawer-backdrop');if(existingBd)existingBd.remove();
-  const entry=(D.fuelLog||[]).find(e=>e.date===dateStr);if(!entry)return;
-  const backdrop=document.createElement('div');
-  backdrop.id='fuel-drawer-backdrop';
-  backdrop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;opacity:0;transition:opacity 0.25s ease;';
-  backdrop.addEventListener('click',closeFuelDrawer);
-  const drawer=document.createElement('div');
-  drawer.id='fuel-drawer';
-  drawer.style.cssText='position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--s2);border-left:1px solid var(--b2);z-index:201;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(var(--nav) + var(--safe)) 0;';
-  drawer.innerHTML=buildFuelDrawerContent(entry,dateStr);
-  document.body.appendChild(backdrop);document.body.appendChild(drawer);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{backdrop.style.opacity='1';drawer.style.transform='translateX(0)';}));
-}
-
-function closeFuelDrawer(){
-  const drawer=document.getElementById('fuel-drawer');
-  const backdrop=document.getElementById('fuel-drawer-backdrop');
-  if(drawer){drawer.style.transform='translateX(100%)';backdrop.style.opacity='0';setTimeout(()=>{drawer?.remove();backdrop?.remove();},280);}
-}
-
-function buildFuelDrawerContent(entry,dateStr){
-  const dateObj=new Date(dateStr+'T12:00:00');
-  const dateDisplay=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  const t=entry.totals||{};
-  const tot=(t.protein||0)+(t.carbs||0)+(t.fat||0);
-  const pPct=tot?Math.round((t.protein||0)/tot*100):33;
-  const cPct=tot?Math.round((t.carbs||0)/tot*100):34;
-  const fPct=Math.max(0,100-pPct-cPct);
-  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;z-index:1;"><div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div><div style="font-size:var(--fs-title);font-weight:600;color:var(--t);">Fuel Log</div></div><button onclick="closeFuelDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">\xd7</button></div><div style="padding:20px;">`;
-  if(t.kcal){
-    html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><span class="macro-pill p">P ${t.protein||0}g</span><span class="macro-pill c">C ${t.carbs||0}g</span><span class="macro-pill f">F ${t.fat||0}g</span><span class="macro-pill k">${t.kcal} kcal</span></div><div class="macro-bar"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:16px;"><span style="color:var(--mp);">■</span> protein &nbsp;<span style="color:var(--mc);">■</span> carbs &nbsp;<span style="color:var(--mf);">■</span> fat</div>`;
-  }
-  html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">meals</div>`;
-  (entry.meals||[]).forEach(m=>{
-    html+=`<div style="padding:9px 0;border-bottom:1px solid var(--b);"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div>${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);margin-right:8px;">${esc(m.time)}</span>`:''}<span style="font-size:var(--fs-sm);color:var(--t);">${esc(m.food)}</span></div>${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;">${m.kcal} kcal</span>`:''}</div>${(m.protein||m.carbs||m.fat)?(()=>{const _bmt=(m.protein||0)+(m.carbs||0)+(m.fat||0);const _bmp=_bmt?Math.round((m.protein||0)/_bmt*100):0;const _bmc=_bmt?Math.round((m.carbs||0)/_bmt*100):0;const _bmf=Math.max(0,100-_bmp-_bmc);return`<div style="margin-top:5px;display:flex;align-items:center;gap:6px;"><div style="flex:1;height:5px;border-radius:3px;overflow:hidden;display:flex;"><div style="width:${_bmp}%;background:var(--mp);"></div><div style="width:${_bmc}%;background:var(--mc);"></div><div style="width:${_bmf}%;background:var(--mf);"></div></div></div>`;})():''}</div>`;
-  });
-  const sig=entry.signals||{};
-  if(sig.betweenMeals||sig.beforeSleep||sig.onWaking){
-    html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;">how you felt</div>`;
-    if(sig.betweenMeals) html+=`<div style="padding:5px 0;font-size:var(--fs-sm);color:var(--t2);"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-right:6px;">BETWEEN</span>${esc(sig.betweenMeals)}</div>`;
-    if(sig.beforeSleep) html+=`<div style="padding:5px 0;font-size:var(--fs-sm);color:var(--t2);"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-right:6px;">SLEEP</span>${esc(sig.beforeSleep)}</div>`;
-    if(sig.onWaking) html+=`<div style="padding:5px 0;font-size:var(--fs-sm);color:var(--t2);"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-right:6px;">WAKING</span>${esc(sig.onWaking)}</div>`;
-  }
-  if(entry.fuelPlan){
-    html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;">fuel plan that day</div><div style="background:var(--s3);border-radius:var(--r);padding:12px;font-size:var(--fs-sm);color:var(--t2);line-height:1.7;">${esc(entry.fuelPlan).replace(/\n/g,'<br>')}</div>`;
-  }
-  html+='</div>';
-  return html;
-}
-
 // ============================================================
 // SYNC
 // ============================================================
@@ -5835,25 +5783,6 @@ function renderBikeRacePredChart(dist) {
   }
 }
 
-function calcRunMetrics(){
-  const runs=(D.runs||[]).filter(r=>r.type==='run'&&r.distance>=1);
-  if(runs.length<2) return null;
-  const recentRuns=runs.slice(-10);
-  const avgPace=recentRuns.reduce((s,r)=>s+r.pace,0)/recentRuns.length;
-  const racePace=avgPace*0.85;
-  const estimated5KSeconds=racePace*3.1;
-  const mins=Math.floor(estimated5KSeconds/60);
-  const secs=Math.round(estimated5KSeconds%60);
-  const estimated5KTime=`${mins}:${String(secs).padStart(2,'0')}`;
-  const hrRuns=runs.filter(r=>r.heartRateAvg&&r.distance>=2);
-  let vo2maxEstimate=null;
-  if(hrRuns.length>0){
-    const estimates=hrRuns.map(r=>estimateVO2max(r)).filter(v=>v!==null);
-    if(estimates.length>0){estimates.sort((a,b)=>a-b);vo2maxEstimate=estimates[Math.floor(estimates.length/2)];}
-  }
-  if(!vo2maxEstimate){const paceMinsPerMile=avgPace/60;vo2maxEstimate=Math.round(483/paceMinsPerMile);}
-  return{estimated5KTime,estimated5KSeconds,racePacePerMile:racePace,vo2maxEstimate,totalRuns:runs.length,avgPace};
-}
 function renderRunMetricsSummary(){
   // Only updates the sync date label — stat cards removed (redundant with race predictions below)
   const syncEl=document.getElementById('run-last-sync');
@@ -5924,8 +5853,6 @@ function renderRunChart(){
     ctx.fillText('Chart unavailable — check data',10,30);
   }
 }
-function setRunChart(){renderRunChart();}
-
 function renderCyclingChart(){
   const canvas=document.getElementById('bike-chart');
   if(!canvas||typeof Chart==='undefined') return;
@@ -7637,17 +7564,6 @@ function initCheckinTab(){
   if(todayBody)updateBodyCalcs();
 }
 
-function formatSleepInput(input){
-  let val=input.value.replace(/[^0-9]/g,'');
-  if(val.length>4)val=val.substring(0,4);
-  if(val.length>=2){
-    const minsStr=val.substring(val.length-2);
-    const minsNum=parseInt(minsStr);
-    if(minsNum>59){val=val.substring(0,val.length-1);}
-    if(val.length>=2){val=val.substring(0,val.length-2)+':'+val.substring(val.length-2);}
-  }
-  input.value=val;
-}
 function parseSleepHHMM(str){
   if(!str||!str.includes(':'))return null;
   const parts=str.split(':');
