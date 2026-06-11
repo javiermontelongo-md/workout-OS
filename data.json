@@ -4378,8 +4378,8 @@
         "category": "Frozen",
         "store": "TJ",
         "shelfDays": 90,
-        "checked": false,
-        "checkedAt": null
+        "checked": true,
+        "checkedAt": "2026-06-11T06:11:17.417Z"
       },
       {
         "name": "Salted Caramel Hot Chocolate Mix (Ghirardelli)",
