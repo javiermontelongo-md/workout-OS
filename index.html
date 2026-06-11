@@ -49,14 +49,16 @@
   /* Prescription card font sizes — overridden by component sliders via @media */
   --fs-presc-text: 13px;
   --fs-presc-lift: 13px;
-  /* Small UI text — controls all inline tiny text; overridden by small-text slider */
-  --fs-xs: 19px;
-  --fs-sm: 22px;
-  /* Inline text tiers — defaults match existing desktop values; mobile preset overrides via JS */
-  --fs-micro: 10px;   /* stat box headers, calendar day headers */
-  --fs-body: 14px;    /* drawer body text, notes, secondary descriptions */
+  /* Full type scale — ALL set together by XS/S/M/L/XL preset buttons */
+  --fs-nano:  10px;   /* store badges, shelf-life labels, age metadata */
+  --fs-tag:   11px;   /* chips, small tags, compact mono labels */
+  --fs-label: 12px;   /* category headers, time buttons, compact section labels */
+  --fs-micro: 10px;   /* stat box headers, calendar day headers (alias for nano) */
+  --fs-xs:    17px;   /* timestamps, secondary mono text */
+  --fs-sm:    20px;   /* secondary card text, check-in labels */
+  --fs-body:  14px;   /* drawer body text, descriptions */
   --fs-title: 17px;   /* drawer titles, card section headers */
-  --fs-data: 20px;    /* race times, big stat values */
+  --fs-data:  20px;   /* race times, big stat values */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -765,40 +767,40 @@ input[type=range]::-webkit-slider-thumb:hover {
 .macro-bar-p{background:var(--mp);}
 .macro-bar-c{background:var(--mc);}
 .macro-bar-f{background:var(--mf);}
-.macro-pill{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:4px;margin:2px;}
+.macro-pill{display:inline-block;font-family:var(--mono);font-size:var(--fs-label);padding:2px 8px;border-radius:4px;margin:2px;}
 .macro-pill.p{background:rgba(104,110,200,.15);color:var(--a);}
 .macro-pill.c{background:rgba(42,160,112,.15);color:var(--a2);}
 .macro-pill.f{background:rgba(184,96,53,.15);color:var(--aw);}
 .macro-pill.k{background:rgba(255,255,255,.07);color:var(--t2);}
 @media(max-width:768px){.fuel-row input[type=time]{width:90px;min-width:90px;}}
-.fuel-time-btn{flex:0 0 auto;width:100px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--aw);font-family:var(--mono);font-size:13px;font-weight:600;padding:8px 10px;cursor:pointer;text-align:center;transition:border-color .15s;white-space:nowrap;}
+.fuel-time-btn{flex:0 0 auto;width:100px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--aw);font-family:var(--mono);font-size:var(--fs-label);font-weight:600;padding:8px 10px;cursor:pointer;text-align:center;transition:border-color .15s;white-space:nowrap;}
 .fuel-time-btn:hover{border-color:var(--aw);}
 .fuel-chips-group{margin-bottom:14px;}
-.fuel-chips-group-lbl{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+.fuel-chips-group-lbl{font-family:var(--mono);font-size:var(--fs-tag);font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
 .fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px;}
-.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:11px;font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;width:100%;}
+.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-tag);font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;width:100%;}
 .fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
 .fuel-chip-item{border-style:dashed;color:var(--t3);}
 .fuel-chip-item:hover{color:var(--t2);}
-.fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;font-size:11px;}
+.fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;}
 .fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;}
 @media(max-width:600px){.fuel-chips-wrap{grid-template-columns:1fr 1fr;}}
 .fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
-.groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
+.groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-tag);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
 .groc-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;}
 .groc-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--a2);flex-shrink:0;cursor:pointer;}
-.groc-item-name{flex:1;font-size:14px;color:var(--t2);}
-.groc-store{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.groc-item-name{flex:1;font-size:var(--fs-body);color:var(--t2);}
+.groc-store{font-family:var(--mono);font-size:var(--fs-nano);padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
 .groc-store.TJ{background:rgba(194,77,114,0.15);color:var(--a4);}
 .groc-store.WF{background:rgba(42,160,112,0.12);color:var(--a2);}
 .groc-store.Target{background:rgba(61,136,212,0.12);color:var(--a3);}
 .groc-bought-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
 .groc-bought-chip{background:var(--s3);border:1px solid var(--b);border-radius:10px;padding:7px 10px 6px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:3px;transition:background .15s,border-color .15s;width:100%;}
 .groc-bought-chip:hover{background:var(--s4);border-color:var(--b2);}
-.groc-bought-name{font-family:var(--mono);font-size:11px;color:var(--t3);text-decoration:line-through;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.groc-bought-name{font-family:var(--mono);font-size:var(--fs-tag);color:var(--t3);text-decoration:line-through;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .groc-bought-row{display:flex;align-items:center;justify-content:space-between;gap:4px;}
-.groc-bought-age{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);}
-.groc-bought-left{font-family:var(--mono);font-size:var(--fs-micro);padding:1px 5px;border-radius:4px;}
+.groc-bought-age{font-family:var(--mono);font-size:var(--fs-nano);color:var(--t3);}
+.groc-bought-left{font-family:var(--mono);font-size:var(--fs-nano);padding:1px 5px;border-radius:4px;}
 .groc-bought-left.fresh{background:rgba(42,160,112,0.12);color:var(--a2);}
 .groc-bought-left.soon{background:rgba(184,96,53,0.12);color:var(--aw);}
 .groc-bought-left.empty{background:rgba(194,77,114,0.12);color:var(--a4);}
@@ -806,15 +808,15 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-tp-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .fuel-tp-scroll{height:176px;overflow-y:scroll;scroll-snap-type:y mandatory;width:68px;border:1px solid var(--b2);border-radius:var(--r);-ms-overflow-style:none;scrollbar-width:none;}
 .fuel-tp-scroll::-webkit-scrollbar{display:none;}
-.fuel-tp-item{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--mono);font-size:20px;color:var(--t3);cursor:pointer;border-radius:var(--r);transition:color .1s,background .1s;}
+.fuel-tp-item{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--mono);font-size:var(--fs-title);color:var(--t3);cursor:pointer;border-radius:var(--r);transition:color .1s,background .1s;}
 .fuel-tp-item:hover{color:var(--t2);}
 .fuel-tp-item.sel{color:var(--t);background:rgba(104,110,210,.2);}
-.fuel-tp-ampm{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t2);font-family:var(--mono);font-size:14px;padding:10px 16px;cursor:pointer;transition:all .15s;width:60px;text-align:center;}
+.fuel-tp-ampm{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t2);font-family:var(--mono);font-size:var(--fs-body);padding:10px 16px;cursor:pointer;transition:all .15s;width:60px;text-align:center;}
 .fuel-tp-ampm.sel{background:rgba(184,96,53,.2);border-color:rgba(184,96,53,.5);color:var(--aw);}
 .fuel-cal-selected{border-color:var(--aw);background:rgba(184,96,53,.15);}
 .fuel-cal-clickable{cursor:pointer;}
 .fuel-date-nav{display:flex;gap:6px;}
-.fuel-date-nav button{padding:6px 13px;font-size:13px;}
+.fuel-date-nav button{padding:6px 13px;font-size:var(--fs-label);}
 
 /* ── PROGRAM TAB ── */
 .prog-day-card { background: var(--s1); border: 1px solid var(--b); border-radius: 12px; overflow: hidden; transition: border-color .2s; }
@@ -2189,7 +2191,7 @@ function _applyMobileComponentFontSizes(){
     const px=+(localStorage.getItem('wos-fs-'+key)||cfg.def);
     return `${cfg.sel}{font-size:${px}px}`;
   }).join('\n');
-  const rootVars=`--fs-sm:${smPx}px;--fs-xs:${xsPx}px;--fs-micro:${tiers.micro}px;--fs-body:${tiers.body}px;--fs-title:${tiers.title}px;--fs-data:${tiers.data}px`;
+  const rootVars=`--fs-sm:${smPx}px;--fs-xs:${xsPx}px;--fs-micro:${tiers.micro}px;--fs-body:${tiers.body}px;--fs-title:${tiers.title}px;--fs-data:${tiers.data}px;--fs-nano:${tiers.nano}px;--fs-tag:${tiers.tag}px;--fs-label:${tiers.label}px`;
   const css=`@media(max-width:768px){\nbody{font-size:${basePx}px}\n:root{${rootVars}}\n${compRules}\n.cstat-lbl{font-size:var(--fs-micro)}\n.cstat-val{font-size:var(--fs-sm)}\n}`;
   let el=document.getElementById('wos-fs-mobile-overrides');
   if(!el){el=document.createElement('style');el.id='wos-fs-mobile-overrides';document.head.appendChild(el);}
@@ -2198,11 +2200,11 @@ function _applyMobileComponentFontSizes(){
 const MOBILE_BASE_MAP={14:11,17:13,19:14,22:16,26:18};
 const MOBILE_SMALLTEXT_MAP={14:9,17:11,19:12,22:14,26:16};
 const MOBILE_FS_TIERS={
-  14:{micro:8, body:11, title:13, data:15},
-  17:{micro:9, body:12, title:14, data:16},
-  19:{micro:10,body:13, title:15, data:17},
-  22:{micro:10,body:14, title:16, data:19},
-  26:{micro:11,body:16, title:18, data:21}
+  14:{micro:8, body:11, title:13, data:15, nano:7,  tag:8,  label:9},
+  17:{micro:9, body:12, title:14, data:16, nano:8,  tag:9,  label:10},
+  19:{micro:10,body:13, title:15, data:17, nano:9,  tag:10, label:11},
+  22:{micro:10,body:14, title:16, data:19, nano:10, tag:11, label:12},
+  26:{micro:11,body:16, title:18, data:21, nano:11, tag:12, label:13},
 };
 function applyDesktopFontPreset(px){
   const preset=FONT_PRESETS[px];if(!preset)return;
@@ -2211,10 +2213,17 @@ function applyDesktopFontPreset(px){
     if(key==='base'){localStorage.setItem('wos-fontsize',val);_applyFontSize(val);}
     else localStorage.setItem('wos-fs-'+key,val);
   });
-  const smallPx=Math.round(12*(+px/19));
-  const clampedSmall=Math.max(22,Math.min(30,smallPx));
-  localStorage.setItem('wos-smalltext',clampedSmall);
-  _applySmallTextSize(clampedSmall);
+  // Set ALL CSS vars directly from preset — no floor, no formula drift
+  const R=document.documentElement;
+  if(preset.xs)    R.style.setProperty('--fs-xs',    preset.xs+'px');
+  if(preset.sm)    R.style.setProperty('--fs-sm',    preset.sm+'px');
+  if(preset.body)  R.style.setProperty('--fs-body',  preset.body+'px');
+  if(preset.title) R.style.setProperty('--fs-title', preset.title+'px');
+  if(preset.data)  R.style.setProperty('--fs-data',  preset.data+'px');
+  if(preset.label) R.style.setProperty('--fs-label', preset.label+'px');
+  if(preset.tag)   R.style.setProperty('--fs-tag',   preset.tag+'px');
+  if(preset.nano)  R.style.setProperty('--fs-nano',  preset.nano+'px');
+  R.style.setProperty('--fs-micro',(preset.nano||10)+'px');
   _applyComponentFontSizes();
   _syncDesktopFontPresetBtns(px);
 }
@@ -2238,11 +2247,22 @@ function applyAppearance(){
   const isMobileViewport=window.innerWidth<=768;
   const fontKey=isMobileViewport&&localStorage.getItem('wos-font-mobile')?'wos-font-mobile':'wos-font';
   _applyFont(localStorage.getItem(fontKey)||'dm');
-  const savedSize=localStorage.getItem('wos-fontsize')||'19';
+  const savedSize=+(localStorage.getItem('wos-fontsize')||19);
   _applyFontSize(savedSize);
-  _syncDesktopFontPresetBtns(+savedSize);
+  _syncDesktopFontPresetBtns(savedSize);
   _syncMobileFontPresetBtns(+(localStorage.getItem('wos-mobile-preset')||19));
-  _applySmallTextSize(Math.max(22,+(localStorage.getItem('wos-smalltext')||'22')));
+  // Initialize all CSS vars from saved preset — no floor formula
+  const preset=FONT_PRESETS[savedSize]||FONT_PRESETS[19];
+  const R=document.documentElement;
+  if(preset.xs)    R.style.setProperty('--fs-xs',    preset.xs+'px');
+  if(preset.sm)    R.style.setProperty('--fs-sm',    preset.sm+'px');
+  if(preset.body)  R.style.setProperty('--fs-body',  preset.body+'px');
+  if(preset.title) R.style.setProperty('--fs-title', preset.title+'px');
+  if(preset.data)  R.style.setProperty('--fs-data',  preset.data+'px');
+  if(preset.label) R.style.setProperty('--fs-label', preset.label+'px');
+  if(preset.tag)   R.style.setProperty('--fs-tag',   preset.tag+'px');
+  if(preset.nano)  R.style.setProperty('--fs-nano',  preset.nano+'px');
+  R.style.setProperty('--fs-micro',(preset.nano||10)+'px');
   _applyComponentFontSizes();
   _applyMobileComponentFontSizes();
 }
@@ -2267,11 +2287,12 @@ function _applySmallTextSize(px){
 }
 function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
 const FONT_PRESETS={
-  14:{base:14,logo:21,nav:18,heading:21,sublabel:15,badge:18,input:17,btn:18,cardtext:17,exercise:17,dataval:24,caltext:16,mono:18,presctext:10,m_mlogo:15,m_nav:10,m_navlbl:6,m_heading:16,m_label:10,m_input:12,m_btn:9,m_cardtext:10},
-  17:{base:17,logo:25,nav:22,heading:26,sublabel:18,badge:21,input:21,btn:22,cardtext:21,exercise:21,dataval:29,caltext:20,mono:21,presctext:12,m_mlogo:18,m_nav:13,m_navlbl:7,m_heading:20,m_label:12,m_input:14,m_btn:11,m_cardtext:13},
-  19:{base:19,logo:28,nav:25,heading:29,sublabel:20,badge:24,input:23,btn:25,cardtext:23,exercise:23,dataval:32,caltext:22,mono:24,presctext:13,m_mlogo:20,m_nav:14,m_navlbl:8,m_heading:22,m_label:13,m_input:16,m_btn:12,m_cardtext:14},
-  22:{base:22,logo:32,nav:29,heading:34,sublabel:23,badge:28,input:27,btn:29,cardtext:27,exercise:27,dataval:37,caltext:26,mono:28,presctext:15,m_mlogo:23,m_nav:16,m_navlbl:9,m_heading:25,m_label:15,m_input:19,m_btn:14,m_cardtext:16},
-  26:{base:26,logo:38,nav:34,heading:40,sublabel:27,badge:28,input:31,btn:34,cardtext:31,exercise:31,dataval:44,caltext:28,mono:28,presctext:18,m_mlogo:27,m_nav:19,m_navlbl:11,m_heading:30,m_label:18,m_input:22,m_btn:16,m_cardtext:19}
+  // compact tier:  nano  tag  label  xs   sm   body title data
+  14:{base:14,nano:8, tag:9, label:10,xs:13,sm:15,body:11,title:13,data:16, logo:21,nav:18,heading:21,sublabel:15,badge:18,input:17,btn:18,cardtext:17,exercise:17,dataval:24,caltext:16,mono:18,presctext:10,m_mlogo:15,m_nav:10,m_navlbl:6,m_heading:16,m_label:10,m_input:12,m_btn:9,m_cardtext:10},
+  17:{base:17,nano:9, tag:10,label:11,xs:15,sm:18,body:12,title:15,data:18, logo:25,nav:22,heading:26,sublabel:18,badge:21,input:21,btn:22,cardtext:21,exercise:21,dataval:29,caltext:20,mono:21,presctext:12,m_mlogo:18,m_nav:13,m_navlbl:7,m_heading:20,m_label:12,m_input:14,m_btn:11,m_cardtext:13},
+  19:{base:19,nano:10,tag:11,label:12,xs:17,sm:20,body:14,title:17,data:20, logo:28,nav:25,heading:29,sublabel:20,badge:24,input:23,btn:25,cardtext:23,exercise:23,dataval:32,caltext:22,mono:24,presctext:13,m_mlogo:20,m_nav:14,m_navlbl:8,m_heading:22,m_label:13,m_input:16,m_btn:12,m_cardtext:14},
+  22:{base:22,nano:11,tag:12,label:13,xs:20,sm:23,body:16,title:19,data:23, logo:32,nav:29,heading:34,sublabel:23,badge:28,input:27,btn:29,cardtext:27,exercise:27,dataval:37,caltext:26,mono:28,presctext:15,m_mlogo:23,m_nav:16,m_navlbl:9,m_heading:25,m_label:15,m_input:19,m_btn:14,m_cardtext:16},
+  26:{base:26,nano:12,tag:13,label:14,xs:24,sm:27,body:18,title:22,data:26, logo:38,nav:34,heading:40,sublabel:27,badge:28,input:31,btn:34,cardtext:31,exercise:31,dataval:44,caltext:28,mono:28,presctext:18,m_mlogo:27,m_nav:19,m_navlbl:11,m_heading:30,m_label:18,m_input:22,m_btn:16,m_cardtext:19}
 };
 function _syncDesktopFontPresetBtns(px){
   const map={14:'dfsp-xs',17:'dfsp-s',19:'dfsp-m',22:'dfsp-l',26:'dfsp-xl'};
