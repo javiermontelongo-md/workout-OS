@@ -3788,11 +3788,11 @@ function renderFuelTrendChart(){
       {label:'Calories',data:kData,type:'line',borderColor:'rgba(226,234,248,0.5)',backgroundColor:'transparent',pointBackgroundColor:'rgba(226,234,248,0.8)',pointRadius:3,yAxisID:'yk',tension:0.3,spanGaps:true}
     ]},
     options:{responsive:true,maintainAspectRatio:true,
-      plugins:{legend:{labels:{color:'#a8b4cc',boxWidth:12,font:{size:11}}}},
+      plugins:{legend:{labels:{color:'#a8b4cc',boxWidth:12,font:{size:13}}}},
       scales:{
-        y:{stacked:true,ticks:{color:'#7e8caa',font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'},title:{display:true,text:'grams',color:'#7e8caa',font:{size:10}}},
-        yk:{position:'right',ticks:{color:'#7e8caa',font:{size:11}},grid:{display:false},title:{display:true,text:'kcal',color:'#7e8caa',font:{size:10}}},
-        x:{ticks:{color:'#7e8caa',maxRotation:45,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}
+        y:{stacked:true,ticks:{color:'#7e8caa',font:{size:13}},grid:{color:'rgba(255,255,255,0.05)'},title:{display:true,text:'grams',color:'#7e8caa',font:{size:12}}},
+        yk:{position:'right',ticks:{color:'#7e8caa',font:{size:13}},grid:{display:false},title:{display:true,text:'kcal',color:'#7e8caa',font:{size:12}}},
+        x:{ticks:{color:'#7e8caa',maxRotation:45,font:{size:12}},grid:{color:'rgba(255,255,255,0.05)'}}
       }
     }
   });
@@ -4503,7 +4503,7 @@ function renderAIUsage(){
     // Resolve CSS vars to real values — Chart.js cannot read var(--x) strings
     const cT3=getComputedStyle(document.documentElement).getPropertyValue('--t3').trim()||'#7e8caa';
     const cGrid='rgba(104,110,210,0.1)';
-    _aiUsageChart=new Chart(canvasEl,{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{color:cT3,font:{size:11},boxWidth:12,padding:10}}},scales:{x:{stacked:true,ticks:{color:cT3,maxRotation:45,font:{size:10}},grid:{color:cGrid}},y:{stacked:true,ticks:{color:cT3,font:{size:10},callback:v=>'$'+v.toFixed(4)},grid:{color:cGrid}}}}});
+    _aiUsageChart=new Chart(canvasEl,{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{color:cT3,font:{size:13},boxWidth:12,padding:10}}},scales:{x:{stacked:true,ticks:{color:cT3,maxRotation:45,font:{size:12}},grid:{color:cGrid}},y:{stacked:true,ticks:{color:cT3,font:{size:12},callback:v=>'$'+v.toFixed(4)},grid:{color:cGrid}}}}});
   }
 
   // Per-type breakdown table
@@ -5288,7 +5288,7 @@ function renderRacePredChart(dist) {
       scales: {
         x: {
           ticks: {
-            color:'#4a5068', font:{size:9}, maxTicksLimit:9, maxRotation:0,
+            color:'#4a5068', font:{size:11}, maxTicksLimit:9, maxRotation:0,
             callback: function(val, i) {
               const lbl = allLabels[i];
               if (!lbl) return '';
@@ -5305,7 +5305,7 @@ function renderRacePredChart(dist) {
         y: {
           reverse: true,
           ticks: {
-            color:'#4a5068', font:{size:9},
+            color:'#4a5068', font:{size:11},
             callback: v => secsToRaceTime(Math.round(v*60))
           },
           grid: { color:'rgba(255,255,255,0.04)' }
@@ -5674,7 +5674,7 @@ function renderBikeRacePredChart(dist) {
       scales: {
         x: {
           ticks: {
-            color:'#4a5068', font:{size:9}, maxTicksLimit:9, maxRotation:0,
+            color:'#4a5068', font:{size:11}, maxTicksLimit:9, maxRotation:0,
             callback: function(val, i) {
               const lbl = allLabels[i];
               if (!lbl) return '';
@@ -5690,7 +5690,7 @@ function renderBikeRacePredChart(dist) {
         y: {
           reverse: true,
           ticks: {
-            color:'#4a5068', font:{size:9},
+            color:'#4a5068', font:{size:11},
             callback: v => secsToRaceTime(Math.round(v*60))
           },
           grid: { color:'rgba(255,255,255,0.04)' }
@@ -5971,12 +5971,12 @@ function renderVO2TrendChart(){
       },
       scales:{
         x:{
-          ticks:{color:'#7e8caa',font:{family:'DM Mono',size:11},maxRotation:0,maxTicksLimit:maxTicks},
+          ticks:{color:'#7e8caa',font:{family:'DM Mono',size:13},maxRotation:0,maxTicksLimit:maxTicks},
           grid:{color:'rgba(255,255,255,0.04)'}
         },
         y:{
           min:yMin,max:yMax,
-          ticks:{color:'rgba(0,212,255,0.7)',font:{family:'DM Mono',size:11},callback:v=>v+' ml'},
+          ticks:{color:'rgba(0,212,255,0.7)',font:{family:'DM Mono',size:13},callback:v=>v+' ml'},
           grid:{color:'rgba(255,255,255,0.04)'}
         }
       }
@@ -6753,7 +6753,7 @@ function renderPredictionChart(lift='bench'){
       c.save();c.beginPath();c.moveTo(x,top);c.lineTo(x,bottom);
       c.strokeStyle='rgba(168,180,204,0.35)';c.setLineDash([4,4]);c.lineWidth=1;c.stroke();c.restore();
     }};
-    window._e1rmChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label(ctx){const v=ctx.parsed.y;if(v===null)return null;if(isPU)return `${ctx.dataset.label}: ${v} lb (BW+added)`;return `${ctx.dataset.label}: ${v} lb`;}}}},scales:{x:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:11},maxTicksLimit:7,maxRotation:0,callback(val){const l=this.getLabelForValue(val);if(!l)return'';const[,m,d]=l.split('-');return months[parseInt(m)-1]+' '+parseInt(d);}},grid:{color:'rgba(104,112,200,0.08)'}},y:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:11},callback:v=>v+' lb'},grid:{color:'rgba(104,112,200,0.08)'}}}},plugins:[todayPlugin]});
+    window._e1rmChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label(ctx){const v=ctx.parsed.y;if(v===null)return null;if(isPU)return `${ctx.dataset.label}: ${v} lb (BW+added)`;return `${ctx.dataset.label}: ${v} lb`;}}}},scales:{x:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:13},maxTicksLimit:7,maxRotation:0,callback(val){const l=this.getLabelForValue(val);if(!l)return'';const[,m,d]=l.split('-');return months[parseInt(m)-1]+' '+parseInt(d);}},grid:{color:'rgba(104,112,200,0.08)'}},y:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:13},callback:v=>v+' lb'},grid:{color:'rgba(104,112,200,0.08)'}}}},plugins:[todayPlugin]});
   }catch(e){
     console.warn('Chart render failed:',e);
     const ctx=canvas.getContext('2d');ctx.font='12px monospace';ctx.fillStyle='#4a5068';
@@ -7542,7 +7542,7 @@ function renderBodyChart(type='weight'){
   window._bodyChart=new Chart(canvas.getContext('2d'),{
     type:'line',
     data:{labels,datasets:[{data,borderColor:color,backgroundColor:color.replace('0.9','0.15'),borderWidth:2,pointRadius:3,tension:0.3,spanGaps:true}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} ${yLabel}`}}},scales:{x:{ticks:{font:{family:'monospace',size:9},color:'#888',maxTicksLimit:6},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{font:{family:'monospace',size:9},color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} ${yLabel}`}}},scales:{x:{ticks:{font:{family:'monospace',size:11},color:'#888',maxTicksLimit:6},grid:{color:'rgba(255,255,255,0.05)'}},y:{ticks:{font:{family:'monospace',size:11},color:'#888'},grid:{color:'rgba(255,255,255,0.05)'}}}}
   });
   }catch(e){
     console.warn('Chart render failed:',e);
