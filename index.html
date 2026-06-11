@@ -466,22 +466,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 .ci label { font-size: 23px; color: var(--t2); cursor: pointer; line-height: 1.5; flex: 1; }
 .ci.done label { text-decoration: line-through; color: var(--t3); }
 
-/* ── PROGRESS BARS ── */
-.pbw { margin-bottom: 10px; }
-.pbl {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--mono);
-  font-size: 24px;
-  color: var(--t3);
-  margin-bottom: 5px;
-}
-.pbb { height: 5px; background: var(--s4); border-radius: 3px; overflow: hidden; }
-.pbf { height: 100%; border-radius: 3px; background: var(--a); transition: width .5s cubic-bezier(.4,0,.2,1); }
-
-.bbar { height: 6px; border-radius: 3px; background: var(--s4); overflow: hidden; margin: 8px 0; }
-.bfill { height: 100%; border-radius: 3px; transition: width .4s cubic-bezier(.4,0,.2,1), background .3s; }
-
 /* ── AI RESPONSE BOX ── */
 .air {
   background: var(--s2);
@@ -627,7 +611,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 }
 .ex-row:hover { border-color: var(--b2); }
 .ex-name { font-size: 23px; font-weight: 500; color: var(--t); margin-bottom: 4px; }
-.ex-plan { font-family: var(--mono); font-size: 25px; color: var(--a); }
 
 /* ── SAVE BUTTON ── */
 .sbtn {
@@ -757,12 +740,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 .cal-badge.cardio { background: rgba(52,201,142,0.13); color: var(--a2); }
 .cal-badge.rest { background: rgba(232,93,138,0.1); color: var(--a4); }
 .cal-badge.planned { background: rgba(192,132,252,0.12); color: var(--a5); border: 1px dashed rgba(192,132,252,0.35); }
-.cal-badge.run-easy { background: rgba(52,201,142,0.12); color: var(--a2); border: 1px solid rgba(52,201,142,0.22); }
-.cal-badge.run-quality { background: rgba(74,157,247,0.12); color: var(--a3); }
-.cal-badge.run-long { background: rgba(74,157,247,0.12); color: var(--a3); }
-.cal-badge.run-moderate { background: rgba(192,132,252,0.12); color: var(--a5); border: 1px solid rgba(192,132,252,0.22); }
 .cal-week-summary { font-family: var(--mono); font-size: 24px; color: var(--t3); text-align: center; padding: 5px 0 2px; }
-.cal-rest { font-family: var(--mono); font-size: 22px; color: var(--t3); opacity: .4; }
 .cal-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 2px;}
 .cal-dot.lift{background:var(--a);box-shadow:0 0 6px rgba(104,110,210,0.7);}
 .cal-dot.run{background:var(--a2);box-shadow:0 0 6px rgba(42,160,112,0.7);}
@@ -776,7 +754,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 .cal-cell.has-lift.has-run{background:linear-gradient(135deg,rgba(104,110,210,0.12),rgba(42,160,112,0.08));border-color:rgba(104,110,210,0.38);}
 .cal-cell.has-lift.has-ride{background:linear-gradient(135deg,rgba(104,110,210,0.12),rgba(160,102,212,0.08));border-color:rgba(104,110,210,0.38);}
 .cal-cell.has-run.has-ride{background:linear-gradient(135deg,rgba(42,160,112,0.1),rgba(160,102,212,0.08));border-color:rgba(42,160,112,0.35);}
-.ride-stat-box{background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.25);border-radius:12px;padding:14px 12px;text-align:center;}
 .ride-act-card{background:var(--s3);border:1px solid rgba(160,102,212,0.3);border-radius:14px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden;}
 .ride-act-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),rgba(160,102,212,0.3));}
 .fuel-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;min-width:0;overflow:hidden;}
@@ -849,7 +826,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 .prog-day-tag { font-family: var(--mono); font-size: 23px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 4px; }
 .prog-day-title { font-size: 25px; font-weight: 500; color: var(--t); }
 .prog-day-sub { font-family: var(--mono); font-size: 24px; color: var(--t3); margin-top: 3px; }
-.prog-exercises { padding: 12px 16px; display: flex; flex-direction: column; gap: 0; }
 .prog-exercise { padding: 11px 0; border-bottom: 1px solid var(--b); }
 .prog-exercise:last-child { border-bottom: none; }
 .prog-exercise.primary .prog-ex-name { font-size: 23px; font-weight: 500; color: var(--t); }
@@ -857,56 +833,10 @@ input[type=range]::-webkit-slider-thumb:hover {
 .prog-ex-presc { font-family: var(--mono); font-size: 22px; color: var(--a); margin-top: 3px; }
 .prog-exercise.accessory .prog-ex-presc { color: var(--t2); font-size: 25px; }
 .prog-exercise.run .prog-ex-presc { color: var(--a2); font-size: 22px; }
-.prog-ex-note { font-family: var(--mono); font-size: 24px; color: var(--t3); margin-top: 3px; font-style: italic; }
 .prog-chevron { font-size: 25px; color: var(--t3); transition: transform .2s; }
 .prog-chevron.open { transform: rotate(90deg); }
-.prog-collapsed-body { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--b); }
 
-/* ── WEEK NAVIGATOR ── */
-.wn-dot { border-radius: 3px; transition: all .2s; }
-
-/* ── ADAPTIVE PLAN ── */
-.ap-week-cell {
-  background: var(--s2);
-  border: 1px solid var(--b);
-  border-radius: 8px;
-  padding: 9px 6px;
-  text-align: center;
-  transition: border-color .2s, background .2s;
-}
-.ap-week-cell.current { border-color: var(--a); background: rgba(124,131,247,0.06); }
-.ap-week-num { font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--t3); }
-.ap-week-cell.current .ap-week-num { color: var(--a); }
-.ap-week-lbl { font-size: 23px; color: var(--t3); margin-top: 3px; letter-spacing: .05em; text-transform: uppercase; }
-
-.ap-lift-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--b);
-}
-.ap-lift-row:last-child { border-bottom: none; }
-.ap-lift-name { font-size: 23px; font-weight: 500; color: var(--t); margin-bottom: 2px; }
-.ap-lift-var { font-family: var(--mono); font-size: 24px; color: var(--t3); }
-.ap-lift-right { text-align: right; flex-shrink: 0; margin-left: 12px; }
 .ap-lift-weight { font-family: var(--mono); font-size: 29px; font-weight: 500; color: var(--a); }
-.ap-lift-detail { font-family: var(--mono); font-size: 24px; color: var(--t2); margin-top: 2px; }
-
-.ap-trend {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-family: var(--mono);
-  font-size: 23px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  margin-top: 4px;
-  letter-spacing: .04em;
-}
-.ap-trend.up { background: rgba(52,201,142,0.1); color: var(--a2); }
-.ap-trend.down { background: rgba(232,93,138,0.1); color: var(--a4); }
-.ap-trend.flat { background: var(--s3); color: var(--t3); }
 
 .rpe-pill {
   display: inline-block;
@@ -925,36 +855,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 .rpe-pill.confirmed { background: var(--a); color: #06080f; border-color: var(--a); }
 
 .chart-lift-btn.active { background: rgba(124,131,247,0.12); color: var(--a); border-color: rgba(124,131,247,0.3); }
-.ap-shift-badge {
-  font-family: var(--mono);
-  font-size: 22px;
-  padding: 1px 5px;
-  border-radius: 3px;
-  background: rgba(124,131,247,0.15);
-  color: var(--a);
-  border: 1px solid rgba(124,131,247,0.3);
-  margin-left: 4px;
-}
-
-/* ── SPARKLINES ── */
-.spark-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--b);
-}
-.spark-row:last-child { border-bottom: none; }
-.spark-label { font-family: var(--mono); font-size: 24px; color: var(--t3); width: 80px; flex-shrink: 0; text-transform: uppercase; letter-spacing: .06em; }
-.spark-avg { font-family: var(--mono); font-size: 25px; color: var(--t2); width: 44px; flex-shrink: 0; text-align: right; }
-.spark-bars { display: flex; align-items: flex-end; gap: 2px; height: 28px; flex: 1; }
-.spark-bar { flex: 1; border-radius: 2px 2px 0 0; min-height: 3px; transition: height .3s; }
-.spark-bar.empty { background: var(--s3); opacity: .4; }
-.spark-bar.good { background: var(--a2); opacity: .7; }
-.spark-bar.good:last-child { opacity: 1; }
-.spark-bar.stress { background: var(--a4); opacity: .7; }
-.spark-bar.stress:last-child { opacity: 1; }
-.spark-bar.neutral { background: var(--a); opacity: .6; }
 
 /* ── MOBILE ── */
 @media(max-width:768px){
@@ -1040,7 +940,6 @@ input[type=range]::-webkit-slider-thumb:hover {
   .sl { font-size: var(--fs-sm); }
   .info-row-label { font-size: var(--fs-xs); }
   .cal-week-label { font-size: var(--fs-xs); }
-  .spark-label { font-size: var(--fs-xs); width: 52px; }
   /* bigger tap targets with 7 tabs instead of 9 */
   :root { --nav: 72px; --fs-presc-text: 15px; --fs-presc-lift: 15px; }
   .ni { min-width: 48px; padding: 10px 4px; gap: 5px; }
