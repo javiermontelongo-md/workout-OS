@@ -4151,6 +4151,39 @@
         "kcal": 2720
       },
       "ts": 1781161869099
+    },
+    {
+      "date": "2026-06-11",
+      "meals": [
+        {
+          "time": "9:57 AM",
+          "food": "Double quarter pounder, mcdouble",
+          "protein": 68,
+          "carbs": 44,
+          "fat": 58,
+          "kcal": 982
+        },
+        {
+          "time": "12:58 PM",
+          "food": "42 g protien fairlife with kashi cereal 10 G protein per serving,",
+          "protein": 52,
+          "carbs": 45,
+          "fat": 6,
+          "kcal": 442
+        }
+      ],
+      "signals": {
+        "betweenMeals": "",
+        "beforeSleep": "",
+        "onWaking": ""
+      },
+      "totals": {
+        "protein": 120,
+        "carbs": 89,
+        "fat": 64,
+        "kcal": 1424
+      },
+      "ts": 1781207926326
     }
   ],
   "fuelMemory": {
@@ -4270,6 +4303,13 @@
       "inp": 333,
       "out": 120,
       "cost": 0.002799
+    },
+    {
+      "ts": 1781207926325,
+      "type": "macros",
+      "inp": 141,
+      "out": 78,
+      "cost": 0.001593
     }
   ],
   "checkins": [
