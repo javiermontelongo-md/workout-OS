@@ -788,35 +788,37 @@ input[type=range]::-webkit-slider-thumb:hover {
 .macro-bar-p{background:var(--mp);}
 .macro-bar-c{background:var(--mc);}
 .macro-bar-f{background:var(--mf);}
-.macro-pill{display:inline-block;font-family:var(--mono);font-size:var(--fs-xs);padding:2px 8px;border-radius:4px;margin:2px;}
+.macro-pill{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:4px;margin:2px;}
 .macro-pill.p{background:rgba(104,110,200,.15);color:var(--a);}
 .macro-pill.c{background:rgba(42,160,112,.15);color:var(--a2);}
 .macro-pill.f{background:rgba(184,96,53,.15);color:var(--aw);}
 .macro-pill.k{background:rgba(255,255,255,.07);color:var(--t2);}
 @media(max-width:768px){.fuel-row input[type=time]{width:90px;min-width:90px;}}
-.fuel-time-btn{flex:0 0 auto;width:88px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--aw);font-family:var(--mono);font-size:var(--fs-xs);padding:7px 8px;cursor:pointer;text-align:center;transition:border-color .15s;white-space:nowrap;}
+.fuel-time-btn{flex:0 0 auto;width:100px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--aw);font-family:var(--mono);font-size:13px;font-weight:600;padding:8px 10px;cursor:pointer;text-align:center;transition:border-color .15s;white-space:nowrap;}
 .fuel-time-btn:hover{border-color:var(--aw);}
-.fuel-chips-group{margin-bottom:12px;}
-.fuel-chips-group-lbl{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
-.fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;}
-.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-xs);font-family:var(--mono);padding:8px 11px 7px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:5px;width:100%;}
+.fuel-chips-group{margin-bottom:14px;}
+.fuel-chips-group-lbl{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+.fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px;}
+.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:11px;font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;width:100%;}
 .fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
-.fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;}
-.fuel-chip-bar{display:flex;height:4px;border-radius:2px;overflow:hidden;width:100%;}
+.fuel-chip-item{border-style:dashed;color:var(--t3);}
+.fuel-chip-item:hover{color:var(--t2);}
+.fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;font-size:11px;}
+.fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;}
 @media(max-width:600px){.fuel-chips-wrap{grid-template-columns:1fr 1fr;}}
 .fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
 .groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
 .groc-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;}
 .groc-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--a2);flex-shrink:0;cursor:pointer;}
-.groc-item-name{flex:1;font-size:var(--fs-sm);color:var(--t2);}
-.groc-store{font-family:var(--mono);font-size:var(--fs-micro);padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.groc-item-name{flex:1;font-size:14px;color:var(--t2);}
+.groc-store{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
 .groc-store.TJ{background:rgba(194,77,114,0.15);color:var(--a4);}
 .groc-store.WF{background:rgba(42,160,112,0.12);color:var(--a2);}
 .groc-store.Target{background:rgba(61,136,212,0.12);color:var(--a3);}
 .groc-bought-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
 .groc-bought-chip{background:var(--s3);border:1px solid var(--b);border-radius:10px;padding:7px 10px 6px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:3px;transition:background .15s,border-color .15s;width:100%;}
 .groc-bought-chip:hover{background:var(--s4);border-color:var(--b2);}
-.groc-bought-name{font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-decoration:line-through;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.groc-bought-name{font-family:var(--mono);font-size:11px;color:var(--t3);text-decoration:line-through;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .groc-bought-row{display:flex;align-items:center;justify-content:space-between;gap:4px;}
 .groc-bought-age{font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);}
 .groc-bought-left{font-family:var(--mono);font-size:var(--fs-micro);padding:1px 5px;border-radius:4px;}
@@ -830,12 +832,12 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-tp-item{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--mono);font-size:20px;color:var(--t3);cursor:pointer;border-radius:var(--r);transition:color .1s,background .1s;}
 .fuel-tp-item:hover{color:var(--t2);}
 .fuel-tp-item.sel{color:var(--t);background:rgba(104,110,210,.2);}
-.fuel-tp-ampm{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t2);font-family:var(--mono);font-size:var(--fs-xs);padding:10px 16px;cursor:pointer;transition:all .15s;width:60px;text-align:center;}
+.fuel-tp-ampm{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t2);font-family:var(--mono);font-size:14px;padding:10px 16px;cursor:pointer;transition:all .15s;width:60px;text-align:center;}
 .fuel-tp-ampm.sel{background:rgba(184,96,53,.2);border-color:rgba(184,96,53,.5);color:var(--aw);}
 .fuel-cal-selected{border-color:var(--aw);background:rgba(184,96,53,.15);}
 .fuel-cal-clickable{cursor:pointer;}
 .fuel-date-nav{display:flex;gap:6px;}
-.fuel-date-nav button{padding:5px 11px;font-size:var(--fs-xs);}
+.fuel-date-nav button{padding:6px 13px;font-size:13px;}
 
 /* ── PROGRAM TAB ── */
 .prog-day-card { background: var(--s1); border: 1px solid var(--b); border-radius: 12px; overflow: hidden; transition: border-color .2s; }
@@ -3039,12 +3041,23 @@ function buildFoodLookup(){
   for(const entry of entries){
     for(const m of (entry.meals||[])){
       const key=(m.food||'').trim();
-      if(key&&!map.has(key)&&m.kcal){
-        const cat=getMealCategory(parseMealHour(m.time||''));
-        map.set(key,{protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0,cat});
+      if(!key) continue;
+      const cat=getMealCategory(parseMealHour(m.time||''));
+      // Add full meal with macros
+      if(!map.has(key)&&m.kcal){
+        map.set(key,{protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0,cat,isItem:false});
+      }
+      // Split comma-separated combos into individual item chips (no cached macros)
+      if(key.includes(',')){
+        const parts=key.split(',').map(s=>s.trim()).filter(s=>s.length>2);
+        for(const part of parts){
+          if(!map.has(part)){
+            map.set(part,{protein:0,carbs:0,fat:0,kcal:0,cat,isItem:true});
+          }
+        }
       }
     }
-    if(map.size>=30) break;
+    if(map.size>=48) break;
   }
   return map;
 }
@@ -3073,6 +3086,9 @@ function renderFuelChips(){
     html+=`<div class="fuel-chips-group"><div class="fuel-chips-group-lbl">${_CHIP_CAT_ICON[cat]} ${cat}</div><div class="fuel-chips-wrap">`;
     html+=groups[cat].map(i=>{
       const [food,m]=_chipData[i];
+      if(m.isItem){
+        return`<button class="fuel-chip fuel-chip-item" title="tap to append to current meal" onclick="addFuelChipRow(${i})"><span class="fuel-chip-lbl">+ ${esc(food)}</span></button>`;
+      }
       const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);
       const _pp=_mt?Math.round((m.protein||0)/_mt*100):0;
       const _cp=_mt?Math.round((m.carbs||0)/_mt*100):0;
@@ -3088,10 +3104,21 @@ function addFuelChipRow(idx){
   const [food,macros]=_chipData[idx]||['',{protein:0,carbs:0,fat:0,kcal:0}];
   const timeStr=currentTimeStr();
   const last=_fuelRows[_fuelRows.length-1];
-  if(last&&!last.food.trim()){
-    _fuelRows[_fuelRows.length-1]={time:last.time||timeStr,food,...macros};
+  if(macros.isItem){
+    // Individual item from a combo — append to current last row with comma
+    if(last){
+      const existing=(last.food||'').trim();
+      _fuelRows[_fuelRows.length-1]={...last,food:existing?existing+', '+food:food,kcal:0,protein:0,carbs:0,fat:0};
+    } else {
+      _fuelRows.push({time:timeStr,food,protein:0,carbs:0,fat:0,kcal:0});
+    }
   } else {
-    _fuelRows.push({time:timeStr,food,...macros});
+    // Full cached meal — fill empty row or create new row with macros
+    if(last&&!last.food.trim()){
+      _fuelRows[_fuelRows.length-1]={time:last.time||timeStr,food,protein:macros.protein,carbs:macros.carbs,fat:macros.fat,kcal:macros.kcal};
+    } else {
+      _fuelRows.push({time:timeStr,food,protein:macros.protein,carbs:macros.carbs,fat:macros.fat,kcal:macros.kcal});
+    }
   }
   renderFuelRows();
 }
