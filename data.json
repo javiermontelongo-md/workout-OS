@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-10",
+  "lastUpdated": "2026-06-11",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -4081,8 +4081,16 @@
           "food": "42 g protien fairlife with kashi cereal 10 G protein per serving,",
           "protein": 52,
           "carbs": 45,
-          "fat": 6,
-          "kcal": 446
+          "fat": 8,
+          "kcal": 468
+        },
+        {
+          "time": "9:13 PM",
+          "food": "Double quarter pound with cheese and mcdouble",
+          "protein": 65,
+          "carbs": 75,
+          "fat": 72,
+          "kcal": 1212
         }
       ],
       "signals": {
@@ -4091,12 +4099,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 52,
-        "carbs": 45,
-        "fat": 6,
-        "kcal": 446
+        "protein": 117,
+        "carbs": 120,
+        "fat": 80,
+        "kcal": 1680
       },
-      "ts": 1781124599354
+      "ts": 1781151236755
     }
   ],
   "fuelMemory": {
@@ -4188,6 +4196,13 @@
       "inp": 736,
       "out": 662,
       "cost": 0.012138
+    },
+    {
+      "ts": 1781151236755,
+      "type": "macros",
+      "inp": 142,
+      "out": 79,
+      "cost": 0.001611
     }
   ],
   "checkins": [
