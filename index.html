@@ -341,8 +341,8 @@ input, select, textarea {
   border-radius: 10px;
   color: var(--t);
   font-family: var(--sans);
-  font-size: 23px;
-  padding: 9px 12px;
+  font-size: var(--fs-body);
+  padding: 7px 12px;
   width: 100%;
   outline: none;
   transition: border-color .2s, background .2s;
@@ -364,19 +364,20 @@ textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 .ig { margin-bottom: 12px; }
 .ig label {
   display: block;
-  font-size: 25px;
-  color: var(--t2);
-  margin-bottom: 5px;
+  font-size: var(--fs-label);
+  color: var(--t3);
+  margin-bottom: 4px;
   font-family: var(--mono);
-  letter-spacing: .04em;
+  letter-spacing: .06em;
+  text-transform: uppercase;
 }
 
 /* ── BUTTONS ── */
 .btn {
   font-family: var(--mono);
-  font-size: 25px;
-  padding: 9px 16px;
-  border-radius: 9px;
+  font-size: var(--fs-body);
+  padding: 6px 13px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   display: inline-flex;
@@ -386,19 +387,20 @@ textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
   letter-spacing: .04em;
 }
 .bp {
-  background: var(--a);
-  color: #06080f;
+  background: rgba(104,110,210,0.15);
+  color: var(--a);
   font-weight: 500;
+  border: 1px solid rgba(104,110,210,0.4);
 }
-.bp:hover { background: #9099f9; }
-.bp:active { background: #6870e8; transform: scale(.98); }
+.bp:hover { background: rgba(104,110,210,0.25); border-color: var(--a); }
+.bp:active { transform: scale(.98); }
 
 .bs {
   background: transparent;
-  color: var(--t2);
-  border: 1px solid var(--b2);
+  color: var(--t3);
+  border: 1px solid rgba(168,180,204,0.18);
 }
-.bs:hover { border-color: var(--a); color: var(--a); background: var(--glow-a); }
+.bs:hover { border-color: rgba(168,180,204,0.45); color: var(--t2); }
 .bs:active { transform: scale(.98); }
 
 .bd {
@@ -407,6 +409,24 @@ textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
   border: 1px solid rgba(232,93,138,0.3);
 }
 .bd:hover { background: rgba(232,93,138,0.08); }
+
+/* chart/filter pill tabs */
+.btn.bs.bi {
+  font-size: var(--fs-label);
+  padding: 3px 9px;
+  border-radius: 100px;
+  border: 1px solid rgba(168,180,204,0.15);
+  color: var(--t3);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.btn.bs.bi:hover { border-color: rgba(168,180,204,0.4); color: var(--t2); background: transparent; }
+.btn.bs.bi.active, .chart-lift-btn.active {
+  border-color: var(--a);
+  color: var(--a);
+  background: rgba(104,110,210,0.1);
+  box-shadow: 0 0 10px rgba(104,110,210,0.15);
+}
 
 .brow { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 
@@ -616,28 +636,35 @@ input[type=range]::-webkit-slider-thumb:hover {
 
 /* ── SAVE BUTTON ── */
 .sbtn {
-  background: var(--a);
-  color: #06080f;
+  background: rgba(104,110,210,0.06);
+  color: var(--a);
   font-family: var(--mono);
-  font-size: 25px;
+  font-size: var(--fs-body);
   font-weight: 500;
-  padding: 13px 20px;
-  border-radius: 10px;
-  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(104,110,210,0.35);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 8px;
   transition: all .18s;
-  letter-spacing: .06em;
+  letter-spacing: .05em;
 }
-.sbtn:hover { background: #9099f9; }
+.sbtn:hover { background: rgba(104,110,210,0.14); border-color: rgba(104,110,210,0.6); }
 .sbtn:active { transform: scale(.98); }
-.sbtn.saving { opacity: .6; pointer-events: none; }
-.smsg { font-family: var(--mono); font-size: 25px; color: var(--t3); text-align: center; margin-top: 6px; min-height: 16px; }
+.sbtn.saving { opacity: .5; pointer-events: none; }
+/* AI variant */
+.sbtn-ai {
+  background: rgba(184,96,53,0.06);
+  color: var(--aw);
+  border-color: rgba(184,96,53,0.35);
+}
+.sbtn-ai:hover { background: rgba(184,96,53,0.13); border-color: rgba(184,96,53,0.6); }
+.smsg { font-family: var(--mono); font-size: var(--fs-label); color: var(--t3); text-align: center; margin-top: 5px; min-height: 14px; }
 
 /* ── SET ROWS ── */
 .srow { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: end; }
@@ -789,7 +816,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 .groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-tag);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
 .groc-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;}
 .groc-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--a2);flex-shrink:0;cursor:pointer;}
-.groc-item-name{flex:1;font-size:var(--fs-body);color:var(--t2);}
+.groc-item-name{flex:1;font-size:var(--fs-title);color:var(--t);}
 .groc-store{font-family:var(--mono);font-size:var(--fs-nano);padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
 .groc-store.TJ{background:rgba(194,77,114,0.15);color:var(--a4);}
 .groc-store.WF{background:rgba(42,160,112,0.12);color:var(--a2);}
@@ -856,7 +883,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 .rpe-pill.predicted { border-color: rgba(124,131,247,0.5); background: rgba(124,131,247,0.08); color: var(--a); }
 .rpe-pill.confirmed { background: var(--a); color: #06080f; border-color: var(--a); }
 
-.chart-lift-btn.active { background: rgba(124,131,247,0.12); color: var(--a); border-color: rgba(124,131,247,0.3); }
 
 /* ── MOBILE ── */
 @media(max-width:768px){
@@ -925,7 +951,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   .g2.k2 { grid-template-columns: 1fr 1fr; }
   .g4.k2 { grid-template-columns: 1fr 1fr; }
   .card { padding: 15px; border-radius: 14px; margin-bottom: 12px; }
-  .btn { width: 100%; justify-content: center; padding: 12px 16px; font-size: 12px; margin-bottom: 8px; }
+  .btn { justify-content: center; padding: 7px 12px; margin-bottom: 6px; }
   .brow { flex-direction: column; gap: 0; }
   input[type=range]::-webkit-slider-thumb { width: 22px; height: 22px; }
   .ci { padding: 11px 0; }
@@ -937,7 +963,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   .wkg { flex-wrap: nowrap; }
   .dc { min-width: 78px; flex: 0 0 78px; }
   .ig label { font-size: var(--fs-sm); }
-  .sbtn { font-size: var(--fs-sm); padding: 10px 14px; }
+  .sbtn { font-size: var(--fs-body); padding: 9px 14px; }
   .smsg { font-size: var(--fs-xs); }
   .sl { font-size: var(--fs-sm); }
   .info-row-label { font-size: var(--fs-xs); }
@@ -1304,10 +1330,10 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="stat"><div class="sv" id="pr-bw">225</div><div class="sl">Bodyweight (lb)</div></div>
   </div>
   <div class="g4 k2" style="margin-bottom:14px;">
-    <div class="stat"><div class="sv a" id="vol-bench" style="font-size:22px;">—</div><div class="sl">Bench vol best</div></div>
-    <div class="stat"><div class="sv a" id="vol-squat" style="font-size:22px;">—</div><div class="sl">Squat vol best</div></div>
-    <div class="stat"><div class="sv a" id="vol-dl" style="font-size:22px;">—</div><div class="sl">DL vol best</div></div>
-    <div class="stat"><div class="sv a" id="vol-ohp" style="font-size:22px;">—</div><div class="sl">OHP vol best</div></div>
+    <div class="stat"><div class="sv a" id="vol-bench">—</div><div class="sl">Bench vol best</div></div>
+    <div class="stat"><div class="sv a" id="vol-squat">—</div><div class="sl">Squat vol best</div></div>
+    <div class="stat"><div class="sv a" id="vol-dl">—</div><div class="sl">DL vol best</div></div>
+    <div class="stat"><div class="sv a" id="vol-ohp">—</div><div class="sl">OHP vol best</div></div>
   </div>
   <div class="card ca ia" style="margin-bottom:14px;">
     <div style="margin-bottom:12px;">
@@ -2019,7 +2045,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
       <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
-      <button class="sbtn" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;background:var(--aw);color:#0d0900;">AI: How am I doing?</button>
+      <button class="sbtn sbtn-ai" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;">AI: How am I doing?</button>
     </div>
     <div class="smsg" id="fuel-save-msg"></div>
     <div id="fuel-advice-out" style="margin-top:10px;"></div>
@@ -2034,7 +2060,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
       <div>
         <div class="lbl" style="color:var(--a2);margin:0;">🛒 grocery list</div>
-        <div id="grocery-meta" style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);margin-top:3px;"></div>
+        <div id="grocery-meta" style="font-family:var(--mono);font-size:var(--fs-label);color:var(--t3);margin-top:3px;"></div>
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn bs" id="grocery-gen-btn" onclick="generateGroceryList()" style="width:auto;">✨ Generate list</button>
