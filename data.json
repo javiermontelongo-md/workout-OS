@@ -3129,7 +3129,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-06-12T23:25:54.982Z",
+  "healthLastSync": "2026-06-12T19:24:20.228Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
@@ -4232,16 +4232,24 @@
           "food": "42 G protein fairlife with kashi cereal 10 G protein per serving",
           "protein": 52,
           "carbs": 45,
-          "fat": 6,
-          "kcal": 437
+          "fat": 5,
+          "kcal": 433
         },
         {
           "time": "11:35 AM",
           "food": "McDouble no cheese, dbl quarter no cheese",
-          "protein": 57,
-          "carbs": 82,
-          "fat": 48,
-          "kcal": 982
+          "protein": 65,
+          "carbs": 80,
+          "fat": 55,
+          "kcal": 1055
+        },
+        {
+          "time": "4:25 PM",
+          "food": "42 G protein fairlife chocolate ",
+          "protein": 42,
+          "carbs": 25,
+          "fat": 2,
+          "kcal": 286
         }
       ],
       "signals": {
@@ -4250,12 +4258,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 109,
-        "carbs": 127,
-        "fat": 54,
-        "kcal": 1419
+        "protein": 159,
+        "carbs": 150,
+        "fat": 62,
+        "kcal": 1774
       },
-      "ts": 1781289416694
+      "ts": 1781306808528
     }
   ],
   "fuelMemory": {
@@ -4438,6 +4446,13 @@
       "inp": 140,
       "out": 78,
       "cost": 0.00159
+    },
+    {
+      "ts": 1781306808528,
+      "type": "macros",
+      "inp": 159,
+      "out": 99,
+      "cost": 0.001962
     }
   ],
   "checkins": [
