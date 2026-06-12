@@ -4532,8 +4532,8 @@
         "category": "Frozen",
         "store": "Target",
         "shelfDays": 60,
-        "checked": true,
-        "checkedAt": "2026-06-12T23:27:36.798Z"
+        "checked": false,
+        "checkedAt": null
       },
       {
         "name": "Trader Joe's Mandarin Orange Chicken",
@@ -4620,8 +4620,8 @@
         "category": "Drinks",
         "store": "WF",
         "shelfDays": 30,
-        "checked": true,
-        "checkedAt": "2026-06-12T15:53:00.608Z"
+        "checked": false,
+        "checkedAt": null
       },
       {
         "name": "Frozen Cauliflower Rice",
