@@ -50,10 +50,10 @@
   --fs-presc-text: 13px;
   --fs-presc-lift: 13px;
   /* Full type scale — ALL set together by XS/S/M/L/XL preset buttons */
-  --fs-nano:  10px;   /* store badges, shelf-life labels, age metadata */
-  --fs-tag:   11px;   /* chips, small tags, compact mono labels */
-  --fs-label: 12px;   /* category headers, time buttons, compact section labels */
-  --fs-micro: 10px;   /* stat box headers, calendar day headers (alias for nano) */
+  --fs-nano:  15px;   /* store badges, shelf-life labels, age metadata */
+  --fs-tag:   16px;   /* chips, small tags, compact mono labels */
+  --fs-label: 17px;   /* category headers, time buttons, compact section labels */
+  --fs-micro: 15px;   /* stat box headers, calendar day headers (alias for nano) */
   --fs-xs:    17px;   /* timestamps, secondary mono text */
   --fs-sm:    20px;   /* secondary card text, check-in labels */
   --fs-body:  14px;   /* drawer body text, descriptions */
@@ -876,6 +876,8 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-tp-ampm{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t2);font-family:var(--mono);font-size:var(--fs-body);padding:10px 16px;cursor:pointer;transition:all .15s;width:60px;text-align:center;}
 .fuel-tp-ampm.sel{background:rgba(184,96,53,.2);border-color:rgba(184,96,53,.5);color:var(--aw);}
 .fuel-cal-selected{border-color:var(--aw);background:rgba(184,96,53,.15);}
+.fuel-cal-has-data{background:rgba(184,96,53,.06);border-color:rgba(184,96,53,.25);}
+.fuel-cal-has-data.today{border-color:var(--a);}
 .fuel-cal-clickable{cursor:pointer;}
 .fuel-date-nav{display:flex;gap:6px;}
 .fuel-date-nav button{padding:6px 13px;font-size:var(--fs-label);}
@@ -2348,11 +2350,11 @@ function _applySmallTextSize(px){
 function setTheme(name){localStorage.setItem('wos-theme',name);_applyTheme(name);_syncAppearanceUI();}
 const FONT_PRESETS={
   // compact tier:  nano  tag  label  xs   sm   body title data
-  14:{base:14,nano:8, tag:9, label:10,xs:13,sm:15,body:11,title:13,data:16, logo:21,nav:18,heading:21,sublabel:15,badge:18,input:17,btn:18,cardtext:17,exercise:17,dataval:24,caltext:16,mono:18,presctext:10,m_mlogo:15,m_nav:10,m_navlbl:6,m_heading:16,m_label:10,m_input:12,m_btn:9,m_cardtext:10},
-  17:{base:17,nano:9, tag:10,label:11,xs:15,sm:18,body:12,title:15,data:18, logo:25,nav:22,heading:26,sublabel:18,badge:21,input:21,btn:22,cardtext:21,exercise:21,dataval:29,caltext:20,mono:21,presctext:12,m_mlogo:18,m_nav:13,m_navlbl:7,m_heading:20,m_label:12,m_input:14,m_btn:11,m_cardtext:13},
-  19:{base:19,nano:10,tag:11,label:12,xs:17,sm:20,body:14,title:17,data:20, logo:28,nav:25,heading:29,sublabel:20,badge:24,input:23,btn:25,cardtext:23,exercise:23,dataval:32,caltext:22,mono:24,presctext:13,m_mlogo:20,m_nav:14,m_navlbl:8,m_heading:22,m_label:13,m_input:16,m_btn:12,m_cardtext:14},
-  22:{base:22,nano:11,tag:12,label:13,xs:20,sm:23,body:16,title:19,data:23, logo:32,nav:29,heading:34,sublabel:23,badge:28,input:27,btn:29,cardtext:27,exercise:27,dataval:37,caltext:26,mono:28,presctext:15,m_mlogo:23,m_nav:16,m_navlbl:9,m_heading:25,m_label:15,m_input:19,m_btn:14,m_cardtext:16},
-  26:{base:26,nano:12,tag:13,label:14,xs:24,sm:27,body:18,title:22,data:26, logo:38,nav:34,heading:40,sublabel:27,badge:28,input:31,btn:34,cardtext:31,exercise:31,dataval:44,caltext:28,mono:28,presctext:18,m_mlogo:27,m_nav:19,m_navlbl:11,m_heading:30,m_label:18,m_input:22,m_btn:16,m_cardtext:19}
+  14:{base:14,nano:13,tag:14,label:15,xs:13,sm:15,body:11,title:13,data:16, logo:21,nav:18,heading:21,sublabel:15,badge:18,input:17,btn:18,cardtext:17,exercise:17,dataval:24,caltext:16,mono:18,presctext:10,m_mlogo:15,m_nav:10,m_navlbl:6,m_heading:16,m_label:10,m_input:12,m_btn:9,m_cardtext:10},
+  17:{base:17,nano:14,tag:15,label:16,xs:15,sm:18,body:12,title:15,data:18, logo:25,nav:22,heading:26,sublabel:18,badge:21,input:21,btn:22,cardtext:21,exercise:21,dataval:29,caltext:20,mono:21,presctext:12,m_mlogo:18,m_nav:13,m_navlbl:7,m_heading:20,m_label:12,m_input:14,m_btn:11,m_cardtext:13},
+  19:{base:19,nano:15,tag:16,label:17,xs:17,sm:20,body:14,title:17,data:20, logo:28,nav:25,heading:29,sublabel:20,badge:24,input:23,btn:25,cardtext:23,exercise:23,dataval:32,caltext:22,mono:24,presctext:13,m_mlogo:20,m_nav:14,m_navlbl:8,m_heading:22,m_label:13,m_input:16,m_btn:12,m_cardtext:14},
+  22:{base:22,nano:16,tag:17,label:18,xs:20,sm:23,body:16,title:19,data:23, logo:32,nav:29,heading:34,sublabel:23,badge:28,input:27,btn:29,cardtext:27,exercise:27,dataval:37,caltext:26,mono:28,presctext:15,m_mlogo:23,m_nav:16,m_navlbl:9,m_heading:25,m_label:15,m_input:19,m_btn:14,m_cardtext:16},
+  26:{base:26,nano:17,tag:18,label:19,xs:24,sm:27,body:18,title:22,data:26, logo:38,nav:34,heading:40,sublabel:27,badge:28,input:31,btn:34,cardtext:31,exercise:31,dataval:44,caltext:28,mono:28,presctext:18,m_mlogo:27,m_nav:19,m_navlbl:11,m_heading:30,m_label:18,m_input:22,m_btn:16,m_cardtext:19}
 };
 function _syncDesktopFontPresetBtns(px){
   const map={14:'dfsp-xs',17:'dfsp-s',19:'dfsp-m',22:'dfsp-l',26:'dfsp-xl'};
@@ -3642,7 +3644,7 @@ function renderFuelCalendar(){
   const daysInMonth=new Date(tYear,tMonth+1,0).getDate();
   const _fuelByDate=Object.fromEntries((D.fuelLog||[]).map(e=>[e.date,e]));
   const fuelDates=new Set(Object.keys(_fuelByDate));
-  let html=['S','M','T','W','T','F','S'].map(h=>`<div class="cal-hdr" style="font-size:var(--fs-micro);">${h}</div>`).join('');
+  let html=['S','M','T','W','T','F','S'].map(h=>`<div class="cal-hdr">${h}</div>`).join('');
   for(let i=0;i<firstDOW;i++) html+=`<div class="cal-cell cal-empty"></div>`;
   let logCount=0;
   for(let d=1;d<=daysInMonth;d++){
@@ -3655,12 +3657,18 @@ function renderFuelCalendar(){
     if(hasFuel) logCount++;
     const kcal=fEntry?.totals?.kcal||0;
     const fTot=(fEntry?.totals?.protein||0)+(fEntry?.totals?.carbs||0)+(fEntry?.totals?.fat||0);
-    const fPp=fTot?Math.round((fEntry?.totals?.protein||0)/fTot*100):0;
-    const fCp=fTot?Math.round((fEntry?.totals?.carbs||0)/fTot*100):0;
-    const fFp=fTot?Math.max(0,100-fPp-fCp):0;
-    const kcalHtml=kcal?`<div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--aw);line-height:1.1;margin-top:1px;">${kcal}</div>`:'';
-    const barHtml=kcal?`<div style="width:100%;height:4px;border-radius:2px;overflow:hidden;display:flex;margin-top:2px;"><div style="width:${fPp}%;background:var(--mp);"></div><div style="width:${fCp}%;background:var(--mc);"></div><div style="width:${fFp}%;background:var(--mf);"></div></div>`:'';
-    html+=`<div class="cal-cell${isToday?' today':''}${isSelected?' fuel-cal-selected':''}${!isFuture?' fuel-cal-clickable':''}" data-fdate="${ds}" style="min-height:50px;padding:5px 3px 4px;gap:0;"><div class="cal-date" style="font-size:var(--fs-title);">${d}</div>${kcalHtml}${barHtml}</div>`;
+    const fPp=fTot?Math.round((fEntry?.totals?.protein||0)/fTot*100):33;
+    const fCp=fTot?Math.round((fEntry?.totals?.carbs||0)/fTot*100):34;
+    const fFp=fTot?Math.max(0,100-fPp-fCp):33;
+    const loggedContent=hasFuel?`
+      <div style="font-family:var(--mono);font-size:var(--fs-label);font-weight:700;color:var(--aw);line-height:1;margin-top:4px;">${kcal}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t3);line-height:1;margin-bottom:2px;">kcal</div>
+      <div style="width:100%;height:8px;border-radius:4px;overflow:hidden;display:flex;gap:1px;">
+        <div style="flex:${fPp};background:var(--mp);border-radius:3px 0 0 3px;"></div>
+        <div style="flex:${fCp};background:var(--mc);"></div>
+        <div style="flex:${fFp};background:var(--mf);border-radius:0 3px 3px 0;"></div>
+      </div>`:'';
+    html+=`<div class="cal-cell${isToday?' today':''}${isSelected?' fuel-cal-selected':''}${!isFuture?' fuel-cal-clickable':''}${hasFuel?' fuel-cal-has-data':''}" data-fdate="${ds}" style="min-height:90px;padding:8px 5px 7px;gap:0;align-items:center;"><div class="cal-date">${d}</div>${loggedContent}</div>`;
   }
   grid.innerHTML=html;
   grid.onclick=function(e){const cell=e.target.closest('[data-fdate]');if(cell&&cell.dataset.fdate<=todayStr)fuelSelectDate(cell.dataset.fdate);};
