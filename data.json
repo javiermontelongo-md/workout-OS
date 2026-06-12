@@ -4230,10 +4230,18 @@
         {
           "time": "8:51 AM",
           "food": "42 g fairlife with kashi cereal 10 G protein per serving",
-          "protein": 13,
-          "carbs": 32,
-          "fat": 3,
-          "kcal": 207
+          "protein": 16,
+          "carbs": 28,
+          "fat": 4,
+          "kcal": 212
+        },
+        {
+          "time": "11:35 AM",
+          "food": "McDouble no cheese, dbl quarter no cheese",
+          "protein": 52,
+          "carbs": 68,
+          "fat": 42,
+          "kcal": 850
         }
       ],
       "signals": {
@@ -4242,12 +4250,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 13,
-        "carbs": 32,
-        "fat": 3,
-        "kcal": 207
+        "protein": 68,
+        "carbs": 96,
+        "fat": 46,
+        "kcal": 1062
       },
-      "ts": 1781279548096
+      "ts": 1781289371379
     }
   ],
   "fuelMemory": {
@@ -4416,6 +4424,13 @@
       "inp": 119,
       "out": 57,
       "cost": 0.001212
+    },
+    {
+      "ts": 1781289371378,
+      "type": "macros",
+      "inp": 139,
+      "out": 78,
+      "cost": 0.001587
     }
   ],
   "checkins": [
