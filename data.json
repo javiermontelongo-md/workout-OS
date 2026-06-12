@@ -4231,25 +4231,25 @@
           "time": "8:51 AM",
           "food": "42 G protein fairlife with kashi cereal 10 G protein per serving",
           "protein": 52,
-          "carbs": 45,
+          "carbs": 38,
           "fat": 5,
-          "kcal": 433
+          "kcal": 405
         },
         {
           "time": "11:35 AM",
           "food": "McDouble no cheese, dbl quarter no cheese",
-          "protein": 65,
-          "carbs": 80,
-          "fat": 55,
-          "kcal": 1055
+          "protein": 58,
+          "carbs": 82,
+          "fat": 48,
+          "kcal": 982
         },
         {
           "time": "4:25 PM",
           "food": "42 G protein fairlife chocolate ",
           "protein": 42,
-          "carbs": 25,
-          "fat": 2,
-          "kcal": 286
+          "carbs": 20,
+          "fat": 5,
+          "kcal": 293
         }
       ],
       "signals": {
@@ -4258,12 +4258,14 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 159,
-        "carbs": 150,
-        "fat": 62,
-        "kcal": 1774
+        "protein": 152,
+        "carbs": 140,
+        "fat": 58,
+        "kcal": 1680
       },
-      "ts": 1781306808528
+      "ts": 1781307029688,
+      "fuelPlan": "## Check-In: 4:25 PM\n\n---\n\n### ASSESSMENT\n\nToday is tracking well — 1,680 kcal and 152g protein by mid-afternoon puts you ahead of your usual crash-day pace, and you're only 30g protein and ~720 kcal from hitting your targets. The risk right now is the same pattern that tanked June 4–5 and June 11: a solid morning followed by nothing substantial in the evening, then waking up in a hole. Sleep is already short at 5.8 hours, which means recovery is entirely dependent on whether you actually eat tonight — don't skip this.\n\n---\n\n### REST OF DAY\n\n**You need: ~30g protein, ~212g carbs, ~70g fat, ~720 kcal**\n\nThe carb gap is the real story here — you're light on carbs and fat, protein is nearly done.\n\n---\n\n**Afternoon Snack (eat within the next 60–90 min, before dinner)**\n- 1 banana (~27g carbs, easy grab)\n- 1 handful mixed nuts, ~1.5oz (~9g fat, ~4g protein, ~160 kcal)\n\n*Total: ~260 kcal, P4g, C30g, F9g*\n\n---\n\n**Dinner (target 7–8 PM, 10–15 min max)**\n\n**Option A — No cooking skill needed:**\n- 1 packet microwaveable rice (Uncle Ben's or Trader Joe's), ~1 cup cooked — **~45g carbs**\n- 1 can chunk chicken or tuna (5oz) — **~26g protein**\n- 2 tbsp olive oil drizzled over rice — **~28g fat**\n- 1 cup frozen edamame, microwaved 3 min — **~17g protein, ~14g carbs**\n- Optional: soy sauce or hot sauce, costs nothing\n\n*Total: ~640 kcal, P43g, C59g, F30g*\n*Prep: open cans, microwave two things, done in 8 minutes*\n\n---\n\n**End-of-Day Totals (projected):**\n~2,580 kcal | P199g | C247g | F84g\n\nSlightly over on protein and fat, close enough on carbs — this is a solid recomp day. Don't let dinner slip.",
+      "fuelPlanTs": 1781307070492
     }
   ],
   "fuelMemory": {
@@ -4453,6 +4455,20 @@
       "inp": 159,
       "out": 99,
       "cost": 0.001962
+    },
+    {
+      "ts": 1781307029687,
+      "type": "macros",
+      "inp": 159,
+      "out": 98,
+      "cost": 0.001947
+    },
+    {
+      "ts": 1781307070489,
+      "type": "checkin",
+      "inp": 685,
+      "out": 565,
+      "cost": 0.01053
     }
   ],
   "checkins": [
