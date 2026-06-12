@@ -4189,9 +4189,9 @@
     }
   ],
   "fuelMemory": {
-    "summary": "Calorie and protein intake continues a persistent spike-and-crash pattern, with higher days (June 3: 2,942 kcal/162g; June 8: 2,836 kcal/146g; June 9: 2,920 kcal/146g; June 10: 2,720 kcal/162g) repeatedly followed by severely underfueled days (June 4–5 averaging 1,773 kcal/90g; June 11: 1,",
-    "lastUpdated": "2026-06-11",
-    "callCount": 10
+    "summary": "Calorie and protein intake continues a persistent spike-and-crash pattern, with higher days (June 3: 2,942 kcal/162g; June 8–10 averaging 2,825 kcal/151g) repeatedly followed by severely underfueled days (June 4–5 averaging 1,773 kcal/90g; June 11: 1,424 kcal/120g), suggesting intake is driven by hunger and recovery debt rather than intentional fueling. Hunger signals on",
+    "lastUpdated": "2026-06-12",
+    "callCount": 11
   },
   "aiUsage": [
     {
@@ -4333,6 +4333,13 @@
       "inp": 614,
       "out": 650,
       "cost": 0.011592
+    },
+    {
+      "ts": 1781250279940,
+      "type": "memory",
+      "inp": 353,
+      "out": 120,
+      "cost": 0.002859
     }
   ],
   "checkins": [
