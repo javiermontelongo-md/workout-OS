@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-11",
+  "lastUpdated": "2026-06-12",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -4453,8 +4453,8 @@
         "category": "Snacks",
         "store": "Target",
         "shelfDays": 120,
-        "checked": false,
-        "checkedAt": null
+        "checked": true,
+        "checkedAt": "2026-06-12T04:12:14.831Z"
       },
       {
         "name": "Cottage Cheese 2% Large Tub",
