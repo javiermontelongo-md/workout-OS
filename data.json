@@ -4453,8 +4453,8 @@
         "category": "Snacks",
         "store": "Target",
         "shelfDays": 120,
-        "checked": true,
-        "checkedAt": "2026-06-12T04:12:14.831Z"
+        "checked": false,
+        "checkedAt": null
       },
       {
         "name": "Cottage Cheese 2% Large Tub",
