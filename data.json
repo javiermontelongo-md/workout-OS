@@ -3107,7 +3107,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-06-12T06:54:47.368Z",
+  "healthLastSync": "2026-06-12T01:51:10.079Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
@@ -4184,8 +4184,8 @@
         "kcal": 1424
       },
       "ts": 1781207926326,
-      "fuelPlan": "## Check-In: June 11\n\n**ASSESSMENT**\n\nYou're at 1,424 kcal and 120g protein by 1pm, which is a decent start — but you still need ~62g protein and likely 800–1,000+ kcal to hit your targets, and your fatigue flags (HRV warning, RHR spike, late sleep) mean today is not the day to let this slide into another 1,770 kcal crash day. The spike-and-crash pattern is showing up again: you had three solid days June 8–10, and the risk right now is coasting on that and under-eating into the weekend. Protein especially needs to be front-loaded into your next meal — don't let it pile up to dinner.\n\n---\n\n**REST OF DAY**\n\n**Afternoon snack (pack for hospital, ~5 min)**\n- 1 Fairlife Core Power 42g shake (if you have another) OR 2 hard-boiled eggs + 1 string cheese\n- 1 banana or handful of crackers\n- **~300 kcal, ~42–45g protein**\n\n**Dinner (~10–15 min)**\n- 6 oz rotisserie chicken breast (grab from any grocery store, zero cooking)\n- 1 pouch microwaveable rice (Uncle Ben's, 90 sec)\n- 1 cup frozen broccoli (microwave 3 min)\n- Drizzle of olive oil or butter on the veg\n- **~650 kcal, ~50g protein**\n\n**Before bed (optional but recommended given RHR spike + poor sleep)**\n- 1 cup cottage cheese or another Fairlife shake\n- **~150–200 kcal, ~25g protein**\n\n---\n\n**End of day total: ~2,500–2,600 kcal | ~235–240g protein**\nSlightly above your protein target — intentional given the fatigue flags and history of crashes. Keep it simple tonight.",
-      "fuelPlanTs": 1781207944448
+      "fuelPlan": "## Check-In — June 11, 2026\n\n---\n\n### 1. ASSESSMENT\n\nYou're 1,424 kcal and 120g protein through midday, which sounds okay until you remember you're targeting ~182g protein and likely 2,400–2,600 kcal for the day — you still need 62g+ protein and 1,000+ calories in the back half. **This is exactly the setup from June 4–5:** a moderate morning followed by an undereat that tanks recovery, especially dangerous today given your HRV warning and RHR spike signaling your body is already under stress. The McDonald's breakfast was a solid calorie anchor but fat-heavy and low on carbs, so your energy later today will likely crater if you don't get ahead of it now. **With late sleep and fatigue flags, undereating tonight is not a recovery option — it's a hole you won't climb out of before July.**\n\n---\n\n### 2. REST OF DAY\n\n**Assumes you're at or heading into a hospital shift.**\n\n---\n\n**🏥 Pack Now — Hospital Lunch/Afternoon (eat 2–4 PM)**\n\n- **2 Fairlife Core Power 42g shakes** (grab both, drink one at lunch, one mid-afternoon)\n- **1 large banana or 2 clementines** (fast carbs, no prep)\n- **1 pack Justin's almond butter or peanut butter** (squeeze pack, ~190 kcal, adds fat + satiety)\n\n> ~620 kcal | ~85g protein | ~50g carbs | ~14g fat\n> *Zero prep. Fits in a white coat pocket.*\n\n---\n\n**🍽️ Dinner — Home, ≤10 min**\n\n- **2 pouches StarKist Salmon or Tuna** (~50g protein, ~200 kcal)\n- **1 bag microwaveable rice** (Uncle Ben's Ready Rice — 90 sec) (~370 kcal, ~74g carbs)\n- **1 tbsp olive oil or butter on rice** (~120 kcal)\n- **Optional: handful of baby carrots or pre-washed spinach** on the side\n\n> ~690 kcal | ~55g protein | ~75g carbs | ~16g fat\n> **Total prep: open pouches, microwave rice. That's it.**\n\n---\n\n### Day Totals (Projected)\n\n| | Kcal | Protein | Carbs | Fat |\n|---|---|---|---|---|\n| So far | 1,424 | 120g | 89g | 64g |\n| Afternoon pack | 620 | 85g | 50g | 14g |\n| Dinner | 690 | 55g",
+      "fuelPlanTs": 1781250275136
     }
   ],
   "fuelMemory": {
@@ -4326,6 +4326,13 @@
       "inp": 353,
       "out": 120,
       "cost": 0.002859
+    },
+    {
+      "ts": 1781250275134,
+      "type": "checkin",
+      "inp": 614,
+      "out": 650,
+      "cost": 0.011592
     }
   ],
   "checkins": [
