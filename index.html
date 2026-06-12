@@ -799,6 +799,41 @@ input[type=range]::-webkit-slider-thumb:hover {
 .macro-pill.c{background:rgba(42,160,112,.15);color:var(--a2);}
 .macro-pill.f{background:rgba(184,96,53,.15);color:var(--aw);}
 .macro-pill.k{background:rgba(255,255,255,.07);color:var(--t2);}
+
+/* ── MACRO GOAL BARS ── */
+.mgoal-row{margin-bottom:14px;}
+.mgoal-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;}
+.mgoal-label{font-family:var(--mono);font-size:var(--fs-label);color:var(--t3);letter-spacing:.07em;text-transform:uppercase;}
+.mgoal-val{font-family:var(--mono);font-size:var(--fs-body);font-weight:600;}
+.mgoal-target{font-family:var(--mono);font-size:var(--fs-label);color:var(--t3);}
+.mgoal-track{height:7px;background:rgba(255,255,255,0.07);border-radius:20px;overflow:hidden;position:relative;}
+.mgoal-fill{height:100%;border-radius:20px;transition:width .5s cubic-bezier(.4,0,.2,1),background .3s;}
+.mgoal-pct{font-family:var(--mono);font-size:var(--fs-label);text-align:right;margin-top:3px;}
+
+/* ── SAVED MEAL LIST (logged meals section) ── */
+.fuel-logged-meal{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background .15s;border-radius:6px;}
+.fuel-logged-meal:hover{background:rgba(255,255,255,0.03);}
+.fuel-logged-meal:last-child{border-bottom:none;}
+.fuel-meal-time-badge{font-family:var(--mono);font-size:var(--fs-label);background:rgba(184,96,53,0.12);color:var(--aw);padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.fuel-meal-food{font-size:var(--fs-body);color:var(--t);line-height:1.4;flex:1;min-width:0;}
+.fuel-meal-edit-icon{color:var(--t3);font-size:13px;flex-shrink:0;opacity:0.5;padding:2px 4px;}
+.fuel-meal-macros{font-family:var(--mono);font-size:var(--fs-label);color:var(--t3);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;}
+.fuel-meal-macros .mp{color:var(--a);}
+.fuel-meal-macros .mc{color:var(--a2);}
+.fuel-meal-macros .mf{color:var(--aw);}
+.fuel-meal-macros .mk{color:var(--t2);}
+
+/* ── MEAL EDIT SHEET ── */
+#fuel-meal-edit-sheet{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.55);display:none;align-items:flex-end;justify-content:center;}
+.fuel-edit-sheet-inner{background:var(--s2);border-radius:18px 18px 0 0;padding:20px 20px 36px;width:100%;max-width:520px;}
+.fuel-edit-sheet-title{font-family:var(--mono);font-size:var(--fs-label);color:var(--aw);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+
+/* ── QUICK TIME CHIPS ── */
+.fuel-quick-times{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px;-webkit-overflow-scrolling:touch;}
+.fuel-quick-times::-webkit-scrollbar{display:none;}
+.fuel-qt-chip{font-family:var(--mono);font-size:var(--fs-label);color:var(--t3);border:1px solid rgba(168,180,204,0.18);border-radius:100px;padding:4px 10px;white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .15s;}
+.fuel-qt-chip:hover,.fuel-qt-chip.qt-now{border-color:var(--aw);color:var(--aw);background:rgba(184,96,53,0.1);}
+
 @media(max-width:768px){.fuel-row input[type=time]{width:90px;min-width:90px;}}
 .fuel-time-btn{flex:0 0 auto;width:100px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);color:var(--aw);font-family:var(--mono);font-size:var(--fs-label);font-weight:600;padding:8px 10px;cursor:pointer;text-align:center;transition:border-color .15s;white-space:nowrap;}
 .fuel-time-btn:hover{border-color:var(--aw);}
@@ -2024,6 +2059,9 @@ input[type=range]::-webkit-slider-thumb:hover {
         <button class="btn bs" id="fuel-today-btn" onclick="fuelGoToday()">Today</button>
       </div>
     </div>
+    <div id="fuel-macros-card" style="display:none;margin-bottom:16px;">
+      <div id="fuel-macros-out"></div>
+    </div>
     <div id="fuel-meal-rows" style="margin-bottom:8px;overflow:hidden;"></div>
     <div id="fuel-chips-section" style="display:none;margin-bottom:10px;overflow:hidden;">
       <div id="fuel-chips"></div>
@@ -2038,10 +2076,6 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="ig"><label>Between meals</label><input type="text" id="fuel-sig-between" placeholder="e.g. low energy at 2pm, hungry early"></div>
       <div class="ig"><label>Before sleep</label><input type="text" id="fuel-sig-sleep" placeholder="e.g. full, still hungry, satisfied"></div>
       <div class="ig"><label>On waking</label><input type="text" id="fuel-sig-wake" placeholder="e.g. hungry, groggy, energized"></div>
-    </div>
-    <div id="fuel-macros-card" style="display:none;margin-bottom:4px;">
-      <div class="lbl">estimated macros</div>
-      <div id="fuel-macros-out"></div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
       <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
@@ -2909,7 +2943,13 @@ function fuelSelectDate(dateStr){
   if(el) el.textContent=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const todayBtn=document.getElementById('fuel-today-btn');
   if(todayBtn) todayBtn.style.opacity=isToday?'0.4':'1';
-  _fuelRows=entry&&entry.meals&&entry.meals.length?entry.meals.map(m=>({time:m.time||'',food:m.food||'',protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0})):[{time:currentTimeStr(),food:''}];
+  if(entry&&entry.meals&&entry.meals.length){
+    // Load saved meals (with kcal = shown read-only above) + one fresh empty row for additions
+    _fuelRows=entry.meals.map(m=>({time:m.time||'',food:m.food||'',protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0}));
+    _fuelRows.push({time:currentTimeStr(),food:''});
+  } else {
+    _fuelRows=[{time:currentTimeStr(),food:''}];
+  }
   const sb=document.getElementById('fuel-sig-between');
   const ss=document.getElementById('fuel-sig-sleep');
   const sw=document.getElementById('fuel-sig-wake');
@@ -2918,7 +2958,7 @@ function fuelSelectDate(dateStr){
   if(sw) sw.value=entry?.signals?.onWaking||'';
   renderFuelRows();
   renderFuelChips();
-  if(entry?.totals?.kcal) renderFuelMacros(entry);
+  if(entry?.meals?.length) renderFuelMacros(entry);
   else{ const mc=document.getElementById('fuel-macros-card'); if(mc) mc.style.display='none'; }
   const advOut=document.getElementById('fuel-advice-out');
   if(advOut){
@@ -2942,10 +2982,10 @@ function fuelGoYesterday(){ const d=new Date(); d.setDate(d.getDate()-1); fuelSe
 
 function renderFuelRows(){
   const el=document.getElementById('fuel-meal-rows'); if(!el) return;
-  el.innerHTML=_fuelRows.map((r,i)=>{
-    const cached=r.kcal&&(r.protein||r.carbs||r.fat);
-    const dot=cached?`<span class="fuel-cached-dot" title="${r.protein}g P · ${r.carbs}g C · ${r.fat}g F · ${r.kcal} kcal"></span>`:'';
-    return`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value;if(_fuelRows[${i}].kcal){_fuelRows[${i}].protein=0;_fuelRows[${i}].carbs=0;_fuelRows[${i}].fat=0;_fuelRows[${i}].kcal=0;var _d=this.parentNode.querySelector('.fuel-cached-dot');if(_d)_d.remove();}" placeholder="e.g. 2 scrambled eggs, toast, coffee">${dot}<button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`;
+  // Only show NEW/pending rows (no cached kcal) — saved meals show in the macros section above
+  const pendingRows=_fuelRows.map((r,i)=>({r,i})).filter(({r})=>!(r.kcal>0));
+  el.innerHTML=pendingRows.map(({r,i})=>{
+    return`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value;" placeholder="e.g. 2 scrambled eggs, toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`;
   }).join('');
 }
 
@@ -3157,48 +3197,71 @@ async function estimateMacros(meals){
   return null;
 }
 
+function _macroGoalBar(label,val,goal,color,id){
+  const pct=goal?Math.round(val/goal*100):0;
+  const over=pct>100;
+  const fillW=Math.min(pct,100);
+  const fillColor=over?'var(--red)':pct>=85?'var(--aw)':color;
+  const pctLabel=over?`<span style="color:var(--red);">&gt;${pct}%</span>`:`<span style="color:${pct>=85?'var(--aw)':'var(--t3)'};">${pct}%</span>`;
+  return`<div class="mgoal-row">
+    <div class="mgoal-header">
+      <span class="mgoal-label">${label}</span>
+      <span><span class="mgoal-val" style="color:${fillColor};">${val}${label==='KCAL'?'':' g'}</span><span class="mgoal-target"> / ${goal}${label==='KCAL'?'':' g'}</span></span>
+    </div>
+    <div class="mgoal-track"><div class="mgoal-fill" id="mfill-${id}" style="width:0%;background:${fillColor};"></div></div>
+    <div class="mgoal-pct">${pctLabel}</div>
+  </div>`;
+}
 function renderFuelMacros(entry){
   const card=document.getElementById('fuel-macros-card');
   const out=document.getElementById('fuel-macros-out');
   if(!card||!out) return;
+  const hasMeals=(entry.meals||[]).length>0;
+  if(!hasMeals){card.style.display='none';return;}
   card.style.display='block';
   const t=entry.totals||{};
-  const tot=(t.protein||0)+(t.carbs||0)+(t.fat||0);
-  const pPct=tot?Math.round((t.protein||0)/tot*100):33;
-  const cPct=tot?Math.round((t.carbs||0)/tot*100):34;
-  const fPct=Math.max(0,100-pPct-cPct);
-  out.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
-<div style="background:rgba(104,110,210,0.1);border:1px solid rgba(104,110,210,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Protein</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);font-weight:600;">${t.protein||0}g</div></div>
-<div style="background:rgba(42,160,112,0.1);border:1px solid rgba(42,160,112,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Carbs</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);font-weight:600;">${t.carbs||0}g</div></div>
-<div style="background:rgba(184,96,53,0.1);border:1px solid rgba(184,96,53,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Fat</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);font-weight:600;">${t.fat||0}g</div></div>
-<div style="background:rgba(160,102,212,0.1);border:1px solid rgba(160,102,212,0.22);border-radius:10px;padding:10px 8px;text-align:center;"><div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">kcal</div><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);font-weight:600;">${t.kcal||0}</div></div>
-</div><div class="macro-bar" style="margin-bottom:6px;"><div class="macro-bar-p" style="width:${pPct}%"></div><div class="macro-bar-c" style="width:${cPct}%"></div><div class="macro-bar-f" style="width:${fPct}%"></div></div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:14px;"><span style="color:var(--mp);">■</span> protein &nbsp;<span style="color:var(--mc);">■</span> carbs &nbsp;<span style="color:var(--mf);">■</span> fat</div><div class="lbl">meals</div>`+
-    (entry.meals||[]).map(m=>{
-      const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);
-      const _mp=_mt?Math.round((m.protein||0)/_mt*100):0;
-      const _mc=_mt?Math.round((m.carbs||0)/_mt*100):0;
-      const _mf=Math.max(0,100-_mp-_mc);
-      const hasMacros=m.protein||m.carbs||m.fat;
-      const macroBar=hasMacros?`<div style="display:flex;align-items:center;gap:6px;margin-top:5px;"><div style="flex:1;height:4px;border-radius:2px;overflow:hidden;display:flex;"><div style="width:${_mp}%;background:var(--mp);"></div><div style="width:${_mc}%;background:var(--mc);"></div><div style="width:${_mf}%;background:var(--mf);"></div></div></div>`:'';
-      const macroNums=hasMacros?`<div style="display:flex;gap:10px;margin-top:5px;flex-wrap:wrap;">
-        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);">P: ${m.protein||0}g</span>
-        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);">C: ${m.carbs||0}g</span>
-        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);">F: ${m.fat||0}g</span>
-        ${m.kcal?`<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);">${m.kcal} kcal</span>`:''}
-      </div>`:(m.kcal?`<div style="margin-top:4px;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);background:var(--s3);padding:2px 6px;border-radius:4px;">${m.kcal} kcal</span></div>`:'');
-      return`<div style="padding:9px 0;border-bottom:1px solid var(--b);">
-        <div style="display:flex;align-items:center;gap:8px;">
-          ${m.time?`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(184,96,53,0.12);color:var(--aw);padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;">${esc(m.time)}</span>`:''}
-          <span style="font-size:var(--fs-sm);color:var(--t2);">${esc(m.food)}</span>
+  const bw=D?.profile?.bodyweight||225;
+  const gP=Math.round(bw*0.8); // protein goal: 0.8g/lb
+  const gC=250; // carbs goal
+  const gF=75;  // fat goal
+  const gK=Math.round(gP*4+gC*4+gF*9); // kcal derived from goals
+
+  // Goal bars section
+  const hasTotals=t.kcal>0;
+  const barsHTML=hasTotals?`<div style="margin-bottom:14px;">
+    ${_macroGoalBar('PROTEIN',t.protein||0,gP,'var(--a)','p')}
+    ${_macroGoalBar('CARBS',t.carbs||0,gC,'var(--a2)','c')}
+    ${_macroGoalBar('FAT',t.fat||0,gF,'var(--aw)','f')}
+    ${_macroGoalBar('KCAL',t.kcal||0,gK,'var(--a5)','k')}
+  </div><div class="dvdr" style="margin-bottom:14px;"></div>`:'';
+
+  // Meals list
+  const mealsHTML=(entry.meals||[]).map((m,i)=>{
+    const hasMacros=m.protein||m.carbs||m.fat;
+    const macroLine=hasMacros
+      ?`<div class="fuel-meal-macros"><span class="mp">P ${m.protein||0}g</span><span class="mc">C ${m.carbs||0}g</span><span class="mf">F ${m.fat||0}g</span>${m.kcal?`<span class="mk">${m.kcal} kcal</span>`:''}</div>`
+      :(m.kcal?`<div class="fuel-meal-macros"><span class="mk">${m.kcal} kcal</span></div>`:'');
+    return`<div class="fuel-logged-meal" onclick="openFuelMealEdit(${i})">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          ${m.time?`<span class="fuel-meal-time-badge">${esc(m.time)}</span>`:''}
+          <span class="fuel-meal-food">${esc(m.food)}</span>
         </div>
-        ${macroNums}${macroBar}
-      </div>`;
-    }).join('')+'</div>';
-  // Set a target reference if bodyweight known
-  const bw=D.profile?.bodyweight||225;
-  const proteinTarget=Math.round(bw*0.8);
-  const pct=t.protein?Math.round(t.protein/proteinTarget*100):0;
-  if(t.protein) out.innerHTML+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:10px;">Protein target ~${proteinTarget}g (0.8\xd7${bw}lb) — <span style="color:${t.protein>=proteinTarget?'var(--a2)':'var(--aw)'};">${pct}% hit</span></div>`;
+        ${macroLine}
+      </div>
+      <span class="fuel-meal-edit-icon">✏</span>
+    </div>`;
+  }).join('');
+
+  out.innerHTML=`${barsHTML}<div style="font-family:var(--mono);font-size:var(--fs-label);color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Meals</div>${mealsHTML}`;
+
+  // Animate the bars in
+  if(hasTotals){
+    requestAnimationFrame(()=>{
+      const pairs=[['mfill-p',Math.min(Math.round((t.protein||0)/gP*100),100)],['mfill-c',Math.min(Math.round((t.carbs||0)/gC*100),100)],['mfill-f',Math.min(Math.round((t.fat||0)/gF*100),100)],['mfill-k',Math.min(Math.round((t.kcal||0)/gK*100),100)]];
+      pairs.forEach(([id,pct])=>{const el=document.getElementById(id);if(el)el.style.width=pct+'%';});
+    });
+  }
 }
 
 async function fuelDayAdvice(){
@@ -3207,7 +3270,13 @@ async function fuelDayAdvice(){
   const out=document.getElementById('fuel-advice-out');
   if(!out) return;
   if(!apiKey){out.innerHTML='<div style="font-size:var(--fs-sm);color:var(--t3);">Add Anthropic API key in Settings first.</div>';return;}
-  if(btn){btn.disabled=true;btn.textContent='Thinking...';}
+  // Auto-save any unsaved rows first
+  const hasUnsaved=_fuelRows.some(r=>r.food.trim()&&!(r.kcal>0));
+  if(hasUnsaved){
+    if(btn){btn.disabled=true;btn.textContent='Saving first...';}
+    await saveFuelDay();
+  }
+  if(btn){btn.disabled=true;btn.textContent='Analyzing...';}
   out.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:8px 0;">Reading your history and today\'s intake...</div>';
   try{
     const ts=evaluateTrainingStatus();
@@ -3235,14 +3304,20 @@ async function fuelDayAdvice(){
     const memory=D.fuelMemory?.summary||'';
     const memoryAge=D.fuelMemory?.lastUpdated?`(updated ${D.fuelMemory.lastUpdated})`:'';
 
-    const proteinTarget=Math.round(bw*0.8);
+    const gP=Math.round(bw*0.8),gC=250,gF=75,gK=Math.round(gP*4+gC*4+gF*9);
+    const proteinTarget=gP;
     const todayProtein=todayTotals?.protein||null;
     const todayKcal=todayTotals?.kcal||null;
 
     const isEditingPast=today!==localDS(new Date());
+    // Time of day context
+    const nowHour=new Date().getHours();
+    const timeOfDay=nowHour<11?'morning':(nowHour<14?'midday':(nowHour<17?'afternoon':(nowHour<20?'evening':'night')));
+    const mealsLeft=!isEditingPast?(nowHour<11?'breakfast, lunch, dinner, and snacks still ahead':(nowHour<14?'lunch, afternoon snack, and dinner still ahead':(nowHour<17?'afternoon snack and dinner still ahead':(nowHour<20?'dinner still ahead':'day is essentially over, this is a review')))):'past day — full review only';
     const prompt=`You are a nutrition coach for Javier, an IM intern starting residency July 2026.
 
 ATHLETE: 225lb, body recomp + performance goal. Limited cooking skill, very limited time. Takes lunch to hospital. Training: ${workoutType} today. Sleep: ${ts.sleepHours||'?'}h. Fatigue flags: ${ts.activeFlags?.join(', ')||'none'}.
+Current time: ${timeOfDay} (${nowHour}:00). ${isEditingPast?'Reviewing a past day.':'Meals remaining today: '+mealsLeft}
 
 LONG-TERM PATTERNS ${memoryAge}:
 ${memory||'No pattern history yet — this is early data.'}
@@ -3252,14 +3327,14 @@ ${pastDays}
 
 ${isEditingPast?'LOG FOR '+today:'TODAY SO FAR ('+today+')'}:
 ${todayMeals}
-${todayTotals?'Totals so far: '+todayKcal+'kcal, P'+todayProtein+'g (target ~'+proteinTarget+'g)':'Macros not yet estimated.'}
+${todayTotals?'Totals so far: '+todayKcal+'kcal, P'+todayProtein+'g (target ~'+proteinTarget+'g), goals: P'+gP+'g C'+gC+'g F'+gF+'g '+gK+'kcal':'Macros not yet estimated.'}
 ${todaySignals.betweenMeals?'Between meals: '+todaySignals.betweenMeals:''}
 ${todaySignals.onWaking?'On waking: '+todaySignals.onWaking:''}
 ${todaySignals.beforeSleep?'Before sleep (yesterday): '+todaySignals.beforeSleep:''}
 
 Give a check-in response in two parts:
-1. ASSESSMENT (2-3 sentences): How is today's intake looking? What patterns from history are repeating? Be direct — flag protein gaps, undereating on training days, energy issues.
-2. REST OF DAY (specific): What to eat for remaining meals today. Exact foods, rough amounts. Max 15 min prep. Must be packable if during hospital shift. Base recommendations on what is actually missing today given training load and past patterns.`;
+1. ASSESSMENT (2-3 sentences): How is today's intake looking relative to the goals and time of day? What patterns from history are repeating? Be direct.
+2. ${isEditingPast?'REVIEW: What went well and what should be different next time.':'REST OF DAY (specific): Exact foods for remaining meals. Exact amounts. Max 15 min prep. Packable for hospital. What is actually missing given the current time and training load.'}`;
 
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:650,messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
@@ -3598,6 +3673,79 @@ function fuelCalNav(dir){
   fuelMonthOffset=next;
   renderFuelCalendar();
 }
+// ---- Quick-time chip data ----
+const QUICK_TIMES=[
+  {label:'Now',now:true},
+  {label:'6 AM',h:6,m:0,ap:'AM'},{label:'7 AM',h:7,m:0,ap:'AM'},{label:'8 AM',h:8,m:0,ap:'AM'},
+  {label:'9 AM',h:9,m:0,ap:'AM'},{label:'10 AM',h:10,m:0,ap:'AM'},{label:'11 AM',h:11,m:0,ap:'AM'},
+  {label:'12 PM',h:12,m:0,ap:'PM'},{label:'1 PM',h:1,m:0,ap:'PM'},{label:'2 PM',h:2,m:0,ap:'PM'},
+  {label:'3 PM',h:3,m:0,ap:'PM'},{label:'4 PM',h:4,m:0,ap:'PM'},{label:'5 PM',h:5,m:0,ap:'PM'},
+  {label:'6 PM',h:6,m:0,ap:'PM'},{label:'7 PM',h:7,m:0,ap:'PM'},{label:'8 PM',h:8,m:0,ap:'PM'},
+  {label:'9 PM',h:9,m:0,ap:'PM'},{label:'10 PM',h:10,m:0,ap:'PM'}
+];
+function _renderQuickTimes(){
+  const row=document.getElementById('fuel-quick-times-row'); if(!row) return;
+  const now=new Date();let nh=now.getHours()%12||12;const nap=now.getHours()>=12?'PM':'AM';const nm=now.getMinutes();
+  row.innerHTML=QUICK_TIMES.map(qt=>{
+    if(qt.now){
+      return`<div class="fuel-qt-chip qt-now" onclick="_fuelTP.hour=${nh};_fuelTP.min=${nm};_fuelTP.ampm='${nap}';_renderTimePicker();_renderQuickTimes();">Now</div>`;
+    }
+    const active=_fuelTP.hour===qt.h&&_fuelTP.min===qt.m&&_fuelTP.ampm===qt.ap;
+    return`<div class="fuel-qt-chip${active?' qt-now':''}" onclick="_fuelTP.hour=${qt.h};_fuelTP.min=${qt.m};_fuelTP.ampm='${qt.ap}';_renderTimePicker();_renderQuickTimes();">${qt.label}</div>`;
+  }).join('');
+}
+let _fuelEditMealIdx=-1;
+function openFuelMealEdit(idx){
+  _fuelEditMealIdx=idx;
+  const m=_fuelRows[idx]||{};
+  const btn=document.getElementById('fuel-edit-time-btn');
+  const food=document.getElementById('fuel-edit-food');
+  if(btn) btn.textContent=m.time||'+ time';
+  if(food) food.value=m.food||'';
+  const sheet=document.getElementById('fuel-meal-edit-sheet');
+  if(sheet) sheet.style.display='flex';
+}
+function closeFuelMealEdit(){
+  const sheet=document.getElementById('fuel-meal-edit-sheet');
+  if(sheet) sheet.style.display='none';
+  _fuelEditMealIdx=-1;
+}
+function saveFuelMealEdit(){
+  if(_fuelEditMealIdx<0) return;
+  const btn=document.getElementById('fuel-edit-time-btn');
+  const food=document.getElementById('fuel-edit-food');
+  const t=btn?btn.textContent:'';
+  const f=food?food.value.trim():'';
+  if(!f){closeFuelMealEdit();return;}
+  _fuelRows[_fuelEditMealIdx]={time:(t==='+ time'?'':t),food:f,protein:0,carbs:0,fat:0,kcal:0};
+  closeFuelMealEdit();
+  renderFuelRows();
+  // rebuild macros card to reflect the edit (remove the old displayed meal)
+  const entry=(D?.fuelLog||[]).find(e=>e.date===_fuelEditDate);
+  if(entry) renderFuelMacros({...entry,meals:_fuelRows.filter(r=>r.food.trim()&&r.kcal>0)});
+}
+function deleteFuelMealEdit(){
+  if(_fuelEditMealIdx<0) return;
+  _fuelRows.splice(_fuelEditMealIdx,1);
+  closeFuelMealEdit();
+  renderFuelRows();
+  const entry=(D?.fuelLog||[]).find(e=>e.date===_fuelEditDate);
+  if(entry) renderFuelMacros({...entry,meals:_fuelRows.filter(r=>r.food.trim()&&r.kcal>0)});
+}
+function openTimePickerEdit(){
+  // Reuse existing time picker but on confirm, update the edit sheet button
+  const btn=document.getElementById('fuel-edit-time-btn');
+  const t=btn?btn.textContent:'';
+  let h=12,m=0,ap='AM';
+  const m12=/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec((t||'').trim());
+  if(m12){h=parseInt(m12[1]);m=parseInt(m12[2]);ap=m12[3].toUpperCase();}
+  _fuelTP.rowIdx=-1; // -1 = editing the sheet
+  _fuelTP.hour=h;_fuelTP.min=m;_fuelTP.ampm=ap;
+  const modal=document.getElementById('fuel-time-modal');
+  if(!modal) return;
+  _renderTimePicker();_renderQuickTimes();
+  modal.style.display='flex';
+}
 function openTimePicker(idx){
   _fuelTP.rowIdx=idx;
   const t=_fuelRows[idx]?.time||'';
@@ -3609,9 +3757,8 @@ function openTimePicker(idx){
   _fuelTP.hour=h;_fuelTP.min=m;_fuelTP.ampm=ap;
   const modal=document.getElementById('fuel-time-modal');
   if(!modal) return;
-  _renderTimePicker();
+  _renderTimePicker();_renderQuickTimes();
   modal.style.display='flex';
-  // Scroll selected items into view
   requestAnimationFrame(()=>{
     const hEl=document.getElementById('fuel-tp-hours');
     const mEl=document.getElementById('fuel-tp-mins');
@@ -3632,8 +3779,15 @@ function fuelTpSetAmPm(ap){_fuelTP.ampm=ap;_renderTimePicker();}
 function closeTimePicker(){const m=document.getElementById('fuel-time-modal');if(m)m.style.display='none';}
 function confirmTimePicker(){
   const mm=String(_fuelTP.min).padStart(2,'0');
-  _fuelRows[_fuelTP.rowIdx].time=`${_fuelTP.hour}:${mm} ${_fuelTP.ampm}`;
-  renderFuelRows();
+  const timeStr=`${_fuelTP.hour}:${mm} ${_fuelTP.ampm}`;
+  if(_fuelTP.rowIdx===-1){
+    // Editing from the meal-edit sheet
+    const btn=document.getElementById('fuel-edit-time-btn');
+    if(btn) btn.textContent=timeStr;
+  } else {
+    _fuelRows[_fuelTP.rowIdx].time=timeStr;
+    renderFuelRows();
+  }
   closeTimePicker();
 }
 // ============================================================
@@ -8023,7 +8177,8 @@ function afdCloseDetail(){
 
 <div id="fuel-time-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeTimePicker()">
   <div style="background:var(--s2);border-radius:18px 18px 0 0;padding:20px 20px 32px;width:100%;max-width:480px;">
-    <div class="lbl" style="text-align:center;margin-bottom:16px;color:var(--aw);">select time</div>
+    <div class="lbl" style="text-align:center;margin-bottom:10px;color:var(--aw);">select time</div>
+    <div class="fuel-quick-times" id="fuel-quick-times-row"></div>
     <div class="fuel-tp-wrap">
       <div class="fuel-tp-col">
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:4px;">hour</div>
@@ -8039,8 +8194,29 @@ function afdCloseDetail(){
         <button class="fuel-tp-ampm" id="fuel-tp-pm" onclick="fuelTpSetAmPm('PM')">PM</button>
       </div>
     </div>
-    <button class="sbtn" style="width:100%;margin-top:12px;background:var(--aw);color:#0d0900;" onclick="confirmTimePicker()">Set Time</button>
+    <button class="sbtn" style="width:100%;margin-top:12px;" onclick="confirmTimePicker()">Set Time</button>
     <button class="btn bs" style="width:100%;margin-top:8px;" onclick="closeTimePicker()">Cancel</button>
+  </div>
+</div>
+
+<div id="fuel-meal-edit-sheet" onclick="if(event.target===this)closeFuelMealEdit()">
+  <div class="fuel-edit-sheet-inner">
+    <div class="fuel-edit-sheet-title">
+      <span>Edit meal</span>
+      <button onclick="closeFuelMealEdit()" style="background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;padding:0;">×</button>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div class="mgoal-label" style="margin-bottom:6px;">Time</div>
+      <button class="fuel-time-btn" id="fuel-edit-time-btn" onclick="openTimePickerEdit()">+ time</button>
+    </div>
+    <div class="ig" style="margin-bottom:14px;">
+      <label>Food</label>
+      <input type="text" id="fuel-edit-food" placeholder="e.g. 2 scrambled eggs, toast">
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="sbtn" style="flex:1;" onclick="saveFuelMealEdit()">Save changes</button>
+      <button class="btn bd" style="flex-shrink:0;" onclick="deleteFuelMealEdit()">Delete</button>
+    </div>
   </div>
 </div>
 
