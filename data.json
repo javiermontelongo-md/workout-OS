@@ -3222,6 +3222,15 @@
       "weight": 115,
       "sets": 5,
       "reps": 5
+    },
+    {
+      "date": "2026-06-14",
+      "lift": "row",
+      "predictedRPE": 7,
+      "actualRPE": 9,
+      "weight": 115,
+      "sets": 5,
+      "reps": 5
     }
   ],
   "scheduleOverrides": {
@@ -4456,30 +4465,6 @@
           "carbs": 7,
           "fat": 3,
           "kcal": 223
-        },
-        {
-          "time": "11:02 PM",
-          "food": "4 eggs",
-          "protein": 28,
-          "carbs": 2,
-          "fat": 20,
-          "kcal": 304
-        },
-        {
-          "time": "11:02 PM",
-          "food": "10 chocolate almonds from Trader Joe’s ",
-          "protein": 3,
-          "carbs": 12,
-          "fat": 9,
-          "kcal": 139
-        },
-        {
-          "time": "11:03 PM",
-          "food": "100 calorie Coke",
-          "protein": 0,
-          "carbs": 25,
-          "fat": 0,
-          "kcal": 100
         }
       ],
       "signals": {
@@ -4488,12 +4473,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 153,
-        "carbs": 105,
-        "fat": 49,
-        "kcal": 1471
+        "protein": 122,
+        "carbs": 66,
+        "fat": 20,
+        "kcal": 928
       },
-      "ts": 1781417042754
+      "ts": 1781415210484
     }
   ],
   "fuelMemory": {
@@ -4753,27 +4738,6 @@
       "inp": 105,
       "out": 57,
       "cost": 0.00117
-    },
-    {
-      "ts": 1781416959662,
-      "type": "macros",
-      "inp": 105,
-      "out": 57,
-      "cost": 0.00117
-    },
-    {
-      "ts": 1781417008499,
-      "type": "macros",
-      "inp": 113,
-      "out": 57,
-      "cost": 0.001194
-    },
-    {
-      "ts": 1781417042754,
-      "type": "macros",
-      "inp": 109,
-      "out": 57,
-      "cost": 0.001182
     }
   ],
   "checkins": [
