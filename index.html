@@ -62,13 +62,14 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: 100%; }
+html { height: 100%; overscroll-behavior-y: none; }
 
 body {
   background: var(--bg);
   color: var(--t);
   font-family: var(--sans);
   font-size: 26px;
+  overscroll-behavior-y: none;
   line-height: 1.7;
   min-height: 100%;
 }
@@ -2952,6 +2953,8 @@ function fuelSelectDate(dateStr){
   } else {
     _fuelRows=[{time:currentTimeStr(),food:''}];
   }
+  // Restore any unsaved draft for this date (overrides empty new row above)
+  _restoreFuelDraftIfMatch(dateStr);
   const sb=document.getElementById('fuel-sig-between');
   const ss=document.getElementById('fuel-sig-sleep');
   const sw=document.getElementById('fuel-sig-wake');
@@ -2982,12 +2985,27 @@ function fuelSelectDate(dateStr){
 function fuelGoToday(){ fuelSelectDate(localDS(new Date())); }
 function fuelGoYesterday(){ const d=new Date(); d.setDate(d.getDate()-1); fuelSelectDate(localDS(d)); }
 
+function _saveFuelDraft(){
+  try{ localStorage.setItem('wos-fuel-draft',JSON.stringify({date:_fuelEditDate,rows:_fuelRows})); }catch(e){}
+}
+function _clearFuelDraft(){ try{ localStorage.removeItem('wos-fuel-draft'); }catch(e){} }
+function _restoreFuelDraftIfMatch(dateStr){
+  try{
+    const raw=localStorage.getItem('wos-fuel-draft');
+    if(!raw) return false;
+    const d=JSON.parse(raw);
+    if(d.date!==dateStr||!d.rows?.length) return false;
+    _fuelRows=d.rows;
+    return true;
+  }catch(e){ return false; }
+}
+
 function renderFuelRows(){
   const el=document.getElementById('fuel-meal-rows'); if(!el) return;
   // Only show NEW/pending rows (no cached kcal) — saved meals show in the macros section above
   const pendingRows=_fuelRows.map((r,i)=>({r,i})).filter(({r})=>!(r.kcal>0));
   el.innerHTML=pendingRows.map(({r,i})=>{
-    return`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value;" placeholder="e.g. 2 scrambled eggs, toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`;
+    return`<div class="fuel-row"><button class="fuel-time-btn" onclick="openTimePicker(${i})">${r.time||'+ time'}</button><input type="text" class="fuel-food" value="${esc(r.food)}" oninput="_fuelRows[${i}].food=this.value;_saveFuelDraft();" placeholder="e.g. 2 scrambled eggs, toast, coffee"><button class="fuel-rm" onclick="removeFuelMealRow(${i})">×</button></div>`;
   }).join('');
 }
 
@@ -3164,7 +3182,7 @@ async function saveFuelDay(){
   const cutoff=localDS(new Date(Date.now()-60*86400000));
   D.fuelLog=D.fuelLog.filter(e=>e.date>=cutoff);
   const ok=await push(null,'fuel-save-msg');
-  if(ok){ msg('fuel-save-msg','Saved — '+new Date().toLocaleTimeString()); renderFuelMacros(entry); renderFuelCalendar(); renderFuelTrendChart(); }
+  if(ok){ _clearFuelDraft(); msg('fuel-save-msg','Saved — '+new Date().toLocaleTimeString()); renderFuelMacros(entry); renderFuelCalendar(); renderFuelTrendChart(); }
   if(btn){btn.disabled=false;btn.textContent='Save to GitHub';}
 }
 
