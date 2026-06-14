@@ -4308,60 +4308,12 @@
           "kcal": 210
         },
         {
-          "time": "10:47 AM",
-          "food": "42 G protein fairlife",
-          "protein": 42,
-          "carbs": 6,
-          "fat": 2,
-          "kcal": 210
-        },
-        {
-          "time": "3:48 PM",
-          "food": "4 eggs ",
-          "protein": 24,
-          "carbs": 1,
-          "fat": 20,
-          "kcal": 280
-        },
-        {
-          "time": "6:48 PM",
-          "food": "Half cotainer of the trader joes shrimp fried rice, half of their chicke n stir fry with mushrooms and green beans.",
-          "protein": 22,
-          "carbs": 30,
-          "fat": 8,
-          "kcal": 280
-        },
-        {
           "time": "6:49 PM",
           "food": "Half cotainer of the trader joes shrimp fried rice, half of their chicke n stir fry with mushrooms and green beans.",
-          "protein": 22,
-          "carbs": 30,
-          "fat": 8,
-          "kcal": 280
-        },
-        {
-          "time": "6:49 PM",
-          "food": "Half cotainer of the trader joes shrimp fried rice, half of their chicke n stir fry with mushrooms and green beans.",
-          "protein": 22,
-          "carbs": 30,
-          "fat": 8,
-          "kcal": 280
-        },
-        {
-          "time": "6:49 PM",
-          "food": "Half cotainer of the trader joes shrimp fried rice, half of their chicke n stir fry with mushrooms and green beans.",
-          "protein": 22,
-          "carbs": 30,
-          "fat": 8,
-          "kcal": 280
-        },
-        {
-          "time": "6:49 PM",
-          "food": "Half cotainer of the trader joes shrimp fried rice, half of their chicke n stir fry with mushrooms and green beans.",
-          "protein": 22,
-          "carbs": 30,
-          "fat": 8,
-          "kcal": 280
+          "protein": 38,
+          "carbs": 52,
+          "fat": 14,
+          "kcal": 486
         }
       ],
       "signals": {
@@ -4370,12 +4322,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 218,
-        "carbs": 163,
-        "fat": 64,
-        "kcal": 2100
+        "protein": 80,
+        "carbs": 58,
+        "fat": 16,
+        "kcal": 696
       },
-      "ts": 1781401761698
+      "ts": 1781401811728
     }
   ],
   "fuelMemory": {
@@ -4600,6 +4552,13 @@
       "inp": 351,
       "out": 198,
       "cost": 0.004023
+    },
+    {
+      "ts": 1781401811728,
+      "type": "macros",
+      "inp": 151,
+      "out": 144,
+      "cost": 0.002613
     }
   ],
   "checkins": [
