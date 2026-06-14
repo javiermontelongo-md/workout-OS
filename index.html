@@ -839,12 +839,13 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-time-btn:hover{border-color:var(--aw);}
 .fuel-chips-group{margin-bottom:14px;}
 .fuel-chips-group-lbl{font-family:var(--mono);font-size:var(--fs-label);font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
-.fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px;}
-.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-label);font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;width:100%;}
+.fuel-chips-wrap{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.fuel-chips-wrap::-webkit-scrollbar{display:none;}
+.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-label);font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;min-width:120px;flex-shrink:0;}
 .fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
 .fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;}
 .fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;}
-@media(max-width:600px){.fuel-chips-wrap{grid-template-columns:1fr 1fr;}}
+
 .fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
 .groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-body);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
 .groc-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;}
@@ -2049,26 +2050,26 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div id="fuel-macros-out"></div>
     </div>
     <div id="fuel-meal-rows" style="margin-bottom:8px;overflow:hidden;"></div>
-    <div id="fuel-chips-section" style="display:none;margin-bottom:10px;overflow:hidden;">
-      <div id="fuel-chips"></div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
       <button class="btn bs" style="width:auto;" onclick="addFuelMealRow()">+ Add meal</button>
       <button class="btn bs" style="width:auto;" onclick="copyYesterdayMeals()">📋 Copy yesterday</button>
     </div>
-    <div class="dvdr"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+      <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
+      <button class="sbtn sbtn-ai" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;">AI: How am I doing?</button>
+    </div>
+    <div class="smsg" id="fuel-save-msg"></div>
+    <div id="fuel-advice-out" style="margin-top:10px;"></div>
+    <div id="fuel-chips-section" style="display:none;margin-top:12px;">
+      <div id="fuel-chips"></div>
+    </div>
+    <div class="dvdr" style="margin-top:14px;"></div>
     <div class="lbl" style="margin-top:14px;">how you felt</div>
     <div class="g3" style="margin-bottom:14px;">
       <div class="ig"><label>Between meals</label><input type="text" id="fuel-sig-between" placeholder="e.g. low energy at 2pm, hungry early"></div>
       <div class="ig"><label>Before sleep</label><input type="text" id="fuel-sig-sleep" placeholder="e.g. full, still hungry, satisfied"></div>
       <div class="ig"><label>On waking</label><input type="text" id="fuel-sig-wake" placeholder="e.g. hungry, groggy, energized"></div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
-      <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
-      <button class="sbtn sbtn-ai" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;">AI: How am I doing?</button>
-    </div>
-    <div class="smsg" id="fuel-save-msg"></div>
-    <div id="fuel-advice-out" style="margin-top:10px;"></div>
   </div>
 
   <div class="card">
