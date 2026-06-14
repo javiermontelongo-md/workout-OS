@@ -839,13 +839,12 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-time-btn:hover{border-color:var(--aw);}
 .fuel-chips-group{margin-bottom:14px;}
 .fuel-chips-group-lbl{font-family:var(--mono);font-size:var(--fs-label);font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
-.fuel-chips-wrap{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.fuel-chips-wrap::-webkit-scrollbar{display:none;}
-.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-label);font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;min-width:120px;flex-shrink:0;}
+.fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px;}
+.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-label);font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;width:100%;}
 .fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
 .fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;}
 .fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;}
-
+@media(max-width:600px){.fuel-chips-wrap{grid-template-columns:1fr 1fr;}}
 .fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
 .groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-body);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
 .groc-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;}
@@ -1201,6 +1200,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
 
   <!-- v2026-05-22 -->
+  <div id="log-form-body">
   <div class="card lift-ia" id="bench-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg a">🏋️ BENCH PRESS</span><span id="planned-bench" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ 190</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
@@ -1306,6 +1306,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   </div>
   <div id="log-notes-card" class="card"><div class="ig"><label>Session notes</label><textarea id="log-notes" placeholder="What went well? What felt off? Any PRs? Anything to flag for next session?"></textarea></div></div>
 
+  </div><!-- /log-form-body -->
   <button class="sbtn" id="log-sbtn" onclick="saveSession()">Save session to GitHub</button>
   <div class="smsg" id="log-smsg"></div>
 
@@ -2050,26 +2051,26 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div id="fuel-macros-out"></div>
     </div>
     <div id="fuel-meal-rows" style="margin-bottom:8px;overflow:hidden;"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+    <div id="fuel-chips-section" style="display:none;margin-bottom:10px;overflow:hidden;">
+      <div id="fuel-chips"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
       <button class="btn bs" style="width:auto;" onclick="addFuelMealRow()">+ Add meal</button>
       <button class="btn bs" style="width:auto;" onclick="copyYesterdayMeals()">📋 Copy yesterday</button>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
-      <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
-      <button class="sbtn sbtn-ai" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;">AI: How am I doing?</button>
-    </div>
-    <div class="smsg" id="fuel-save-msg"></div>
-    <div id="fuel-advice-out" style="margin-top:10px;"></div>
-    <div id="fuel-chips-section" style="display:none;margin-top:12px;">
-      <div id="fuel-chips"></div>
-    </div>
-    <div class="dvdr" style="margin-top:14px;"></div>
+    <div class="dvdr"></div>
     <div class="lbl" style="margin-top:14px;">how you felt</div>
     <div class="g3" style="margin-bottom:14px;">
       <div class="ig"><label>Between meals</label><input type="text" id="fuel-sig-between" placeholder="e.g. low energy at 2pm, hungry early"></div>
       <div class="ig"><label>Before sleep</label><input type="text" id="fuel-sig-sleep" placeholder="e.g. full, still hungry, satisfied"></div>
       <div class="ig"><label>On waking</label><input type="text" id="fuel-sig-wake" placeholder="e.g. hungry, groggy, energized"></div>
     </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+      <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
+      <button class="sbtn sbtn-ai" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;">AI: How am I doing?</button>
+    </div>
+    <div class="smsg" id="fuel-save-msg"></div>
+    <div id="fuel-advice-out" style="margin-top:10px;"></div>
   </div>
 
   <div class="card">
@@ -3952,7 +3953,12 @@ function _midReps(repsStr){
 }
 function addSet(lift){
   const i=SD[lift].length;
-  SD[lift].push({w:DEF[lift]||'',r:DEF_REPS[lift]||'',rpe:DEF_RPE[lift]||''});
+  if(i>0){
+    const prev=SD[lift][i-1];
+    SD[lift].push({w:prev.w!==''?prev.w:(DEF[lift]||''),r:prev.r!==''?prev.r:(DEF_REPS[lift]||''),rpe:prev.rpe!==''?prev.rpe:(DEF_RPE[lift]||'')});
+  } else {
+    SD[lift].push({w:DEF[lift]||'',r:DEF_REPS[lift]||'',rpe:DEF_RPE[lift]||''});
+  }
   renderSets(lift);
   if(i>0) showRPEConfirm(lift);
 }
@@ -4061,11 +4067,36 @@ async function saveSession(){
 function resetLogForm(){
   ['log-notes','log-session-rpe','pullup-notes','row-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   initSets();
-  // Clear accessories inputs without hiding the block (updateLogTabPlanned will re-render)
   (window._logAccessories||[]).forEach((_,i)=>{
     ['acc-wt-','acc-sets-','acc-reps-'].forEach(p=>{const el=document.getElementById(p+i);if(el)el.value='';});
     const n=document.getElementById('acc-note-'+i);if(n)n.value='';
   });
+  // Hide form, show saved confirmation
+  const logForm=document.getElementById('log-form-body');
+  const saveBtn=document.getElementById('log-sbtn');
+  if(logForm) logForm.style.display='none';
+  if(saveBtn) saveBtn.style.display='none';
+  let banner=document.getElementById('log-saved-banner');
+  if(!banner){
+    banner=document.createElement('div');
+    banner.id='log-saved-banner';
+    banner.style.cssText='background:rgba(127,255,110,.07);border:1px solid rgba(127,255,110,.25);border-radius:14px;padding:32px 20px;text-align:center;margin-bottom:16px;';
+    banner.innerHTML=`<div style="font-size:38px;margin-bottom:10px;">✓</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-body);color:var(--g);font-weight:500;margin-bottom:6px;">Session saved to GitHub</div>
+      <div style="font-size:var(--fs-sm);color:var(--t3);line-height:1.6;margin-bottom:20px;">Your lifts, RPE, and notes are locked in.<br>AI feedback is generating below.</div>
+      <button class="btn bp" onclick="showLogFormAgain()" style="font-size:var(--fs-sm);">Log another session</button>`;
+    const panel=document.getElementById('panel-log');
+    if(panel) panel.insertBefore(banner, panel.querySelector('.card'));
+  }
+  banner.style.display='block';
+}
+function showLogFormAgain(){
+  const banner=document.getElementById('log-saved-banner');
+  if(banner) banner.style.display='none';
+  const logForm=document.getElementById('log-form-body');
+  if(logForm) logForm.style.display='';
+  const saveBtn=document.getElementById('log-sbtn');
+  if(saveBtn) saveBtn.style.display='';
 }
 function renderSessHist(){
   const legacyDayMap={1:'A',2:'B',3:'C',4:'A',5:'B'};
