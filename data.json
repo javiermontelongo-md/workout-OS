@@ -3834,6 +3834,101 @@
           "reason": "168h cycle repeat; 48h+ from Monday easy run; if today's sets all hit top of rep range at RPE ≤7, apply double progression and add 2.5lb to bench and OHP next week"
         }
       ]
+    },
+    "2026-06-13": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "reasoning": "Recent push sessions show bench and OHP are both running hotter than predicted (actual RPE consistently 1-2 points above target), so conservative load management is warranted system-wide. Today's pull session is a good reset point — back and biceps have no flagged fatigue and no stall data, so we can build clean baseline numbers for row and pullup within the 6-10 rep range. Keeping row load moderate and pullup volume controlled sets a solid foundation for double progression going forward.",
+      "warmup": "5 min light cardio (row erg or bike). Then: Band pull-aparts 2×15, dead hangs 2×20s, scapular shrugs on bar 2×10, face-pull with light band 2×15. Prime the posterior chain and rotator cuff before loading.",
+      "mainWork": {
+        "summary": "2 main lifts · 4 accessories",
+        "lifts": {
+          "row": {
+            "sets": 4,
+            "reps": "6–10",
+            "weight": 135,
+            "targetRPE": 7,
+            "variation": "Barbell Bent-Over Row",
+            "coachNote": "No prior row data on file — opening at 135lb is a conservative but honest baseline. Focus on a strict hip-hinge, row to lower sternum, and controlled eccentric. If all 4 sets hit 10 reps at RPE ≤7, note it for next session's load bump (+2.5lb per double-progression rules)."
+          },
+          "pullup": {
+            "sets": 4,
+            "reps": "6–10",
+            "weight": 0,
+            "targetRPE": 7,
+            "variation": "Pull-ups (Bodyweight)",
+            "coachNote": "0 = bodyweight. No prior pullup data on file — establish your rep count per set today. Full dead hang at bottom, chin over bar at top. Log actual reps per set. If you hit 10 on all 4 sets at RPE ≤7, we add belt weight next session (+5lb). If you can't reach 6 on any set, use an assisted band."
+          }
+        },
+        "accessories": [
+          "Lat Pulldown 3×10 @ RPE 7 — wide overhand grip, pull to upper chest, full stretch at top",
+          "Cable Face Pull 3×15 @ RPE 6 — rope attachment at face height, external rotation at end, elbows high",
+          "Incline Dumbbell Curl 3×12 @ RPE 7 — seated on 45° incline, full supination at top, strict no-swing",
+          "Rear Delt Fly (DB or Cable) 3×15 @ RPE 6 — slight bend at hip, lead with elbows, squeeze at end range"
+        ]
+      },
+      "cooldown": "5 min: Child's pose 60s, doorway lat stretch 30s each side, overhead tricep/lat stretch 30s each side, neck rolls and thoracic rotation 60s. Optional 3 min easy walk to bring HR down.",
+      "coachNote": "With bench and OHP both running RPE 9-10 on loads predicted at 7-8, your push fatigue is real even if today is a pull day. Keep every set today at a true RPE ≤7-8 — this is a data-collection session as much as a training session. Log exact reps per set for row and pullup so we can apply double progression accurately starting next week.",
+      "ifTooHard": "Drop row to 115lb and use a resistance band for pullup assistance. Cut accessories to 2 sets each. Stop any set that reaches RPE 8 regardless of rep count.",
+      "watchOutFor": [
+        "Lower back fatigue on bent-over rows — if you feel lumbar strain rather than lat engagement, reset with a chest-supported DB row instead",
+        "Grip fatigue limiting pullup reps before back is actually fatigued — use chalk or straps on final sets if needed so back gets the intended stimulus"
+      ],
+      "workoutType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-06-14T02:04:36.503Z",
+      "weekPlan": [
+        {
+          "date": "2026-06-14",
+          "dow": "Sun",
+          "suggestion": "Zone 2 Easy Run — 30–35 min, hard cap 147bpm",
+          "confidence": "high",
+          "reason": "Active recovery day after pull; Zone 2 aerobic base work supports sub-20 5K goal, HR ceiling 147bpm enforced — likely 11:30–12:30/mi pace given current easy run HR trend"
+        },
+        {
+          "date": "2026-06-15",
+          "dow": "Mon",
+          "suggestion": "Push — Chest & Shoulders (Bench + OHP)",
+          "confidence": "high",
+          "reason": "48h+ since pull session; push movements fully recovered; bench and OHP loads need to be dialed back — target ~185lb bench and ~82.5lb OHP based on recent RPE overshoot data"
+        },
+        {
+          "date": "2026-06-16",
+          "dow": "Tue",
+          "suggestion": "Zone 2 Easy Run — 35–40 min, hard cap 147bpm",
+          "confidence": "high",
+          "reason": "Day after push lift; legs are fresh; pure aerobic Zone 2 volume day supporting 80/20 polarization balance for the week"
+        },
+        {
+          "date": "2026-06-17",
+          "dow": "Wed",
+          "suggestion": "Legs — Squat & Deadlift",
+          "confidence": "high",
+          "reason": "Midweek lower body session; 48h+ since push; squat and DL both have no recent session data so baseline loads needed — conservative entry point, RPE cap 8 strictly enforced"
+        },
+        {
+          "date": "2026-06-18",
+          "dow": "Thu",
+          "suggestion": "Zone 2 Easy Run — 30 min, hard cap 147bpm",
+          "confidence": "medium",
+          "reason": "24h+ after legs day satisfies recovery window for easy run; keeps weekly Zone 2 volume on track; keep effort very easy given post-leg session residual fatigue"
+        },
+        {
+          "date": "2026-06-19",
+          "dow": "Fri",
+          "suggestion": "Pull — Back & Biceps (repeat)",
+          "confidence": "medium",
+          "reason": "48h+ since Wednesday legs session and 24h+ since easy run; second pull session of the week adds row and pullup volume within weekly ceiling (Pullup ≤16 sets, Row ≤16 sets); loads same as today, aim to improve reps"
+        },
+        {
+          "date": "2026-06-20",
+          "dow": "Sat",
+          "suggestion": "Quality Run — 20-min Tempo or 4×1mile @ comfortably hard (≈80% effort) OR rest",
+          "confidence": "low",
+          "reason": "20% quality run slot for the week; 48h+ since Thursday easy run satisfies quality window; however, cumulative lift volume across 5 sessions this week is high — assess fatigue before committing, swap for Zone 2 or full rest if legs or sleep quality are poor"
+        }
+      ]
     }
   },
   "coachingMemory": {
@@ -4573,6 +4668,13 @@
       "inp": 151,
       "out": 144,
       "cost": 0.002613
+    },
+    {
+      "ts": 1781402676503,
+      "type": "prescription",
+      "inp": 1770,
+      "out": 1851,
+      "cost": 0.033075
     }
   ],
   "checkins": [
