@@ -7083,12 +7083,59 @@ function toggleEquationDrawer(){
   if(btn)btn.classList.toggle('active',open);
 }
 
+function showLogSessionSummary(session){
+  const formEls=['bench-block','ohp-block','squat-block','deadlift-block','pullup-block','row-block',
+                 'accessories-block','run-log-section','run-prescription-card','log-session-meta-card','log-notes-card','log-sbtn','log-smsg','log-no-plan','log-form-body'];
+  formEls.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  const dayLabels={'A':'Push — Upper Strength','B':'Pull — Back & Biceps','C':'Legs — Strength & Stability','run':'Run','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run','rest':'Rest Day','1':'Lift A','2':'Lift B','3':'Easy Run','4':'Lift C','5':'Quality Run'};
+  const dayLabel=dayLabels[String(session.day||session.type||'')]||session.day||'Workout';
+  const liftKeys=[{key:'bench',label:'Bench Press'},{key:'ohp',label:'Overhead Press'},{key:'pullup',label:'Weighted Pull-ups'},{key:'row',label:'Barbell Row'},{key:'squat',label:'Back Squat'},{key:'dl',label:'Deadlift'}];
+  let liftHtml='';
+  liftKeys.filter(l=>session[l.key]?.sets?.length>0).forEach(l=>{
+    liftHtml+=`<div style="margin-bottom:14px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${l.label}</div>`;
+    liftHtml+=session[l.key].sets.map((s,i)=>{
+      const w=s.w?`${s.w} lb`:'BW';
+      const r=s.r?`× ${s.r}`:'';
+      const rpe=s.rpe?` @ RPE ${s.rpe}`:'';
+      return `<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);padding:5px 0;border-bottom:1px solid var(--b);">S${i+1} — ${w} ${r}${rpe}</div>`;
+    }).join('');
+    if(session[l.key].notes) liftHtml+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:6px;padding:6px 8px;background:var(--s3);border-radius:6px;">${session[l.key].notes}</div>`;
+    liftHtml+=`</div>`;
+  });
+  const meta=[];
+  if(session.duration) meta.push(`${session.duration} min`);
+  if(session.rpe) meta.push(`RPE ${session.rpe}`);
+  if(session.energy) meta.push(`Energy ${session.energy}/10`);
+  if(session.bw) meta.push(`${session.bw} lb`);
+  const metaHtml=meta.length?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;">${meta.map(m=>`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--t2);padding:3px 10px;border-radius:6px;border:1px solid var(--b);">${m}</span>`).join('')}</div>`:'';
+  const summaryCard=liftHtml?`<div class="card" style="margin-bottom:0;">${metaHtml}${liftHtml}${session.notes?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;padding:8px;background:var(--s3);border-radius:6px;">${session.notes}</div>`:''}${session.accessories?.length?`<div style="margin-top:12px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${session.accessories.map(a=>`${a.name} ${a.sets||''}×${a.reps||''}`).join(' · ')}</div>`:''}</div>`:metaHtml?`<div class="card" style="margin-bottom:0;">${metaHtml}</div>`:'';
+  let banner=document.getElementById('log-saved-banner');
+  if(!banner){
+    banner=document.createElement('div');
+    banner.id='log-saved-banner';
+    const panel=document.getElementById('panel-log');
+    if(panel) panel.insertBefore(banner,panel.querySelector('.card'));
+  }
+  banner.style.cssText='margin-bottom:16px;';
+  banner.innerHTML=`<div style="background:rgba(127,255,110,.07);border:1px solid rgba(127,255,110,.25);border-radius:14px;padding:24px 20px;text-align:center;margin-bottom:16px;">
+    <div style="font-size:32px;margin-bottom:8px;">✓</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-body);color:var(--a2);font-weight:500;margin-bottom:4px;">Session saved</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:16px;">${dayLabel}</div>
+    <button class="btn bp" onclick="showLogFormAgain()" style="font-size:var(--fs-sm);">Log another session</button>
+  </div>
+  ${summaryCard}`;
+  banner.style.display='block';
+}
 function updateLogTabPlanned(){
   const today=localDS(new Date());
   const presc=D?.dailyPrescriptions?.[today];
   const noplanEl=document.getElementById('log-no-plan');
   const formEls=['bench-block','ohp-block','squat-block','deadlift-block','pullup-block','row-block',
                  'accessories-block','run-log-section','run-prescription-card','log-session-meta-card','log-notes-card','log-sbtn','log-smsg'];
+
+  // ── ALREADY LOGGED TODAY ────────────────────────────────────
+  const todaySession=(D?.sessions||[]).slice().reverse().find(s=>s.date===today);
+  if(todaySession){ showLogSessionSummary(todaySession); return; }
 
   // ── NO PRESCRIPTION FOR TODAY ──────────────────────────────
   if(!presc || presc.workoutType==='rest' || (!presc.mainWork?.lifts && !['run','cycling'].includes(presc.workoutType))){
