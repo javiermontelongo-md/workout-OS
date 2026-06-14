@@ -2141,6 +2141,8 @@ input[type=range]::-webkit-slider-thumb:hover {
 <script>
 var SD={bench:[],ohp:[],squat:[],dl:[],pullup:[],row:[]};
 var DEF={bench:190,ohp:90,squat:160,dl:160,pullup:0,row:115};
+var DEF_REPS={bench:8,ohp:8,squat:8,dl:5,pullup:8,row:8};
+var DEF_RPE={bench:7,ohp:7,squat:7,dl:7,pullup:7,row:7};
 let fuelMonthOffset=0;
 let _fuelRows=[{time:'',food:''}];
 let _fuelEditDate='';
@@ -4046,15 +4048,24 @@ function restChk(){
 // SET-BY-SET LOGGING
 // ============================================================
 function initSets(){ ['bench','ohp','squat','dl','pullup','row'].forEach(l=>{SD[l]=[];addSet(l);}); }
+function _midReps(repsStr){
+  if(!repsStr) return DEF_REPS;
+  const s=String(repsStr);
+  const m=s.match(/(\d+)[–\-](\d+)/);
+  if(m) return Math.round((parseInt(m[1])+parseInt(m[2]))/2);
+  const n=parseInt(s);
+  return isNaN(n)?8:n;
+}
 function addSet(lift){
-  const i=SD[lift].length; SD[lift].push({w:'',r:'',rpe:''});
+  const i=SD[lift].length;
+  SD[lift].push({w:DEF[lift]||'',r:DEF_REPS[lift]||'',rpe:DEF_RPE[lift]||''});
   renderSets(lift);
   if(i>0) showRPEConfirm(lift);
 }
 function removeSet(lift,i){ SD[lift].splice(i,1); renderSets(lift); }
 function renderSets(lift){
   const c=document.getElementById(lift+'-sets'); if(!c) return;
-  c.innerHTML=SD[lift].map((s,i)=>`<div class="srow"><input type="number" placeholder="${DEF[lift]}" value="${s.w}" oninput="SD['${lift}'][${i}].w=this.value" style="text-align:center;"><input type="number" placeholder="5" value="${s.r}" oninput="SD['${lift}'][${i}].r=this.value" style="text-align:center;"><input type="number" placeholder="7" min="1" max="10" value="${s.rpe}" oninput="SD['${lift}'][${i}].rpe=this.value" style="text-align:center;"><button class="rmbtn" onclick="removeSet('${lift}',${i})">x</button></div>`).join('');
+  c.innerHTML=SD[lift].map((s,i)=>`<div class="srow"><input type="number" placeholder="${DEF[lift]||0}" value="${s.w}" oninput="SD['${lift}'][${i}].w=this.value" style="text-align:center;"><input type="number" placeholder="${DEF_REPS[lift]||8}" value="${s.r}" oninput="SD['${lift}'][${i}].r=this.value" style="text-align:center;"><input type="number" placeholder="${DEF_RPE[lift]||7}" min="1" max="10" value="${s.rpe}" oninput="SD['${lift}'][${i}].rpe=this.value" style="text-align:center;"><button class="rmbtn" onclick="removeSet('${lift}',${i})">x</button></div>`).join('');
 }
 
 // ============================================================
@@ -7036,6 +7047,14 @@ function updateLogTabPlanned(){
   ['bench','ohp','squat','dl','pullup','row'].forEach(lift=>{
     const l=lifts[lift];if(!l)return;
     if(l.weight>0)DEF[lift]=l.weight;
+    DEF_REPS[lift]=_midReps(l.reps);
+    DEF_RPE[lift]=l.targetRPE||7;
+    // Pre-fill any existing blank rows with prescription defaults
+    SD[lift]=SD[lift].map(s=>({
+      w:s.w!==''?s.w:DEF[lift]||'',
+      r:s.r!==''?s.r:DEF_REPS[lift]||'',
+      rpe:s.rpe!==''?s.rpe:DEF_RPE[lift]||''
+    }));
     renderSets(lift);
   });
 
