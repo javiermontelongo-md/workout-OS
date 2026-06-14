@@ -140,7 +140,6 @@ body {
   50% { opacity: .5; transform: scale(.8); }
 }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
-@keyframes ptr-spin { to { transform: rotate(360deg); } }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1056,13 +1055,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 </div>
 
 <div class="main">
-<div id="ptr-indicator" style="position:absolute;top:0;left:0;right:0;z-index:1;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .15s;">
-  <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">
-    <span id="ptr-icon" style="display:inline-block;transition:transform .2s;font-size:16px;">↓</span>
-    <span id="ptr-label">Pull to refresh</span>
-  </div>
-</div>
-
 <!-- v2026-05-22 -->
 <div id="panel-today" class="panel on">
   <div class="h1">Today's <span>training</span></div>
@@ -1171,15 +1163,9 @@ input[type=range]::-webkit-slider-thumb:hover {
     <button class="btn bp" onclick="showTab('program')" style="margin:0 auto;">Go to Program →</button>
   </div>
 
-  <!-- Post-workout AI feedback card — persists between sessions -->
+  <!-- Post-save AI session feedback (auto-runs after saveSession) -->
   <div id="log-feedback-card" class="card" style="display:none;border-color:rgba(160,102,212,0.3);">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;">
-      <div>
-        <div class="lbl" style="color:var(--a5);margin:0;">💬 session feedback</div>
-        <div id="log-feedback-meta" style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);margin-top:3px;"></div>
-      </div>
-      <button class="btn bs" id="log-feedback-btn" onclick="generateSessionFeedback()" style="width:auto;font-size:var(--fs-xs);">Get feedback</button>
-    </div>
+    <div class="lbl" style="color:var(--a5);margin:0 0 10px;">session feedback</div>
     <div id="log-feedback-out" style="font-size:var(--fs-sm);color:var(--t2);line-height:1.75;"></div>
   </div>
 
@@ -1627,13 +1613,12 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
   </div>
   <div id="prog-today-card" class="prog-day-card prog-today" style="margin-bottom:12px;"></div>
-  <div id="prog-custom-card" style="display:none;margin-bottom:12px;"></div>
   <div id="prog-no-plan" style="display:none;padding:20px;text-align:center;">
     <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">Select workout type and duration above, then tap "Get Prescription".</div>
   </div>
   <div class="card" id="week-suggestions-card" style="margin-bottom:14px;">
-    <div class="lbl">7-day suggestions</div>
-    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · tap "Get Prescription" to regenerate</div>
+    <div class="lbl">next session recommendation</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;">AI-generated with your last prescription · use this to choose above, then tap "Get Prescription"</div>
     <div id="week-suggestions"></div>
   </div>
 
@@ -2583,10 +2568,9 @@ async function push(btnId,msgId){
 // INIT
 // ============================================================
 applyAppearance(); // apply saved theme/font/size before anything renders
-const APP_BUILD='06-07 07:13'; // replaced by commit hook — shows in mobile header so you can confirm fresh code is loaded
 const now=new Date();
 if(document.getElementById('dd')) document.getElementById('dd').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-if(document.getElementById('md')) document.getElementById('md').textContent='build '+APP_BUILD;
+if(document.getElementById('md')) document.getElementById('md').textContent=now.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit'});
 if(CFG.tok) document.getElementById('gh-tok').value=CFG.tok;
 document.getElementById('gh-usr').value=CFG.usr;
 document.getElementById('gh-repo').value=CFG.repo;
@@ -2623,97 +2607,6 @@ function onLoad(){
   renderSnapshotCharts();
   rendered.today=true;
   renderSystemLog();
-  initPullToRefresh();
-}
-
-function initPullToRefresh(){
-  if(!('ontouchstart' in window))return;
-
-  const INDICATOR_H=48; // matches #ptr-indicator height
-  const RESIST=0.42;    // elastic feel — lower = harder to pull
-
-  let startY=0, dist=0, pulling=false, refreshing=false;
-
-  const ind=document.getElementById('ptr-indicator');
-  const icon=document.getElementById('ptr-icon');
-  const label=document.getElementById('ptr-label');
-
-  function getPanel(){ return document.querySelector('.app .panel.on'); }
-
-  function showInd(){ if(ind) ind.style.opacity='1'; }
-  function hideInd(){ if(ind){ ind.style.transition='opacity .25s'; ind.style.opacity='0'; } }
-
-  function slidePanel(panel,px){
-    panel.style.transition='';
-    panel.style.transform=px>0?`translateY(${px}px)`:'';
-  }
-
-  function springBack(panel){
-    panel.style.transition='transform .3s cubic-bezier(.2,.8,.4,1)';
-    panel.style.transform='';
-    setTimeout(()=>{ panel.style.transition=''; hideInd(); },320);
-  }
-
-  function updateHint(d){
-    const ready=d*RESIST>=INDICATOR_H*0.82;
-    icon.style.transform=ready?'rotate(180deg)':'rotate(0deg)';
-    icon.textContent='↓';
-    label.textContent=ready?'Release to refresh':'Pull to refresh';
-    showInd();
-  }
-
-  function doRefresh(panel){
-    if(refreshing)return;
-    refreshing=true;
-    icon.style.animation='ptr-spin 0.75s linear infinite';
-    icon.style.transform='';
-    label.textContent='Refreshing…';
-    showInd();
-    // Hold panel open at indicator height while navigating
-    panel.style.transition='transform .15s ease';
-    panel.style.transform=`translateY(${INDICATOR_H}px)`;
-    setTimeout(()=>{panel.style.transition='';},160);
-    // Hard reload via cache-busting URL so iOS PWA always fetches fresh HTML/JS.
-    // onLoad() re-fetches data automatically on boot, so no separate fetchData() needed.
-    setTimeout(()=>{
-      const url=location.pathname+'?v='+Date.now();
-      location.replace(url);
-    },300);
-  }
-
-  document.addEventListener('touchstart',e=>{
-    if(refreshing)return;
-    const panel=getPanel();
-    if(!panel||panel.scrollTop>0)return;
-    startY=e.touches[0].clientY;
-    dist=0; pulling=false;
-  },{passive:true});
-
-  document.addEventListener('touchmove',e=>{
-    if(refreshing)return;
-    const panel=getPanel();
-    if(!panel||panel.scrollTop>0){dist=0;return;}
-    const dy=e.touches[0].clientY-startY;
-    if(dy<=0){dist=0;return;}
-    pulling=true;
-    dist=dy;
-    // Slide panel down — capped slightly above indicator height for feel
-    slidePanel(panel,Math.min(dist*RESIST, INDICATOR_H*1.15));
-    updateHint(dist);
-  },{passive:true});
-
-  document.addEventListener('touchend',()=>{
-    if(!pulling)return;
-    pulling=false;
-    const panel=getPanel();
-    if(!panel)return;
-    if(dist*RESIST>=INDICATOR_H*0.82){
-      doRefresh(panel);
-    }else{
-      springBack(panel);
-      dist=0;
-    }
-  },{passive:true});
 }
 
 function renderSystemLog() {
@@ -2924,7 +2817,7 @@ function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); renderLogFeedback(); }
   else if(n==='week'){ }
   else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
-  else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||getLatestPrescription(); renderPrescriptionCard(_pd); renderWeekSuggestions(_pd?.weekPlan||null); renderAIFlowDiagram(); }
+  else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||getLatestPrescription(); renderPrescriptionCard(_pd); renderNextSessionRec(_pd?.nextSession||null); renderAIFlowDiagram(); }
 }
 
 // ============================================================
@@ -4063,9 +3956,50 @@ function addSet(lift){
   if(i>0) showRPEConfirm(lift);
 }
 function removeSet(lift,i){ SD[lift].splice(i,1); renderSets(lift); }
+function _saveLogDraft(){
+  try{
+    const LIFTS=['bench','ohp','squat','dl','pullup','row'];
+    const notes={};
+    LIFTS.forEach(l=>{const el=document.getElementById(l+'-notes');if(el)notes[l]=el.value;});
+    const runFields={};
+    ['run-duration','run-distance','run-hr','run-rpe','run-notes'].forEach(id=>{
+      const el=document.getElementById(id);if(el)runFields[id]=el.value;
+    });
+    const accFields={};
+    (window._logAccessories||[]).forEach((_,i)=>{
+      ['acc-wt-','acc-sets-','acc-reps-','acc-note-'].forEach(p=>{
+        const el=document.getElementById(p+i);if(el)accFields[p+i]=el.value;
+      });
+    });
+    localStorage.setItem('wos-log-draft',JSON.stringify({
+      dayType:window._logDayType||'',SD,notes,runFields,accFields,
+      sessionRpe:document.getElementById('log-session-rpe')?.value||'',
+      logNotes:document.getElementById('log-notes')?.value||'',
+      ts:Date.now()
+    }));
+  }catch(e){}
+}
+function _clearLogDraft(){ try{ localStorage.removeItem('wos-log-draft'); }catch(e){} }
+function _restoreLogDraft(){
+  try{
+    const raw=localStorage.getItem('wos-log-draft');
+    if(!raw) return;
+    const d=JSON.parse(raw);
+    if(d.dayType!==window._logDayType) return;
+    if(Date.now()-d.ts>86400000) return;
+    const LIFTS=['bench','ohp','squat','dl','pullup','row'];
+    LIFTS.forEach(l=>{ if(d.SD?.[l]?.length){ SD[l]=d.SD[l]; renderSets(l); } });
+    LIFTS.forEach(l=>{ const el=document.getElementById(l+'-notes'); if(el&&d.notes?.[l]!=null) el.value=d.notes[l]; });
+    Object.entries(d.runFields||{}).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+    Object.entries(d.accFields||{}).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+    const rpe=document.getElementById('log-session-rpe'); if(rpe&&d.sessionRpe) rpe.value=d.sessionRpe;
+    const ln=document.getElementById('log-notes'); if(ln&&d.logNotes) ln.value=d.logNotes;
+  }catch(e){}
+}
+
 function renderSets(lift){
   const c=document.getElementById(lift+'-sets'); if(!c) return;
-  c.innerHTML=SD[lift].map((s,i)=>`<div class="srow"><input type="number" placeholder="${DEF[lift]||0}" value="${s.w}" oninput="SD['${lift}'][${i}].w=this.value" style="text-align:center;"><input type="number" placeholder="${DEF_REPS[lift]||8}" value="${s.r}" oninput="SD['${lift}'][${i}].r=this.value" style="text-align:center;"><input type="number" placeholder="${DEF_RPE[lift]||7}" min="1" max="10" value="${s.rpe}" oninput="SD['${lift}'][${i}].rpe=this.value" style="text-align:center;"><button class="rmbtn" onclick="removeSet('${lift}',${i})">x</button></div>`).join('');
+  c.innerHTML=SD[lift].map((s,i)=>`<div class="srow"><input type="number" placeholder="${DEF[lift]||0}" value="${s.w}" oninput="SD['${lift}'][${i}].w=this.value;_saveLogDraft();" style="text-align:center;"><input type="number" placeholder="${DEF_REPS[lift]||8}" value="${s.r}" oninput="SD['${lift}'][${i}].r=this.value;_saveLogDraft();" style="text-align:center;"><input type="number" placeholder="${DEF_RPE[lift]||7}" min="1" max="10" value="${s.rpe}" oninput="SD['${lift}'][${i}].rpe=this.value;_saveLogDraft();" style="text-align:center;"><button class="rmbtn" onclick="removeSet('${lift}',${i})">x</button></div>`).join('');
 }
 
 // ============================================================
@@ -4106,6 +4040,7 @@ async function saveSession(){
   const session={date,day,type:day,notes:document.getElementById('log-notes')?.value||'',...(sessionRpe?{rpe:sessionRpe}:{}),...(sessionEnergy?{energy:sessionEnergy}:{}),...(sessionBW?{bw:sessionBW}:{}),bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
+  _clearLogDraft();
   // Update e1RM (Epley formula)
   const updE=(sets,key)=>{ sets.filter(s=>s.w&&s.r).forEach(s=>{const e=Math.round(s.w*(1+s.r/30));if(e>(D.currentLifts[key]||0))D.currentLifts[key]=e;}); };
   if(session.bench.sets.length) updE(session.bench.sets,'benchE1RM');
@@ -6248,6 +6183,8 @@ function onDayTypeChange(value){
       renderRunLogCard(); // show prescription or placeholder
     }
   }
+  // Restore any unsaved draft for this day type
+  setTimeout(_restoreLogDraft, 0);
 }
 function startLoggingSession(){
   const prescType=document.getElementById('presc-workout-type')?.value||'';
@@ -6506,7 +6443,7 @@ async function generateDailyPrescription(workoutType,durationMins){
     // Return cached if same workout type and duration
     if(D.dailyPrescriptions?.[today]?.workoutType===workoutType&&D.dailyPrescriptions?.[today]?.durationMins===durationMins){
       renderPrescriptionCard(D.dailyPrescriptions[today]);
-      if(D.dailyPrescriptions[today].weekPlan)renderWeekSuggestions(D.dailyPrescriptions[today].weekPlan);
+      if(D.dailyPrescriptions[today].nextSession)renderNextSessionRec(D.dailyPrescriptions[today].nextSession);
       const sumEl=document.getElementById('presc-summary');
       if(sumEl)sumEl.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-presc-text);color:var(--a);margin-bottom:4px;">${esc(D.dailyPrescriptions[today].summary||'')}</div><div style="font-size:var(--fs-presc-text);color:var(--t2);">${esc(D.dailyPrescriptions[today].mainWork?.summary||'')}</div>`;
       if(genMsg){genMsg.textContent='Using cached prescription ✓';genMsg.style.color='var(--a3)';setTimeout(()=>{if(genMsg)genMsg.textContent='';},3000);}
@@ -6632,8 +6569,6 @@ BIOMETRICS (7-day means):
 Resting HR: ${means.rhr||'?'}bpm · HRV: ${means.hrv||'?'}ms · 7-day entries: ${means.count}
 Sleep timing (last night): onset ${ts.sleepOnset||'unknown'} · wake ${ts.wakeTime||'unknown'}${ts.sleepOnset&&ts.wakeTime?' · flags: '+(ts.activeFlags.filter(f=>f==='LATE_SLEEP'||f==='EARLY_WAKE').join(', ')||'none'):''}
 
-NEXT 7 DAYS FOR SUGGESTIONS: ${next7Days.map(d=>d.date+'('+d.dow+')').join(', ')}
-
 Output ONLY valid JSON. No markdown. No text outside the JSON.
 
 {
@@ -6649,9 +6584,22 @@ Output ONLY valid JSON. No markdown. No text outside the JSON.
     "ifTooHard": "specific modification",
     "watchOutFor": ["concern 1","concern 2"]
   },
-  "weekPlan": [
-    {"date":"YYYY-MM-DD","dow":"Mon","suggestion":"Push","confidence":"high","reason":"one line"}
-  ]
+  "nextSession": {
+    "primary": {
+      "type": "push|pull|legs|run|cycling|rest",
+      "label": "e.g. Pull — Back & Biceps or Zone 2 Easy Run or Zone 2 Cycling",
+      "duration": 60,
+      "reason": "1-2 sentences: why this is the best next session given recovery, balance, and goals",
+      "confidence": "high|medium|low"
+    },
+    "alternate": {
+      "type": "run|cycling|rest",
+      "label": "e.g. Zone 2 Easy Ride — 45 min",
+      "duration": 45,
+      "reason": "1 sentence: when to pick this over primary",
+      "confidence": "medium|low"
+    }
+  }
 }
 
 RULES:
@@ -6660,8 +6608,10 @@ RULES:
 - Apply volumeModifier ${ts.volumeModifier} to all set counts (multiply, round down, min 2)
 - RPE cap: never exceed ${ts.liftRPECap}
 - If canTrain=false: type="rest", explain in reasoning
-- weekPlan: exactly 7 entries for the exact dates provided above
-- confidence: high=data clearly supports, medium=reasonable given patterns, low=depends on recovery`;
+- nextSession.primary: single best next workout given today + recovery windows + training balance
+- nextSession.alternate: ALWAYS include; different modality swap — cycling and running are both valid; use rest if fatigue is high
+- confidence: high=data clearly supports, medium=reasonable, low=depends on recovery
+- Consider cycling (Zone 2 ride) as a valid option when run legs need recovery or ride data shows recent aerobic work`;
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2500,system:'You are a strength and running coach. Output only valid JSON. No text outside the JSON object.',messages:[{role:'user',content:prompt}]})});
     const d=await r.json();
     recordAIUsage('prescription',d.usage);
@@ -6671,12 +6621,12 @@ RULES:
     const start=clean.indexOf('{'),end=clean.lastIndexOf('}');
     if(start===-1||end===-1)throw new Error('No JSON found in response. Raw: '+responseText.slice(0,200));
     const parsed=JSON.parse(clean.slice(start,end+1));
-    if(!parsed.todayPrescription||!parsed.weekPlan)throw new Error('Response missing required fields. Got: '+Object.keys(parsed).join(', '));
+    if(!parsed.todayPrescription||!parsed.nextSession)throw new Error('Response missing required fields. Got: '+Object.keys(parsed).join(', '));
     if(!D.dailyPrescriptions)D.dailyPrescriptions={};
-    D.dailyPrescriptions[today]={...parsed.todayPrescription,workoutType,durationMins,generatedAt:new Date().toISOString(),weekPlan:parsed.weekPlan};
+    D.dailyPrescriptions[today]={...parsed.todayPrescription,workoutType,durationMins,generatedAt:new Date().toISOString(),nextSession:parsed.nextSession};
     await pushSilent();
     renderPrescriptionCard(D.dailyPrescriptions[today]);
-    renderWeekSuggestions(D.dailyPrescriptions[today].weekPlan);
+    renderNextSessionRec(D.dailyPrescriptions[today].nextSession);
     updateLogTabPlanned();
     renderSystemLog();
     const sumEl=document.getElementById('presc-summary');
