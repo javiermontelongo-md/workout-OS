@@ -3188,6 +3188,15 @@
       "weight": 102.5,
       "sets": 5,
       "reps": 5
+    },
+    {
+      "date": "2026-06-14",
+      "lift": "pullup",
+      "predictedRPE": 7,
+      "actualRPE": 9,
+      "weight": 227,
+      "sets": 5,
+      "reps": 5
     }
   ],
   "scheduleOverrides": {
@@ -3306,6 +3315,11 @@
       "ts": 1781066668244,
       "type": "daily_prescription",
       "label": "push 60min · 2026-06-09"
+    },
+    {
+      "ts": 1781402677673,
+      "type": "daily_prescription",
+      "label": "pull 60min · 2026-06-13"
     }
   ],
   "runPrescriptions": {
