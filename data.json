@@ -4434,12 +4434,12 @@
           "kcal": 482
         },
         {
-          "time": "10:00 AM",
-          "food": "4 eggs",
-          "protein": 28,
-          "carbs": 2,
-          "fat": 20,
-          "kcal": 296
+          "time": "10:33 PM",
+          "food": "42 G protein fairlife",
+          "protein": 42,
+          "carbs": 7,
+          "fat": 3,
+          "kcal": 223
         }
       ],
       "signals": {
@@ -4448,12 +4448,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 108,
-        "carbs": 61,
-        "fat": 37,
-        "kcal": 1001
+        "protein": 122,
+        "carbs": 66,
+        "fat": 20,
+        "kcal": 928
       },
-      "ts": 1781415107954
+      "ts": 1781415210484
     }
   ],
   "fuelMemory": {
