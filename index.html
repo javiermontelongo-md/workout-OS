@@ -3083,7 +3083,7 @@ async function saveFuelDay(){
   const cutoff=localDS(new Date(Date.now()-60*86400000));
   D.fuelLog=D.fuelLog.filter(e=>e.date>=cutoff);
   const ok=await push(null,'fuel-save-msg');
-  if(ok){ _clearFuelDraft(); msg('fuel-save-msg','Saved — '+new Date().toLocaleTimeString()); renderFuelMacros(entry); renderFuelCalendar(); renderFuelTrendChart(); }
+  if(ok){ _clearFuelDraft(); _fuelRows=[...mealsFull,{time:currentTimeStr(),food:''}]; renderFuelRows(); msg('fuel-save-msg','Saved — '+new Date().toLocaleTimeString()); renderFuelMacros(entry); renderFuelCalendar(); renderFuelTrendChart(); }
   if(btn){btn.disabled=false;btn.textContent='Save to GitHub';}
 }
 
@@ -8172,42 +8172,6 @@ function afdCloseDetail(){
   document.querySelectorAll('.afd-node').forEach(n=>{n.style.opacity='1';n.style.transform='scale(1)';});
   const eng=document.getElementById('afd-engine');
   if(eng){eng.style.background='linear-gradient(135deg,rgba(104,112,200,0.25),rgba(160,102,212,0.18))';eng.style.borderColor='rgba(104,112,200,0.55)';}
-}
-
-// ============================================================
-// FORCE STRAVA SYNC — triggers workflow_dispatch via GitHub API
-// ============================================================
-async function forceStravaSync(){
-  if(!CFG.tok){ alert('Add your GitHub token in Settings first.'); return; }
-  const btn=document.getElementById('strava-sync-btn');
-  const msgEl=document.getElementById('strava-sync-msg');
-  btn.disabled=true; btn.textContent='Syncing...';
-  if(msgEl) msgEl.textContent='Triggering Strava sync...';
-  const dispatchURL=`https://api.github.com/repos/${CFG.usr}/${CFG.repo}/actions/workflows/strava-sync.yml/dispatches`;
-  try{
-    const r=await fetch(dispatchURL,{
-      method:'POST',
-      headers:{Authorization:`token ${CFG.tok}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
-      body:JSON.stringify({ref:'main'})
-    });
-    if(r.status===204){
-      if(msgEl) msgEl.textContent='Sync triggered — pulling new data in 20s...';
-      setTimeout(async ()=>{
-        if(msgEl) msgEl.textContent='Pulling updated data...';
-        await fetchData();
-        if(msgEl) msgEl.textContent='Done — new activities loaded.';
-        btn.disabled=false; btn.textContent='⟳ Strava';
-        setTimeout(()=>{ if(msgEl) msgEl.textContent=''; },5000);
-      }, 20000);
-    } else {
-      const err=await r.json().catch(()=>({}));
-      if(msgEl) msgEl.textContent='Error '+r.status+': '+(err.message||'check token has workflow permission');
-      btn.disabled=false; btn.textContent='⟳ Strava';
-    }
-  }catch(e){
-    if(msgEl) msgEl.textContent='Network error: '+e.message;
-    btn.disabled=false; btn.textContent='⟳ Strava';
-  }
 }
 
 </script>
