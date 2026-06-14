@@ -4464,6 +4464,14 @@
           "carbs": 2,
           "fat": 20,
           "kcal": 304
+        },
+        {
+          "time": "11:02 PM",
+          "food": "10 chocolate almonds from Trader Joe’s ",
+          "protein": 3,
+          "carbs": 12,
+          "fat": 9,
+          "kcal": 139
         }
       ],
       "signals": {
@@ -4472,12 +4480,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 150,
-        "carbs": 68,
-        "fat": 40,
-        "kcal": 1232
+        "protein": 153,
+        "carbs": 80,
+        "fat": 49,
+        "kcal": 1371
       },
-      "ts": 1781416959662
+      "ts": 1781417008500
     }
   ],
   "fuelMemory": {
@@ -4744,6 +4752,13 @@
       "inp": 105,
       "out": 57,
       "cost": 0.00117
+    },
+    {
+      "ts": 1781417008499,
+      "type": "macros",
+      "inp": 113,
+      "out": 57,
+      "cost": 0.001194
     }
   ],
   "checkins": [
