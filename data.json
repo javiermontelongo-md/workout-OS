@@ -3197,6 +3197,15 @@
       "weight": 227,
       "sets": 5,
       "reps": 5
+    },
+    {
+      "date": "2026-06-14",
+      "lift": "row",
+      "predictedRPE": 7,
+      "actualRPE": 9,
+      "weight": 115,
+      "sets": 5,
+      "reps": 5
     }
   ],
   "scheduleOverrides": {
