@@ -4612,6 +4612,14 @@
           "carbs": 7,
           "fat": 3,
           "kcal": 223
+        },
+        {
+          "time": "9:16 AM",
+          "food": "4 eggs",
+          "protein": 24,
+          "carbs": 2,
+          "fat": 20,
+          "kcal": 284
         }
       ],
       "signals": {
@@ -4620,12 +4628,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 122,
-        "carbs": 66,
-        "fat": 20,
-        "kcal": 928
+        "protein": 146,
+        "carbs": 68,
+        "fat": 40,
+        "kcal": 1212
       },
-      "ts": 1781415210484
+      "ts": 1781453811684
     }
   ],
   "fuelMemory": {
@@ -4892,6 +4900,13 @@
       "inp": 577,
       "out": 246,
       "cost": 0.005421
+    },
+    {
+      "ts": 1781453811684,
+      "type": "macros",
+      "inp": 105,
+      "out": 57,
+      "cost": 0.00117
     }
   ],
   "checkins": [
