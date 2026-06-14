@@ -4620,6 +4620,14 @@
           "carbs": 2,
           "fat": 20,
           "kcal": 284
+        },
+        {
+          "time": "9:16 AM",
+          "food": "Coke 100 calories ",
+          "protein": 0,
+          "carbs": 25,
+          "fat": 0,
+          "kcal": 100
         }
       ],
       "signals": {
@@ -4629,11 +4637,11 @@
       },
       "totals": {
         "protein": 146,
-        "carbs": 68,
+        "carbs": 93,
         "fat": 40,
-        "kcal": 1212
+        "kcal": 1312
       },
-      "ts": 1781453811684
+      "ts": 1781453857883
     }
   ],
   "fuelMemory": {
@@ -4907,6 +4915,13 @@
       "inp": 105,
       "out": 57,
       "cost": 0.00117
+    },
+    {
+      "ts": 1781453857883,
+      "type": "macros",
+      "inp": 109,
+      "out": 57,
+      "cost": 0.001182
     }
   ],
   "checkins": [
