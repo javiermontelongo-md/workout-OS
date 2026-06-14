@@ -2712,7 +2712,7 @@ function renderSystemLog() {
   (D.coachingLog || []).forEach(entry => {
     if (!entry.ts || entry.ts < sevenDaysAgo) return;
     const labels = {
-      week_plan: 'AI weekly plan generated',
+      week_plan: 'Next session recommendation generated',
       run_prescription: 'AI run prescription generated',
       daily_prescription: 'Daily prescription generated',
     };
@@ -2814,7 +2814,7 @@ function showTab(n){
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
-  if(n==='log'){ renderSessHist(); updateLogTabPlanned(); renderLogFeedback(); }
+  if(n==='log'){ renderSessHist(); updateLogTabPlanned(); }
   else if(n==='week'){ }
   else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||getLatestPrescription(); renderPrescriptionCard(_pd); renderNextSessionRec(_pd?.nextSession||null); renderAIFlowDiagram(); }
@@ -6652,7 +6652,6 @@ function renderPrescriptionCard(prescription){
   if(!prescription){
     if(el)el.style.display='none';
     if(noplan)noplan.style.display='block';
-    const cc=document.getElementById('prog-custom-card');if(cc)cc.style.display='none';
     return;
   }
   if(noplan)noplan.style.display='none';
@@ -6695,82 +6694,48 @@ function renderPrescriptionCard(prescription){
   el.style.borderColor=color;
   const secHdr=(icon,lbl,clr)=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><span style="font-size:var(--fs-sm);">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:${clr||'var(--t3)'};letter-spacing:.1em;text-transform:uppercase;">${lbl}</span></div>`;
   el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${esc(label)}</div><div class="prog-day-title">${esc(prescription.summary||'')}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div class="presc-body">${prescription.reasoning?`<div style="font-size:var(--fs-presc-text);color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:rgba(104,110,210,0.06);border:1px solid rgba(104,110,210,0.15);border-radius:10px;">💭 ${esc(prescription.reasoning)}</div>`:''}${prescription.warmup?`<div style="margin-bottom:14px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;padding:12px 14px;background:rgba(61,136,212,0.07);border:1px solid rgba(61,136,212,0.2);border-radius:10px;">${secHdr('🔥','Warmup','var(--a3)')}${esc(prescription.warmup)}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;padding:12px 14px;background:rgba(42,160,112,0.07);border:1px solid rgba(42,160,112,0.2);border-radius:10px;">${secHdr('🧊','Cooldown','var(--a2)')}${esc(prescription.cooldown)}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:rgba(104,110,210,0.07);border-left:3px solid ${color};border-radius:0 10px 10px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">📌 ${esc(prescription.coachNote)}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
-  renderCustomExercises();
-}
-function renderCustomExercises(){
-  const el=document.getElementById('prog-custom-card');
-  if(!el)return;
-  const today=localDS(new Date());
-  const presc=D.dailyPrescriptions?.[today];
-  if(!presc){el.style.display='none';return;}
-  el.style.display='';
-  const customs=presc.customExercises||[];
-  const inp=(id,ph,type='text')=>`<input id="${id}" type="${type}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;text-align:center;">`;
-  const listHtml=customs.map((ex,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b);"><div><div style="font-size:var(--fs-presc-text);color:var(--t);">${esc(ex.name)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${[ex.sets&&ex.reps?ex.sets+'×'+ex.reps:null,ex.weight?ex.weight+' lb':null,ex.note?esc(ex.note):null].filter(Boolean).join(' · ')}</div></div><button onclick="removeCustomExercise(${i})" style="background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:0 6px;line-height:1;flex-shrink:0;">×</button></div>`).join('');
-  el.innerHTML=`<div class="card" style="margin-bottom:0;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;margin-bottom:${customs.length?'10px':'0'};">${customs.length?'CUSTOM EXERCISES':''}</div>${listHtml}<div style="margin-top:${customs.length?'12px':'0'};"><input id="cex-name" type="text" placeholder="Exercise name" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">${inp('cex-sets','Sets','number')}${inp('cex-reps','Reps','number')}${inp('cex-weight','lb','number')}</div><input id="cex-note" type="text" placeholder="Note (optional)" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;"><button onclick="addCustomExercise()" style="width:100%;font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:8px;padding:10px;cursor:pointer;letter-spacing:.04em;">+ Add exercise</button></div></div>`;
-}
-function addCustomExercise(){
-  const name=document.getElementById('cex-name')?.value?.trim();
-  if(!name)return;
-  const today=localDS(new Date());
-  if(!D.dailyPrescriptions?.[today])return;
-  if(!D.dailyPrescriptions[today].customExercises)D.dailyPrescriptions[today].customExercises=[];
-  D.dailyPrescriptions[today].customExercises.push({
-    name,
-    sets:+document.getElementById('cex-sets')?.value||null,
-    reps:+document.getElementById('cex-reps')?.value||null,
-    weight:+document.getElementById('cex-weight')?.value||null,
-    note:document.getElementById('cex-note')?.value?.trim()||''
-  });
-  pushSilent();
-  renderCustomExercises();
-}
-function removeCustomExercise(i){
-  const today=localDS(new Date());
-  if(!D.dailyPrescriptions?.[today]?.customExercises)return;
-  D.dailyPrescriptions[today].customExercises.splice(i,1);
-  pushSilent();
-  renderCustomExercises();
 }
 
-function renderWeekSuggestions(weekPlan){
+function renderNextSessionRec(nextSession){
   const el=document.getElementById('week-suggestions');
   if(!el)return;
-  if(!weekPlan||!weekPlan.length){
-    el.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">Tap "Get Prescription" on the Program tab to generate week suggestions.</div>`;
+  if(!nextSession?.primary){
+    el.innerHTML=`<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">Tap "Get Prescription" to generate a next-session recommendation.</div>`;
     return;
   }
+  const TYPE_META={
+    push:    {color:'var(--a)',  bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'🏋️'},
+    pull:    {color:'var(--a)',  bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'💪'},
+    legs:    {color:'var(--a)',  bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'🦵'},
+    run:     {color:'var(--a2)', bg:'rgba(42,160,112,0.08)', border:'rgba(42,160,112,0.3)', icon:'🏃'},
+    cycling: {color:'var(--a5)', bg:'rgba(160,102,212,0.08)',border:'rgba(160,102,212,0.3)',icon:'🚴'},
+    rest:    {color:'var(--t3)', bg:'rgba(255,255,255,0.02)',border:'rgba(255,255,255,0.08)',icon:'💤'},
+  };
   const CONF_COLORS={high:'var(--a2)',medium:'var(--a)',low:'var(--t3)'};
   const CONF_BG={high:'rgba(42,160,112,0.12)',medium:'rgba(104,110,210,0.12)',low:'rgba(255,255,255,0.04)'};
-  const TYPE_META={
-    Push:   {color:'var(--a)',   bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'🏋️'},
-    Pull:   {color:'var(--a)',   bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'💪'},
-    Legs:   {color:'var(--a)',   bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'🦵'},
-    Run:    {color:'var(--a2)',  bg:'rgba(42,160,112,0.08)', border:'rgba(42,160,112,0.3)', icon:'🏃'},
-    Cycling:{color:'var(--a5)',  bg:'rgba(160,102,212,0.08)',border:'rgba(160,102,212,0.3)',icon:'🚴'},
-    Rest:   {color:'var(--t3)', bg:'rgba(255,255,255,0.02)',border:'rgba(255,255,255,0.08)',icon:'💤'},
-    rest:   {color:'var(--t3)', bg:'rgba(255,255,255,0.02)',border:'rgba(255,255,255,0.08)',icon:'💤'},
-  };
-  const today=localDS(new Date());
-  el.innerHTML=weekPlan.map(day=>{
-    const conf=day.confidence||'low';
-    const m=TYPE_META[day.suggestion]||{color:'var(--t2)',bg:'rgba(255,255,255,0.03)',border:'rgba(255,255,255,0.1)',icon:'•'};
-    const isToday=day.date===today;
-    const todayGlow=isToday?`;box-shadow:0 0 0 1px ${m.border}`:'';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:12px;background:${m.bg};border:1px solid ${m.border}${todayGlow};position:relative;overflow:hidden;">
-${isToday?`<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${m.color},transparent);"></div>`:''}
-<div style="min-width:58px;">
-  <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${(day.date||'').slice(5)||''}</div>
-  <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);opacity:.7;">${day.dow||''}</div>
-</div>
-<div style="width:30px;height:30px;border-radius:8px;background:${m.border};display:flex;align-items:center;justify-content:center;font-size:var(--fs-body);flex-shrink:0;">${m.icon}</div>
+  const renderOption=(opt,badge)=>{
+    const m=TYPE_META[(opt.type||'').toLowerCase()]||{color:'var(--t2)',bg:'rgba(255,255,255,0.03)',border:'rgba(255,255,255,0.1)',icon:'•'};
+    const conf=opt.confidence||'medium';
+    const dur=opt.duration?` · ${opt.duration} min`:'';
+    return`<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:12px;background:${m.bg};border:1px solid ${m.border};position:relative;overflow:hidden;margin-bottom:10px;">
+<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${m.color},transparent);"></div>
+<div style="width:38px;height:38px;border-radius:10px;background:${m.border};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;margin-top:2px;">${m.icon}</div>
 <div style="flex:1;min-width:0;">
-  <div style="font-size:var(--fs-presc-lift);color:${m.color};font-weight:600;">${day.suggestion||''}</div>
-  <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${day.reason||''}</div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+    <span style="font-family:var(--mono);font-size:var(--fs-label);background:${m.border};color:${m.color};padding:2px 7px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase;">${badge}</span>
+    <span style="font-size:var(--fs-body);color:${m.color};font-weight:600;">${esc(opt.label||opt.type)}</span>
+    <span style="font-family:var(--mono);font-size:var(--fs-label);color:var(--t3);">${dur}</span>
+  </div>
+  <div style="font-size:var(--fs-sm);color:var(--t2);line-height:1.6;">${esc(opt.reason||'')}</div>
 </div>
-<div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:var(--fs-xs);padding:3px 8px;border-radius:5px;border:1px solid ${CONF_COLORS[conf]}60;white-space:nowrap;">${conf.toUpperCase()}</div>
+<div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:var(--fs-label);padding:3px 8px;border-radius:5px;border:1px solid ${CONF_COLORS[conf]}60;white-space:nowrap;flex-shrink:0;">${conf.toUpperCase()}</div>
 </div>`;
-  }).join('');
+  };
+  let html=renderOption(nextSession.primary,'Option A — Recommended');
+  if(nextSession.alternate){
+    html+=renderOption(nextSession.alternate,'Option B — Alternative');
+  }
+  el.innerHTML=html;
 }
 
 // ── PRESCRIPTION PERSISTENCE HELPER ─────────────────────────────────────────
@@ -6781,49 +6746,23 @@ function getLatestPrescription(){
   return D.dailyPrescriptions[dates[dates.length-1]];
 }
 
-// ── POST-WORKOUT SESSION FEEDBACK ────────────────────────────────────────────
-function renderLogFeedback(){
-  const card=document.getElementById('log-feedback-card');
-  const out=document.getElementById('log-feedback-out');
-  const meta=document.getElementById('log-feedback-meta');
-  const btn=document.getElementById('log-feedback-btn');
-  if(!card) return;
-  // Find the most recent session with aiFeedback
-  const sessions=[...(D.sessions||[])].reverse();
-  const withFb=sessions.find(s=>s.aiFeedback);
-  const latest=sessions[0];
-  if(withFb){
-    card.style.display='';
-    if(meta) meta.textContent=withFb.date+(withFb.day?' · '+withFb.day:'');
-    if(out) out.innerHTML=withFb.aiFeedback.replace(/\n/g,'<br>');
-    // Show re-evaluate button if latest session doesn't have feedback yet
-    if(btn) btn.textContent=latest&&!latest.aiFeedback?'Evaluate latest':'Re-evaluate';
-  } else if(latest){
-    card.style.display='';
-    if(meta) meta.textContent='No feedback yet for '+latest.date;
-    if(out) out.innerHTML='<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Tap "Get feedback" to get AI analysis of your last session.</span>';
-    if(btn) btn.textContent='Get feedback';
-  } else {
-    card.style.display='none';
-  }
-}
-
+// ── POST-WORKOUT SESSION FEEDBACK (auto-runs after save) ─────────────────────
 async function generateSessionFeedback(ts){
   const apiKey=document.getElementById('api-key')?.value?.trim()||CFG.api||localStorage.getItem('jm_api_key')||'';
-  const btn=document.getElementById('log-feedback-btn');
+  const card=document.getElementById('log-feedback-card');
   const out=document.getElementById('log-feedback-out');
-  if(!apiKey){if(out)out.innerHTML='<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Add API key in Settings first.</span>';renderLogFeedback();return;}
-  // Find the target session
+  if(!card||!out)return;
+  if(!apiKey){
+    card.style.display='';
+    out.innerHTML='<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Add API key in Settings to receive session feedback.</span>';
+    return;
+  }
   const sessions=D.sessions||[];
   const session=ts?sessions.find(s=>s.ts===ts):sessions[sessions.length-1];
-  if(!session){renderLogFeedback();return;}
-  if(btn){btn.disabled=true;btn.textContent='Analyzing...';}
-  const card=document.getElementById('log-feedback-card');
-  if(card) card.style.display='';
-  if(out) out.innerHTML='<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Reading your session data...</span>';
-  // Get prescription for that day
+  if(!session)return;
+  card.style.display='';
+  out.innerHTML='<span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">Analyzing your session...</span>';
   const presc=D.dailyPrescriptions?.[session.date]||null;
-  // Format session data
   const liftLines=[];
   const LIFT_NAMES={bench:'Bench Press',ohp:'Overhead Press',squat:'Squat',dl:'Deadlift',pullup:'Pull-ups',row:'Barbell Row'};
   Object.entries(LIFT_NAMES).forEach(([k,name])=>{
@@ -6835,26 +6774,25 @@ async function generateSessionFeedback(ts){
   });
   const accLines=(session.accessories||[]).map(a=>`${a.name}: ${a.sets||'?'}×${a.reps||'?'}${a.weight?' @ '+a.weight+'lb':''}${a.notes?' — '+a.notes:''}`);
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a strength coach giving concise post-workout feedback. Be direct, specific, and encouraging. 3-5 sentences max. Focus on: did they hit targets? RPE trends? What to watch next session? No filler phrases.',messages:[{role:'user',content:`Athlete: ${session.bw||225}lb, ${session.energy?'energy '+session.energy+'/10':''}, session RPE ${session.rpe||'not logged'}.
-
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a strength and conditioning coach giving concise post-workout feedback. Be direct, specific, honest. 3-5 sentences. Cover: did they hit targets? RPE trends (over/under)? One concrete thing to focus on next session. No filler phrases.',messages:[{role:'user',content:`Athlete: ${session.bw||225}lb${session.energy?', energy '+session.energy+'/10':''}, session RPE ${session.rpe||'not logged'}.
 DATE: ${session.date} | TYPE: ${session.day||session.type}
 ${presc?.reasoning?'PLAN CONTEXT: '+presc.reasoning:''}
-
 LIFTS:
 ${liftLines.join('\n')||'No lift data.'}
-${accLines.length?'\nACCESSORIES:\n'+accLines.join('\n'):''}
-${session.notes?'\nNOTES: '+session.notes:''}
-
-Give me honest, specific feedback on this session.`}]})});
+${accLines.length?'ACCESSORIES:\n'+accLines.join('\n'):''}
+${session.notes?'NOTES: '+session.notes:''}
+Give honest, specific feedback.`}]})});
     const d=await r.json();
     recordAIUsage('sessionFeedback',d.usage);
     const text=d.content?.[0]?.text||'';
     session.aiFeedback=text;
     session.aiFeedbackAt=new Date().toISOString();
     pushSilent();
-    renderLogFeedback();
-  }catch(err){console.error('Session feedback error:',err);if(out)out.innerHTML='<span style="color:var(--a4);">Error — try again.</span>';}
-  if(btn){btn.disabled=false;btn.textContent='Re-evaluate';}
+    out.innerHTML=text.replace(/\n/g,'<br>');
+  }catch(err){
+    console.error('Session feedback error:',err);
+    out.innerHTML='<span style="color:var(--a4);">Feedback error — check console.</span>';
+  }
 }
 
 async function confirmRPE(lift,actualRPE){
@@ -8036,19 +7974,21 @@ function renderAIFlowDiagram(){
     },
     {
       id:'out-weekplan',
-      icon:'📆',
-      label:'7-Day Suggestions',
-      sublabel:'confidence · reasoning per day',
+      icon:'🔮',
+      label:'Next Session Rec',
+      sublabel:'option A + option B',
       color:'rgba(160,102,212,0.85)',
       bg:'rgba(160,102,212,0.07)',
       border:'rgba(160,102,212,0.3)',
       detail(){
         const today=localDS(new Date());
         const p=D.dailyPrescriptions?.[today];
-        const wp=p?.weekPlan||[];
-        const rows=wp.length?wp.map(d=>[d.date+' '+d.dow,d.suggestion+' — '+(d.confidence||'').toUpperCase(),d.reason||'']):
-          [['Status','Generate a prescription to see week plan','']];
-        return{title:'📆 7-Day Suggestions — full week plan',desc:'Generated alongside today\'s prescription in the same API call. Each day gets a workout suggestion with HIGH / MEDIUM / LOW confidence and a one-line reason. Confidence reflects how certain the AI is given your current fatigue state and training schedule. Shown in the 7-Day Suggestions card above.',rows};
+        const ns=p?.nextSession;
+        const rows=ns?[
+          ['Option A',ns.primary?.label||ns.primary?.type||'—',(ns.primary?.confidence||'').toUpperCase()+' · '+( ns.primary?.reason||'')],
+          ['Option B',ns.alternate?.label||ns.alternate?.type||'—',(ns.alternate?.confidence||'').toUpperCase()+' · '+(ns.alternate?.reason||'')]
+        ]:[['Status','Generate a prescription to see next session recommendation','']];
+        return{title:'🔮 Next Session Recommendation',desc:'Generated alongside today\'s prescription. Option A is the primary recommendation; Option B is an alternative (different modality — run, cycling, or rest). Use this to decide what to select in the workout-type dropdown before hitting "Get Prescription".',rows};
       }
     },
   ];
