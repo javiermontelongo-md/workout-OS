@@ -4310,10 +4310,18 @@
         {
           "time": "6:49 PM",
           "food": "Half cotainer of the trader joes shrimp fried rice, half of their chicke n stir fry with mushrooms and green beans.",
-          "protein": 38,
+          "protein": 28,
           "carbs": 52,
           "fat": 14,
-          "kcal": 486
+          "kcal": 446
+        },
+        {
+          "time": "6:50 PM",
+          "food": "4 eggs",
+          "protein": 24,
+          "carbs": 2,
+          "fat": 20,
+          "kcal": 284
         }
       ],
       "signals": {
@@ -4322,12 +4330,12 @@
         "onWaking": ""
       },
       "totals": {
-        "protein": 80,
-        "carbs": 58,
-        "fat": 16,
-        "kcal": 696
+        "protein": 94,
+        "carbs": 60,
+        "fat": 36,
+        "kcal": 940
       },
-      "ts": 1781401811728
+      "ts": 1781401845096
     }
   ],
   "fuelMemory": {
@@ -4559,6 +4567,13 @@
       "inp": 151,
       "out": 144,
       "cost": 0.002613
+    },
+    {
+      "ts": 1781401845096,
+      "type": "macros",
+      "inp": 165,
+      "out": 97,
+      "cost": 0.00195
     }
   ],
   "checkins": [
