@@ -4274,10 +4274,114 @@ function renderCalendar(){
 function handleDayCardClick(dateStr){
   const sessions=getSessionsForDate(dateStr);
   const today=localDS(new Date());
-  if(sessions.length>0&&dateStr<=today){ openSessionDrawer(sessions[0],dateStr); return; }
-  const stravaActivities=dateStr<=today?(D.runs||[]).filter(r=>r.date===dateStr):[];
-  if(!stravaActivities.length) return;
+  if(dateStr>today) return;
+  const stravaActivities=(D.runs||[]).filter(r=>r.date===dateStr);
+  if(!sessions.length&&!stravaActivities.length) return;
+  if(sessions.length>0&&stravaActivities.length>0){
+    openCombinedDrawer(sessions,stravaActivities,dateStr); return;
+  }
+  if(sessions.length>0){ openSessionDrawer(sessions[0],dateStr); return; }
   openStravaDrawer(stravaActivities,dateStr);
+}
+function openCombinedDrawer(sessions,stravaActivities,dateStr){
+  const existing=document.getElementById('session-drawer');
+  if(existing) existing.remove();
+  const existingBackdrop=document.getElementById('session-drawer-backdrop');
+  if(existingBackdrop) existingBackdrop.remove();
+  const dateObj=new Date(dateStr+'T12:00:00');
+  const dateDisplay=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+  const total=sessions.length+stravaActivities.length;
+  const summaryLabel=`${total} ${total===1?'activity':'activities'}`;
+  let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);z-index:1;">`;
+  html+=`<div style="padding:20px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between;">`;
+  html+=`<div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${dateDisplay}</div>`;
+  html+=`<div style="font-size:var(--fs-title);font-weight:600;color:var(--t);">${summaryLabel}</div></div>`;
+  html+=`<button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;margin-top:2px;">×</button></div></div>`;
+  html+=`<div style="padding:20px;display:flex;flex-direction:column;gap:20px;">`;
+  const dayLabels={'A':'Push — Upper Strength','B':'Pull — Back & Biceps','C':'Legs — Strength & Stability','run':'Run','run_easy':'Easy Run','run_quality':'Quality Run','run_long':'Long Run','rest':'Rest Day','1':'Lift A','2':'Lift B','3':'Easy Run','4':'Lift C','5':'Quality Run'};
+  sessions.forEach(session=>{
+    const dayLabel=dayLabels[String(session.day)]||session.day||'Workout';
+    let sh=`<div style="background:var(--s3);border:1px solid var(--b2);border-radius:16px;padding:18px;position:relative;overflow:hidden;">`;
+    sh+=`<div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a),rgba(104,110,200,0.2));"></div>`;
+    sh+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">${dayLabel}</div>`;
+    const meta=[];
+    if(session.duration) meta.push(`${session.duration} min`);
+    if(session.rpe)      meta.push(`RPE ${session.rpe}`);
+    if(session.energy)   meta.push(`Energy ${session.energy}/10`);
+    if(meta.length) sh+=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">${meta.map(m=>`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s4);color:var(--t2);padding:3px 8px;border-radius:5px;border:1px solid var(--b);">${m}</span>`).join('')}</div>`;
+    const liftKeys=[{key:'bench',label:'Bench'},{key:'ohp',label:'OHP'},{key:'pullup',label:'Pull-ups'},{key:'row',label:'Row'},{key:'squat',label:'Squat'},{key:'dl',label:'Deadlift'}];
+    liftKeys.filter(l=>session[l.key]?.sets?.length>0).forEach(l=>{
+      const sets=session[l.key].sets;
+      sh+=`<div style="margin-bottom:12px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:6px;">${l.label}</div>`;
+      sh+=sets.map((s,i)=>{
+        const w=s.w?`${s.w} lb`:'BW';
+        const r=s.r?`× ${s.r}`:'';
+        const rpe=s.rpe?` @ RPE ${s.rpe}`:'';
+        return `<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t);padding:4px 0;border-bottom:1px solid var(--b);">S${i+1} ${w} ${r}${rpe}</div>`;
+      }).join('');
+      sh+=`</div>`;
+    });
+    if(session.notes) sh+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;padding:8px;background:var(--s2);border-radius:6px;">${session.notes}</div>`;
+    sh+=`</div>`;
+    html+=sh;
+  });
+  const fmtDur=m=>m==null?null:m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`;
+  stravaActivities.forEach(act=>{
+    const isRide=act.type==='ride';
+    const dur=act.duration?Math.round(act.duration/60):null;
+    const dist=act.distance||act.distanceMi||null;
+    const speedMph=(dist&&dur)?((dist/(dur/60)).toFixed(1)+' mph'):null;
+    const fmtPace=s=>s?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:null;
+    const pace=!isRide?fmtPace(act.pace):null;
+    const name=act.name||(isRide?'Ride':'Run');
+    const accentColor=isRide?'var(--a5)':'var(--a2)';
+    const accentRgb=isRide?'160,102,212':'42,160,112';
+    const icon=isRide?'🚴':'🏃';
+    const watts=act.weightedAvgWatts||act.averageWatts||null;
+    const stats=[
+      dist?{lbl:'Distance',val:`${Number(dist).toFixed(2)} mi`}:null,
+      dur?{lbl:'Duration',val:fmtDur(dur)}:null,
+      speedMph&&isRide?{lbl:'Avg Speed',val:speedMph}:null,
+      pace&&!isRide?{lbl:'Pace',val:`${pace}/mi`}:null,
+      act.heartRateAvg?{lbl:'Avg HR',val:`${act.heartRateAvg} bpm`}:null,
+      act.heartRateMax?{lbl:'Max HR',val:`${act.heartRateMax} bpm`}:null,
+      isRide&&watts?{lbl:act.weightedAvgWatts?'NP Watts':'Avg Watts',val:`${Math.round(watts)} W`}:null,
+      act.elevationGain?{lbl:'Elevation',val:`${Math.round(act.elevationGain)} ft`}:null,
+    ].filter(Boolean);
+    let ah=`<div style="background:var(--s3);border:1px solid rgba(${accentRgb},0.3);border-radius:16px;padding:18px;position:relative;overflow:hidden;">`;
+    ah+=`<div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,${accentColor},rgba(${accentRgb},0.2));"></div>`;
+    ah+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">`;
+    ah+=`<div style="width:36px;height:36px;border-radius:10px;background:rgba(${accentRgb},0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">${icon}</div>`;
+    ah+=`<div><div style="font-size:var(--fs-body);font-weight:600;color:var(--t);">${name}</div>`;
+    if(act.runType) ah+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:${accentColor};text-transform:uppercase;letter-spacing:.05em;margin-top:1px;">${act.runType}</div>`;
+    ah+=`</div></div>`;
+    ah+=`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:rgba(252,76,2,0.12);color:#fc4c02;padding:2px 8px;border-radius:5px;letter-spacing:.04em;display:inline-block;margin-bottom:12px;">STRAVA</span>`;
+    if(stats.length){
+      const cols=stats.length<=3?stats.length:Math.min(3,stats.length);
+      ah+=`<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px;">`;
+      stats.forEach(s=>{
+        ah+=`<div style="background:rgba(${accentRgb},0.1);border:1px solid rgba(${accentRgb},0.22);border-radius:10px;padding:10px 8px;text-align:center;">`;
+        ah+=`<div style="font-family:var(--mono);font-size:var(--fs-micro);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">${s.lbl}</div>`;
+        ah+=`<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);font-weight:600;">${s.val}</div>`;
+        ah+=`</div>`;
+      });
+      ah+=`</div>`;
+    }
+    ah+=`</div>`;
+    html+=ah;
+  });
+  html+=`</div>`;
+  const backdrop=document.createElement('div');
+  backdrop.id='session-drawer-backdrop';
+  backdrop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;opacity:0;transition:opacity 0.25s ease;';
+  backdrop.addEventListener('click',closeSessionDrawer);
+  const drawer=document.createElement('div');
+  drawer.id='session-drawer';
+  drawer.style.cssText='position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--s2);border-left:1px solid var(--b2);z-index:201;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(var(--nav) + var(--safe)) 0;';
+  drawer.innerHTML=html;
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{backdrop.style.opacity='1';drawer.style.transform='translateX(0)';}));
 }
 function openStravaDrawer(activities,dateStr){
   const existing=document.getElementById('session-drawer');
