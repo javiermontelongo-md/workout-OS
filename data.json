@@ -5010,8 +5010,8 @@
         "category": "Produce",
         "store": "TJ",
         "shelfDays": 6,
-        "checked": false,
-        "checkedAt": null
+        "checked": true,
+        "checkedAt": "2026-06-14T19:14:49.593Z"
       },
       {
         "name": "Chocolate Covered Almonds",
