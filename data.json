@@ -4642,6 +4642,31 @@
         "kcal": 1312
       },
       "ts": 1781453857883
+    },
+    {
+      "date": "2026-06-14",
+      "meals": [
+        {
+          "time": "9:31 AM",
+          "food": "42 G protein fairlife",
+          "protein": 42,
+          "carbs": 7,
+          "fat": 3,
+          "kcal": 223
+        }
+      ],
+      "signals": {
+        "betweenMeals": "",
+        "beforeSleep": "",
+        "onWaking": ""
+      },
+      "totals": {
+        "protein": 42,
+        "carbs": 7,
+        "fat": 3,
+        "kcal": 223
+      },
+      "ts": 1781454684433
     }
   ],
   "fuelMemory": {
