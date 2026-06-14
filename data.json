@@ -209,6 +209,123 @@
         }
       ],
       "ts": 1781069352257
+    },
+    {
+      "date": "2026-06-13",
+      "day": "B",
+      "type": "B",
+      "notes": "Due to time constraints, workout ended early ",
+      "rpe": 6,
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 190,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 90,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [
+          {
+            "w": 160,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [
+          {
+            "w": 160,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": null,
+            "r": 6,
+            "rpe": 9
+          },
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 9
+          }
+        ],
+        "notes": "for the last set i added a 25lb assist to lighten my weight"
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 135,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 135,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 135,
+            "r": 6,
+            "rpe": 9
+          },
+          {
+            "w": 135,
+            "r": 6,
+            "rpe": 10
+          }
+        ],
+        "notes": "form was poor at this weight for the last 2 sets"
+      },
+      "accessories": [
+        {
+          "name": "Cable Face Pull",
+          "prescribed": "3×15",
+          "weight": null,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        },
+        {
+          "name": "Incline Dumbbell Curl",
+          "prescribed": "3×12",
+          "weight": 60,
+          "sets": 3,
+          "reps": 10,
+          "notes": "EZ bar standing curl was done instead"
+        }
+      ],
+      "ts": 1781417798498
     }
   ],
   "recoveryLogs": [],
@@ -229,7 +346,7 @@
     "ohpE1RM": 123,
     "pullups": 5,
     "pullupE1RM": 0,
-    "rowE1RM": 135
+    "rowE1RM": 162
   },
   "cardioBaseline": {
     "pace": "10:30",
