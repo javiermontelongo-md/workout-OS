@@ -325,7 +325,9 @@
           "notes": "EZ bar standing curl was done instead"
         }
       ],
-      "ts": 1781417798498
+      "ts": 1781417798498,
+      "aiFeedback": "**Solid session RPE overall, but the lifts tell a mixed story.**\n\nPull-ups ran hot fast — RPE 8 on set 1 with only 5 reps, needing 25lb assist by set 4, means bodyweight pull-ups are a legitimate limiter right now; consider starting with assisted work (consistent assist weight) to build clean reps before progressing. Row deteriorated badly — RPE 10 with form breakdown on the last two sets at 135lb is a red flag for a baseline session, not a strength signal; drop to 115-120lb next session and rebuild from there. The push lifts (bench, OHP, squat, deadlift) all landed at RPE 7 as singles — good data points, but they shouldn't be in a pull session; note whether time constraints forced this or if programming got compressed. Next session, set your row load conservatively (115-120lb) and cap pull-ups at the rep count where form holds, likely 4×4-5 unassisted or 4×6-8 with consistent assist weight.",
+      "aiFeedbackAt": "2026-06-14T06:16:47.138Z"
     }
   ],
   "recoveryLogs": [],
@@ -3361,66 +3363,72 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-06-10T04:58:49.011Z",
-    "vo2maxUsed": 41.91,
-    "runCount": 24,
+    "generatedAt": "2026-06-14T06:16:39.774Z",
+    "vo2maxUsed": 42.5,
+    "runCount": 25,
     "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1850,
-        "ciSeconds": 315,
+        "seconds": 1875,
+        "ciSeconds": 319,
         "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3812,
-        "ciSeconds": 843,
+        "seconds": 3866,
+        "ciSeconds": 854,
         "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 8326,
-        "ciSeconds": 2406,
+        "seconds": 8440,
+        "ciSeconds": 2439,
         "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 17245,
-        "ciSeconds": 7622,
+        "seconds": 17490,
+        "ciSeconds": 7731,
         "method": "VO2max / VDOT"
       }
     },
-    "medianTrainingPace": 632.3275862068966,
+    "medianTrainingPace": 702.6578073089702,
+    "decayFactor": 1,
+    "daysInactive": 0,
+    "lastActivityDate": "2026-06-13",
+    "rawVO2": 42.53,
     "debugInfo": {
       "riegelPred": {
-        "s5k": 1999,
-        "s10k": 4168,
-        "shalf": 9197,
-        "sfull": 19175,
+        "s5k": 2187,
+        "s10k": 4560,
+        "shalf": 10061,
+        "sfull": 20978,
         "anchor": {
-          "date": "2026-05-26",
-          "stravaId": 18670031015,
-          "name": "Evening Run",
+          "date": "2026-06-10",
+          "stravaId": 18873271328,
+          "name": "Panhandle run",
           "type": "run",
-          "distance": 2.32,
-          "duration": 1467,
-          "pace": 631,
-          "elevationGain": 71,
-          "heartRateAvg": 172,
-          "heartRateMax": 187,
+          "distance": 3.01,
+          "duration": 2115,
+          "pace": 704,
+          "elevationGain": 238,
+          "heartRateAvg": 160.7,
+          "heartRateMax": 178,
+          "averageWatts": null,
+          "weightedAvgWatts": null,
           "source": "strava",
-          "runType": "intervals"
+          "runType": "tempo"
         },
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1758,
-        "s10k": 3638,
-        "shalf": 7998,
-        "sfull": 16715
+        "s5k": 1691,
+        "s10k": 3503,
+        "shalf": 7695,
+        "sfull": 16095
       },
       "hrPred": {
-        "s5k": 1858,
-        "s10k": 3715,
-        "shalf": 7838,
-        "sfull": 15675
+        "s5k": 1866,
+        "s10k": 3731,
+        "shalf": 7872,
+        "sfull": 15745
       },
       "weights": {
         "riegel": 0.3,
@@ -3428,7 +3436,7 @@
         "hr": 0.2
       },
       "vo2maxSource": "Apple Watch",
-      "medianPace": 632.3275862068966
+      "medianPace": 702.6578073089702
     }
   },
   "coachingLog": [
@@ -4855,6 +4863,13 @@
       "inp": 105,
       "out": 57,
       "cost": 0.00117
+    },
+    {
+      "ts": 1781417807138,
+      "type": "sessionFeedback",
+      "inp": 577,
+      "out": 246,
+      "cost": 0.005421
     }
   ],
   "checkins": [
