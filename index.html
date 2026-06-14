@@ -3951,7 +3951,12 @@ function _midReps(repsStr){
 }
 function addSet(lift){
   const i=SD[lift].length;
-  SD[lift].push({w:DEF[lift]||'',r:DEF_REPS[lift]||'',rpe:DEF_RPE[lift]||''});
+  const prev=i>0?SD[lift][i-1]:null;
+  SD[lift].push({
+    w:prev?prev.w:(DEF[lift]??''),
+    r:prev?prev.r:(DEF_REPS[lift]??''),
+    rpe:prev?prev.rpe:(DEF_RPE[lift]??'')
+  });
   renderSets(lift);
   if(i>0) showRPEConfirm(lift);
 }
@@ -6939,9 +6944,9 @@ function updateLogTabPlanned(){
     DEF_RPE[lift]=l.targetRPE||7;
     // Pre-fill any existing blank rows with prescription defaults
     SD[lift]=SD[lift].map(s=>({
-      w:s.w!==''?s.w:DEF[lift]||'',
-      r:s.r!==''?s.r:DEF_REPS[lift]||'',
-      rpe:s.rpe!==''?s.rpe:DEF_RPE[lift]||''
+      w:s.w!==''?s.w:(DEF[lift]??''),
+      r:s.r!==''?s.r:(DEF_REPS[lift]??''),
+      rpe:s.rpe!==''?s.rpe:(DEF_RPE[lift]??'')
     }));
     renderSets(lift);
   });
@@ -6970,8 +6975,8 @@ function updateLogTabPlanned(){
           <div class="srh"><span>WEIGHT (lb)</span><span>SETS</span><span>REPS</span><span></span></div>
           <div class="srow">
             <input type="number" id="acc-wt-${i}" placeholder="lb (opt.)" style="text-align:center;">
-            <input type="number" id="acc-sets-${i}" placeholder="${pSets||'3'}" style="text-align:center;">
-            <input type="number" id="acc-reps-${i}" placeholder="${pReps||'10'}" style="text-align:center;">
+            <input type="number" id="acc-sets-${i}" value="${pSets||'3'}" style="text-align:center;">
+            <input type="number" id="acc-reps-${i}" value="${pReps||'10'}" style="text-align:center;">
             <span></span>
           </div>
           <div class="ig" style="margin-top:8px;margin-bottom:0;"><input type="text" id="acc-note-${i}" placeholder="Notes..."></div>
