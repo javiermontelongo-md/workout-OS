@@ -843,8 +843,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px;}
 .fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-label);font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;width:100%;}
 .fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
-.fuel-chip-item{border-style:dashed;color:var(--t3);}
-.fuel-chip-item:hover{color:var(--t2);}
 .fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;}
 .fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;}
 @media(max-width:600px){.fuel-chips-wrap{grid-template-columns:1fr 1fr;}}
@@ -3046,24 +3044,18 @@ function buildFoodLookup(){
   const entries=[...(D.fuelLog||[])].sort((a,b)=>b.date.localeCompare(a.date));
   for(const entry of entries){
     for(const m of (entry.meals||[])){
-      const key=(m.food||'').trim();
-      if(!key) continue;
+      const raw=(m.food||'').trim();
+      if(!raw||!m.kcal) continue;
       const cat=getMealCategory(parseMealHour(m.time||''));
-      // Add full meal with macros
-      if(!map.has(key)&&m.kcal){
-        map.set(key,{protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0,cat,isItem:false});
-      }
-      // Split comma-separated combos into individual item chips (no cached macros)
-      if(key.includes(',')){
-        const parts=key.split(',').map(s=>s.trim()).filter(s=>s.length>2);
-        for(const part of parts){
-          if(!map.has(part)){
-            map.set(part,{protein:0,carbs:0,fat:0,kcal:0,cat,isItem:true});
-          }
-        }
+      // Deduplicate by first 4 words lowercase — "4 eggs" and "4 eggs, toast" → same chip
+      const normKey=raw.toLowerCase().split(/[\s,]+/).slice(0,4).join(' ');
+      // Short display label: truncate at word boundary ≤28 chars
+      const label=raw.length>28?raw.slice(0,28).replace(/\s\S*$/,'')+'…':raw;
+      if(!map.has(normKey)){
+        map.set(normKey,{label,food:raw,protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0,cat});
       }
     }
-    if(map.size>=48) break;
+    if(map.size>=24) break;
   }
   return map;
 }
@@ -3078,10 +3070,10 @@ function renderFuelChips(){
   const lookup=buildFoodLookup();
   if(!lookup.size){section.style.display='none';return;}
   section.style.display='';
-  _chipData=[...lookup.entries()].slice(0,24);
+  _chipData=[...lookup.values()].slice(0,24);
   // Group by category
   const groups={};
-  _chipData.forEach(([food,m],i)=>{
+  _chipData.forEach((m,i)=>{
     const cat=m.cat||'Evening';
     if(!groups[cat]) groups[cat]=[];
     groups[cat].push(i);
@@ -3091,42 +3083,61 @@ function renderFuelChips(){
     if(!groups[cat]) return;
     html+=`<div class="fuel-chips-group"><div class="fuel-chips-group-lbl">${_CHIP_CAT_ICON[cat]} ${cat}</div><div class="fuel-chips-wrap">`;
     html+=groups[cat].map(i=>{
-      const [food,m]=_chipData[i];
-      if(m.isItem){
-        return`<button class="fuel-chip fuel-chip-item" title="tap to append to current meal" onclick="addFuelChipRow(${i})"><span class="fuel-chip-lbl">+ ${esc(food)}</span></button>`;
-      }
+      const m=_chipData[i];
       const _mt=(m.protein||0)+(m.carbs||0)+(m.fat||0);
       const _pp=_mt?Math.round((m.protein||0)/_mt*100):0;
       const _cp=_mt?Math.round((m.carbs||0)/_mt*100):0;
       const _fp=Math.max(0,100-_pp-_cp);
-      return`<button class="fuel-chip" title="P:${m.protein}g · C:${m.carbs}g · F:${m.fat}g · ${m.kcal}kcal" onclick="addFuelChipRow(${i})"><span class="fuel-chip-lbl">${esc(food)}</span><span class="fuel-chip-bar"><span style="flex:0 0 ${_pp}%;background:var(--mp);"></span><span style="flex:0 0 ${_cp}%;background:var(--mc);"></span><span style="flex:0 0 ${_fp}%;background:var(--mf);"></span></span></button>`;
+      return`<button class="fuel-chip" title="${esc(m.food)}\nP:${m.protein}g · C:${m.carbs}g · F:${m.fat}g · ${m.kcal}kcal" onclick="openChipQtyModal(${i})"><span class="fuel-chip-lbl">${esc(m.label)}</span><span class="fuel-chip-bar"><span style="flex:0 0 ${_pp}%;background:var(--mp);"></span><span style="flex:0 0 ${_cp}%;background:var(--mc);"></span><span style="flex:0 0 ${_fp}%;background:var(--mf);"></span></span></button>`;
     }).join('');
     html+='</div></div>';
   });
   el.innerHTML=html;
 }
 
-function addFuelChipRow(idx){
-  const [food,macros]=_chipData[idx]||['',{protein:0,carbs:0,fat:0,kcal:0}];
-  const timeStr=currentTimeStr();
-  const last=_fuelRows[_fuelRows.length-1];
-  if(macros.isItem){
-    // Individual item from a combo — append to current last row with comma
-    if(last){
-      const existing=(last.food||'').trim();
-      _fuelRows[_fuelRows.length-1]={...last,food:existing?existing+', '+food:food,kcal:0,protein:0,carbs:0,fat:0};
-    } else {
-      _fuelRows.push({time:timeStr,food,protein:0,carbs:0,fat:0,kcal:0});
-    }
-  } else {
-    // Full cached meal — fill empty row or create new row with macros
-    if(last&&!last.food.trim()){
-      _fuelRows[_fuelRows.length-1]={time:last.time||timeStr,food,protein:macros.protein,carbs:macros.carbs,fat:macros.fat,kcal:macros.kcal};
-    } else {
-      _fuelRows.push({time:timeStr,food,protein:macros.protein,carbs:macros.carbs,fat:macros.fat,kcal:macros.kcal});
-    }
-  }
-  renderFuelRows();
+let _chipQtyState={chipIdx:-1,qty:1};
+function openChipQtyModal(idx){
+  const m=_chipData[idx];
+  if(!m) return;
+  _chipQtyState={chipIdx:idx,qty:1};
+  const modal=document.getElementById('chip-qty-modal');
+  document.getElementById('chip-qty-food').textContent=m.food;
+  updateChipQtyDisplay();
+  modal.style.display='flex';
+}
+function updateChipQtyDisplay(){
+  const m=_chipData[_chipQtyState.chipIdx];
+  if(!m) return;
+  const q=_chipQtyState.qty||1;
+  const el=document.getElementById('chip-qty-macros');
+  if(el) el.textContent=`P ${Math.round((m.protein||0)*q)}g · C ${Math.round((m.carbs||0)*q)}g · F ${Math.round((m.fat||0)*q)}g · ${Math.round((m.kcal||0)*q)} kcal`;
+  const inp=document.getElementById('chip-qty-input');
+  if(inp) inp.value=q;
+}
+function adjustChipQty(delta){
+  _chipQtyState.qty=Math.max(0.5,Math.round((_chipQtyState.qty+delta)*2)/2);
+  updateChipQtyDisplay();
+}
+function closeChipQtyModal(){
+  const modal=document.getElementById('chip-qty-modal');
+  if(modal) modal.style.display='none';
+}
+async function confirmChipQty(){
+  const m=_chipData[_chipQtyState.chipIdx];
+  if(!m) return;
+  const q=_chipQtyState.qty||1;
+  closeChipQtyModal();
+  const food=q===1?m.food:`${q}× ${m.food}`;
+  const row={
+    time:currentTimeStr(),food,
+    protein:Math.round((m.protein||0)*q),
+    carbs:Math.round((m.carbs||0)*q),
+    fat:Math.round((m.fat||0)*q),
+    kcal:Math.round((m.kcal||0)*q)
+  };
+  _fuelRows.push(row);
+  await saveFuelDay();
+  fuelSelectDate(_fuelEditDate||localDS(new Date()));
 }
 
 function copyYesterdayMeals(){
@@ -3151,27 +3162,22 @@ async function saveFuelDay(){
   };
   const btn=document.getElementById('fuel-save-btn');
   msg('fuel-save-msg','');
-  // If every meal already has cached macros, skip AI call entirely
-  const allCached=meals.every(m=>m.kcal&&(m.protein||m.carbs||m.fat));
-  let macroData=null;
-  if(allCached){
-    if(btn){btn.disabled=true;btn.textContent='Saving...';}
-    macroData={
-      meals:meals.map(m=>({protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal||0})),
-      totals:meals.reduce((a,m)=>({protein:a.protein+(m.protein||0),carbs:a.carbs+(m.carbs||0),fat:a.fat+(m.fat||0),kcal:a.kcal+(m.kcal||0)}),{protein:0,carbs:0,fat:0,kcal:0})
-    };
-  } else {
+  // Only estimate NEW rows (kcal=0) — preserve cached macros on existing meals
+  const newRows=meals.filter(m=>!(m.kcal>0));
+  let estimatedData=null;
+  if(newRows.length>0){
     if(btn){btn.disabled=true;btn.textContent='Estimating macros...';}
-    macroData=await estimateMacros(meals);
+    estimatedData=await estimateMacros(newRows);
+  } else {
+    if(btn){btn.disabled=true;btn.textContent='Saving...';}
   }
-  const mealsFull=meals.map((m,i)=>({
-    time:m.time, food:m.food,
-    protein:macroData?.meals?.[i]?.protein||0,
-    carbs:macroData?.meals?.[i]?.carbs||0,
-    fat:macroData?.meals?.[i]?.fat||0,
-    kcal:macroData?.meals?.[i]?.kcal||0
-  }));
-  const totals=macroData?.totals||mealsFull.reduce((a,m)=>({protein:a.protein+m.protein,carbs:a.carbs+m.carbs,fat:a.fat+m.fat,kcal:a.kcal+m.kcal}),{protein:0,carbs:0,fat:0,kcal:0});
+  let newIdx=0;
+  const mealsFull=meals.map(m=>{
+    if(m.kcal>0) return{time:m.time,food:m.food,protein:m.protein||0,carbs:m.carbs||0,fat:m.fat||0,kcal:m.kcal};
+    const est=estimatedData?.meals?.[newIdx++]||{protein:0,carbs:0,fat:0,kcal:0};
+    return{time:m.time,food:m.food,protein:est.protein||0,carbs:est.carbs||0,fat:est.fat||0,kcal:est.kcal||0};
+  });
+  const totals=mealsFull.reduce((a,m)=>({protein:a.protein+m.protein,carbs:a.carbs+m.carbs,fat:a.fat+m.fat,kcal:a.kcal+m.kcal}),{protein:0,carbs:0,fat:0,kcal:0});
   if(!D.fuelLog) D.fuelLog=[];
   const idx=D.fuelLog.findIndex(e=>e.date===today);
   const prevPlan=idx>=0?D.fuelLog[idx].fuelPlan:null;
@@ -8222,6 +8228,22 @@ function afdCloseDetail(){
     </div>
     <button class="sbtn" style="width:100%;margin-top:12px;" onclick="confirmTimePicker()">Set Time</button>
     <button class="btn bs" style="width:100%;margin-top:8px;" onclick="closeTimePicker()">Cancel</button>
+  </div>
+</div>
+
+<div id="chip-qty-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;" onclick="if(event.target===this)closeChipQtyModal()">
+  <div style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--rl);padding:22px 20px;width:min(340px,92vw);">
+    <div id="chip-qty-food" style="font-size:var(--fs-body);color:var(--t);font-weight:600;margin-bottom:4px;line-height:1.35;"></div>
+    <div id="chip-qty-macros" style="font-family:var(--mono);font-size:var(--fs-label);color:var(--t3);margin-bottom:18px;"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;">
+      <button class="btn bs" onclick="adjustChipQty(-1)" style="width:38px;height:38px;font-size:20px;padding:0;justify-content:center;border-radius:50%;">−</button>
+      <input type="number" id="chip-qty-input" min="0.5" step="0.5" value="1" style="width:64px;text-align:center;font-size:var(--fs-title);font-family:var(--mono);background:var(--s3);border:1px solid var(--b);border-radius:8px;color:var(--t);padding:6px;" oninput="_chipQtyState.qty=Math.max(0.5,parseFloat(this.value)||1);updateChipQtyDisplay();">
+      <button class="btn bs" onclick="adjustChipQty(1)" style="width:38px;height:38px;font-size:20px;padding:0;justify-content:center;border-radius:50%;">+</button>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="sbtn" style="flex:1;" onclick="confirmChipQty()">Add meal</button>
+      <button class="btn bs" onclick="closeChipQtyModal()">Cancel</button>
+    </div>
   </div>
 </div>
 
