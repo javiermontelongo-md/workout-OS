@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-14",
+  "lastUpdated": "2026-06-15",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5130,8 +5130,8 @@
         "category": "Pantry",
         "store": "Target",
         "shelfDays": 180,
-        "checked": false,
-        "checkedAt": null
+        "checked": true,
+        "checkedAt": "2026-06-15T06:03:20.641Z"
       }
     ]
   }
