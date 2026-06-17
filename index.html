@@ -844,11 +844,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
 .fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;}
 .fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;}
-@media(max-width:600px){
-  .fuel-chips-wrap{display:flex;flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:6px;padding-bottom:6px;}
-  .fuel-chips-wrap::-webkit-scrollbar{display:none;}
-  .fuel-chip{flex:0 0 auto;width:130px;}
-}
+@media(max-width:600px){.fuel-chips-wrap{grid-template-columns:1fr 1fr;}}
 .fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
 .groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-body);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
 .groc-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;}
@@ -1646,7 +1642,7 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div style="display:flex;flex-direction:column;align-items:center;padding-top:4px;" id="afd-center">
         <div id="afd-engine" style="background:linear-gradient(135deg,rgba(104,112,200,0.25),rgba(160,102,212,0.18));border:1.5px solid rgba(104,112,200,0.55);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;width:120px;" onclick="afdShowDetail('engine')">
           <div style="font-size:var(--fs-sm);margin-bottom:6px;">🤖</div>
-          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.04em;line-height:1.5;">Claude Sonnet 4.5</div>
+          <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.04em;line-height:1.5;">Claude Sonnet 4.6</div>
           <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:5px;">2,500 tokens</div>
         </div>
         <!-- animated flow arrows drawn by JS -->
@@ -2597,27 +2593,6 @@ function onLoad(){
     });
   }
   if(!D.dailyPrescriptions)D.dailyPrescriptions={};
-  // One-time fix: strip lift data that doesn't belong to the session type
-  // Pull (B/pull) should never have bench/ohp/squat/dl
-  // Push (A/push) should never have pullup/row
-  {
-    const pullLifts=['bench','ohp','squat','dl'];
-    const pushLifts=['pullup','row'];
-    const emptyLift=()=>({sets:[],notes:''});
-    let fixed=false;
-    (D.sessions||[]).forEach(s=>{
-      const t=String(s.day||s.type||'').toLowerCase();
-      const isPull=t==='b'||t==='pull';
-      const isPush=t==='a'||t==='push';
-      if(isPull){
-        pullLifts.forEach(k=>{if(s[k]?.sets?.length){s[k]=emptyLift();fixed=true;}});
-      }
-      if(isPush){
-        pushLifts.forEach(k=>{if(s[k]?.sets?.length){s[k]=emptyLift();fixed=true;}});
-      }
-    });
-    if(fixed) pushSilent();
-  }
   // Warn if data.json is approaching GitHub's 1MB file limit
   try{
     const sizeKB=Math.round(new TextEncoder().encode(JSON.stringify(D)).length/1024);
@@ -2838,6 +2813,7 @@ function showTab(n){
   if(n==='progress'){ }
   if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
+  if(n==='program'){ renderAIFlowDiagram(); }
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
@@ -3980,9 +3956,9 @@ function addSet(lift){
   const i=SD[lift].length;
   if(i>0){
     const prev=SD[lift][i-1];
-    SD[lift].push({w:prev.w||'',r:prev.r||'',rpe:prev.rpe||''});
+    SD[lift].push({w:prev.w!==''?prev.w:(DEF[lift]||''),r:prev.r!==''?prev.r:(DEF_REPS[lift]||''),rpe:prev.rpe!==''?prev.rpe:(DEF_RPE[lift]||'')});
   } else {
-    SD[lift].push({w:'',r:'',rpe:''});
+    SD[lift].push({w:DEF[lift]||'',r:DEF_REPS[lift]||'',rpe:DEF_RPE[lift]||''});
   }
   renderSets(lift);
   if(i>0) showRPEConfirm(lift);
@@ -7250,6 +7226,12 @@ function updateLogTabPlanned(){
     if(l.weight>0)DEF[lift]=l.weight;
     DEF_REPS[lift]=_midReps(l.reps);
     DEF_RPE[lift]=l.targetRPE||7;
+    // Pre-fill any existing blank rows with prescription defaults
+    SD[lift]=SD[lift].map(s=>({
+      w:s.w!==''?s.w:DEF[lift]||'',
+      r:s.r!==''?s.r:DEF_REPS[lift]||'',
+      rpe:s.rpe!==''?s.rpe:DEF_RPE[lift]||''
+    }));
     renderSets(lift);
   });
 
