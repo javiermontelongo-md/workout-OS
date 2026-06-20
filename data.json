@@ -3496,6 +3496,15 @@
       "weight": 115,
       "sets": 5,
       "reps": 5
+    },
+    {
+      "date": "2026-06-20",
+      "lift": "bench",
+      "predictedRPE": 7,
+      "actualRPE": 8,
+      "weight": 197.5,
+      "sets": 5,
+      "reps": 5
     }
   ],
   "scheduleOverrides": {
@@ -3509,37 +3518,37 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-06-14T06:16:39.774Z",
-    "vo2maxUsed": 42.5,
+    "generatedAt": "2026-06-20T17:27:34.003Z",
+    "vo2maxUsed": 44.4,
     "runCount": 25,
     "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1875,
-        "ciSeconds": 319,
+        "seconds": 1772,
+        "ciSeconds": 301,
         "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3866,
-        "ciSeconds": 854,
+        "seconds": 3659,
+        "ciSeconds": 809,
         "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 8440,
-        "ciSeconds": 2439,
+        "seconds": 7983,
+        "ciSeconds": 2307,
         "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 17490,
-        "ciSeconds": 7731,
+        "seconds": 16552,
+        "ciSeconds": 7316,
         "method": "VO2max / VDOT"
       }
     },
     "medianTrainingPace": 702.6578073089702,
     "decayFactor": 1,
     "daysInactive": 0,
-    "lastActivityDate": "2026-06-13",
-    "rawVO2": 42.53,
+    "lastActivityDate": "2026-06-19",
+    "rawVO2": 44.4,
     "debugInfo": {
       "riegelPred": {
         "s5k": 2187,
@@ -3565,10 +3574,10 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1691,
-        "s10k": 3503,
-        "shalf": 7695,
-        "sfull": 16095
+        "s5k": 1485,
+        "s10k": 3090,
+        "shalf": 6780,
+        "sfull": 14220
       },
       "hrPred": {
         "s5k": 1866,
@@ -5120,6 +5129,13 @@
       "inp": 2531,
       "out": 1202,
       "cost": 0.025623
+    },
+    {
+      "ts": 1781975457717,
+      "type": "prescription",
+      "inp": 2166,
+      "out": 2500,
+      "cost": 0.043998
     }
   ],
   "checkins": [
