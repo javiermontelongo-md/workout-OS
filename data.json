@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-15",
+  "lastUpdated": "2026-06-20",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -4248,6 +4248,48 @@
           "reason": "20% quality run slot for the week; 48h+ since Thursday easy run satisfies quality window; however, cumulative lift volume across 5 sessions this week is high — assess fatigue before committing, swap for Zone 2 or full rest if legs or sleep quality are poor"
         }
       ]
+    },
+    "2026-06-20": {
+      "type": "run",
+      "duration": 60,
+      "summary": "Zone 2 Long Easy Run — 60 min",
+      "reasoning": "Recent easy runs have been running at 165–174 bpm, which is threshold/tempo effort, not Zone 2. Today's priority is strict HR discipline: stay at or below 147 bpm for the full 60 minutes. This means slowing down significantly — likely 12:30–13:30/mile depending on conditions and fatigue — which is exactly correct for aerobic base building and VO2max development via the polarized model. With no hard quality sessions in the past week and a light recent load, this is a safe and productive long easy effort.",
+      "warmup": "5 min brisk walk to elevate HR gently. Start running at a very easy shuffle — slower than feels natural. Let HR settle below 140 bpm before settling into a steady Zone 2 rhythm. If HR climbs above 147 within the first 10 min, return to a walk-run approach.",
+      "mainWork": {
+        "summary": "Zone 2 easy run · 4–5 miles · strict HR cap 147 bpm",
+        "runType": "easy",
+        "mainSet": "Run continuously for 50 minutes at a pace that keeps HR at or below 147 bpm at all times. This will likely feel slower than comfortable — that is intentional and correct. If HR drifts above 147, immediately slow your pace or insert a 60–90 second walk until HR drops back below 143, then resume running. Focus on nasal breathing and the ability to speak in full sentences throughout. Do not chase pace — HR is the only metric that matters today. On a warm Philadelphia June day, expect HR to drift; be aggressive about slowing down early to avoid blowups in the back half.",
+        "totalDistance": "4–5 miles",
+        "paceTarget": "12:30–13:30/mile",
+        "hrCeiling": 147,
+        "effort": "conversational — can speak full sentences comfortably throughout"
+      },
+      "cooldown": "5 min easy walk. Stop and do 2–3 minutes of standing calf raises and hip flexor stretches (30 sec each side). Hydrate immediately — summer heat in Philly will accelerate dehydration.",
+      "coachNote": "Your recent data shows every 'easy' run logging 165–174 bpm — that is tempo/threshold work, not Zone 2. Running that hard on easy days undermines polarized training and limits VO2max adaptations. The pace prescription of 12:30–13:30/mile is not a bug — it is the medicine. Trust the process: Zone 2 adaptations (mitochondrial density, fat oxidation, cardiac stroke volume) require genuine aerobic-only effort. In 8–12 weeks of honest Zone 2 work, your easy pace at 147 bpm will naturally drop toward 11:00/mile and beyond.",
+      "ifTooHard": "Switch to a walk-run protocol: run 4 minutes at a pace that keeps HR below 145, walk 1 minute. Repeat for the full 50-minute main set. This is completely valid Zone 2 training — do not feel like you are failing. Prioritize HR over continuous running.",
+      "watchOutFor": [
+        "HR creep in summer heat — Philadelphia June humidity can push HR 5–10 bpm higher than expected at the same pace; start slower than you think necessary",
+        "Ego pacing — the instinct to run at your 'normal' easy pace will push you straight into threshold territory; check your watch every 3–4 minutes and slow down before HR rises, not after"
+      ],
+      "workoutType": "run",
+      "durationMins": 60,
+      "generatedAt": "2026-06-20T16:10:48.330Z",
+      "nextSession": {
+        "primary": {
+          "type": "push",
+          "label": "Push — Bench & OHP",
+          "duration": 60,
+          "reason": "Last logged push session was June 9th (11 days ago), making it well overdue. Bench has shown inconsistency (195×6 then 195×4, then a reset to 185×5) suggesting a weight reset to ~175–180 lb is warranted; OHP data at 85 lb shows RPE 7–8 across declining reps. A push session Sunday or Monday satisfies the 24h recovery window from today's easy run and keeps the weekly strength block on track without conflicting with any quality run scheduled later in the week.",
+          "confidence": "high"
+        },
+        "alternate": {
+          "type": "cycling",
+          "label": "Zone 2 Easy Ride — 45 min",
+          "duration": 45,
+          "reason": "Choose this if legs feel heavy or HR is elevated at rest tomorrow morning — a low-cadence Zone 2 spin (HR 130–145 bpm) will flush the legs from today's run without adding meaningful fatigue, keeping aerobic volume high while protecting run recovery.",
+          "confidence": "medium"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -5071,6 +5113,13 @@
       "inp": 109,
       "out": 57,
       "cost": 0.001182
+    },
+    {
+      "ts": 1781971848329,
+      "type": "prescription",
+      "inp": 2531,
+      "out": 1202,
+      "cost": 0.025623
     }
   ],
   "checkins": [
