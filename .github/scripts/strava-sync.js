@@ -147,12 +147,31 @@ async function main() {
   const ALLOWED_TYPES = new Set(['Run', 'Ride', 'VirtualRide']);
   const existingIds = new Set(data.runs.map(r => r.stravaId));
   let newCount = 0;
+  let backfillCount = 0;
 
   for (const activity of activities) {
     const type = activity.type || activity.sport_type || '';
     if (!ALLOWED_TYPES.has(type)) continue;
 
-    if (existingIds.has(activity.id)) continue;
+    if (existingIds.has(activity.id)) {
+      // Backfill power / HR onto rides synced before these fields were captured.
+      // Strava returns estimated power for rides without a power meter, so this
+      // populates older rides and lets them contribute to VO2max estimates.
+      const isRideExisting = activity.type === 'Ride' || activity.sport_type === 'Ride' ||
+                             activity.type === 'VirtualRide' || activity.sport_type === 'VirtualRide';
+      const existing = data.runs.find(r => r.stravaId === activity.id);
+      if (existing) {
+        let changed = false;
+        if (isRideExisting) {
+          if (existing.averageWatts == null && activity.average_watts != null) { existing.averageWatts = activity.average_watts; changed = true; }
+          if (existing.weightedAvgWatts == null && activity.weighted_average_watts != null) { existing.weightedAvgWatts = activity.weighted_average_watts; changed = true; }
+        }
+        if (existing.heartRateAvg == null && activity.average_heartrate != null) { existing.heartRateAvg = activity.average_heartrate; changed = true; }
+        if (existing.heartRateMax == null && activity.max_heartrate != null) { existing.heartRateMax = activity.max_heartrate; changed = true; }
+        if (changed) { backfillCount++; console.log(`Backfilled: ${existing.date} — ${existing.name}`); }
+      }
+      continue;
+    }
 
     const distanceMiles = activity.distance / 1609.34;
     const durationSeconds = activity.moving_time;
@@ -197,7 +216,7 @@ async function main() {
 
   // 7. Save data.json
   fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
-  console.log(`Done. Added ${newCount} new activities. Total runs: ${data.runs.length}`);
+  console.log(`Done. Added ${newCount} new activities, backfilled ${backfillCount}. Total runs: ${data.runs.length}`);
 }
 
 main().catch(err => {

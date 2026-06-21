@@ -6088,6 +6088,7 @@ function renderCyclingChart(){
     const speedData=rides.map(r=>r.duration>0?+((r.distance/(r.duration/3600)).toFixed(2)):null);
     const distData=rides.map(r=>r.distance||null);
     const hrData=rides.map(r=>r.heartRateAvg||null);
+    const pwrData=rides.map(r=>r.weightedAvgWatts||r.averageWatts||null);
     const vSolid='rgba(160,102,212,0.9)';
     const vMid='rgba(160,102,212,0.55)';
     const vLight='rgba(160,102,212,0.22)';
@@ -6098,12 +6099,15 @@ function renderCyclingChart(){
     const hrMin=validHR.length?Math.max(100,Math.floor(Math.min(...validHR)/10)*10-10):100;
     const hrMax=validHR.length?Math.ceil(Math.max(...validHR)/10)*10+10:200;
     const maxDist=Math.max(...distData.filter(v=>v!=null));
+    const validPwr=pwrData.filter(v=>v!=null);
+    const pwrMax=validPwr.length?Math.ceil(Math.max(...validPwr)/25)*25+25:300;
     window._bikeChart=new Chart(canvas,{
       type:'bar',
       data:{labels,datasets:[
         {type:'bar',label:'Distance (mi)',data:distData,backgroundColor:vLight,borderColor:vMid,borderWidth:1,borderRadius:4,yAxisID:'yDist',order:3},
-        {type:'line',label:'Speed (mph)',data:speedData,borderColor:vSolid,backgroundColor:'transparent',borderWidth:2.5,pointRadius:5,pointBackgroundColor:vSolid,pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'ySpeed',order:1},
-        {type:'line',label:'Avg HR (bpm)',data:hrData,borderColor:'rgba(232,93,138,0.85)',backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:'rgba(232,93,138,0.85)',pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'yHR',order:2}
+        {type:'line',label:'Speed (mph)',data:speedData,borderColor:vSolid,backgroundColor:'transparent',borderWidth:2.5,pointRadius:5,pointBackgroundColor:vSolid,pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'ySpeed',order:2},
+        {type:'line',label:'Avg HR (bpm)',data:hrData,borderColor:'rgba(232,93,138,0.85)',backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:'rgba(232,93,138,0.85)',pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'yHR',order:3},
+        {type:'line',label:'Avg Power (W)',data:pwrData,borderColor:'rgba(245,176,65,0.9)',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:4,pointBackgroundColor:'rgba(245,176,65,0.9)',pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,tension:0.3,spanGaps:false,yAxisID:'yPwr',order:1}
       ]},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{
@@ -6111,6 +6115,7 @@ function renderCyclingChart(){
             if(c.dataset.label==='Speed (mph)') return c.raw!=null?'Speed: '+c.raw.toFixed(1)+' mph':null;
             if(c.dataset.label==='Avg HR (bpm)') return c.raw!=null?'HR: '+c.raw+' bpm':null;
             if(c.dataset.label==='Distance (mi)') return c.raw!=null?'Dist: '+c.raw.toFixed(1)+' mi':null;
+            if(c.dataset.label==='Avg Power (W)') return c.raw!=null?'Power: '+Math.round(c.raw)+' W':null;
             return null;
           }
         }}},
@@ -6118,13 +6123,14 @@ function renderCyclingChart(){
           x:{ticks:{color:'#a8b4cc',font:{family:'DM Mono',size:13},maxRotation:0},grid:{color:'rgba(255,255,255,0.05)'}},
           ySpeed:{type:'linear',position:'left',min:sMin,max:sMax,ticks:{color:'rgba(160,102,212,0.9)',font:{family:'DM Mono',size:13},callback:v=>v+' mph'},grid:{color:'rgba(255,255,255,0.05)'}},
           yHR:{type:'linear',position:'right',min:hrMin,max:hrMax,ticks:{color:'rgba(232,93,138,0.85)',font:{family:'DM Mono',size:13},callback:v=>v+' bpm'},grid:{display:false}},
-          yDist:{type:'linear',display:false,min:0,max:maxDist*3}
+          yDist:{type:'linear',display:false,min:0,max:maxDist*3},
+          yPwr:{type:'linear',display:false,min:0,max:pwrMax*1.6}
         }
       }
     });
     const syncEl=document.getElementById('bike-last-sync');
     if(syncEl)syncEl.textContent=D.stravaLastSync?new Date(D.stravaLastSync).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'never';
-    if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"><span style="color:rgba(160,102,212,0.9);">── Speed</span><span style="color:rgba(232,93,138,0.9);">── Avg HR</span><span>▪ Bars = distance</span></div>';
+    if(legendEl)legendEl.innerHTML='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"><span style="color:rgba(160,102,212,0.9);">── Speed</span><span style="color:rgba(232,93,138,0.9);">── Avg HR</span><span style="color:rgba(245,176,65,0.9);">- - Avg Power</span><span>▪ Bars = distance</span></div>';
   }catch(e){
     console.warn('Bike chart render failed:',e);
     const ctx=canvas.getContext('2d');ctx.font='12px monospace';ctx.fillStyle='#4a5068';
@@ -6183,7 +6189,7 @@ function renderVO2TrendChart(){
 
   // Y range — include all datasets
   const allVals=[...runPoints,...ridePoints,...applePoints].map(p=>p.vo2);
-  const yMin=Math.max(25,Math.floor(Math.min(...allVals))-2);
+  const yMin=Math.max(15,Math.floor(Math.min(...allVals))-2);
   const yMax=Math.ceil(Math.max(...allVals))+2;
 
   // Meta line: latest values
