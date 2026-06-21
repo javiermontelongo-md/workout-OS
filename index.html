@@ -719,6 +719,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 2px; }
+canvas { touch-action: pan-y; }
 
 /* ── CALENDAR ── */
 .cal-nav-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -840,12 +841,13 @@ input[type=range]::-webkit-slider-thumb:hover {
 .fuel-time-btn:hover{border-color:var(--aw);}
 .fuel-chips-group{margin-bottom:14px;}
 .fuel-chips-group-lbl{font-family:var(--mono);font-size:var(--fs-label);font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
-.fuel-chips-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:5px;width:100%;}
-.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-label);font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;width:100%;}
+.fuel-chips-wrap{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.fuel-chips-wrap::-webkit-scrollbar{display:none;}
+.fuel-chip{background:var(--s3);border:1px solid var(--b);color:var(--t2);font-size:var(--fs-label);font-family:var(--mono);padding:7px 10px 6px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;display:flex;flex-direction:column;gap:4px;min-width:120px;flex-shrink:0;}
 .fuel-chip:hover{background:var(--s4);border-color:var(--b2);}
 .fuel-chip-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%;}
 .fuel-chip-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;width:100%;}
-@media(max-width:600px){.fuel-chips-wrap{grid-template-columns:repeat(2,minmax(0,1fr));}}
+
 .fuel-cached-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a2);margin-left:6px;vertical-align:middle;flex-shrink:0;}
 .groc-cat-lbl{font-family:var(--mono);font-size:var(--fs-body);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 5px;margin-top:4px;}
 .groc-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;}
@@ -2053,26 +2055,26 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div id="fuel-macros-out"></div>
     </div>
     <div id="fuel-meal-rows" style="margin-bottom:8px;overflow:hidden;"></div>
-    <div id="fuel-chips-section" style="display:none;margin-bottom:10px;overflow:hidden;">
-      <div id="fuel-chips"></div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
       <button class="btn bs" style="width:auto;" onclick="addFuelMealRow()">+ Add meal</button>
       <button class="btn bs" style="width:auto;" onclick="copyYesterdayMeals()">📋 Copy yesterday</button>
     </div>
-    <div class="dvdr"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+      <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
+      <button class="sbtn sbtn-ai" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;">AI: How am I doing?</button>
+    </div>
+    <div class="smsg" id="fuel-save-msg"></div>
+    <div id="fuel-advice-out" style="margin-top:10px;margin-bottom:4px;"></div>
+    <div id="fuel-chips-section" style="display:none;margin-bottom:12px;">
+      <div id="fuel-chips"></div>
+    </div>
+    <div class="dvdr" style="margin-top:4px;"></div>
     <div class="lbl" style="margin-top:14px;">how you felt</div>
     <div class="g3" style="margin-bottom:14px;">
       <div class="ig"><label>Between meals</label><input type="text" id="fuel-sig-between" placeholder="e.g. low energy at 2pm, hungry early"></div>
       <div class="ig"><label>Before sleep</label><input type="text" id="fuel-sig-sleep" placeholder="e.g. full, still hungry, satisfied"></div>
       <div class="ig"><label>On waking</label><input type="text" id="fuel-sig-wake" placeholder="e.g. hungry, groggy, energized"></div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
-      <button class="sbtn" id="fuel-save-btn" onclick="saveFuelDay()" style="flex:1;min-width:140px;">Save to GitHub</button>
-      <button class="sbtn sbtn-ai" id="fuel-advice-btn" onclick="fuelDayAdvice()" style="flex:1;min-width:140px;">AI: How am I doing?</button>
-    </div>
-    <div class="smsg" id="fuel-save-msg"></div>
-    <div id="fuel-advice-out" style="margin-top:10px;"></div>
   </div>
 
   <div class="card">
@@ -6910,6 +6912,35 @@ ${isToday?`<div style="position:absolute;top:0;left:0;right:0;height:2px;backgro
 <div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:var(--fs-xs);padding:3px 8px;border-radius:5px;border:1px solid ${CONF_COLORS[conf]}60;white-space:nowrap;">${conf.toUpperCase()}</div>
 </div>`;
   }).join('');
+}
+
+function renderNextSessionRec(nextSession){
+  const el=document.getElementById('week-suggestions');
+  if(!el)return;
+  if(!nextSession){
+    el.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">Generate a prescription to see next session recommendations.</div>';
+    return;
+  }
+  const CONF_COLORS={high:'var(--a2)',medium:'var(--a)',low:'var(--t3)'};
+  const CONF_BG={high:'rgba(42,160,112,0.12)',medium:'rgba(104,110,210,0.12)',low:'rgba(255,255,255,0.04)'};
+  const TYPE_META={
+    push:{color:'var(--a)',bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'🏋️'},
+    pull:{color:'var(--a)',bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'💪'},
+    legs:{color:'var(--a)',bg:'rgba(104,110,210,0.08)',border:'rgba(104,110,210,0.3)',icon:'🦵'},
+    run:{color:'var(--a2)',bg:'rgba(42,160,112,0.08)',border:'rgba(42,160,112,0.3)',icon:'🏃'},
+    cycling:{color:'var(--a5)',bg:'rgba(160,102,212,0.08)',border:'rgba(160,102,212,0.3)',icon:'🚴'},
+    rest:{color:'var(--t3)',bg:'rgba(255,255,255,0.02)',border:'rgba(255,255,255,0.08)',icon:'💤'},
+  };
+  const renderOpt=(opt,tag)=>{
+    const t=(opt.type||'rest').toLowerCase();
+    const m=TYPE_META[t]||{color:'var(--t2)',bg:'rgba(255,255,255,0.03)',border:'rgba(255,255,255,0.1)',icon:'•'};
+    const conf=opt.confidence||'medium';
+    return `<div style="padding:12px 14px;border-radius:12px;background:${m.bg};border:1px solid ${m.border};margin-bottom:8px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${m.color},transparent);"></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><div style="width:30px;height:30px;border-radius:8px;background:${m.border};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${m.icon}</div><div style="flex:1;min-width:0;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;">${tag}</div><div style="font-size:var(--fs-presc-lift);color:${m.color};font-weight:600;margin-top:2px;">${esc(opt.label||t)}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">${opt.duration?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${opt.duration} min</div>`:''}<div style="background:${CONF_BG[conf]};color:${CONF_COLORS[conf]};font-family:var(--mono);font-size:var(--fs-xs);padding:2px 7px;border-radius:5px;border:1px solid ${CONF_COLORS[conf]}60;">${conf.toUpperCase()}</div></div></div><div style="font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;padding-left:40px;">${esc(opt.reason||'')}</div></div>`;
+  };
+  let html='';
+  if(nextSession.primary) html+=renderOpt(nextSession.primary,'Primary');
+  if(nextSession.alternate) html+=renderOpt(nextSession.alternate,'Alternate');
+  el.innerHTML=html||'<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">No recommendation available.</div>';
 }
 
 // ── PRESCRIPTION PERSISTENCE HELPER ─────────────────────────────────────────
