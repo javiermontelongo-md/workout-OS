@@ -719,7 +719,6 @@ input[type=range]::-webkit-slider-thumb:hover {
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 2px; }
-canvas { touch-action: pan-y; }
 
 /* ── CALENDAR ── */
 .cal-nav-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -927,6 +926,9 @@ canvas { touch-action: pan-y; }
   .hdr { display: none; }
   .mbar {
     display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 50;
     background: var(--s1);
     border-bottom: 1px solid var(--b);
     padding: 12px 16px 10px;
@@ -938,14 +940,10 @@ canvas { touch-action: pan-y; }
   }
   .mlogo { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--a); }
   .mlogo span { color: var(--t2); font-style: italic; }
-  .app { height: 100dvh; min-height: 100dvh; overflow: hidden; }
-  .main { padding: 0; max-width: 100%; flex: 1; overflow: hidden; position: relative; }
+  .app { min-height: 100dvh; }
+  .main { padding: 0; max-width: 100%; flex: 1; }
   .app .panel {
-    position: absolute; inset: 0;
-    overflow-y: auto;
     overflow-x: hidden;
-    overscroll-behavior: none;
-    z-index: 2;
     padding: 14px 14px calc(var(--nav) + var(--safe) + 14px);
     display: none;
   }
@@ -2810,7 +2808,8 @@ function renderRulesTab(){
 function showTab(n){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab,.ni').forEach(t=>t.classList.remove('on'));
-  const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); p.scrollTop=0; }
+  const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); }
+  window.scrollTo(0,0);
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='week'){ renderCalendar(); renderSessionList(); }
   if(n==='progress'){ }
