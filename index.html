@@ -938,13 +938,12 @@ canvas { touch-action: pan-y; }
   }
   .mlogo { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--a); }
   .mlogo span { color: var(--t2); font-style: italic; }
-  .app { height: 100dvh; overflow: hidden; }
+  .app { height: 100dvh; min-height: 100dvh; overflow: hidden; }
   .main { padding: 0; max-width: 100%; flex: 1; overflow: hidden; position: relative; }
   .app .panel {
     position: absolute; inset: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
     z-index: 2;
     padding: 14px 14px calc(var(--nav) + var(--safe) + 14px);
