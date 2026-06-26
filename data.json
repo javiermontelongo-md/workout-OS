@@ -3562,7 +3562,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-06-26T03:19:55.630Z",
+  "healthLastSync": "2026-06-25T23:48:44.493Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
@@ -3633,6 +3633,15 @@
       "predictedRPE": 7,
       "actualRPE": 8,
       "weight": 197.5,
+      "sets": 5,
+      "reps": 5
+    },
+    {
+      "date": "2026-06-26",
+      "lift": "pullup",
+      "predictedRPE": 7,
+      "actualRPE": 9,
+      "weight": 235,
       "sets": 5,
       "reps": 5
     }
@@ -3764,6 +3773,11 @@
       "ts": 1781402677673,
       "type": "daily_prescription",
       "label": "pull 60min · 2026-06-13"
+    },
+    {
+      "ts": 1782443666676,
+      "type": "daily_prescription",
+      "label": "pull 60min · 2026-06-25"
     }
   ],
   "runPrescriptions": {
