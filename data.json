@@ -304,6 +304,128 @@
       "ts": 1781417798498,
       "aiFeedback": "**Solid session RPE overall, but the lifts tell a mixed story.**\n\nPull-ups ran hot fast — RPE 8 on set 1 with only 5 reps, needing 25lb assist by set 4, means bodyweight pull-ups are a legitimate limiter right now; consider starting with assisted work (consistent assist weight) to build clean reps before progressing. Row deteriorated badly — RPE 10 with form breakdown on the last two sets at 135lb is a red flag for a baseline session, not a strength signal; drop to 115-120lb next session and rebuild from there. The push lifts (bench, OHP, squat, deadlift) all landed at RPE 7 as singles — good data points, but they shouldn't be in a pull session; note whether time constraints forced this or if programming got compressed. Next session, set your row load conservatively (115-120lb) and cap pull-ups at the rep count where form holds, likely 4×4-5 unassisted or 4×6-8 with consistent assist weight.",
       "aiFeedbackAt": "2026-06-14T06:16:47.138Z"
+    },
+    {
+      "date": "2026-06-25",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "rpe": 8,
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 190,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 90,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [
+          {
+            "w": 160,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [
+          {
+            "w": 160,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": null,
+            "r": 3,
+            "rpe": 10
+          },
+          {
+            "w": -20,
+            "r": 2,
+            "rpe": 7
+          },
+          {
+            "w": -20,
+            "r": 5,
+            "rpe": 9
+          },
+          {
+            "w": -20,
+            "r": 3,
+            "rpe": 10
+          }
+        ],
+        "notes": "The -20 means I had 20 lbs of assisted weight lighten my body weight "
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 145,
+            "r": 5,
+            "rpe": 10
+          },
+          {
+            "w": 115,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 115,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 115,
+            "r": 6,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "Lat Pulldown — 2×10 @ moderate load (~RPE 6), wide overhand grip, focus on lat stretch at top and squeeze at bottom",
+          "prescribed": "Lat Pulldown — 2×10 @ moderate load (~RPE 6), wide overhand grip, focus on lat stretch at top and squeeze at bottom",
+          "weight": null,
+          "sets": null,
+          "reps": null,
+          "notes": "None due to fatigue "
+        },
+        {
+          "name": "Incline DB Hammer Curl —",
+          "prescribed": "2×12",
+          "weight": 60,
+          "sets": 3,
+          "reps": 10,
+          "notes": "Standing ez bar curls were performed instead "
+        }
+      ],
+      "ts": 1782451215500
     }
   ],
   "recoveryLogs": [],
@@ -324,7 +446,7 @@
     "ohpE1RM": 123,
     "pullups": 5,
     "pullupE1RM": 0,
-    "rowE1RM": 162
+    "rowE1RM": 169
   },
   "cardioBaseline": {
     "pace": "10:30",
