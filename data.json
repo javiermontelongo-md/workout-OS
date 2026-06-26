@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-20",
+  "lastUpdated": "2026-06-26",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -4429,6 +4429,64 @@
           "confidence": "medium"
         }
       }
+    },
+    "2026-06-25": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps (RHR-Spike Modified)",
+      "reasoning": "RHR is 2.1 SD above baseline, blocking quality intensity — liftRPECap is hard-locked at 7 today. Recent RPE confirmations on pullups (predicted 7, actual 9 on 2026-06-14 at BW) and rows (predicted 7, actual 9 at 115lb) show consistent underestimation, so loads are stepped back meaningfully to land at true RPE 7 under current fatigue. Volume modifier of 0.85 is applied to all set counts (round down, minimum 2), and the lower stimulus today is appropriate given the autonomic stress signal.",
+      "warmup": "5 min easy movement: arm circles, band pull-aparts 2×15, scapular wall slides 2×10, dead hangs 3×10s, single-arm cable row warm-up set at 40% working weight ×12 each side — total ~8 min before first working set",
+      "mainWork": {
+        "summary": "2 main lifts (row + pullup) · 2 accessories",
+        "lifts": {
+          "row": {
+            "sets": 3,
+            "reps": "6–10",
+            "weight": 95,
+            "targetRPE": 7,
+            "variation": "Barbell Bent-Over Row",
+            "coachNote": "Last session at 115lb produced actual RPE 9 vs predicted 7 — that is a 2-point miss, indicating significant overload. Stepping back to 95lb targets true RPE 7 under today's elevated RHR. Double progression: build reps to 10 across all 3 sets at ≤RPE 7 before adding 2.5lb. Raw set count: 4×0.85=3.4 → 3 sets (min respected). Hinge 45°, bar drags to lower sternum, full scapular retraction at top."
+          },
+          "pullup": {
+            "sets": 3,
+            "reps": "6–10",
+            "weight": 0,
+            "targetRPE": 7,
+            "variation": "Bodyweight Pull-up",
+            "coachNote": "Last logged pullup session (2026-06-14) at BW hit actual RPE 9 vs predicted 7 — dropping to strict BW with a controlled tempo (2-1-2) to land at true RPE 7 given RHR spike. If 10 reps at RPE ≤7 is achieved across all 3 sets on a non-flagged day, next progression adds +5lb via belt. Raw set count: 4×0.85=3.4 → 3 sets. Full dead hang each rep, chin clears bar. Stop each set 2–3 reps shy of failure today."
+          }
+        },
+        "accessories": [
+          "Lat Pulldown — 2×10 @ moderate load (~RPE 6), wide overhand grip, focus on lat stretch at top and squeeze at bottom",
+          "Incline DB Hammer Curl — 2×12 @ RPE 6, strict tempo 2-0-2, elbows pinned, no shoulder involvement"
+        ]
+      },
+      "cooldown": "5 min: thoracic rotation stretch 30s each side, doorway lat stretch 30s each side, supinated wrist flexor stretch 20s each arm, child's pose 60s — finish with 2 min slow diaphragmatic breathing to support HRV recovery",
+      "coachNote": "Your autonomic nervous system is under stress today (RHR +9bpm above baseline). The goal of this session is to maintain movement pattern quality and accumulate volume at genuine RPE 7 — not to push output. Trust the step-back on row and pullup loads; both lifts have shown a consistent 2-point RPE underestimation recently, so 95lb row and strict BW pull-ups are appropriate, not a regression. Log actual RPEs carefully so next session can be calibrated accurately.",
+      "ifTooHard": "If RPE climbs above 7 on the first working set of either compound, drop rows to 85lb and convert pull-ups to band-assisted pull-ups or TRX rows — complete the prescribed sets at true RPE ≤7 and note modification. Do not push through elevated RPE today given the RHR flag.",
+      "watchOutFor": [
+        "RPE creep: with autonomic stress, lifts will feel harder than normal — trust the numbers and cut the set early rather than grinding to RPE 8+",
+        "Neck and upper trap compensation on pull-ups under fatigue — if shrugging appears, terminate the set immediately and rest longer between sets"
+      ],
+      "workoutType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-06-26T03:14:24.828Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run — 30–35 min @ ≤147bpm",
+          "duration": 35,
+          "reason": "Tomorrow (Friday 2026-06-26) is ideal for a Zone 2 aerobic stimulus: today's pull session involves zero leg stress, satisfying the legs→quality run 24h window, and a low-intensity run does not violate the quality→quality 48h rule since both today and tomorrow are sub-RPE-7 efforts. RHR spike makes Zone 2 — not quality — the correct intensity; target a pace slow enough to genuinely stay under 147bpm (likely 11:30–13:00/mile given recent runs at 165–174bpm were threshold, not Zone 2). This directly builds aerobic base for the sub-20 5K goal.",
+          "confidence": "high"
+        },
+        "alternate": {
+          "type": "cycling",
+          "label": "Zone 2 Easy Ride — 40 min @ ≤147bpm",
+          "duration": 40,
+          "reason": "Choose this over the run if legs feel heavy or if RHR has not meaningfully dropped toward baseline by tomorrow morning — cycling provides the same Zone 2 aerobic stimulus with lower impact stress and is equally valid for VO2max development.",
+          "confidence": "medium"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -5266,6 +5324,13 @@
       "inp": 2166,
       "out": 2500,
       "cost": 0.043998
+    },
+    {
+      "ts": 1782443664827,
+      "type": "prescription",
+      "inp": 2132,
+      "out": 1547,
+      "cost": 0.029601
     }
   ],
   "checkins": [
