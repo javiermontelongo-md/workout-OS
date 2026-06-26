@@ -425,7 +425,9 @@
           "notes": "Standing ez bar curls were performed instead "
         }
       ],
-      "ts": 1782451215500
+      "ts": 1782451215500,
+      "aiFeedback": "**Pull-ups and rows blew past the RPE cap repeatedly — that's the story of this session.** Your autonomic stress was already flagging recovery issues, the cap was set at 7, and you hit RPE 10 twice on pull-ups and opened rows at 145lb/RPE 10 when the target was 95lb. The load reductions mid-set on both movements confirm the system was right to be conservative — you just didn't apply it from the start.\n\n**Bench, OHP, squat, and deadlift were executed well** — all landed at RPE 7 as prescribed, which is exactly what a high-RHR day should look like.\n\n**Next session:** Pull-ups need a hard starting point of BW with band assistance or -20lb from rep one — not as a bailout. Rows should open at 95–105lb regardless of how you feel in warm-up; your recent history shows you consistently underestimate these by 2 RPE points. **Check your RHR before next session** — if it's still elevated, the cap stays and you need to respect it on the pulling movements, not just the barbell lifts.",
+      "aiFeedbackAt": "2026-06-26T05:20:25.742Z"
     }
   ],
   "recoveryLogs": [],
@@ -3779,37 +3781,37 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-06-20T17:27:34.003Z",
-    "vo2maxUsed": 44.4,
+    "generatedAt": "2026-06-26T05:20:17.447Z",
+    "vo2maxUsed": 44.5,
     "runCount": 25,
     "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1772,
+        "seconds": 1770,
         "ciSeconds": 301,
         "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3659,
-        "ciSeconds": 809,
+        "seconds": 3656,
+        "ciSeconds": 808,
         "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 7983,
-        "ciSeconds": 2307,
+        "seconds": 7975,
+        "ciSeconds": 2305,
         "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 16552,
-        "ciSeconds": 7316,
+        "seconds": 16537,
+        "ciSeconds": 7310,
         "method": "VO2max / VDOT"
       }
     },
     "medianTrainingPace": 702.6578073089702,
     "decayFactor": 1,
-    "daysInactive": 0,
-    "lastActivityDate": "2026-06-19",
-    "rawVO2": 44.4,
+    "daysInactive": 4,
+    "lastActivityDate": "2026-06-21",
+    "rawVO2": 44.54,
     "debugInfo": {
       "riegelPred": {
         "s5k": 2187,
@@ -3835,10 +3837,10 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1485,
-        "s10k": 3090,
-        "shalf": 6780,
-        "sfull": 14220
+        "s5k": 1481,
+        "s10k": 3083,
+        "shalf": 6765,
+        "sfull": 14190
       },
       "hrPred": {
         "s5k": 1866,
@@ -5467,6 +5469,13 @@
       "inp": 2132,
       "out": 1547,
       "cost": 0.029601
+    },
+    {
+      "ts": 1782451225742,
+      "type": "sessionFeedback",
+      "inp": 647,
+      "out": 265,
+      "cost": 0.005916
     }
   ],
   "checkins": [
