@@ -1094,9 +1094,25 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-06-26",
+      "stravaId": 19079593260,
+      "name": "Afternoon Run",
+      "type": "run",
+      "distance": 2.81,
+      "duration": 1803,
+      "pace": 642,
+      "elevationGain": 276,
+      "heartRateAvg": 171.5,
+      "heartRateMax": 189,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "intervals"
     }
   ],
-  "stravaLastSync": "2026-06-27T00:08:15.961Z",
+  "stravaLastSync": "2026-06-27T04:53:45.898Z",
   "adaptivePlanCache": {
     "narrative": "Week 1 of volume accumulation. Last bench session hit RPE 9-10 at 205lb for triples/quads, indicating significant overreach. Dropping to 192.5lb×4×4 to build sustainable volume at RPE 8. OHP showed good capacity at 100lb×7. Easy runs are being executed at threshold HR (165-174 bpm) instead of Zone 2 (130-145 bpm) — strict MAF HR compliance required.",
     "weeklyFocus": "Re-establish true Zone 2 easy running at MAF HR 147 ceiling and build bench volume at sustainable RPE 8",
