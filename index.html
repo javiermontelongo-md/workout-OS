@@ -4019,7 +4019,13 @@ async function saveSession(){
   if(!D){ msg('log-smsg','Data not loaded -- go to Settings, check your token, then tap Reload data'); return; }
   const date=localDS(new Date()),day=window._logDayType||'';
   if(!day){ msg('log-smsg','Start a session from the Program tab first'); return; }
-  const getLift=l=>({sets:SD[l].filter(s=>s.w||s.r).map(s=>({w:+s.w||null,r:+s.r||null,rpe:+s.rpe||null})),notes:document.getElementById(l+'-notes')?.value||''});
+  // Only save lifts whose input block is actually shown for today's day type.
+  // The form pre-fills SD for all six lifts with prescription/DEF values, but a
+  // pull day hides bench/ohp/squat/dl — without this gate those hidden lifts would
+  // be saved as phantom default sets (see DEF/DEF_REPS/DEF_RPE).
+  const _liftBlock={bench:'bench-block',ohp:'ohp-block',squat:'squat-block',dl:'deadlift-block',pullup:'pullup-block',row:'row-block'};
+  const _liftActive=l=>{const b=document.getElementById(_liftBlock[l]);return !!b&&b.style.display!=='none';};
+  const getLift=l=>_liftActive(l)?({sets:SD[l].filter(s=>s.w||s.r).map(s=>({w:+s.w||null,r:+s.r||null,rpe:+s.rpe||null})),notes:document.getElementById(l+'-notes')?.value||''}):({sets:[],notes:''});
   const isRunDay=['run','run_easy','run_quality','run_long'].includes(day);
   const runDur=+document.getElementById('run-duration')?.value||null;
   const runDist=+document.getElementById('run-distance')?.value||null;
