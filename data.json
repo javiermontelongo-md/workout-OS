@@ -3745,28 +3745,28 @@
     },
     {
       "date": "2026-06-29",
-      "restingHR": 72,
-      "hrv": 47.26146944283131,
-      "wristTemp": -2.19,
-      "sleepHours": 6.9,
-      "sleepDeep": 0.8853800280557739,
-      "sleepREM": 1.9710068308644826,
-      "sleepLight": 4.0841385736399225,
-      "sleepAwake": 0.1,
-      "sleepOnset": "23:07",
-      "wakeTime": "06:11",
-      "sleepMidpoint": 2.6499999999999986,
-      "steps": 1017,
-      "exerciseMinutes": 2,
-      "activeCalories": 55,
+      "restingHR": null,
+      "hrv": null,
+      "wristTemp": null,
+      "sleepHours": null,
+      "sleepDeep": null,
+      "sleepREM": null,
+      "sleepLight": null,
+      "sleepAwake": null,
+      "sleepOnset": null,
+      "wakeTime": null,
+      "sleepMidpoint": null,
+      "steps": 304,
+      "exerciseMinutes": null,
+      "activeCalories": null,
       "walkingHR": null,
-      "walkingSpeed": 2.68,
-      "respiratoryRate": 17.38888888888889,
+      "walkingSpeed": null,
+      "respiratoryRate": null,
       "vo2maxApple": null,
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-06-29T18:24:01.175Z",
+  "healthLastSync": "2026-06-29T16:59:21.638Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
@@ -3846,6 +3846,15 @@
       "predictedRPE": 7,
       "actualRPE": 9,
       "weight": 235,
+      "sets": 5,
+      "reps": 5
+    },
+    {
+      "date": "2026-06-29",
+      "lift": "bench",
+      "predictedRPE": 7,
+      "actualRPE": 7,
+      "weight": 197.5,
       "sets": 5,
       "reps": 5
     }
@@ -3982,6 +3991,11 @@
       "ts": 1782443666676,
       "type": "daily_prescription",
       "label": "pull 60min · 2026-06-25"
+    },
+    {
+      "ts": 1782755157548,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-06-29"
     }
   ],
   "runPrescriptions": {
