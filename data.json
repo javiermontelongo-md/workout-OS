@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-26",
+  "lastUpdated": "2026-06-29",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -4705,6 +4705,67 @@
           "confidence": "medium"
         }
       }
+    },
+    "2026-06-29": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "reasoning": "Recent RPE data consistently shows bench performing harder than predicted — 205lb was RPE 10 in May and 207.5lb hit RPE 9 in June, meaning working weight has been too aggressive. Pulling back to 190lb today targets a true RPE 7–8 to rebuild solid doubles-progression from a safe base, matching the confirmed 190×5@7 from May 10 as a reliable anchor. OHP has similarly run hot at 90lb (predicted 7, actual 9 in May), so 85lb is the correct starting point to stay within the RPE cap and avoid another failed progression attempt.",
+      "warmup": "5 min light cardio (bike or brisk walk). Shoulder CARs × 10 each side. Band pull-aparts 2×15. Scapular wall slides 2×10. Empty bar bench press 2×10, then ramp: 95lb×5, 135lb×5, 165lb×3. Empty bar OHP 2×8, then 65lb×5.",
+      "mainWork": {
+        "summary": "2 main lifts · 4 accessories",
+        "lifts": {
+          "bench": {
+            "sets": 3,
+            "reps": "5–8",
+            "weight": 190,
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "coachNote": "Your bench RPE has been consistently 1–2 points hotter than predicted across multiple sessions — 190lb is not a step back, it is the correct working weight to build from. Hit all 3 sets for 5+ reps at true RPE ≤7–8, record actual reps carefully. When all sets reach 8 clean reps, move to 192.5lb. Brace hard, drive feet into the floor, maintain consistent arch and leg drive every set."
+          },
+          "ohp": {
+            "sets": 3,
+            "reps": "5–8",
+            "weight": 85,
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "coachNote": "85lb is the correct load — 90lb went RPE 9 in May when 7 was predicted. Own this weight: full lockout overhead, ribs down, glutes squeezed, bar over mid-foot. No layback. When 3×8 at RPE ≤8 is achieved, move to 87.5lb."
+          }
+        },
+        "accessories": [
+          "Incline DB Press 3×10 @ moderate load (RPE ≤7) — add horizontal chest volume and reduce shoulder impingement risk vs flat bar",
+          "Cable Tricep Pushdown 3×12 — full elbow extension at bottom, elbows pinned to sides, smooth eccentric",
+          "DB Lateral Raise 3×15 — light load, strict form, slight forward lean, no momentum; build shoulder width and rotator cuff health",
+          "Face Pulls 3×15 (light cable or band, external rotation emphasis) — shoulder prehab, counteracts all pressing volume, keeps rotator cuff balanced"
+        ]
+      },
+      "cooldown": "5 min: doorway pec stretch 60 sec each side, cross-body shoulder stretch 30 sec each side, thoracic spine foam roll 2 min, band pull-aparts 1×20 light.",
+      "coachNote": "The central theme today is re-calibrating load to reality. Multiple sessions of actual RPE exceeding predicted by 2 points means the weights were simply too heavy to drive clean progression. 190lb bench and 85lb OHP are not conservative — they are the correct weights given your confirmed RPE data. Record actual reps and RPE for every set today so next session has clean data to progress from.",
+      "ifTooHard": "If bench feels heavy from warmup, drop to 185lb and treat today as a form/technique consolidation day. For OHP, drop to 80lb if 85lb feels above RPE 7 on set 1. Skip the incline press and substitute a second set of lateral raises if shoulders are fatigued.",
+      "watchOutFor": [
+        "Ego load creep — if the bar feels light early, do not add weight mid-session. The goal today is clean reps at true RPE ≤8, not maximal effort.",
+        "Upper trap and neck tension on OHP — if traps are firing before deltoids or neck feels compressed overhead, reduce load further and prioritize bar path directly over the crown of the head.",
+        "Elbow flare on bench — keep elbows at roughly 45–60° from torso, not 90°, to protect the shoulder capsule especially with accumulated fatigue from prior sessions."
+      ],
+      "workoutType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-06-29T17:45:55.834Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run — 30–35 min strictly ≤147bpm",
+          "duration": 35,
+          "reason": "Today is a push (upper body) strength session, so legs and CNS are fresh for aerobic work tomorrow. A Zone 2 run Tuesday respects the quality→quality 48h window (next quality lift session no earlier than Wednesday) and directly builds the aerobic base needed for sub-20 5K and VO2max improvement. Target pace should be slow enough to keep HR genuinely ≤147bpm — likely 11:00–12:30/mile given your recent easy efforts are running at 165–174bpm; use HR as the governor, not pace.",
+          "confidence": "high"
+        },
+        "alternate": {
+          "type": "cycling",
+          "label": "Zone 2 Easy Ride — 40 min strictly ≤147bpm",
+          "duration": 40,
+          "reason": "Choose this if legs or ankles feel sore from any residual fatigue, or if outdoor conditions are poor — cycling delivers equivalent Zone 2 cardiac stimulus with zero run impact stress.",
+          "confidence": "medium"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -5556,6 +5617,13 @@
       "inp": 647,
       "out": 265,
       "cost": 0.005916
+    },
+    {
+      "ts": 1782755155834,
+      "type": "prescription",
+      "inp": 2184,
+      "out": 1503,
+      "cost": 0.029097
     }
   ],
   "checkins": [
