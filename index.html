@@ -1076,35 +1076,6 @@ input[type=range]::-webkit-slider-thumb:hover {
       <div class="lbl" style="margin:0;">daily check-in</div>
       <div id="checkin-date-label" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></div>
     </div>
-    <div class="ci-row er">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">⚡ ENERGY</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);font-weight:600;" id="ci-energy-val">7</div>
-      </div>
-      <input type="range" id="ci-energy" min="1" max="10" value="7" oninput="document.getElementById('ci-energy-val').textContent=this.value;updateFatiguePreview()">
-    </div>
-    <div class="ci-row sr">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);">🔥 SORENESS</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a4);font-weight:600;" id="ci-soreness-val">3</div>
-      </div>
-      <input type="range" id="ci-soreness" min="1" max="10" value="3" oninput="document.getElementById('ci-soreness-val').textContent=this.value;updateFatiguePreview()">
-    </div>
-    <div class="ci-row mr">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);">💪 MOTIVATION</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a2);font-weight:600;" id="ci-motivation-val">7</div>
-      </div>
-      <input type="range" id="ci-motivation" min="1" max="10" value="7" oninput="document.getElementById('ci-motivation-val').textContent=this.value;updateFatiguePreview()">
-    </div>
-    <div class="ci-row str">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);">😤 STRESS</div>
-        <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--aw);font-weight:600;" id="ci-stress-val">5</div>
-      </div>
-      <input type="range" id="ci-stress" min="1" max="10" value="5"
-        oninput="document.getElementById('ci-stress-val').textContent=this.value;updateFatiguePreview()">
-    </div>
     <div class="ci-row wr">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a3);">⚖️ WEIGHT</div>
@@ -1124,10 +1095,6 @@ input[type=range]::-webkit-slider-thumb:hover {
         <input type="number" id="ci-waist" placeholder="34.0" step="0.25" style="font-family:var(--mono);font-size:14px;text-align:center;" oninput="updateBodyCalcs()">
         <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);white-space:nowrap;">W/H: <span id="ci-whr-display" style="color:var(--a3);">--</span></div>
       </div>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:14px;">
-      <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">FATIGUE SCORE</div>
-      <div style="font-family:var(--mono);font-size:var(--fs-body);font-weight:500;" id="ci-fatigue-preview">--</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:10px;margin-bottom:4px;">
       <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);text-transform:uppercase;letter-spacing:.06em;">Post-call / no sleep</div>
@@ -1301,7 +1268,6 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Session feel</div>
     <div class="g2" style="gap:10px;">
       <div class="ig"><label>Overall RPE <span style="font-weight:normal;color:var(--t3);">1–10</span></label><input type="number" id="log-session-rpe" min="1" max="10" placeholder="7"></div>
-      <div class="ig"><label style="color:var(--t3);">Energy <span style="font-family:var(--mono);font-size:var(--fs-xs);">from today's check-in</span></label><input type="number" id="log-session-energy-disp" disabled placeholder="—" style="opacity:0.5;"></div>
     </div>
   </div>
   <div id="log-notes-card" class="card"><div class="ig"><label>Session notes</label><textarea id="log-notes" placeholder="What went well? What felt off? Any PRs? Anything to flag for next session?"></textarea></div></div>
@@ -2737,7 +2703,7 @@ function renderSystemLog() {
       color: 'var(--a4)',
       bg: 'rgba(194,77,114,0.14)',
       title: 'Daily check-in saved',
-      detail: 'energy ' + (c.energy || '?') + ' · soreness ' + (c.soreness || '?') + ' · fatigue ' + (c.fatigueScore || '?') + ' · sleep ' + (c.sleepHours || c.sleep || '?') + 'h'
+      detail: 'sleep ' + (c.sleepHours || c.sleep || '?') + 'h' + (c.postCall ? ' · post-call' : '')
     });
   });
   // Sort reverse chronological
@@ -4046,13 +4012,11 @@ async function saveSession(){
     const note=document.getElementById('acc-note-'+i)?.value||'';
     return(wt||sets||reps||note)?{name,prescribed,weight:wt,sets,reps,notes:note}:null;
   }).filter(Boolean);
-  // Session-level feel — RPE from input, energy+BW auto-pulled from today's check-in/body metrics
+  // Session-level feel — RPE from input, BW auto-pulled from today's body metrics
   const sessionRpe=+document.getElementById('log-session-rpe')?.value||null;
-  const todayCI=(D.checkins||[]).slice().reverse().find(c=>c.date===date)||{};
-  const sessionEnergy=todayCI.energy||null;
   const latestBodyEntry=(D.bodyMetrics||[]).slice(-1)[0]||{};
   const sessionBW=latestBodyEntry.weightLbs||D.profile?.bodyweight||null;
-  const session={date,day,type:day,notes:document.getElementById('log-notes')?.value||'',...(sessionRpe?{rpe:sessionRpe}:{}),...(sessionEnergy?{energy:sessionEnergy}:{}),...(sessionBW?{bw:sessionBW}:{}),bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
+  const session={date,day,type:day,notes:document.getElementById('log-notes')?.value||'',...(sessionRpe?{rpe:sessionRpe}:{}),...(sessionBW?{bw:sessionBW}:{}),bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
   _clearLogDraft();
@@ -4315,7 +4279,6 @@ function openCombinedDrawer(sessions,stravaActivities,dateStr){
     const meta=[];
     if(session.duration) meta.push(`${session.duration} min`);
     if(session.rpe)      meta.push(`RPE ${session.rpe}`);
-    if(session.energy)   meta.push(`Energy ${session.energy}/10`);
     if(meta.length) sh+=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">${meta.map(m=>`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s4);color:var(--t2);padding:3px 8px;border-radius:5px;border:1px solid var(--b);">${m}</span>`).join('')}</div>`;
     const liftKeys=[{key:'bench',label:'Bench'},{key:'ohp',label:'OHP'},{key:'pullup',label:'Pull-ups'},{key:'row',label:'Row'},{key:'squat',label:'Squat'},{key:'dl',label:'Deadlift'}];
     liftKeys.filter(l=>session[l.key]?.sets?.length>0).forEach(l=>{
@@ -4516,7 +4479,6 @@ function buildSessionDrawerContent(session,dateStr){
   const meta=[];
   if(session.duration) meta.push(`${session.duration} min`);
   if(session.rpe)      meta.push(`RPE ${session.rpe}`);
-  if(session.energy)   meta.push(`Energy ${session.energy}/10`);
   if(session.sleep)    meta.push(`Sleep ${session.sleep}h`);
   if(session.bw)       meta.push(`${session.bw} lb`);
   if(meta.length){
@@ -6546,15 +6508,6 @@ function evaluateTrainingStatus(){
     reasons.push('Week 4 deload — no quality, volume at 60%, RPE cap 6.');
   }
 
-  const fatigue=todayCI.fatigueScore||null;
-  if(fatigue!==null&&fatigue>=8){
-    liftRPECap=Math.min(liftRPECap,7);
-    volumeModifier=Math.min(volumeModifier,0.85);
-    if(!flags.includes('HRV_ACUTE_CRASH')){
-      reasons.push(`High subjective fatigue (${fatigue}/10) — volume and RPE moderated.`);
-    }
-  }
-
   let stressScore=0;
   if(flags.some(f=>['POST_CALL','FEVER_SIGNAL','HRV_ACUTE_CRASH','SLEEP_BLOCK'].includes(f))){
     stressScore=3;
@@ -6602,7 +6555,7 @@ async function generateDailyPrescription(workoutType,durationMins){
     const ts=evaluateTrainingStatus();
     const means=compute7DayMeans();
     const recentSessions=(D.sessions||[]).slice(-8).map(s=>({
-      date:s.date,type:s.day||s.dayType,rpe:s.rpe,energy:s.energy,
+      date:s.date,type:s.day||s.dayType,rpe:s.rpe,
       bench:s.bench?.sets?.filter(x=>x.w).map(x=>`${x.w}×${x.r}@${x.rpe||'?'}`).join(',')||null,
       ohp:s.ohp?.sets?.filter(x=>x.w).map(x=>`${x.w}×${x.r}@${x.rpe||'?'}`).join(',')||null,
       squat:s.squat?.sets?.filter(x=>x.w).map(x=>`${x.w}×${x.r}@${x.rpe||'?'}`).join(',')||null,
@@ -7014,7 +6967,7 @@ async function generateSessionFeedback(ts){
   });
   const accLines=(session.accessories||[]).map(a=>`${a.name}: ${a.sets||'?'}×${a.reps||'?'}${a.weight?' @ '+a.weight+'lb':''}${a.notes?' — '+a.notes:''}`);
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a strength coach giving concise post-workout feedback. Be direct, specific, and encouraging. 3-5 sentences max. Focus on: did they hit targets? RPE trends? What to watch next session? No filler phrases.',messages:[{role:'user',content:`Athlete: ${session.bw||225}lb, ${session.energy?'energy '+session.energy+'/10':''}, session RPE ${session.rpe||'not logged'}.
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a strength coach giving concise post-workout feedback. Be direct, specific, and encouraging. 3-5 sentences max. Focus on: did they hit targets? RPE trends? What to watch next session? No filler phrases.',messages:[{role:'user',content:`Athlete: ${session.bw||225}lb, session RPE ${session.rpe||'not logged'}.
 
 DATE: ${session.date} | TYPE: ${session.day||session.type}
 ${presc?.reasoning?'PLAN CONTEXT: '+presc.reasoning:''}
@@ -7148,7 +7101,6 @@ function showLogSessionSummary(session){
   const meta=[];
   if(session.duration) meta.push(`${session.duration} min`);
   if(session.rpe) meta.push(`RPE ${session.rpe}`);
-  if(session.energy) meta.push(`Energy ${session.energy}/10`);
   if(session.bw) meta.push(`${session.bw} lb`);
   const metaHtml=meta.length?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;">${meta.map(m=>`<span style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--t2);padding:3px 10px;border-radius:6px;border:1px solid var(--b);">${m}</span>`).join('')}</div>`:'';
   const summaryCard=liftHtml?`<div class="card" style="margin-bottom:0;">${metaHtml}${liftHtml}${session.notes?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;padding:8px;background:var(--s3);border-radius:6px;">${session.notes}</div>`:''}${session.accessories?.length?`<div style="margin-top:12px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${session.accessories.map(a=>`${a.name} ${a.sets||''}×${a.reps||''}`).join(' · ')}</div>`:''}</div>`:metaHtml?`<div class="card" style="margin-bottom:0;">${metaHtml}</div>`:'';
@@ -7197,10 +7149,6 @@ function updateLogTabPlanned(){
   if(smsg) smsg.style.display='';
   const notesCard=document.getElementById('log-notes-card');
   if(notesCard) notesCard.style.display='';
-  // Populate energy read-only display from today's check-in
-  const _todayCI=(D.checkins||[]).slice().reverse().find(c=>c.date===today)||{};
-  const energyDisp=document.getElementById('log-session-energy-disp');
-  if(energyDisp) energyDisp.placeholder=_todayCI.energy?`${_todayCI.energy}/10`:'no check-in today';
 
   // Map prescription type → onDayTypeChange value, then apply
   const typeMap={push:'A',pull:'B',legs:'C',run:'run',cycling:'run'};
@@ -7330,23 +7278,6 @@ function showRPEConfirm(lift){
 // DAILY CHECK-IN SYSTEM
 // ============================================================
 
-function calcFatigue(energy,sleep,soreness,motivation,stress){
-  const st=stress||5;
-  return Math.round(((10-energy)+(10-motivation)+soreness+st+Math.max(0,8-sleep))/5*10)/10;
-}
-
-function updateFatiguePreview(){
-  const el=document.getElementById('ci-fatigue-preview');if(!el)return;
-  const e=+document.getElementById('ci-energy').value;
-  const sleepHrs=parseSleepHHMM(document.getElementById('ci-sleep-input')?.value)||7;
-  const so=+document.getElementById('ci-soreness').value;
-  const m=+document.getElementById('ci-motivation').value;
-  const stress=+document.getElementById('ci-stress').value;
-  const f=calcFatigue(e,sleepHrs,so,m,stress);
-  el.textContent=f.toFixed(1);
-  el.style.color=f<4?'var(--a3)':f<6?'var(--a)':'var(--a4)';
-}
-
 function togglePostCall(){
   const btn=document.getElementById('ci-postcall-btn');
   if(!btn)return;
@@ -7360,19 +7291,13 @@ function togglePostCall(){
 async function saveCheckin(){
   if(!D)return;
   const today=new Date().toISOString().split('T')[0];
-  const energy=+document.getElementById('ci-energy').value;
-  const soreness=+document.getElementById('ci-soreness').value;
-  const motivation=+document.getElementById('ci-motivation').value;
-  const stress=+document.getElementById('ci-stress').value;
   const sleepInput=document.getElementById('ci-sleep-input')?.value;
   const sleepHours=parseSleepHHMM(sleepInput)||null;
-  const sleepForFatigue=sleepHours||7;
-  const fatigueScore=calcFatigue(energy,sleepForFatigue,soreness,motivation,stress);
   const weightLbs=parseFloat(document.getElementById('ci-weight')?.value)||null;
   const waistInches=parseFloat(document.getElementById('ci-waist')?.value)||null;
   if(!D.checkins)D.checkins=[];
   const existing=D.checkins.findIndex(c=>c.date===today);
-  const entry={date:today,energy,soreness,motivation,stress,fatigueScore,postCall:document.getElementById('ci-postcall-btn')?.textContent?.trim()==='Yes'};
+  const entry={date:today,postCall:document.getElementById('ci-postcall-btn')?.textContent?.trim()==='Yes'};
   if(sleepHours!=null){entry.sleepHours=sleepHours;entry.sleep=sleepHours;}
   if(existing>=0)D.checkins[existing]=entry;else D.checkins.push(entry);
   if(weightLbs||waistInches){
@@ -7912,15 +7837,6 @@ function initCheckinTab(){
   const lbl=document.getElementById('checkin-date-label');
   if(lbl){const d=new Date();lbl.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();}
   const today=new Date().toISOString().split('T')[0];
-  const existing=(D.checkins||[]).find(c=>c.date===today);
-  if(existing){
-    const se=id=>document.getElementById(id);
-    if(se('ci-energy')){se('ci-energy').value=existing.energy;se('ci-energy-val').textContent=existing.energy;}
-    if(se('ci-soreness')){se('ci-soreness').value=existing.soreness;se('ci-soreness-val').textContent=existing.soreness;}
-    if(se('ci-motivation')){se('ci-motivation').value=existing.motivation;se('ci-motivation-val').textContent=existing.motivation;}
-    if(existing.stress&&se('ci-stress')){se('ci-stress').value=existing.stress;se('ci-stress-val').textContent=existing.stress;}
-  }
-  updateFatiguePreview();
   const today2=new Date().toISOString().split('T')[0];
   const todayCheckin=(D.checkins||[]).find(c=>c.date===today2);
   if(todayCheckin?.sleepHours){
@@ -8093,18 +8009,12 @@ function renderAIFlowDiagram(){
         const ci=(D.checkins||[]).slice().reverse().find(c=>c.date===today)||{};
         const avg7=(key)=>{const vals=(D.checkins||[]).slice(-7).map(c=>c[key]).filter(Number.isFinite);return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*10)/10:null;};
         const rows=[
-          ['Energy', ci.energy!=null?ci.energy+' / 10':'— (not entered today)', 'Scale 1–10. Feeds into fatigue score and modulates AI tone + intensity recommendations.'],
-          ['Soreness', ci.soreness!=null?ci.soreness+' / 10':'—', 'Muscle soreness 1–10. High soreness → AI shifts toward accessory work, longer warmup.'],
-          ['Motivation', ci.motivation!=null?ci.motivation+' / 10':'—', 'Subjective motivation 1–10. AI adjusts prescription framing and optional volume.'],
-          ['Stress', ci.stress!=null?ci.stress+' / 10':'—', 'Life/work stress 1–10. Combined with sleep and energy for the overall fatigue score.'],
           ['Sleep (today)', ci.sleepHours!=null?ci.sleepHours+'h':'—', 'Entered in HH:MM format. Overrides Apple Watch sleep if entered. Feeds hard rules engine.'],
-          ['Fatigue Score', ci.fatigueScore!=null?ci.fatigueScore+' / 10':'—', 'Computed from energy, sleep, soreness, motivation, stress. ≥8 triggers RPE cap + volume reduction.'],
           ['Post-Call Flag', ci.postCall?'🚨 ON — all training blocked':'Off', 'One-tap flag for call shifts or total sleep loss. Instantly fires POST_CALL hard block.'],
-          ['7d avg energy', avg7('energy')!=null?avg7('energy')+' / 10':'—', 'Rolling 7-day average of your energy scores. AI uses this to distinguish acute dips from chronic fatigue.'],
           ['7d avg sleep', avg7('sleepHours')!=null?avg7('sleepHours')+'h':'—', 'Rolling average sleep. AI references this to flag if you\'re consistently under-sleeping.'],
           ['Check-in age', '', 'Only check-ins from the last 2 days are used. If yours is older, the AI notes the gap explicitly.'],
         ];
-        return{title:'📋 Daily Check-In — subjective state',desc:'Filled in on the TODAY tab. The AI compares your subjective report against your objective biometrics — if they diverge (e.g., HRV is fine but you feel terrible), the AI weighs the subjective report more heavily for intensity decisions.',rows};
+        return{title:'📋 Daily Check-In',desc:'Filled in on the TODAY tab. Sleep and post-call status feed the hard rules engine that gates training intensity.',rows};
       }
     },
     {

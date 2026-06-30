@@ -7,7 +7,6 @@
       "day": "1",
       "rpe": null,
       "duration": null,
-      "energy": null,
       "bw": null,
       "sleep": null,
       "notes": "",
@@ -52,7 +51,6 @@
       "day": "push",
       "rpe": null,
       "duration": null,
-      "energy": null,
       "bw": null,
       "sleep": null,
       "notes": "",
@@ -124,7 +122,6 @@
       "day": "A",
       "type": "A",
       "notes": "Been a while since I lifted, didn’t really feel too tired today though due to 6.4 hours asleep. Probably since I have been resting well the days before. ",
-      "energy": 7,
       "bw": 227,
       "bench": {
         "sets": [
@@ -5665,20 +5662,10 @@
   "checkins": [
     {
       "date": "2026-06-09",
-      "energy": 7,
-      "soreness": 3,
-      "motivation": 7,
-      "stress": 5,
-      "fatigueScore": 3,
       "postCall": false
     },
     {
       "date": "2026-06-10",
-      "energy": 5,
-      "soreness": 5,
-      "motivation": 4,
-      "stress": 8,
-      "fatigueScore": 5,
       "postCall": false
     }
   ],
