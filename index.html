@@ -1122,8 +1122,29 @@ input[type=range]::-webkit-slider-thumb:hover {
 <div id="panel-log" class="panel">
   <div class="h1">Log <span>session</span></div>
 
+  <!-- Date picker + manual day-type selector + unsaved-draft resume banner -->
+  <div id="log-controls-card" class="card">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div class="ig" style="margin:0;flex:0 0 auto;">
+        <label style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;">Logging for</label>
+        <input type="date" id="log-date-input" onchange="onLogDateChange(this.value)" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;">
+      </div>
+      <div id="log-date-status" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding-bottom:7px;"></div>
+    </div>
+    <div id="log-manual-typebar" style="display:none;margin-top:14px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:8px;">WHAT DID YOU TRAIN? <span style="color:var(--t3);">— manual log, no AI plan saved for this day</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="daytype-btn" data-type="A" onclick="setManualDayType('A')" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:6px;padding:7px 14px;cursor:pointer;">🏋️ Push</button>
+        <button type="button" class="daytype-btn" data-type="B" onclick="setManualDayType('B')" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:6px;padding:7px 14px;cursor:pointer;">🚣 Pull</button>
+        <button type="button" class="daytype-btn" data-type="C" onclick="setManualDayType('C')" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:6px;padding:7px 14px;cursor:pointer;">🦵 Legs</button>
+        <button type="button" class="daytype-btn" data-type="run" onclick="setManualDayType('run')" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:6px;padding:7px 14px;cursor:pointer;">🏃 Run</button>
+      </div>
+    </div>
+    <div id="log-draft-banner" style="margin-top:14px;display:none;"></div>
+  </div>
+
   <!-- shown when there is no prescription for today -->
-  <div id="log-no-plan" class="card" style="text-align:center;padding:48px 24px;">
+  <div id="log-no-plan" class="card" style="text-align:center;padding:48px 24px;display:none;">
     <div style="font-size:32px;margin-bottom:16px;">📋</div>
     <div style="font-size:var(--fs-title);font-weight:600;color:var(--t);margin-bottom:10px;">No plan for today</div>
     <div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);line-height:1.7;margin-bottom:20px;">Go to the <strong style="color:var(--t2);">Program</strong> tab, select a workout type and duration,<br>then tap <strong style="color:var(--t2);">"Get Prescription"</strong> to generate today's plan.</div>
@@ -2546,6 +2567,8 @@ document.getElementById('gh-file').value=CFG.file;
 if(CFG.api){ document.getElementById('api-key').value=CFG.api; document.getElementById('api-st').textContent='Key loaded'; }
 fetchData();
 initSets();
+window._logDate=localDS(new Date());
+_migrateOldDraft();
 
 function hOv(){ const e=document.getElementById('ov'); if(e){ e.style.opacity='0'; e.style.transition='opacity .4s'; setTimeout(()=>e.remove(),400); } }
 
@@ -3931,8 +3954,45 @@ function addSet(lift){
   if(i>0) showRPEConfirm(lift);
 }
 function removeSet(lift,i){ SD[lift].splice(i,1); renderSets(lift); }
+// ── DRAFT PERSISTENCE (per-date, never expires) ──────────────────
+// Inputs are saved to localStorage under a date-specific key on every
+// keystroke and survive reloads/days indefinitely until the session for
+// that date is saved or the draft is explicitly discarded.
+const _DRAFT_PREFIX='wos-log-draft-';
+function _draftKey(date){ return _DRAFT_PREFIX+date; }
+function _loadDraft(date){ try{ const r=localStorage.getItem(_draftKey(date)); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function _allDraftDates(){
+  const out=[];
+  try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf(_DRAFT_PREFIX)===0) out.push(k.slice(_DRAFT_PREFIX.length)); } }catch(e){}
+  return out;
+}
+function _draftHasContent(d){
+  if(!d) return false;
+  const LIFTS=['bench','ohp','squat','dl','pullup','row'];
+  const has=v=>v!==''&&v!=null;
+  if(LIFTS.some(l=>(d.SD?.[l]||[]).some(s=>s&&(has(s.w)||has(s.r))))) return true;
+  if(d.notes&&Object.values(d.notes).some(v=>v&&String(v).trim())) return true;
+  if(d.logNotes&&String(d.logNotes).trim()) return true;
+  if(d.sessionRpe) return true;
+  if(d.runFields&&Object.values(d.runFields).some(v=>v&&String(v).trim())) return true;
+  if(d.accFields&&Object.values(d.accFields).some(v=>v&&String(v).trim())) return true;
+  return false;
+}
+// One-time migration of the legacy single-slot draft into the per-date scheme.
+// This recovers any unsaved work left under the old 'wos-log-draft' key.
+function _migrateOldDraft(){
+  try{
+    const raw=localStorage.getItem('wos-log-draft');
+    if(!raw) return;
+    const d=JSON.parse(raw);
+    const date=d.date||(d.ts?localDS(new Date(d.ts)):localDS(new Date()));
+    if(!localStorage.getItem(_draftKey(date))){ d.date=date; localStorage.setItem(_draftKey(date),JSON.stringify(d)); }
+    localStorage.removeItem('wos-log-draft');
+  }catch(e){}
+}
 function _saveLogDraft(){
   try{
+    if(!window._logDate) return;
     const LIFTS=['bench','ohp','squat','dl','pullup','row'];
     const notes={};
     LIFTS.forEach(l=>{const el=document.getElementById(l+'-notes');if(el)notes[l]=el.value;});
@@ -3946,22 +4006,20 @@ function _saveLogDraft(){
         const el=document.getElementById(p+i);if(el)accFields[p+i]=el.value;
       });
     });
-    localStorage.setItem('wos-log-draft',JSON.stringify({
-      dayType:window._logDayType||'',SD,notes,runFields,accFields,
+    localStorage.setItem(_draftKey(window._logDate),JSON.stringify({
+      date:window._logDate,dayType:window._logDayType||'',manualType:window._logManualType||'',
+      SD,notes,runFields,accFields,
       sessionRpe:document.getElementById('log-session-rpe')?.value||'',
       logNotes:document.getElementById('log-notes')?.value||'',
       ts:Date.now()
     }));
   }catch(e){}
 }
-function _clearLogDraft(){ try{ localStorage.removeItem('wos-log-draft'); }catch(e){} }
+function _clearLogDraft(date){ try{ localStorage.removeItem(_draftKey(date||window._logDate)); }catch(e){} }
 function _restoreLogDraft(){
   try{
-    const raw=localStorage.getItem('wos-log-draft');
-    if(!raw) return;
-    const d=JSON.parse(raw);
-    if(d.dayType!==window._logDayType) return;
-    if(Date.now()-d.ts>86400000) return;
+    const d=_loadDraft(window._logDate);
+    if(!d) return;
     const LIFTS=['bench','ohp','squat','dl','pullup','row'];
     LIFTS.forEach(l=>{ if(d.SD?.[l]?.length){ SD[l]=d.SD[l]; renderSets(l); } });
     LIFTS.forEach(l=>{ const el=document.getElementById(l+'-notes'); if(el&&d.notes?.[l]!=null) el.value=d.notes[l]; });
@@ -3970,6 +4028,67 @@ function _restoreLogDraft(){
     const rpe=document.getElementById('log-session-rpe'); if(rpe&&d.sessionRpe) rpe.value=d.sessionRpe;
     const ln=document.getElementById('log-notes'); if(ln&&d.logNotes) ln.value=d.logNotes;
   }catch(e){}
+}
+const _DAY_LBL_SHORT={A:'Push',B:'Pull',C:'Legs',run:'Run',run_easy:'Easy Run',run_quality:'Quality Run',run_long:'Long Run',rest:'Rest'};
+function renderDraftBanner(){
+  const host=document.getElementById('log-draft-banner');
+  if(!host) return;
+  const today=localDS(new Date());
+  const drafts=_allDraftDates()
+    .filter(dt=>dt!==window._logDate)
+    .map(dt=>({dt,d:_loadDraft(dt)}))
+    .filter(x=>_draftHasContent(x.d))
+    .sort((a,b)=>b.dt.localeCompare(a.dt));
+  if(!drafts.length){ host.innerHTML=''; host.style.display='none'; return; }
+  host.style.display='';
+  host.innerHTML=drafts.map(({dt,d})=>{
+    const lbl=_DAY_LBL_SHORT[d.dayType]||_DAY_LBL_SHORT[d.manualType]||'Session';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,183,77,.07);border:1px solid rgba(255,183,77,.28);border-radius:10px;padding:10px 12px;margin-bottom:8px;flex-wrap:wrap;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t2);">⚠️ Unsaved <strong style="color:var(--aw);">${lbl}</strong> session — ${dt===today?'today':dt}</div>
+      <div style="display:flex;gap:6px;">
+        <button type="button" onclick="resumeDraft('${dt}')" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--a);color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;">Resume</button>
+        <button type="button" onclick="discardDraft('${dt}')" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--t3);border:1px solid var(--b2);border-radius:6px;padding:5px 12px;cursor:pointer;">Discard</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function resumeDraft(dt){
+  const d=_loadDraft(dt);
+  window._logDate=dt;
+  window._logManualType=(d&&!D?.dailyPrescriptions?.[dt])?(d.manualType||d.dayType||null):null;
+  const sb=document.getElementById('log-saved-banner'); if(sb) sb.style.display='none';
+  const lf=document.getElementById('log-form-body'); if(lf) lf.style.display='';
+  const sbtn=document.getElementById('log-sbtn'); if(sbtn) sbtn.style.display='';
+  showTab('log');
+  updateLogTabPlanned();
+}
+function discardDraft(dt){
+  if(!confirm('Discard the unsaved session from '+dt+'? This cannot be undone.')) return;
+  _clearLogDraft(dt);
+  renderDraftBanner();
+  if(dt===window._logDate) updateLogTabPlanned();
+}
+function onLogDateChange(val){
+  if(!val) return;
+  window._logDate=val;
+  window._logManualType=null;
+  const sb=document.getElementById('log-saved-banner'); if(sb) sb.style.display='none';
+  const lf=document.getElementById('log-form-body'); if(lf) lf.style.display='';
+  const sbtn=document.getElementById('log-sbtn'); if(sbtn) sbtn.style.display='';
+  updateLogTabPlanned();
+}
+function setManualDayType(type){
+  window._logManualType=type;
+  window._logDayType=type;
+  // Manual logging starts from blank fields (no prescription prefill).
+  ['bench','ohp','squat','dl','pullup','row'].forEach(l=>{ SD[l]=[{w:'',r:'',rpe:''}]; renderSets(l); });
+  document.querySelectorAll('#log-manual-typebar .daytype-btn').forEach(b=>{
+    const on=b.dataset.type===type;
+    b.style.background=on?'var(--a)':'var(--s3)';
+    b.style.color=on?'#fff':'var(--t2)';
+    b.style.borderColor=on?'var(--a)':'var(--b2)';
+  });
+  updateLogTabPlanned();
 }
 
 function renderSets(lift){
@@ -3983,8 +4102,8 @@ function renderSets(lift){
 async function saveSession(){
   try{
   if(!D){ msg('log-smsg','Data not loaded -- go to Settings, check your token, then tap Reload data'); return; }
-  const date=localDS(new Date()),day=window._logDayType||'';
-  if(!day){ msg('log-smsg','Start a session from the Program tab first'); return; }
+  const date=window._logDate||localDS(new Date()),day=window._logDayType||'';
+  if(!day){ msg('log-smsg','Pick a date and what you trained, or start a session from the Program tab'); return; }
   // Only save lifts whose input block is actually shown for today's day type.
   // The form pre-fills SD for all six lifts with prescription/DEF values, but a
   // pull day hides bench/ohp/squat/dl — without this gate those hidden lifts would
@@ -4019,7 +4138,8 @@ async function saveSession(){
   const session={date,day,type:day,notes:document.getElementById('log-notes')?.value||'',...(sessionRpe?{rpe:sessionRpe}:{}),...(sessionBW?{bw:sessionBW}:{}),bench:getLift('bench'),ohp:getLift('ohp'),squat:getLift('squat'),dl:getLift('dl'),pullup:getLift('pullup'),row:getLift('row'),...(cardioObj?{cardio:cardioObj}:{}),...(accData.length?{accessories:accData}:{}),ts:Date.now()};
   if(!D.sessions) D.sessions=[];
   D.sessions.push(session);
-  _clearLogDraft();
+  _clearLogDraft(date);
+  window._logManualType=null;
   // Update e1RM (Epley formula)
   const updE=(sets,key)=>{ sets.filter(s=>s.w&&s.r).forEach(s=>{const e=Math.round(s.w*(1+s.r/30));if(e>(D.currentLifts[key]||0))D.currentLifts[key]=e;}); };
   if(session.bench.sets.length) updE(session.bench.sets,'benchE1RM');
@@ -4058,7 +4178,7 @@ function resetLogForm(){
       <div style="font-size:var(--fs-sm);color:var(--t3);line-height:1.6;margin-bottom:20px;">Your lifts, RPE, and notes are locked in.<br>AI feedback is generating below.</div>
       <button class="btn bp" onclick="showLogFormAgain()" style="font-size:var(--fs-sm);">Log another session</button>`;
     const panel=document.getElementById('panel-log');
-    if(panel) panel.insertBefore(banner, panel.querySelector('.card'));
+    if(panel){ const ref=document.getElementById('log-no-plan'); panel.insertBefore(banner, ref||panel.querySelector('.card')); }
   }
   banner.style.display='block';
 }
@@ -6302,6 +6422,8 @@ function startLoggingSession(){
   const prescType=document.getElementById('presc-workout-type')?.value||'';
   const typeMap={push:'A',pull:'B',legs:'C',run:'run',cycling:'run',rest:'rest'};
   const todayDay=typeMap[prescType]||prescType;
+  window._logDate=localDS(new Date());
+  window._logManualType=null;
   window._logDayType=todayDay;
   showTab('log');
   if(todayDay) onDayTypeChange(todayDay);
@@ -6730,6 +6852,7 @@ RULES:
     await pushSilent();
     renderPrescriptionCard(D.dailyPrescriptions[today]);
     renderNextSessionRec(D.dailyPrescriptions[today].nextSession);
+    window._logDate=today; window._logManualType=null;
     updateLogTabPlanned();
     renderSystemLog();
     const sumEl=document.getElementById('presc-summary');
@@ -7109,7 +7232,7 @@ function showLogSessionSummary(session){
     banner=document.createElement('div');
     banner.id='log-saved-banner';
     const panel=document.getElementById('panel-log');
-    if(panel) panel.insertBefore(banner,panel.querySelector('.card'));
+    if(panel){ const ref=document.getElementById('log-no-plan'); panel.insertBefore(banner, ref||panel.querySelector('.card')); }
   }
   banner.style.cssText='margin-bottom:16px;';
   banner.innerHTML=`<div style="background:rgba(127,255,110,.07);border:1px solid rgba(127,255,110,.25);border-radius:14px;padding:24px 20px;text-align:center;margin-bottom:16px;">
@@ -7123,24 +7246,68 @@ function showLogSessionSummary(session){
 }
 function updateLogTabPlanned(){
   const today=localDS(new Date());
-  const presc=D?.dailyPrescriptions?.[today];
+  if(!window._logDate) window._logDate=today;
+  const date=window._logDate;
+  // Reset all inputs before (re)populating for this date so values from a
+  // previously-viewed date never bleed across. (Only runs on navigation, never
+  // mid-typing — drafts are restored immediately after via onDayTypeChange.)
+  ['bench','ohp','squat','dl','pullup','row'].forEach(l=>{ SD[l]=[{w:'',r:'',rpe:''}]; renderSets(l); });
+  ['bench-notes','ohp-notes','squat-notes','dl-notes','pullup-notes','row-notes','run-duration','run-distance','run-hr','run-rpe','run-notes','log-session-rpe','log-notes'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  // Keep the date picker + relative-day status label in sync.
+  const di=document.getElementById('log-date-input');
+  if(di){ di.max=today; if(di.value!==date) di.value=date; }
+  const statusEl=document.getElementById('log-date-status');
+  if(statusEl){
+    if(date===today) statusEl.textContent='Today';
+    else { const diff=Math.round((new Date(today)-new Date(date))/86400000); statusEl.textContent=diff===1?'Yesterday':(diff>1?diff+' days ago':''); }
+  }
+  renderDraftBanner();
+
+  const presc=D?.dailyPrescriptions?.[date];
   const noplanEl=document.getElementById('log-no-plan');
+  const typebar=document.getElementById('log-manual-typebar');
+  const formBody=document.getElementById('log-form-body');
   const formEls=['bench-block','ohp-block','squat-block','deadlift-block','pullup-block','row-block',
-                 'accessories-block','run-log-section','run-prescription-card','log-session-meta-card','log-notes-card','log-sbtn','log-smsg'];
+                 'accessories-block','run-log-section','run-prescription-card','log-session-meta-card','log-notes-card','log-sbtn','log-smsg','log-form-body'];
 
-  // ── ALREADY LOGGED TODAY ────────────────────────────────────
-  const todaySession=(D?.sessions||[]).slice().reverse().find(s=>s.date===today);
-  if(todaySession){ showLogSessionSummary(todaySession); return; }
+  // ── ALREADY LOGGED THIS DATE (and not mid-draft) ────────────
+  const draftForDate=_loadDraft(date);
+  const editingDraft=draftForDate&&_draftHasContent(draftForDate);
+  const existing=(D?.sessions||[]).slice().reverse().find(s=>s.date===date);
+  if(existing&&!editingDraft){ if(typebar) typebar.style.display='none'; showLogSessionSummary(existing); return; }
 
-  // ── NO PRESCRIPTION FOR TODAY ──────────────────────────────
-  if(!presc || presc.workoutType==='rest' || (!presc.mainWork?.lifts && !['run','cycling'].includes(presc.workoutType))){
-    if(noplanEl) noplanEl.style.display='';
-    formEls.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  // We're logging, not viewing — drop any leftover saved-confirmation banner.
+  const savedBanner=document.getElementById('log-saved-banner'); if(savedBanner) savedBanner.style.display='none';
+
+  const prescUsable=presc && presc.workoutType!=='rest' && (presc.mainWork?.lifts || ['run','cycling'].includes(presc.workoutType));
+
+  // ── MANUAL MODE (no usable AI plan saved for this date) ─────
+  if(!prescUsable){
+    if(noplanEl) noplanEl.style.display='none';
+    if(typebar) typebar.style.display='';
+    const mtype=window._logManualType;
+    if(!mtype){
+      // Wait for the user to pick what they trained on this date.
+      formEls.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+      window._logAccessories=[];
+      return;
+    }
+    // A day type is chosen — render the matching blank form.
+    window._logDayType=mtype;
+    if(formBody) formBody.style.display='';
+    ['log-session-meta-card','log-notes-card','log-sbtn','log-smsg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+    ['planned-bench','planned-ohp','planned-squat','planned-dl','planned-pullup','planned-row'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Manual entry';});
+    const brief=document.getElementById('log-session-brief'); if(brief) brief.style.display='none';
     window._logAccessories=[];
+    const accBlock=document.getElementById('accessories-block'); if(accBlock){ accBlock.innerHTML=''; accBlock.style.display='none'; }
+    onDayTypeChange(mtype);
+    const rc=document.getElementById('run-prescription-card'); if(rc) rc.style.display='none';
     return;
   }
 
   // ── PRESCRIPTION EXISTS ─────────────────────────────────────
+  if(typebar) typebar.style.display='none';
+  if(formBody) formBody.style.display='';
   if(noplanEl) noplanEl.style.display='none';
   // Show the save button and notes card
   const saveBtn=document.getElementById('log-sbtn');
@@ -7172,7 +7339,6 @@ function updateLogTabPlanned(){
   // ── SESSION BRIEF (warmup / coach note / watch / if-too-hard) ──
   const blockIdMap={bench:'bench-block',ohp:'ohp-block',squat:'squat-block',dl:'deadlift-block',pullup:'pullup-block',row:'row-block'};
   let brief=document.getElementById('log-session-brief');
-  const formBody=document.getElementById('log-form-body');
   const briefParts=[];
   if(presc.warmup) briefParts.push(`<div style="margin-bottom:10px;padding:10px 14px;background:rgba(61,136,212,0.07);border:1px solid rgba(61,136,212,0.2);border-radius:10px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:4px;">🔥 Warmup</span>${presc.warmup}</div>`);
   if(presc.coachNote) briefParts.push(`<div style="margin-bottom:10px;padding:10px 14px;background:rgba(104,110,210,0.07);border-left:3px solid var(--a);border-radius:0 10px 10px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">📌 ${presc.coachNote}</div>`);
