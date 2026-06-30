@@ -6734,7 +6734,7 @@ async function generateDailyPrescription(workoutType,durationMins){
       "accessories": ["Bulgarian Split Squat 3×8ea","Leg Curl 3×10","Copenhagen Plank 3×20s"]`
     };
     const workoutTypeRule={
-      push:'PUSH DAY — chest/shoulders/triceps ONLY. mainWork.lifts must contain ONLY bench and ohp. Accessories must be push/tricep/delt movements. ZERO row, pullup, or any pull exercises. ZERO run/Zone 2/HR/pace content in ANY field including coachNote, reasoning, or watchOutFor.',
+      push:'PUSH DAY — chest/shoulders/triceps ONLY. mainWork.lifts must contain ONLY bench and ohp. Accessories must be push/tricep/delt movements. ZERO row, pullup, or any pull exercises. ZERO run/Zone 2/HR/pace content in ANY field.',
       pull:'PULL DAY — back/biceps ONLY. mainWork.lifts must contain ONLY row and pullup. Accessories must be back/bicep movements. ZERO bench, ohp, or any push exercises. ZERO run/Zone 2/HR/pace content in ANY field.',
       legs:'LEGS DAY — quads/hamstrings/glutes ONLY. mainWork.lifts must contain ONLY squat and dl. ZERO upper body lifts. ZERO run/Zone 2/HR/pace content in ANY field.',
       run:'RUN DAY — mainWork must contain ONLY the run fields. Absolutely NO lifts object, NO bench/ohp/squat/dl references.',
@@ -6802,12 +6802,7 @@ Output ONLY valid JSON. No markdown. No text outside the JSON.
     "duration": ${durationMins},
     "summary": "short title, e.g. ${workoutLabel[workoutType]||workoutType}",
     "reasoning": "2-3 sentences about THIS ${isLiftDay?'lift':'run'} session based on recent data",
-    "warmup": "warmup description",
-    "mainWork": ${mainWorkSchema},
-    "cooldown": "cooldown description",
-    "coachNote": "one focused insight about ${isLiftDay?'the lift session — technique, load selection, or recovery':'pacing, HR discipline, or effort level'}",
-    "ifTooHard": "specific modification",
-    "watchOutFor": ["concern 1","concern 2"]
+    "mainWork": ${mainWorkSchema}
   },
   "nextSession": {
     "primary": {
@@ -6816,13 +6811,6 @@ Output ONLY valid JSON. No markdown. No text outside the JSON.
       "duration": 60,
       "reason": "1-2 sentences: why this is the best next session given recovery, balance, and goals",
       "confidence": "high|medium|low"
-    },
-    "alternate": {
-      "type": "run|cycling|rest",
-      "label": "e.g. Zone 2 Easy Ride — 45 min",
-      "duration": 45,
-      "reason": "1 sentence: when to pick this over primary",
-      "confidence": "medium|low"
     }
   }
 }
@@ -6834,7 +6822,6 @@ RULES:
 - RPE cap: never exceed ${ts.liftRPECap}
 - If canTrain=false: type="rest", explain in reasoning
 - nextSession.primary: single best next workout given today + recovery windows + training balance
-- nextSession.alternate: ALWAYS include; different modality swap — cycling and running are both valid; use rest if fatigue is high
 - confidence: high=data clearly supports, medium=reasonable, low=depends on recovery
 - Consider cycling (Zone 2 ride) as a valid option when run legs need recovery or ride data shows recent aerobic work`;
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2500,system:'You are a strength and running coach. Output only valid JSON. No text outside the JSON object.',messages:[{role:'user',content:prompt}]})});
@@ -6915,12 +6902,9 @@ function renderPrescriptionCard(prescription){
     const accessHtml=accessories.length?`<div style="margin-top:12px;padding-top:10px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="font-size:var(--fs-sm);">➕</span><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;text-transform:uppercase;">Accessories</div></div>${accessories.map(a=>`<div style="font-size:var(--fs-presc-text);color:var(--t2);padding:3px 0;">· ${esc(a)}</div>`).join('')}</div>`:'';
     mainHtml=`<div style="background:rgba(104,110,210,0.07);border:1px solid rgba(104,110,210,0.25);border-radius:12px;padding:16px;margin-bottom:2px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${color},transparent);"></div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="font-size:16px;">🏋️</span><div style="font-family:var(--mono);font-size:var(--fs-xs);color:${color};letter-spacing:.15em;text-transform:uppercase;">Main Work</div></div>${liftRows}${accessHtml}</div>`;
   }
-  const watchHtml=(prescription.watchOutFor||[]).length?`<div style="margin-top:14px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;">WATCH: ${prescription.watchOutFor.map(esc).join(' · ')}</div>`:'';
-  const ifTooHardHtml=prescription.ifTooHard?`<div style="margin-top:12px;padding:10px 14px;background:rgba(184,96,53,.07);border:1px solid rgba(184,96,53,.2);border-radius:8px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px;">If too hard</span>${esc(prescription.ifTooHard)}</div>`:'';
   el.className='prog-day-card prog-today';
   el.style.borderColor=color;
-  const secHdr=(icon,lbl,clr)=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><span style="font-size:var(--fs-sm);">${icon}</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:${clr||'var(--t3)'};letter-spacing:.1em;text-transform:uppercase;">${lbl}</span></div>`;
-  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${esc(label)}</div><div class="prog-day-title">${esc(prescription.summary||'')}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div class="presc-body">${prescription.reasoning?`<div style="font-size:var(--fs-presc-text);color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:rgba(104,110,210,0.06);border:1px solid rgba(104,110,210,0.15);border-radius:10px;">💭 ${esc(prescription.reasoning)}</div>`:''}${prescription.warmup?`<div style="margin-bottom:14px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;padding:12px 14px;background:rgba(61,136,212,0.07);border:1px solid rgba(61,136,212,0.2);border-radius:10px;">${secHdr('🔥','Warmup','var(--a3)')}${esc(prescription.warmup)}</div>`:''}${mainHtml}${prescription.cooldown?`<div style="margin-top:12px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;padding:12px 14px;background:rgba(42,160,112,0.07);border:1px solid rgba(42,160,112,0.2);border-radius:10px;">${secHdr('🧊','Cooldown','var(--a2)')}${esc(prescription.cooldown)}</div>`:''}${prescription.coachNote?`<div style="margin-top:12px;padding:12px 14px;background:rgba(104,110,210,0.07);border-left:3px solid ${color};border-radius:0 10px 10px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">📌 ${esc(prescription.coachNote)}</div>`:''}${ifTooHardHtml}${watchHtml}</div>`;
+  el.innerHTML=`<div class="prog-day-header" style="border-bottom-color:${color}40;"><div class="prog-day-tag" style="color:${color};">${esc(label)}</div><div class="prog-day-title">${esc(prescription.summary||'')}</div><div class="prog-day-sub">Today · ${new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dur?' · '+dur+'min':''}</div></div><div class="presc-body">${prescription.reasoning?`<div style="font-size:var(--fs-presc-text);color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:16px;padding:12px 14px;background:rgba(104,110,210,0.06);border:1px solid rgba(104,110,210,0.15);border-radius:10px;">💭 ${esc(prescription.reasoning)}</div>`:''}${mainHtml}</div>`;
   renderCustomExercises();
 }
 function renderCustomExercises(){
@@ -7024,7 +7008,6 @@ function renderNextSessionRec(nextSession){
   };
   let html='';
   if(nextSession.primary) html+=renderOpt(nextSession.primary,'Primary');
-  if(nextSession.alternate) html+=renderOpt(nextSession.alternate,'Alternate');
   el.innerHTML=html||'<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:12px 0;">No recommendation available.</div>';
 }
 
@@ -7297,7 +7280,6 @@ function updateLogTabPlanned(){
     if(formBody) formBody.style.display='';
     ['log-session-meta-card','log-notes-card','log-sbtn','log-smsg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
     ['planned-bench','planned-ohp','planned-squat','planned-dl','planned-pullup','planned-row'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Manual entry';});
-    const brief=document.getElementById('log-session-brief'); if(brief) brief.style.display='none';
     window._logAccessories=[];
     const accBlock=document.getElementById('accessories-block'); if(accBlock){ accBlock.innerHTML=''; accBlock.style.display='none'; }
     onDayTypeChange(mtype);
@@ -7336,27 +7318,8 @@ function updateLogTabPlanned(){
   upd('planned-bench','bench');upd('planned-ohp','ohp');upd('planned-squat','squat');
   upd('planned-dl','dl');upd('planned-pullup','pullup');upd('planned-row','row');
 
-  // ── SESSION BRIEF (warmup / coach note / watch / if-too-hard) ──
-  const blockIdMap={bench:'bench-block',ohp:'ohp-block',squat:'squat-block',dl:'deadlift-block',pullup:'pullup-block',row:'row-block'};
-  let brief=document.getElementById('log-session-brief');
-  const briefParts=[];
-  if(presc.warmup) briefParts.push(`<div style="margin-bottom:10px;padding:10px 14px;background:rgba(61,136,212,0.07);border:1px solid rgba(61,136,212,0.2);border-radius:10px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:4px;">🔥 Warmup</span>${presc.warmup}</div>`);
-  if(presc.coachNote) briefParts.push(`<div style="margin-bottom:10px;padding:10px 14px;background:rgba(104,110,210,0.07);border-left:3px solid var(--a);border-radius:0 10px 10px 0;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.6;">📌 ${presc.coachNote}</div>`);
-  if(presc.ifTooHard) briefParts.push(`<div style="margin-bottom:10px;padding:10px 14px;background:rgba(184,96,53,.07);border:1px solid rgba(184,96,53,.2);border-radius:10px;font-size:var(--fs-presc-text);color:var(--t2);line-height:1.5;"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:4px;">If too hard</span>${presc.ifTooHard}</div>`);
-  if((presc.watchOutFor||[]).length) briefParts.push(`<div style="padding:8px 14px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.8;">WATCH: ${presc.watchOutFor.join(' · ')}</div>`);
-  if(briefParts.length){
-    if(!brief){
-      brief=document.createElement('div');
-      brief.id='log-session-brief';
-      brief.className='card';
-      brief.style.cssText='margin-bottom:16px;';
-      if(formBody) formBody.insertBefore(brief,formBody.firstChild);
-    }
-    brief.innerHTML=briefParts.join('');
-    brief.style.display='';
-  } else if(brief){ brief.style.display='none'; }
-
   // ── PER-LIFT COACH NOTES ────────────────────────────────────
+  const blockIdMap={bench:'bench-block',ohp:'ohp-block',squat:'squat-block',dl:'deadlift-block',pullup:'pullup-block',row:'row-block'};
   ['bench','ohp','squat','dl','pullup','row'].forEach(lift=>{
     const l=lifts[lift];if(!l)return;
     const block=document.getElementById(blockIdMap[lift]);
@@ -8268,7 +8231,7 @@ function renderAIFlowDiagram(){
         const cached=D.dailyPrescriptions?.[today];
         const rows=[
           ['Workout Type', 'Push · Pull · Legs · Run · Cycling · Rest', 'You select this from the dropdown. Determines which lift pattern (upper push, back/biceps, lower body) or cardio modality is prescribed.'],
-          ['Duration', '30 · 60 · 90 min', 'The AI scales volume and exercise count to fit the time. 30 min = trimmed main work + quick warmup. 90 min = full program with accessories.'],
+          ['Duration', '30 · 60 · 90 min', 'The AI scales volume and exercise count to fit the time. 30 min = trimmed main work. 90 min = full program with accessories.'],
           ['Today\'s date', today, 'Sent explicitly so the AI knows the day of week and can reference your training schedule.'],
           ['Last prescription', cached?cached.workoutType+' · '+cached.durationMins+'min · '+cached.generatedAt?.split('T')[0]:'None today', 'Cached to avoid redundant API calls. Same type + duration re-uses the cache.'],
           ['14-day schedule', 'Mon A · Tue Run · Wed B · Thu Run · Fri C · Sat Run · Sun Rest × 2', 'The AI sees a 2-week look-ahead so the 7-day suggestions it generates are consistent with your planned structure.'],
@@ -8293,23 +8256,6 @@ function renderAIFlowDiagram(){
         const p=D.dailyPrescriptions?.[today];
         return{title:'💭 Reasoning — AI rationale',desc:'A 1–3 sentence explanation of why the AI chose this specific prescription. References your biometrics, recent training load, and goals. Shown at the top of the prescription card.',rows:[
           ['Example', p?.reasoning||'(generate a prescription to see)',''],
-        ]};
-      }
-    },
-    {
-      id:'out-warmup',
-      icon:'🔥',
-      label:'Warmup + Cooldown',
-      sublabel:'dynamic movements + recovery',
-      color:'rgba(255,183,77,0.85)',
-      bg:'rgba(255,183,77,0.07)',
-      border:'rgba(255,183,77,0.3)',
-      detail(){
-        const today=localDS(new Date());
-        const p=D.dailyPrescriptions?.[today];
-        return{title:'🔥 Warmup & Cooldown',desc:'Specific warm-up movements tailored to the workout type. Push day gets shoulder/chest activation; leg day gets hip + ankle mobility. Cooldown includes targeted static stretches. Both are scaled to available time.',rows:[
-          ['Warmup', p?.warmup||'(generate a prescription to see)',''],
-          ['Cooldown', p?.cooldown||'—',''],
         ]};
       }
     },
@@ -8359,24 +8305,6 @@ function renderAIFlowDiagram(){
         const rows=acc.length?acc.map(a=>[a.name,`${a.sets||'?'}×${a.reps||'?'}`,a.note||'']):
           [['Status','Generate a prescription to see live accessories','']];
         return{title:'🎒 Accessories — support work',desc:'3–5 accessory exercises chosen to complement the main work. Push day gets triceps, rear delts, cable work. Pull day gets face pulls, curls. Legs gets Nordic curls, single-leg work. Volume is scaled by the block week and any active fatigue flags.',rows};
-      }
-    },
-    {
-      id:'out-coachnote',
-      icon:'📌',
-      label:'Coach Note + Warnings',
-      sublabel:'key insight · if too hard · watch out for',
-      color:'rgba(194,77,114,0.85)',
-      bg:'rgba(194,77,114,0.07)',
-      border:'rgba(194,77,114,0.3)',
-      detail(){
-        const today=localDS(new Date());
-        const p=D.dailyPrescriptions?.[today];
-        return{title:'📌 Coach Note + Safety Warnings',desc:'Three distinct outputs the AI generates to guide and protect the session.',rows:[
-          ['Coach Note', p?.coachNote||'(generate to see)', 'The most important thing to focus on today. Shown with a colored left border in the prescription card.'],
-          ['If Too Hard', p?.ifTooHard||'—', 'Specific modifications if the prescribed weights feel too heavy. Amber warning banner.'],
-          ['Watch Out For', (p?.watchOutFor||[]).join(' · ')||'—', 'A checklist of injury risks, form cues, or recovery signals specific to today\'s session.'],
-        ]};
       }
     },
     {
