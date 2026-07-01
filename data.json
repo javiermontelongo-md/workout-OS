@@ -385,6 +385,88 @@
       "ts": 1782451215500,
       "aiFeedback": "**Pull-ups and rows blew past the RPE cap repeatedly — that's the story of this session.** Your autonomic stress was already flagging recovery issues, the cap was set at 7, and you hit RPE 10 twice on pull-ups and opened rows at 145lb/RPE 10 when the target was 95lb. The load reductions mid-set on both movements confirm the system was right to be conservative — you just didn't apply it from the start.\n\n**Bench, OHP, squat, and deadlift were executed well** — all landed at RPE 7 as prescribed, which is exactly what a high-RHR day should look like.\n\n**Next session:** Pull-ups need a hard starting point of BW with band assistance or -20lb from rep one — not as a bailout. Rows should open at 95–105lb regardless of how you feel in warm-up; your recent history shows you consistently underestimate these by 2 RPE points. **Check your RHR before next session** — if it's still elevated, the cap stays and you need to respect it on the pulling movements, not just the barbell lifts.",
       "aiFeedbackAt": "2026-06-26T05:20:25.742Z"
+    },
+    {
+      "date": "2026-06-29",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 195,
+            "r": 7,
+            "rpe": 8
+          },
+          {
+            "w": 195,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 195,
+            "r": 7,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 95,
+            "r": 7,
+            "rpe": 7
+          },
+          {
+            "w": 95,
+            "r": 7,
+            "rpe": 7
+          },
+          {
+            "w": 95,
+            "r": 7,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "Cable Tricep Pushdown 3×12 — full elbow extension at bottom, elbows pinned to sides, smooth eccentric",
+          "prescribed": "Cable Tricep Pushdown 3×12 — full elbow extension at bottom, elbows pinned to sides, smooth eccentric",
+          "weight": null,
+          "sets": 3,
+          "reps": 10,
+          "notes": "Did body weight dips instead"
+        },
+        {
+          "name": "DB Lateral Raise 3×15 — light load, strict form, slight forward lean, no momentum; build shoulder width and rotator cuff health",
+          "prescribed": "DB Lateral Raise 3×15 — light load, strict form, slight forward lean, no momentum; build shoulder width and rotator cuff health",
+          "weight": 15,
+          "sets": 3,
+          "reps": 10,
+          "notes": ""
+        }
+      ],
+      "ts": 1782882789942
     }
   ],
   "recoveryLogs": [],
