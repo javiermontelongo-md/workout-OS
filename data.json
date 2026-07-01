@@ -4939,6 +4939,50 @@
           "confidence": "medium"
         }
       }
+    },
+    "2026-07-01": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "reasoning": "RPE confirmations show pullups have consistently come in 2 points above predicted (actual 9 vs predicted 7) at bodyweight 227–235lb, indicating the movement is harder than anticipated — today's bodyweight sets will be prescribed conservatively at RPE 7 to stay within the RPE 8 cap. Rows similarly ran 2 RPE points hot at 115lb (actual 9 vs predicted 7), so load is being reduced to 100lb to land in the 6–8 RPE window and allow clean double-progression mechanics. Sleep quality looks solid (7.5h, no flags) and HRV at 48ms with RHR 66bpm is acceptable for a standard training day.",
+      "mainWork": {
+        "summary": "2 main compound movements · 3 accessories",
+        "lifts": {
+          "row": {
+            "sets": 3,
+            "reps": "6–10",
+            "weight": 100,
+            "targetRPE": 7,
+            "variation": "Barbell Bent-Over Row",
+            "coachNote": "Last two logged row sessions came in at actual RPE 9 vs predicted 7 at 115lb — dropping to 100lb to re-establish double-progression baseline at true RPE 7. Hit all 3×10 cleanly at ≤RPE 8 before adding weight."
+          },
+          "pullup": {
+            "sets": 3,
+            "reps": "6–10",
+            "weight": 0,
+            "targetRPE": 7,
+            "variation": "Pull-ups (Bodyweight)",
+            "coachNote": "0 = bodyweight. RPE confirmations on 2026-06-14 and 2026-06-26 both hit actual 9 vs predicted 7 — holding BW with a controlled target of RPE 7. Stop each set 2–3 reps from failure. Once 3×10 at ≤RPE 8 is achieved, then add 5lb via belt."
+          }
+        },
+        "accessories": [
+          "Lat Pulldown 3×10 @ RPE 7 — full stretch at top, controlled tempo",
+          "Face Pulls 3×15 @ RPE 6–7 — cable at eye height, external rotation emphasis",
+          "Incline DB Curl 3×12 @ RPE 7 — supinate at top, no swinging"
+        ]
+      },
+      "workoutType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-07-01T16:25:21.516Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 40,
+          "reason": "Today is a lifting session (pull), so Thursday is an ideal slot for a Zone 2 easy run — no recovery window conflict exists (quality-to-quality requires 48h, but Zone 2 is low-intensity and does not trigger that constraint). Given that recent easy runs have been logged at 165–174bpm (threshold intensity), tomorrow's run must be hard-capped at 147bpm MAF HR; prescribe a 12–13 min/mile pace or run-walk strategy to actually stay sub-147bpm, not perceived easy effort. This directly serves the sub-20 5K and VO2max goals via aerobic base development under the 80/20 polarized model.",
+          "confidence": "high"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -5804,6 +5848,13 @@
       "inp": 487,
       "out": 302,
       "cost": 0.005991
+    },
+    {
+      "ts": 1782923121515,
+      "type": "prescription",
+      "inp": 2157,
+      "out": 870,
+      "cost": 0.019521
     }
   ],
   "checkins": [
