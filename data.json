@@ -466,7 +466,9 @@
           "notes": ""
         }
       ],
-      "ts": 1782882789942
+      "ts": 1782882789942,
+      "aiFeedback": "**Bench:** You went 5lb over the planned 190lb and still landed RPE 7–8 — that's actually a positive signal. The strength is there and the fatigue management held. RPE dropped from S1 to S2/S3 which is normal intra-session, but 7 reps at RPE 7 on S3 confirms you're well clear of the previous ceiling. Solid session.\n\n**OHP:** You jumped 10lb over the 85lb target and ran clean 7s across all three sets — that's a meaningful data point. The May RPE-9 at 90lb was likely fatigue-confounded; 95lb @ RPE 7 today suggests your OHP base is stronger than the recent trend indicated.\n\n**Accessories:** Dips are a reasonable tricep swap but note they also load chest and shoulders — on a bench day, that's additional pressing volume you didn't plan for. Lateral raises came in 5 reps short of target each set; if load felt right, hit the full 15.\n\n**Next session:** Bench can progress — try 197.5–200lb for 3×5–8 and keep the RPE honest. OHP at 95lb is now your confirmed working weight; log it as the new baseline. Nail your accessory rep targets.",
+      "aiFeedbackAt": "2026-07-01T05:13:20.694Z"
     }
   ],
   "recoveryLogs": [],
@@ -4005,72 +4007,72 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-06-26T05:20:17.447Z",
-    "vo2maxUsed": 44.5,
-    "runCount": 25,
+    "generatedAt": "2026-07-01T05:13:11.415Z",
+    "vo2maxUsed": 46,
+    "runCount": 27,
     "methodLabel": "VO2max / VDOT",
     "predictions": {
       "s5k": {
-        "seconds": 1770,
-        "ciSeconds": 301,
+        "seconds": 1692,
+        "ciSeconds": 288,
         "method": "VO2max / VDOT"
       },
       "s10k": {
-        "seconds": 3656,
-        "ciSeconds": 808,
+        "seconds": 3494,
+        "ciSeconds": 772,
         "method": "VO2max / VDOT"
       },
       "shalf": {
-        "seconds": 7975,
-        "ciSeconds": 2305,
+        "seconds": 7630,
+        "ciSeconds": 2205,
         "method": "VO2max / VDOT"
       },
       "sfull": {
-        "seconds": 16537,
-        "ciSeconds": 7310,
+        "seconds": 15825,
+        "ciSeconds": 6995,
         "method": "VO2max / VDOT"
       }
     },
-    "medianTrainingPace": 702.6578073089702,
+    "medianTrainingPace": 641.6370106761566,
     "decayFactor": 1,
-    "daysInactive": 4,
-    "lastActivityDate": "2026-06-21",
-    "rawVO2": 44.54,
+    "daysInactive": 0,
+    "lastActivityDate": "2026-06-30",
+    "rawVO2": 45.97,
     "debugInfo": {
       "riegelPred": {
-        "s5k": 2187,
-        "s10k": 4560,
-        "shalf": 10061,
-        "sfull": 20978,
+        "s5k": 2006,
+        "s10k": 4181,
+        "shalf": 9226,
+        "sfull": 19235,
         "anchor": {
-          "date": "2026-06-10",
-          "stravaId": 18873271328,
-          "name": "Panhandle run",
+          "date": "2026-06-26",
+          "stravaId": 19079593260,
+          "name": "Afternoon Run",
           "type": "run",
-          "distance": 3.01,
-          "duration": 2115,
-          "pace": 704,
-          "elevationGain": 238,
-          "heartRateAvg": 160.7,
-          "heartRateMax": 178,
+          "distance": 2.81,
+          "duration": 1803,
+          "pace": 642,
+          "elevationGain": 276,
+          "heartRateAvg": 171.5,
+          "heartRateMax": 189,
           "averageWatts": null,
           "weightedAvgWatts": null,
           "source": "strava",
-          "runType": "tempo"
+          "runType": "intervals"
         },
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1481,
-        "s10k": 3083,
-        "shalf": 6765,
-        "sfull": 14190
+        "s5k": 1425,
+        "s10k": 2970,
+        "shalf": 6540,
+        "sfull": 13740
       },
       "hrPred": {
-        "s5k": 1866,
-        "s10k": 3731,
-        "shalf": 7872,
-        "sfull": 15745
+        "s5k": 1887,
+        "s10k": 3774,
+        "shalf": 7961,
+        "sfull": 15923
       },
       "weights": {
         "riegel": 0.3,
@@ -4078,7 +4080,7 @@
         "hr": 0.2
       },
       "vo2maxSource": "Apple Watch",
-      "medianPace": 702.6578073089702
+      "medianPace": 641.6370106761566
     }
   },
   "coachingLog": [
@@ -5773,6 +5775,13 @@
       "inp": 2184,
       "out": 1503,
       "cost": 0.029097
+    },
+    {
+      "ts": 1782882800694,
+      "type": "sessionFeedback",
+      "inp": 487,
+      "out": 302,
+      "cost": 0.005991
     }
   ],
   "checkins": [
