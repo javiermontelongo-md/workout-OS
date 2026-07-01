@@ -469,6 +469,88 @@
       "ts": 1782882789942,
       "aiFeedback": "**Bench:** You went 5lb over the planned 190lb and still landed RPE 7–8 — that's actually a positive signal. The strength is there and the fatigue management held. RPE dropped from S1 to S2/S3 which is normal intra-session, but 7 reps at RPE 7 on S3 confirms you're well clear of the previous ceiling. Solid session.\n\n**OHP:** You jumped 10lb over the 85lb target and ran clean 7s across all three sets — that's a meaningful data point. The May RPE-9 at 90lb was likely fatigue-confounded; 95lb @ RPE 7 today suggests your OHP base is stronger than the recent trend indicated.\n\n**Accessories:** Dips are a reasonable tricep swap but note they also load chest and shoulders — on a bench day, that's additional pressing volume you didn't plan for. Lateral raises came in 5 reps short of target each set; if load felt right, hit the full 15.\n\n**Next session:** Bench can progress — try 197.5–200lb for 3×5–8 and keep the RPE honest. OHP at 95lb is now your confirmed working weight; log it as the new baseline. Nail your accessory rep targets.",
       "aiFeedbackAt": "2026-07-01T05:13:20.694Z"
+    },
+    {
+      "date": "2026-07-01",
+      "day": "B",
+      "type": "B",
+      "notes": "Pull ups were kinda hard but was really rewarding",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": null,
+            "r": 6,
+            "rpe": 9
+          },
+          {
+            "w": null,
+            "r": 6,
+            "rpe": 10
+          },
+          {
+            "w": null,
+            "r": 6,
+            "rpe": 10
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 115,
+            "r": 8,
+            "rpe": 7
+          },
+          {
+            "w": 135,
+            "r": 6,
+            "rpe": 10
+          },
+          {
+            "w": 115,
+            "r": 6,
+            "rpe": 10
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "Face Pulls",
+          "prescribed": "3×15",
+          "weight": 25,
+          "sets": 3,
+          "reps": 15,
+          "notes": ""
+        },
+        {
+          "name": "Incline DB Curl",
+          "prescribed": "3×12",
+          "weight": 20,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        }
+      ],
+      "ts": 1782929326400
     }
   ],
   "recoveryLogs": [],
