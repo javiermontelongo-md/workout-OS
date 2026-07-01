@@ -550,7 +550,9 @@
           "notes": ""
         }
       ],
-      "ts": 1782929326400
+      "ts": 1782929326400,
+      "aiFeedback": "Pull-ups hit RPE 9-10 across all three sets against a conservative RPE 7 prescription — this movement is consistently harder than programmed, and we need to take that seriously rather than push through it. Rows were the bigger issue: you jumped to 135lb on S2 after hitting RPE 7 at 100lb, blew past the RPE 8 cap, then paid for it on S3 at 115lb with RPE 10 — that's self-sabotage mid-session. Next session, pull-ups stay at bodyweight but we're capping at 5 reps to create actual headroom, and rows stay at 100lb for all three sets regardless of how easy S1 feels. Trust the prescribed load — chasing heavier weight when you're already running hot on RPE is what stalls progress.",
+      "aiFeedbackAt": "2026-07-01T18:08:54.005Z"
     }
   ],
   "recoveryLogs": [],
@@ -4120,7 +4122,7 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-01T05:13:11.415Z",
+    "generatedAt": "2026-07-01T18:08:47.641Z",
     "vo2maxUsed": 46,
     "runCount": 27,
     "methodLabel": "VO2max / VDOT",
@@ -5946,6 +5948,13 @@
       "inp": 2157,
       "out": 870,
       "cost": 0.019521
+    },
+    {
+      "ts": 1782929334004,
+      "type": "sessionFeedback",
+      "inp": 467,
+      "out": 192,
+      "cost": 0.004281
     }
   ],
   "checkins": [
