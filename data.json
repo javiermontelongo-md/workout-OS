@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-29",
+  "lastUpdated": "2026-07-01",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -3886,6 +3886,15 @@
     },
     {
       "date": "2026-06-29",
+      "lift": "bench",
+      "predictedRPE": 7,
+      "actualRPE": 7,
+      "weight": 197.5,
+      "sets": 5,
+      "reps": 5
+    },
+    {
+      "date": "2026-07-01",
       "lift": "bench",
       "predictedRPE": 7,
       "actualRPE": 7,
