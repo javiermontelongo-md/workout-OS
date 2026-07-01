@@ -4016,6 +4016,15 @@
       "weight": 87.5,
       "sets": 5,
       "reps": 5
+    },
+    {
+      "date": "2026-07-01",
+      "lift": "pullup",
+      "predictedRPE": 7,
+      "actualRPE": 10,
+      "weight": 230,
+      "sets": 5,
+      "reps": 5
     }
   ],
   "scheduleOverrides": {
