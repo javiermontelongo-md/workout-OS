@@ -2800,7 +2800,7 @@ function showTab(n){
   window.scrollTo(0,0);
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='week'){ renderCalendar(); renderSessionList(); }
-  if(n==='progress'){ }
+  if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
   if(n==='program'){ renderAIFlowDiagram(); }
@@ -2809,7 +2809,7 @@ function showTab(n){
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); renderLogFeedback(); }
   else if(n==='week'){ }
-  else if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
+  else if(n==='progress'){ }
   else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||getLatestPrescription(); renderPrescriptionCard(_pd); renderNextSessionRec(_pd?.nextSession||null); renderAIFlowDiagram(); }
 }
 
