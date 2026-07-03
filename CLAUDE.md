@@ -566,17 +566,23 @@ vo2maxApple:     ml/kg/min (float) — Apple Watch estimate, updates ~weekly; nu
 - Cloudflare webhook approach abandoned — OAuth token kept invalidating. Hourly cron is the reliable alternative.
 
 ## D.runs[] Entry Shape
+Written by the Strava sync (`.github/scripts/strava-sync.js`). Field names below are
+the ACTUAL keys in data.json — earlier docs said `distanceMi`/`paceMinkm`, which is wrong.
 ```
 date:         'YYYY-MM-DD'
-type:         'run'
-runType:      'easy' | 'long' | 'intervals' | 'tempo' | 'moderate'
+stravaId:     number (Strava activity id)
+name:         string (Strava activity title)
+type:         'run' | 'ride'
+runType:      'easy' | 'long' | 'intervals' | 'tempo' | 'moderate' | 'walk' | 'cycling'
               (NOTE: 'quality' filter must also include 'intervals' and 'tempo')
-distanceMi:   miles (float)
-paceMinkm:    pace (also aliased as r.pace)
+distance:     miles (float)            ← field is `distance`, NOT distanceMi
+pace:         seconds per mile (int)   ← e.g. 688 = 11:28/mi (NOT min/km)
+duration:     seconds
 heartRateAvg: bpm
 heartRateMax: bpm
-duration:     seconds
 elevationGain: feet
+averageWatts / weightedAvgWatts: cycling only (watts)
+source:       'strava'
 ```
 
 ## State Variables (global JS)

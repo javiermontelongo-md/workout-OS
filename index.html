@@ -1335,7 +1335,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="stat"><div class="sv a" id="pr-ohp">120</div><div class="sl">OHP e1RM (lb)</div></div>
   </div>
   <div class="g4 k2" style="margin-bottom:14px;">
-    <div class="stat"><div class="sv b" id="pr-pace">10:30</div><div class="sl">Run pace (min/mi)</div></div>
+    <div class="stat"><div class="sv b" id="pr-pace">10:30</div><div class="sl">Easy pace (min/mi)</div></div>
     <div class="stat"><div class="sv b" id="pr-hr">165</div><div class="sl">Zone 2 avg HR</div></div>
     <div class="stat"><div class="sv g" id="pr-pu">5</div><div class="sl">Max clean pullups</div></div>
     <div class="stat"><div class="sv" id="pr-bw">225</div><div class="sl">Bodyweight (lb)</div></div>
@@ -4253,8 +4253,8 @@ function updProgressStats(){
   })();
   if(e('pr-pu'))e('pr-pu').textContent=maxPU;
 
-  // Run pace — avg pace of last 20 actual runs (excluding walks), fallback to baseline
-  const paceRuns=(D.runs||[]).filter(r=>r.pace&&r.runType!=='walk').slice(-20);
+  // Easy pace — avg pace of last 20 easy/aerobic runs (pairs with the Zone 2 HR box), fallback to baseline
+  const paceRuns=(D.runs||[]).filter(r=>r.pace&&['easy','run_easy'].includes(r.runType||'')).slice(-20);
   if(paceRuns.length>0){
     const avgSec=Math.round(paceRuns.reduce((s,r)=>s+r.pace,0)/paceRuns.length);
     const mm=Math.floor(avgSec/60);const ss=String(avgSec%60).padStart(2,'0');
@@ -5148,6 +5148,11 @@ function getRestingHR(){
   const recent=logs.slice(-7);
   return Math.round(recent.reduce((s,h)=>s+h.restingHR,0)/recent.length);
 }
+function estMaxHR(){
+  // Highest heart rate observed across all Strava activities; fallback 190.
+  const seen=(D.runs||[]).map(r=>r.heartRateMax||0).filter(x=>x>0);
+  return seen.length?Math.max(...seen):190;
+}
 function estimateVO2max(run){
   const HR_REST=getRestingHR();
   if(!run||!run.heartRateAvg) return null;
@@ -5185,24 +5190,26 @@ function estimateVO2max(run){
 // ── RACE PREDICTION ENGINE ────────────────────────────────────────────────────
 
 // VDOT table: [vo2max, 5kSecs, 10kSecs, halfSecs, fullSecs]
-// Extended down to VO2max=30 and up to VO2max=65 for better interpolation at all fitness levels
+// Jack Daniels VDOT race-equivalent times (Running Formula). Monotonic and smooth
+// across the whole range — replaces an earlier table that had a ~4-min discontinuity
+// between VO2max 42 and 44 and ran systematically slow at the low end.
 const VDOT_TABLE = [
-  [30, 2340, 4860, 10680, 22380],
-  [32, 2220, 4620, 10140, 21240],
-  [34, 2100, 4380,  9600, 20100],
-  [36, 2010, 4170,  9150, 19140],
-  [38, 1920, 3990,  8760, 18300],
-  [40, 1830, 3810,  8370, 17460],
-  [42, 1755, 3630,  7980, 16680],
-  [44, 1500, 3120,  6840, 14340],
-  [46, 1425, 2970,  6540, 13740],
-  [48, 1365, 2820,  6240, 13140],
-  [50, 1290, 2670,  5910, 12360],
-  [52, 1230, 2550,  5640, 11820],
-  [55, 1155, 2385,  5280, 11040],
-  [58, 1095, 2250,  4980, 10440],
-  [62, 1020, 2100,  4620,  9660],
-  [65,  975, 2010,  4440,  9300]
+  [30, 1840, 3826, 8464, 17357],
+  [32, 1745, 3626, 8050, 16460],
+  [34, 1659, 3446, 7658, 15723],
+  [36, 1582, 3284, 7341, 15019],
+  [38, 1512, 3137, 7039, 14426],
+  [40, 1448, 3003, 6754, 13785],
+  [42, 1389, 2879, 6494, 13222],
+  [44, 1335, 2769, 6252, 12720],
+  [46, 1285, 2665, 6020, 12279],
+  [48, 1239, 2570, 5812, 11849],
+  [50, 1197, 2481, 5625, 11449],
+  [52, 1157, 2399, 5448, 11076],
+  [55, 1102, 2286, 5199, 10561],
+  [58, 1053, 2184, 4976, 10094],
+  [62,  989, 2056, 4602,  9668],
+  [65,  949, 1972, 4415,  9267]
 ];
 
 function vdotPredict(vo2max) {
@@ -5273,8 +5280,8 @@ function hrRegressionPredict(runs) {
   const m = (n*sumXY - sumX*sumY) / denom;
   const b = (sumY - m*sumX) / n;
 
-  // Threshold HR = 88% of 190 = ~167 bpm
-  const thresholdHR = 167;
+  // Threshold HR ≈ 88% of observed max HR (data-driven, falls back to 190)
+  const thresholdHR = Math.round(0.88 * estMaxHR());
   const racePacePerMile = m * thresholdHR + b; // sec/mile
   if (racePacePerMile <= 0) return null;
 
@@ -5319,7 +5326,9 @@ function calcRacePredictions() {
   const distances = ['s5k','s10k','shalf','sfull'];
 
   // Determine weights based on available methods
-  let w = { riegel: riegel ? 0.3 : 0, vdot: vdot ? 0.5 : 0, hr: hrReg ? 0.2 : 0 };
+  // Weight real-pace methods (Riegel, HR regression) over the VDOT branch, since VDOT
+  // leans on Apple Watch VO2max which tends to run optimistic vs actual training paces.
+  let w = { riegel: riegel ? 0.45 : 0, vdot: vdot ? 0.30 : 0, hr: hrReg ? 0.25 : 0 };
   const wSum = w.riegel + w.vdot + w.hr;
   if (wSum === 0) return null;
   // Normalize weights
@@ -5477,7 +5486,7 @@ function renderRacePredictions() {
     const anchorDate = r?.anchor?.date || '?';
     const hrPaceStr = h ? secsToPace(h.s5k, 3.107) : 'insufficient data';
     const hrRunCount = (D.runs||[]).filter(r=>r.heartRateAvg&&r.distance>0).length;
-    const threshHR = 167;
+    const threshHR = Math.round(0.88 * estMaxHR());
 
     formulaEl.textContent = [
       `Riegel formula (${Math.round((db.weights.riegel||0)*100)}%): T2 = T1 × (D2/D1)^1.06`,
@@ -5759,8 +5768,8 @@ function bikeHRRegressionPredict(rides) {
   const m = (n*sumXY - sumX*sumY) / denom;
   const b = (sumY - m*sumX) / n;
 
-  // Threshold HR for cycling ~88% of 190 = ~167 bpm
-  const thresholdHR = 167;
+  // Threshold HR for cycling ≈ 88% of observed max HR (data-driven, falls back to 190)
+  const thresholdHR = Math.round(0.88 * estMaxHR());
   const raceSpeedKmh = m * thresholdHR + b;
   if (raceSpeedKmh <= 0) return null;
 
@@ -5904,7 +5913,7 @@ function renderBikeRacePredictions() {
       ...anchorLines,
       ``,
       `HR-speed regression (${Math.round((db.weights.hr||0)*100)}%): linear fit across ${hrRideCount} rides`,
-      `  Threshold HR: 167 bpm → projected race-effort speed`,
+      `  Threshold HR: ${Math.round(0.88 * estMaxHR())} bpm → projected race-effort speed`,
       ``,
       `Max ride: ${pred.maxRideKm} km · Confidence tightens when you've ridden ≥ target distance.`,
     ].join('\n');
@@ -7120,15 +7129,21 @@ function renderPredictionChart(lift='bench'){
     const ab=document.getElementById('chart-'+lift);if(ab)ab.classList.add('active');
     const history=getLiftHistory(lift,120);
     const planData=predictLift(lift, detectBlockWeek());
-    const labels=history.map(h=>h.date);
     const actualPts=history.map(h=>h.e1RM);
     let predLabels=[],optVals=[],conVals=[];
     if(planData?.predictedE1RMs){
       predLabels=planData.predictedE1RMs.map(p=>p.date);
       optVals=planData.predictedE1RMs.map(p=>p.optimistic);
       conVals=planData.predictedE1RMs.map(p=>p.conservative);
-      predLabels.filter(l=>!labels.includes(l)).forEach(l=>labels.push(l));
     }
+    // Build decay curve from last actual data point
+    const lastActual=history.length?history[history.length-1]:null;
+    const decayCurveRaw=lastActual?buildStrengthDecayCurve(lastActual.date,lastActual.e1RM):[];
+    const decayCurveLabels=decayCurveRaw.map(p=>p.date);
+    // Single de-duplicated, chronologically sorted x-axis for every dataset. Appending
+    // history+prediction+decay dates without sorting used to misplace the projection and
+    // decay lines whenever the last logged session predated the future date ranges.
+    const labels=[...new Set([...history.map(h=>h.date),...predLabels,...decayCurveLabels])].sort();
     const actualPadded=labels.map(l=>{const i=history.findIndex(h=>h.date===l);return i>=0?actualPts[i]:null;});
     const optPadded=labels.map(l=>{const i=predLabels.indexOf(l);return i>=0?optVals[i]:null;});
     const conPadded=labels.map(l=>{const i=predLabels.indexOf(l);return i>=0?conVals[i]:null;});
@@ -7136,11 +7151,6 @@ function renderPredictionChart(lift='bench'){
       const bi=labels.indexOf(history[history.length-1].date);
       if(bi>=0){if(optPadded[bi]===null)optPadded[bi]=actualPadded[bi];if(conPadded[bi]===null)conPadded[bi]=actualPadded[bi];}
     }
-    // Build decay curve from last actual data point
-    const lastActual=history.length?history[history.length-1]:null;
-    const decayCurveRaw=lastActual?buildStrengthDecayCurve(lastActual.date,lastActual.e1RM):[];
-    const decayCurveLabels=decayCurveRaw.map(p=>p.date);
-    decayCurveLabels.filter(l=>!labels.includes(l)).forEach(l=>labels.push(l));
     const decayPadded=labels.map(l=>{const i=decayCurveRaw.findIndex(p=>p.date===l);return i>=0?decayCurveRaw[i].value:null;});
     if(lastActual&&decayCurveRaw.length){const bi=labels.indexOf(lastActual.date);if(bi>=0&&decayPadded[bi]===null)decayPadded[bi]=lastActual.e1RM;}
     const datasets=[
