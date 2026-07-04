@@ -1407,10 +1407,10 @@ input[type=range]::-webkit-slider-thumb:hover {
         <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:3px;" id="vo2-trend-meta"></div>
       </div>
       <div style="display:flex;gap:4px;">
-        <button class="btn bs bi" id="vo2btn-14" onclick="setVO2Range(14)" style="font-size:var(--fs-xs);padding:5px 10px;">14D</button>
+        <button class="btn bs bi" id="vo2btn-14" onclick="setVO2Range(14)" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">14D</button>
         <button class="btn bs bi" id="vo2btn-30" onclick="setVO2Range(30)" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">30D</button>
         <button class="btn bs bi" id="vo2btn-60" onclick="setVO2Range(60)" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">60D</button>
-        <button class="btn bs bi" id="vo2btn-90" onclick="setVO2Range(90)" style="font-size:var(--fs-xs);padding:5px 10px;opacity:.5;">90D</button>
+        <button class="btn bs bi" id="vo2btn-90" onclick="setVO2Range(90)" style="font-size:var(--fs-xs);padding:5px 10px;">90D</button>
       </div>
     </div>
     <div style="position:relative;height:220px;overflow:hidden;"><canvas id="vo2-chart"></canvas></div>
@@ -2123,7 +2123,7 @@ let _fuelEditDate='';
 let _fuelTrendChart=null;
 let _fuelTP={rowIdx:0,hour:8,min:0,ampm:'AM'};
 let _snapDays=7;
-let _vo2Days=14;
+let _vo2Days=90;
 
 // ============================================================
 // STATE -- no data here. All data in data.json on GitHub.
@@ -5123,10 +5123,15 @@ function predictLift(liftKey,blockWeek){
   const totalW=history.reduce((s,h)=>s+h.recencyWeight,0);
   const wAvgE1RM=history.reduce((s,h)=>s+h.e1RM*h.recencyWeight,0)/totalW;
   const last6=history.slice(-6);
+  // Slope in lb PER WEEK — regression of e1RM against weeks-since-first-session, so the
+  // projection's weekly steps are correct regardless of how often the lift is trained.
+  // (Previously used session index, which conflated "gains per session" with "per week".)
   let slope=0;
   if(last6.length>=2){
-    const n=last6.length,xs=last6.map((_,i)=>i),ys=last6.map(h=>h.e1RM);
-    const xm=xs.reduce((a,b)=>a+b,0)/n,ym=ys.reduce((a,b)=>a+b,0)/n;
+    const t0=new Date(last6[0].date+'T12:00:00');
+    const xs=last6.map(h=>(new Date(h.date+'T12:00:00')-t0)/(7*86400000));
+    const ys=last6.map(h=>h.e1RM);
+    const n=last6.length,xm=xs.reduce((a,b)=>a+b,0)/n,ym=ys.reduce((a,b)=>a+b,0)/n;
     const num=xs.reduce((s,x,i)=>s+(x-xm)*(ys[i]-ym),0);
     const den=xs.reduce((s,x)=>s+(x-xm)**2,0);
     slope=den?num/den:0;
@@ -5138,7 +5143,11 @@ function predictLift(liftKey,blockWeek){
   nextW=Math.round(nextW/2.5)*2.5;
   const trend=slope>1?'up':slope<-1?'down':'flat';
   const confidence=history.length<3?'low':history.length<7?'medium':'high';
-  return {weight:nextW,sets,reps,targetRPE,trend,confidence,predictedE1RMs:buildPredictions(wAvgE1RM,slope)};
+  // Anchor the projection to your most recent actual e1RM (damped 30% toward the weighted
+  // average to soften single-session noise), so the trajectory connects to and rises from
+  // your last real lift instead of dipping below it from a lagging average.
+  const anchorE1RM=Math.round((last.e1RM*0.7+wAvgE1RM*0.3)/2.5)*2.5;
+  return {weight:nextW,sets,reps,targetRPE,trend,confidence,predictedE1RMs:buildPredictions(anchorE1RM,slope)};
 }
 
 function localDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -6317,8 +6326,9 @@ function renderVO2TrendChart(){
         borderColor:'rgba(0,212,255,0.75)',
         backgroundColor:'rgba(0,212,255,0.06)',
         borderWidth:2,
-        pointRadius:0,
-        pointHoverRadius:5,
+        pointRadius:runData.map(v=>v!=null?4:0),
+        pointHoverRadius:6,
+        pointBackgroundColor:'rgba(0,212,255,0.9)',
         pointHoverBackgroundColor:'rgba(0,212,255,0.9)',
         tension:0.4,
         spanGaps:false,
@@ -7155,10 +7165,10 @@ function renderPredictionChart(lift='bench'){
     if(lastActual&&decayCurveRaw.length){const bi=labels.indexOf(lastActual.date);if(bi>=0&&decayPadded[bi]===null)decayPadded[bi]=lastActual.e1RM;}
     const datasets=[
       {label:'Actual e1RM',data:actualPadded,borderColor:'#ffb74d',backgroundColor:'rgba(255,183,77,0.08)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#ffb74d',tension:0.3,spanGaps:false},
-      ...(decayCurveRaw.length?[{label:'Est. current (decay)',data:decayPadded,borderColor:'rgba(232,93,138,0.7)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:false}]:[])
+      ...(decayCurveRaw.length?[{label:'Est. current (decay)',data:decayPadded,borderColor:'rgba(232,93,138,0.7)',borderDash:[4,4],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:true}]:[])
     ];
-    if(planData?.predictedE1RMs){
-      datasets.push({label:'Optimistic',data:optPadded,borderColor:'rgba(255,183,77,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:'+1',backgroundColor:'rgba(255,183,77,0.08)',tension:0.3,spanGaps:false},{label:'Conservative',data:conPadded,borderColor:'rgba(79,195,247,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:false});
+    if(planData?.predictedE1RMs&&history.length){
+      datasets.push({label:'Optimistic',data:optPadded,borderColor:'rgba(255,183,77,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:'+1',backgroundColor:'rgba(255,183,77,0.08)',tension:0.3,spanGaps:true},{label:'Conservative',data:conPadded,borderColor:'rgba(79,195,247,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:true});
     }
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const isPU=lift==='pullup';
