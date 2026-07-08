@@ -553,6 +553,88 @@
       "ts": 1782929326400,
       "aiFeedback": "Pull-ups hit RPE 9-10 across all three sets against a conservative RPE 7 prescription — this movement is consistently harder than programmed, and we need to take that seriously rather than push through it. Rows were the bigger issue: you jumped to 135lb on S2 after hitting RPE 7 at 100lb, blew past the RPE 8 cap, then paid for it on S3 at 115lb with RPE 10 — that's self-sabotage mid-session. Next session, pull-ups stay at bodyweight but we're capping at 5 reps to create actual headroom, and rows stay at 100lb for all three sets regardless of how easy S1 feels. Trust the prescribed load — chasing heavier weight when you're already running hot on RPE is what stalls progress.",
       "aiFeedbackAt": "2026-07-01T18:08:54.005Z"
+    },
+    {
+      "date": "2026-07-07",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 205,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 205,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 205,
+            "r": 5,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 95,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 105,
+            "r": 5,
+            "rpe": 9
+          },
+          {
+            "w": 95,
+            "r": 5,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "DB Lateral Raise",
+          "prescribed": "3×15",
+          "weight": 15,
+          "sets": null,
+          "reps": 15,
+          "notes": "Very difficult and tiring. Did first from accessories "
+        },
+        {
+          "name": "Cable Tricep Pushdown (rope)",
+          "prescribed": "3×12",
+          "weight": 37.5,
+          "sets": 3,
+          "reps": 15,
+          "notes": ""
+        }
+      ],
+      "ts": 1783480026367
     }
   ],
   "recoveryLogs": [],
