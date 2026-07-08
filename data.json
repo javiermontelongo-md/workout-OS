@@ -634,7 +634,9 @@
           "notes": ""
         }
       ],
-      "ts": 1783480026367
+      "ts": 1783480026367,
+      "aiFeedback": "**Bench:** You trained at 205lb instead of the prescribed 195lb — that's a 10lb jump above target with no plan authorization. RPE crept to 9 on S3, which confirms the load was too aggressive for the volume block. Log this as data, but next session return to 195lb and hit the 8-rep threshold before any weight increase.\n\n**OHP:** S1 was clean at 95lb, but S2 jumped to 105lb — that's 7.5lb above the prescribed 97.5lb progression and landed at RPE 9. S3 dropped back to 95lb, which shows the 105lb set cost you. Stick to 97.5lb across all three sets next session; load-hopping within a session breaks the progression signal.\n\n**Session RPE not logged — fix that going forward**, it's essential data for managing fatigue across weeks.\n\n**Next session priority:** Discipline on prescribed loads. Both lifts showed you going heavier than planned and paying for it in later sets. The program is working — don't outrun it.",
+      "aiFeedbackAt": "2026-07-08T03:07:16.797Z"
     }
   ],
   "recoveryLogs": [],
@@ -4386,37 +4388,37 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-01T18:08:47.641Z",
-    "vo2maxUsed": 46,
+    "generatedAt": "2026-07-08T03:07:08.734Z",
+    "vo2maxUsed": 46.8,
     "runCount": 27,
-    "methodLabel": "VO2max / VDOT",
+    "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1692,
-        "ciSeconds": 288,
-        "method": "VO2max / VDOT"
+        "seconds": 1685,
+        "ciSeconds": 287,
+        "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3494,
-        "ciSeconds": 772,
-        "method": "VO2max / VDOT"
+        "seconds": 3474,
+        "ciSeconds": 768,
+        "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7630,
+        "seconds": 7631,
         "ciSeconds": 2205,
-        "method": "VO2max / VDOT"
+        "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15825,
-        "ciSeconds": 6995,
-        "method": "VO2max / VDOT"
+        "seconds": 15684,
+        "ciSeconds": 6932,
+        "method": "Riegel"
       }
     },
     "medianTrainingPace": 641.6370106761566,
     "decayFactor": 1,
-    "daysInactive": 0,
-    "lastActivityDate": "2026-06-30",
-    "rawVO2": 45.97,
+    "daysInactive": 3,
+    "lastActivityDate": "2026-07-04",
+    "rawVO2": 46.78,
     "debugInfo": {
       "riegelPred": {
         "s5k": 2006,
@@ -4442,21 +4444,21 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1425,
-        "s10k": 2970,
-        "shalf": 6540,
-        "sfull": 13740
+        "s5k": 1267,
+        "s10k": 2627,
+        "shalf": 5937,
+        "sfull": 12107
       },
       "hrPred": {
-        "s5k": 1887,
-        "s10k": 3774,
-        "shalf": 7961,
-        "sfull": 15923
+        "s5k": 1610,
+        "s10k": 3219,
+        "shalf": 6792,
+        "sfull": 13584
       },
       "weights": {
-        "riegel": 0.3,
-        "vdot": 0.5,
-        "hr": 0.2
+        "riegel": 0.45,
+        "vdot": 0.3,
+        "hr": 0.25
       },
       "vo2maxSource": "Apple Watch",
       "medianPace": 641.6370106761566
@@ -6271,6 +6273,13 @@
       "inp": 2244,
       "out": 1010,
       "cost": 0.021882
+    },
+    {
+      "ts": 1783480036797,
+      "type": "sessionFeedback",
+      "inp": 546,
+      "out": 246,
+      "cost": 0.005328
     }
   ],
   "checkins": [
