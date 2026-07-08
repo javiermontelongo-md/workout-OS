@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-01",
+  "lastUpdated": "2026-07-08",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5240,6 +5240,51 @@
           "confidence": "high"
         }
       }
+    },
+    "2026-07-07": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "reasoning": "Bench is showing solid progress: the last two logged sessions (2026-06-29 and the 2026-07-01 RPE confirmation) both recorded 195lb at RPE 7–8 across multiple sets, with reps trending upward (7, 5, 7 on 06-29). RPE calibration is now accurate at this load — no overshoot — so the double-progression rule calls for continuing to build reps at 195lb rather than jumping weight yet; all sets must hit 8 reps before advancing to 197.5lb. OHP last logged 95×7×3 @RPE 7 on 06-29, meaning all three sets matched the top of the 5–8 rep range at RPE 7 (≤8) — the double-progression threshold is met and load advances to 97.5lb today. Pullups are flagged as RPE 10 on 07-01 at bodyweight 230lb; no added load today, keep bodyweight and manage volume conservatively.",
+      "mainWork": {
+        "summary": "2 main lifts · 2 accessories",
+        "lifts": {
+          "bench": {
+            "sets": 3,
+            "reps": "5–8",
+            "weight": 195,
+            "targetRPE": 8,
+            "variation": "Barbell Bench Press",
+            "coachNote": "Hold 195lb — your last session hit 7/5/7 reps; today push all three sets toward 8 clean reps with controlled descent (~2s). The moment all sets reach 8 reps at RPE ≤8, next session bumps to 197.5lb. Do NOT grind past RPE 8 — the calibration data shows you tend to underestimate early and blow past the cap."
+          },
+          "ohp": {
+            "sets": 3,
+            "reps": "5–8",
+            "weight": 97.5,
+            "targetRPE": 8,
+            "variation": "Barbell Strict OHP",
+            "coachNote": "Load advances from 95lb to 97.5lb — you hit all three sets at 7 reps @RPE 7 on 06-29, clearing the double-progression threshold. Stay strict: no leg drive, ribs down, brace hard. Target 6–7 reps on the first set to gauge the new load; back off to 95lb on any set that trends toward RPE 9."
+          }
+        },
+        "accessories": [
+          "Incline DB Press 3×10 @RPE 7 — chest volume without additional shoulder fatigue; select a load you could do 13 reps with",
+          "DB Lateral Raise 3×15 @RPE 7 — strict partial arc, elbow slightly bent, control the descent",
+          "Cable Tricep Pushdown (rope) 3×12 @RPE 7 — elbows pinned, full extension, slow eccentric",
+          "Overhead DB Tricep Extension 2×12 @RPE 7 — long-head emphasis, keep core braced throughout"
+        ]
+      },
+      "workoutType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-07-08T02:00:40.356Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 40,
+          "reason": "Today is a quality lifting session; the next session must be aerobic-only to respect the 48-hour quality-to-quality recovery window and to accumulate Zone 2 mileage toward the sub-20 5K VO2max goal. A 40-minute easy run tomorrow (Wed 07-08) at a pace slow enough to keep HR strictly at or below 147bpm — likely 11:30–13:00/mile given your current easy runs are reading 165–174bpm — keeps you on the 80/20 polarized split without compromising Thursday's potential quality session.",
+          "confidence": "high"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -6119,6 +6164,13 @@
       "inp": 467,
       "out": 192,
       "cost": 0.004281
+    },
+    {
+      "ts": 1783476040356,
+      "type": "prescription",
+      "inp": 2244,
+      "out": 1010,
+      "cost": 0.021882
     }
   ],
   "checkins": [
