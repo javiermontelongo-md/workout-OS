@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-08",
+  "lastUpdated": "2026-07-11",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -4470,53 +4470,53 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-08T03:07:08.734Z",
-    "vo2maxUsed": 46.8,
-    "runCount": 27,
+    "generatedAt": "2026-07-11T00:47:39.639Z",
+    "vo2maxUsed": 45.6,
+    "runCount": 28,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1685,
+        "seconds": 1692,
         "ciSeconds": 287,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3474,
-        "ciSeconds": 768,
+        "seconds": 3489,
+        "ciSeconds": 770,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7631,
-        "ciSeconds": 2205,
+        "seconds": 7662,
+        "ciSeconds": 2212,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15684,
-        "ciSeconds": 6932,
+        "seconds": 15746,
+        "ciSeconds": 6954,
         "method": "Riegel"
       }
     },
-    "medianTrainingPace": 641.6370106761566,
+    "medianTrainingPace": 645.1515151515152,
     "decayFactor": 1,
-    "daysInactive": 3,
-    "lastActivityDate": "2026-07-04",
-    "rawVO2": 46.78,
+    "daysInactive": 2,
+    "lastActivityDate": "2026-07-08",
+    "rawVO2": 45.56,
     "debugInfo": {
       "riegelPred": {
-        "s5k": 2006,
-        "s10k": 4181,
-        "shalf": 9226,
-        "sfull": 19235,
+        "s5k": 1997,
+        "s10k": 4164,
+        "shalf": 9187,
+        "sfull": 19155,
         "anchor": {
-          "date": "2026-06-26",
-          "stravaId": 19079593260,
-          "name": "Afternoon Run",
+          "date": "2026-07-08",
+          "stravaId": 19236887949,
+          "name": "Panhandle run with hill sprints at the end of",
           "type": "run",
-          "distance": 2.81,
-          "duration": 1803,
-          "pace": 642,
-          "elevationGain": 276,
-          "heartRateAvg": 171.5,
+          "distance": 3.3,
+          "duration": 2129,
+          "pace": 644,
+          "elevationGain": 341,
+          "heartRateAvg": 167.4,
           "heartRateMax": 189,
           "averageWatts": null,
           "weightedAvgWatts": null,
@@ -4526,16 +4526,16 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1267,
-        "s10k": 2627,
-        "shalf": 5937,
-        "sfull": 12107
+        "s5k": 1295,
+        "s10k": 2686,
+        "shalf": 6066,
+        "sfull": 12367
       },
       "hrPred": {
-        "s5k": 1610,
-        "s10k": 3219,
-        "shalf": 6792,
-        "sfull": 13584
+        "s5k": 1619,
+        "s10k": 3239,
+        "shalf": 6832,
+        "sfull": 13665
       },
       "weights": {
         "riegel": 0.45,
@@ -4543,7 +4543,7 @@
         "hr": 0.25
       },
       "vo2maxSource": "Apple Watch",
-      "medianPace": 641.6370106761566
+      "medianPace": 645.1515151515152
     }
   },
   "coachingLog": [
@@ -5469,6 +5469,50 @@
           "confidence": "high"
         }
       }
+    },
+    "2026-07-10": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "reasoning": "Sleep was abbreviated at 6.3h with an early wake at 04:59, so volume is reduced via the 0.85 modifier and RPE is hard-capped at 7 — no grinding today. Pullup RPE data shows a consistent pattern of actual RPE running 2 points above predicted (predicted 7, actual 9–10 on 2026-06-14 and 2026-07-01), indicating bodyweight alone is already taxing; prescribing bodyweight only with a conservative rep target to stay honest at RPE 7. Row data similarly trended hot (predicted 7, actual 9 at 115lb), so load is pulled back to 105lb to reliably land at or below RPE 7 on reduced sleep.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "row": {
+            "sets": 3,
+            "reps": "6–10",
+            "weight": 105,
+            "targetRPE": 7,
+            "variation": "Barbell Bent-Over Row",
+            "coachNote": "Raw sets at 105lb — RPE confirmation history shows 115lb ran to actual RPE 9 twice; drop to 105lb to land at true RPE 7 today. Work the 6–10 range with strict form, initiate each rep with scapular retraction. 4 prescribed sets × 0.85 = 3.4 → 3 sets (min 2 satisfied)."
+          },
+          "pullup": {
+            "sets": 2,
+            "reps": "6–10",
+            "weight": 0,
+            "targetRPE": 7,
+            "variation": "Pull-ups",
+            "coachNote": "Bodyweight only — actual RPE has exceeded predicted by +2 to +3 on every logged pullup session (actual 9–10 vs predicted 7). On 6.3h sleep, stay strict at BW and stop each set 2–3 reps shy of failure to hold RPE ≤ 7. 3 prescribed sets × 0.85 = 2.55 → 2 sets (min 2 satisfied)."
+          }
+        },
+        "accessories": [
+          "Lat Pulldown 2×10 @RPE 6–7 — cable, full stretch at top, controlled return",
+          "Face Pulls 2×15 @RPE 6 — rope attachment, external rotation emphasis, elbows at shoulder height",
+          "Incline DB Hammer Curl 2×12 @RPE 6–7 — neutral grip, no swinging, 2-sec eccentric"
+        ]
+      },
+      "workoutType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-07-11T00:48:14.104Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 40,
+          "reason": "Today is a pull (upper body) session with zero leg stress, so there is no legs-day recovery window blocking a run tomorrow. A Zone 2 easy run at or below 147bpm Saturday supports the 80/20 polarization goal and builds aerobic base toward the sub-20 5K without adding meaningful fatigue — keep pace slow enough (likely 12:30–13:30 min/mile given that recent easy runs have been drifting to 165–174bpm) to actually stay under the 147bpm ceiling.",
+          "confidence": "high"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -6362,6 +6406,13 @@
       "inp": 546,
       "out": 246,
       "cost": 0.005328
+    },
+    {
+      "ts": 1783730894104,
+      "type": "prescription",
+      "inp": 2437,
+      "out": 897,
+      "cost": 0.020766
     }
   ],
   "checkins": [
