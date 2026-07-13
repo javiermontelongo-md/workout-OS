@@ -637,6 +637,80 @@
       "ts": 1783480026367,
       "aiFeedback": "**Bench:** You trained at 205lb instead of the prescribed 195lb — that's a 10lb jump above target with no plan authorization. RPE crept to 9 on S3, which confirms the load was too aggressive for the volume block. Log this as data, but next session return to 195lb and hit the 8-rep threshold before any weight increase.\n\n**OHP:** S1 was clean at 95lb, but S2 jumped to 105lb — that's 7.5lb above the prescribed 97.5lb progression and landed at RPE 9. S3 dropped back to 95lb, which shows the 105lb set cost you. Stick to 97.5lb across all three sets next session; load-hopping within a session breaks the progression signal.\n\n**Session RPE not logged — fix that going forward**, it's essential data for managing fatigue across weeks.\n\n**Next session priority:** Discipline on prescribed loads. Both lifts showed you going heavier than planned and paying for it in later sets. The program is working — don't outrun it.",
       "aiFeedbackAt": "2026-07-08T03:07:16.797Z"
+    },
+    {
+      "date": "2026-07-10",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 9
+          },
+          {
+            "w": -40,
+            "r": 5,
+            "rpe": 9
+          },
+          {
+            "w": -40,
+            "r": 5,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 105,
+            "r": 8,
+            "rpe": 6
+          },
+          {
+            "w": 125,
+            "r": 8,
+            "rpe": 7
+          },
+          {
+            "w": 125,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "Incline DB Hammer Curl",
+          "prescribed": "2×12",
+          "weight": 60,
+          "sets": 3,
+          "reps": 12,
+          "notes": "Curls with straight bar"
+        }
+      ],
+      "ts": 1783903915789
     }
   ],
   "recoveryLogs": [],
