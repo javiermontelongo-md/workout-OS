@@ -5658,6 +5658,49 @@
           "confidence": "high"
         }
       }
+    },
+    "2026-07-12": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength (Sleep-Modified)",
+      "reasoning": "Sleep was only 5.8h last night, triggering SLEEP_WARNING: all sets are volume-reduced via the 0.85 modifier and RPE is hard-capped at 7. Bench is loaded at 195lb based on the 2026-06-29 session where 195×7@8,195×5@7,195×7@7 were hit — today's target is conservative reps at RPE ≤7 to stay within the cap. OHP remains at 95lb following the 2026-07-07 session (95×6@8) where RPE ran high; keeping weight flat and aiming for clean reps at 7 or below before any progression. No new weight increases are warranted today given the sleep deficit and recent RPE creep on both lifts.",
+      "mainWork": {
+        "summary": "2 main lifts · 2 accessories",
+        "lifts": {
+          "bench": {
+            "sets": 2,
+            "reps": "5–8",
+            "weight": 195,
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "coachNote": "Volume modifier (0.85) + sleep flag reduces 3 working sets to 2 today. Stay strict at RPE 7 — if rep 6 feels like an 8, rack it. Drive scapulae into the bench and keep wrists stacked over elbows. Progress to 197.5lb only when both sets hit 8 reps at ≤7 RPE on a fresh day."
+          },
+          "ohp": {
+            "sets": 2,
+            "reps": "5–8",
+            "weight": 95,
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "coachNote": "OHP has shown RPE creep (95×6@8 and 105×5@9 on 2026-07-07); holding 95lb today with the RPE cap at 7. Brace hard, slight forward lean at the hips before the press, lock out overhead without hyperextending lumbar. Do not attempt 105lb until 95lb hits 8 clean reps at ≤7 on a non-flagged day."
+          }
+        },
+        "accessories": [
+          "Incline DB Press 2×10 @RPE 6-7 — chest volume at reduced load; elbows ~45° from torso, controlled 2-sec descent",
+          "Cable Tricep Pushdown (rope) 2×12 @RPE 6 — elbow lockout each rep, keep upper arms pinned to sides; tricep finishing volume after compounds"
+        ]
+      },
+      "workoutType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-07-13T00:52:24.829Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 45,
+          "reason": "Today is a push strength session (no legs stressed); a Zone 2 aerobic run tomorrow fits perfectly within the polarized 80/20 framework and builds the aerobic base needed for sub-20 5K and VO2max gains. Hard-cap HR at 147bpm — target a pace around 11:30–12:30/mile to actually stay in Zone 2 rather than drifting to threshold. No quality/recovery conflicts with today's upper-body push day.",
+          "confidence": "high"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -6565,6 +6608,13 @@
       "inp": 457,
       "out": 296,
       "cost": 0.005811
+    },
+    {
+      "ts": 1783903944829,
+      "type": "prescription",
+      "inp": 2426,
+      "out": 886,
+      "cost": 0.020568
     }
   ],
   "checkins": [
