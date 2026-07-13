@@ -4371,7 +4371,7 @@
       "sleepOnset": "23:25",
       "wakeTime": "05:20",
       "sleepMidpoint": 2.379999999999999,
-      "steps": 3769,
+      "steps": 4065,
       "exerciseMinutes": 37,
       "activeCalories": 658,
       "walkingHR": 98,
@@ -4381,7 +4381,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-07-13T00:13:25.041Z",
+  "healthLastSync": "2026-07-13T00:31:38.713Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
