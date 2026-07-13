@@ -710,7 +710,9 @@
           "notes": "Curls with straight bar"
         }
       ],
-      "ts": 1783903915789
+      "ts": 1783903915789,
+      "aiFeedback": "**Pull-ups:** S1 at BW hit RPE 9 — that's the established pattern holding true, so dropping to -40lb was the right call. Problem is RPE 9 on a sleep-reduced day with a hard cap of 7 means you blew past the limit immediately. Three sets at RPE 9 on compromised recovery is exactly what the plan was designed to prevent.\n\n**Rows:** S1 at 105lb landed RPE 6 — perfect, that's the target. Then you jumped 20lb and ran two more sets at 125lb. That unilateral decision violated the day's protocol; the load was prescribed conservatively for a reason. RPE 7 at 125lb looks fine on paper, but you don't get to self-modify on a capped day.\n\n**Accessories:** Note says \"curls with straight bar\" on a hammer curl prescription — if that was a substitution, log it correctly next time. Execution matters for tracking.\n\n**Next session:** Pull-up RPE trend is now three data points deep — actual RPE consistently runs 2+ points hot. The prescription needs to reflect that structurally, not just on sleep-reduced days. Resist the urge to self-upgrade rows again; trust the process on the conservative loads until the data justifies progression.",
+      "aiFeedbackAt": "2026-07-13T00:52:10.892Z"
     }
   ],
   "recoveryLogs": [],
@@ -4613,7 +4615,7 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-11T00:47:39.639Z",
+    "generatedAt": "2026-07-13T00:52:01.915Z",
     "vo2maxUsed": 45.6,
     "runCount": 28,
     "methodLabel": "Riegel",
@@ -4641,8 +4643,8 @@
     },
     "medianTrainingPace": 645.1515151515152,
     "decayFactor": 1,
-    "daysInactive": 2,
-    "lastActivityDate": "2026-07-08",
+    "daysInactive": 1,
+    "lastActivityDate": "2026-07-11",
     "rawVO2": 45.56,
     "debugInfo": {
       "riegelPred": {
@@ -6556,6 +6558,13 @@
       "inp": 2437,
       "out": 897,
       "cost": 0.020766
+    },
+    {
+      "ts": 1783903930892,
+      "type": "sessionFeedback",
+      "inp": 457,
+      "out": 296,
+      "cost": 0.005811
     }
   ],
   "checkins": [
