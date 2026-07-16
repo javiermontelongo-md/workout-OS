@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-13",
+  "lastUpdated": "2026-07-16",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -713,6 +713,80 @@
       "ts": 1783903915789,
       "aiFeedback": "**Pull-ups:** S1 at BW hit RPE 9 — that's the established pattern holding true, so dropping to -40lb was the right call. Problem is RPE 9 on a sleep-reduced day with a hard cap of 7 means you blew past the limit immediately. Three sets at RPE 9 on compromised recovery is exactly what the plan was designed to prevent.\n\n**Rows:** S1 at 105lb landed RPE 6 — perfect, that's the target. Then you jumped 20lb and ran two more sets at 125lb. That unilateral decision violated the day's protocol; the load was prescribed conservatively for a reason. RPE 7 at 125lb looks fine on paper, but you don't get to self-modify on a capped day.\n\n**Accessories:** Note says \"curls with straight bar\" on a hammer curl prescription — if that was a substitution, log it correctly next time. Execution matters for tracking.\n\n**Next session:** Pull-up RPE trend is now three data points deep — actual RPE consistently runs 2+ points hot. The prescription needs to reflect that structurally, not just on sleep-reduced days. Resist the urge to self-upgrade rows again; trust the process on the conservative loads until the data justifies progression.",
       "aiFeedbackAt": "2026-07-13T00:52:10.892Z"
+    },
+    {
+      "date": "2026-07-12",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 205,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 205,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 205,
+            "r": 6,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 95,
+            "r": 8,
+            "rpe": 7
+          },
+          {
+            "w": 95,
+            "r": 8,
+            "rpe": 7
+          },
+          {
+            "w": 95,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "Cable Tricep Pushdown (rope)",
+          "prescribed": "2×12",
+          "weight": 55,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        }
+      ],
+      "ts": 1784168275502
     }
   ],
   "recoveryLogs": [],
