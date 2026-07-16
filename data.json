@@ -852,7 +852,9 @@
           "notes": "Seated dumbbell curls"
         }
       ],
-      "ts": 1784171553827
+      "ts": 1784171553827,
+      "aiFeedback": "Pull-ups held RPE 7 for two sets, then jumped to 9 on S3 — that's the same pattern flagging in your logs and confirms fatigue accumulation within the session, not just set-to-set variance. Bodyweight was the right call given the sleep deficit, but S3 crept over the cap anyway; next poor-sleep session, consider stopping at 2 sets if RPE hits 9 before the final set. Barbell Row is a problem: you jumped straight to 115lb despite the explicit 100lb prescription to manage RPE, hit RPE 7 fine, but you've now undermined the data point we needed at the dialed-back load — and only completed 1 of 3 sets with no logged reason for stopping. Next session, follow the prescribed load exactly so we can actually calibrate your fatigue-adjusted baseline. Session RPE missing again — log it, it matters for tracking cumulative load.",
+      "aiFeedbackAt": "2026-07-16T03:12:42.945Z"
     }
   ],
   "recoveryLogs": [],
@@ -4837,7 +4839,7 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-16T02:17:57.641Z",
+    "generatedAt": "2026-07-16T03:12:35.773Z",
     "vo2maxUsed": 45.9,
     "runCount": 29,
     "methodLabel": "Riegel",
@@ -6894,6 +6896,13 @@
       "inp": 2399,
       "out": 935,
       "cost": 0.021222
+    },
+    {
+      "ts": 1784171562944,
+      "type": "sessionFeedback",
+      "inp": 432,
+      "out": 214,
+      "cost": 0.004506
     }
   ],
   "checkins": [
