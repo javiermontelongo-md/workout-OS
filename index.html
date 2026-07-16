@@ -4765,17 +4765,19 @@ function buildEditForm(session){
   const dayOpts=['push','pull','legs','run','run_easy','run_quality','run_long','rest'];
   const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
   const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
-  const colHdr=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">WEIGHT</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">REPS</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">RPE</div><div></div></div>`;
-  const rmBtn=(key,i)=>`<button onclick="removeEditSet('${key}',${i},${session.ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button>`;
   let html=`<div style="position:sticky;top:0;background:var(--s2);border-bottom:1px solid var(--b);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:1;"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);text-transform:uppercase;letter-spacing:.08em;">Edit &middot; ${session.date}</div><button onclick="closeSessionDrawer()" style="background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;padding:0;line-height:1;">&#215;</button></div><div style="padding:20px;">`;
   html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Session type</div><select id="edit-day" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;width:100%;">${dayOpts.map(o=>`<option value="${o}"${session.day===o?' selected':''}>${o}</option>`).join('')}</select></div>`;
   liftKeys.forEach(({key,label})=>{
     const lift=session[key]; if(!lift?.sets?.length) return;
     window._EF[key]=lift.sets.map(s=>({...s}));
-    const rowsHtml=lift.sets.map((s,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${i}`,s.w,'lb')}${numInp(`edit-${key}-r-${i}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${i}`,s.rpe,'RPE')}${rmBtn(key,i)}</div>`).join('');
-    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}<div id="edit-sets-${key}">${rowsHtml}</div><button onclick="addEditSet('${key}',${session.ts})" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--a);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;margin-top:4px;width:100%;">+ Add set</button>`;
-    html+=`<input id="edit-${key}-notes" type="text" value="${esc(lift.notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;margin-top:2px;"></div>`;
+    html+=buildEditLiftBlock(key,label,session.ts,lift.notes||'');
   });
+  // Container for lifts added via the picker, then the picker itself (only missing lifts)
+  html+=`<div id="edit-added-lifts"></div>`;
+  const missing=liftKeys.filter(({key})=>!session[key]?.sets?.length);
+  if(missing.length){
+    html+=`<div id="edit-add-ex-wrap" style="display:flex;gap:8px;margin-bottom:16px;"><select id="edit-add-ex-select" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;">${missing.map(m=>`<option value="${m.key}">${m.label}</option>`).join('')}</select><button onclick="addEditExercise(${session.ts})" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--a);border:1px solid var(--b2);border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap;">+ Add exercise</button></div>`;
+  }
   if(session.cardio){
     const c=session.cardio;
     html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Cardio</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">${numInp('edit-cardio-dist',c.dist,'Dist (mi)')}${numInp('edit-cardio-dur',c.dur,'Dur (min)')}${numInp('edit-cardio-hr',c.hr,'Avg HR')}${numInp('edit-cardio-rpe',c.rpe,'RPE')}</div><input id="edit-cardio-notes" type="text" value="${esc(c.notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;"></div>`;
@@ -4783,6 +4785,13 @@ function buildEditForm(session){
   html+=`<div style="margin-bottom:20px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Session notes</div><textarea id="edit-session-notes" rows="3" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:8px;width:100%;box-sizing:border-box;resize:vertical;">${esc(session.notes)}</textarea></div>`;
   html+=`<div style="display:flex;gap:8px;"><button id="edit-save-btn" onclick="saveEditedSession(${session.ts})" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);background:var(--a);color:#fff;border:none;border-radius:8px;padding:10px;cursor:pointer;">Save changes</button><button onclick="openSessionDrawerByTs(${session.ts})" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:8px;padding:10px 16px;cursor:pointer;">Cancel</button></div><div id="edit-save-msg" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;text-align:center;"></div></div>`;
   return html;
+}
+function buildEditLiftBlock(key,label,ts,notes){
+  const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
+  const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
+  const colHdr=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">WEIGHT</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">REPS</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">RPE</div><div></div></div>`;
+  const rows=((window._EF&&window._EF[key])||[]).map((s,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${i}`,s.w,'lb')}${numInp(`edit-${key}-r-${i}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${i}`,s.rpe,'RPE')}<button onclick="removeEditSet('${key}',${i},${ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button></div>`).join('');
+  return `<div id="edit-block-${key}" style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}<div id="edit-sets-${key}">${rows}</div><button onclick="addEditSet('${key}',${ts})" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--a);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;margin-top:4px;width:100%;">+ Add set</button><input id="edit-${key}-notes" type="text" value="${esc(notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;margin-top:2px;"></div>`;
 }
 function _captureEditSets(key){
   if(!window._EF||!window._EF[key]) return;
@@ -4809,6 +4818,20 @@ function removeEditSet(key,i,ts){
   window._EF[key].splice(i,1);
   renderEditSets(key,ts);
 }
+function addEditExercise(ts){
+  const sel=document.getElementById('edit-add-ex-select');
+  if(!sel||!sel.value) return;
+  const key=sel.value;
+  const labels={bench:'Bench Press',ohp:'OHP',pullup:'Pull-ups',row:'Barbell Row',squat:'Back Squat',dl:'Deadlift'};
+  if(!window._EF) window._EF={};
+  if(window._EF[key]) return; // already added
+  window._EF[key]=[{w:null,r:null,rpe:null}];
+  const cont=document.getElementById('edit-added-lifts');
+  if(cont) cont.insertAdjacentHTML('beforeend',buildEditLiftBlock(key,labels[key]||key,ts,''));
+  const opt=sel.querySelector(`option[value="${key}"]`);
+  if(opt) opt.remove();
+  if(sel.options.length===0){const w=document.getElementById('edit-add-ex-wrap');if(w)w.style.display='none';}
+}
 async function saveEditedSession(ts){
   const btn=document.getElementById('edit-save-btn');
   const msgEl=document.getElementById('edit-save-msg');
@@ -4820,10 +4843,17 @@ async function saveEditedSession(ts){
   const liftKeys=['bench','ohp','squat','dl','pullup','row'];
   session.day=g('edit-day')?.value||session.day;
   liftKeys.forEach(key=>{
-    if(!session[key]?.sets) return;
-    const setCount=(window._EF&&window._EF[key])?window._EF[key].length:session[key].sets.length;
-    session[key].sets=Array.from({length:setCount},(_,i)=>({w:+g(`edit-${key}-w-${i}`)?.value||null,r:+g(`edit-${key}-r-${i}`)?.value||null,rpe:+g(`edit-${key}-rpe-${i}`)?.value||null}));
-    session[key].notes=g(`edit-${key}-notes`)?.value||'';
+    const inForm=!!(window._EF&&window._EF[key]);
+    if(!inForm&&!session[key]?.sets) return;
+    const setCount=inForm?window._EF[key].length:session[key].sets.length;
+    const sets=Array.from({length:setCount},(_,i)=>({w:+g(`edit-${key}-w-${i}`)?.value||null,r:+g(`edit-${key}-r-${i}`)?.value||null,rpe:+g(`edit-${key}-rpe-${i}`)?.value||null}));
+    // Existing lifts always update (allows clearing sets); newly picked lifts persist
+    // only if the user actually entered something, so an empty pick leaves no phantom.
+    if(session[key]||sets.some(x=>x.w||x.r||x.rpe)){
+      if(!session[key]) session[key]={};
+      session[key].sets=sets;
+      session[key].notes=g(`edit-${key}-notes`)?.value||'';
+    }
   });
   if(session.cardio){
     const dist=+g('edit-cardio-dist')?.value||null,dur=+g('edit-cardio-dur')?.value||null;
