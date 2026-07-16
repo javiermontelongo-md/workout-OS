@@ -5859,6 +5859,49 @@
           "confidence": "high"
         }
       }
+    },
+    "2026-07-15": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "reasoning": "Sleep flag (6.1h) activates a reduced-volume, RPE-capped session — all sets held to RPE ≤7 and volumeModifier 0.85 applied (floor at 2 sets). Pullup RPE data is consistently running 1–2 points above predicted (predicted 7 actual 9 on 2026-07-01 and 2026-07-13), so bodyweight is prescribed today rather than belt weight to stay within the RPE 7 cap while fatigued. Row has similarly shown actual RPE 9 vs predicted 7 at 115lb, so load is dialed back to ~100lb to land at a true RPE 7 on poor sleep. Double-progression rules apply: build reps to top of range across all sets before adding weight.",
+      "mainWork": {
+        "summary": "2 main lifts · 2 accessories",
+        "lifts": {
+          "row": {
+            "sets": 3,
+            "reps": "6–10",
+            "weight": 100,
+            "targetRPE": 7,
+            "variation": "Barbell Bent-Over Row",
+            "coachNote": "Raw set count 3.4 → floor 3 (min 2 satisfied). Prior sessions at 115lb hit RPE 9 vs predicted 7 — drop to 100lb to achieve true RPE 7 on reduced sleep. Drive elbows to hip pockets, 1-sec pause at top. Advance reps each set within 6–10 range; add 2.5lb only when all sets hit 10 reps at RPE ≤7."
+          },
+          "pullup": {
+            "sets": 3,
+            "reps": "6–10",
+            "weight": 0,
+            "targetRPE": 7,
+            "variation": "Pull-ups (Bodyweight)",
+            "coachNote": "Raw set count 3.4 → floor 3. Recent sessions with belt weight (227–235lb total) consistently produce RPE 9 — bodyweight only today to respect RPE 7 cap under sleep flag. Full dead hang at bottom, chin clears bar at top. Progress reps within 6–10; add belt (+5lb) only when all sets hit 10 reps at ≤RPE 7 on a non-flagged day."
+          }
+        },
+        "accessories": [
+          "Seated Cable Row 2×10–12 @ RPE 6–7 — neutral grip, controlled 3-sec eccentric, stay shy of failure",
+          "Face Pulls 2×15 @ RPE 6 — rope to forehead, external rotation emphasis, not a push movement; pure rear-delt/upper-back health"
+        ]
+      },
+      "workoutType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-07-16T02:18:34.554Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 40,
+          "reason": "Today is a lifting-only pull day with no running, so no recovery window conflict exists for tomorrow (Thu 2026-07-16). A Zone 2 easy run at strict ≤147bpm is the highest-priority next session given the sub-20 5K / VO2max goals and the 80/20 polarization target — the bulk of weekly run volume must be Zone 2 and easy aerobic sessions are accumulating a deficit. Keep pace conservative enough (likely 11:30–12:30/mi) to genuinely stay under 147bpm; recent easy runs at 165–174bpm are threshold efforts, not Zone 2.",
+          "confidence": "high"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -6780,6 +6823,13 @@
       "inp": 460,
       "out": 220,
       "cost": 0.00468
+    },
+    {
+      "ts": 1784168314554,
+      "type": "prescription",
+      "inp": 2399,
+      "out": 935,
+      "cost": 0.021222
     }
   ],
   "checkins": [
