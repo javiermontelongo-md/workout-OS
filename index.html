@@ -4773,7 +4773,7 @@ function buildEditForm(session){
     const lift=session[key]; if(!lift?.sets?.length) return;
     window._EF[key]=lift.sets.map(s=>({...s}));
     const rowsHtml=lift.sets.map((s,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${i}`,s.w,'lb')}${numInp(`edit-${key}-r-${i}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${i}`,s.rpe,'RPE')}${rmBtn(key,i)}</div>`).join('');
-    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}<div id="edit-sets-${key}">${rowsHtml}</div>`;
+    html+=`<div style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}<div id="edit-sets-${key}">${rowsHtml}</div><button onclick="addEditSet('${key}',${session.ts})" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--a);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;margin-top:4px;width:100%;">+ Add set</button>`;
     html+=`<input id="edit-${key}-notes" type="text" value="${esc(lift.notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;margin-top:2px;"></div>`;
   });
   if(session.cardio){
@@ -4784,16 +4784,30 @@ function buildEditForm(session){
   html+=`<div style="display:flex;gap:8px;"><button id="edit-save-btn" onclick="saveEditedSession(${session.ts})" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);background:var(--a);color:#fff;border:none;border-radius:8px;padding:10px;cursor:pointer;">Save changes</button><button onclick="openSessionDrawerByTs(${session.ts})" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:8px;padding:10px 16px;cursor:pointer;">Cancel</button></div><div id="edit-save-msg" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;text-align:center;"></div></div>`;
   return html;
 }
-function removeEditSet(key,i,ts){
+function _captureEditSets(key){
   if(!window._EF||!window._EF[key]) return;
   const g=id=>document.getElementById(id);
   window._EF[key].forEach((_,j)=>{window._EF[key][j]={w:+g(`edit-${key}-w-${j}`)?.value||null,r:+g(`edit-${key}-r-${j}`)?.value||null,rpe:+g(`edit-${key}-rpe-${j}`)?.value||null};});
-  window._EF[key].splice(i,1);
+}
+function renderEditSets(key,ts){
   const cont=document.getElementById('edit-sets-'+key);
-  if(!cont) return;
+  if(!cont||!window._EF||!window._EF[key]) return;
   const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
   const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
   cont.innerHTML=window._EF[key].map((s,j)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${j}`,s.w,'lb')}${numInp(`edit-${key}-r-${j}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${j}`,s.rpe,'RPE')}<button onclick="removeEditSet('${key}',${j},${ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button></div>`).join('');
+}
+function addEditSet(key,ts){
+  if(!window._EF) window._EF={};
+  if(!window._EF[key]) window._EF[key]=[];
+  _captureEditSets(key);
+  window._EF[key].push({w:null,r:null,rpe:null});
+  renderEditSets(key,ts);
+}
+function removeEditSet(key,i,ts){
+  if(!window._EF||!window._EF[key]) return;
+  _captureEditSets(key);
+  window._EF[key].splice(i,1);
+  renderEditSets(key,ts);
 }
 async function saveEditedSession(ts){
   const btn=document.getElementById('edit-save-btn');
