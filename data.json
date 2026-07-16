@@ -789,6 +789,70 @@
       "ts": 1784168275502,
       "aiFeedback": "**Bench:** You hit 205lb instead of the prescribed 195lb — that's a 10lb jump on a sleep-reduced day where the plan explicitly held weight flat. The fact that you held RPE 7 across all three sets is genuinely impressive and suggests your strength is ahead of the programming, but going off-script on a SLEEP_WARNING day is a risk that paid off this time, not a green light to freelance regularly.\n\n**OHP:** Textbook execution — 95×8@7 across three clean sets is exactly what was needed. You've earned a load increase here; 100lb is the logical next step next session.\n\n**Next session:** Bench needs a conversation — if 205@7 feels that clean on 5.8h sleep, 200–205lb is probably the right working weight going forward, but clear it with your plan rather than self-prescribing on compromised recovery days. Log your session RPE — it's a data point that matters.",
       "aiFeedbackAt": "2026-07-16T02:18:05.698Z"
+    },
+    {
+      "date": "2026-07-15",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": null,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": null,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": null,
+            "r": 6,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 115,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "Face Pulls",
+          "prescribed": "2×15",
+          "weight": 22.5,
+          "sets": 3,
+          "reps": 12,
+          "notes": "Seated dumbbell curls"
+        }
+      ],
+      "ts": 1784171553827
     }
   ],
   "recoveryLogs": [],
