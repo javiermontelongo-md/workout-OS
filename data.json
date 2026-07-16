@@ -786,7 +786,9 @@
           "notes": ""
         }
       ],
-      "ts": 1784168275502
+      "ts": 1784168275502,
+      "aiFeedback": "**Bench:** You hit 205lb instead of the prescribed 195lb — that's a 10lb jump on a sleep-reduced day where the plan explicitly held weight flat. The fact that you held RPE 7 across all three sets is genuinely impressive and suggests your strength is ahead of the programming, but going off-script on a SLEEP_WARNING day is a risk that paid off this time, not a green light to freelance regularly.\n\n**OHP:** Textbook execution — 95×8@7 across three clean sets is exactly what was needed. You've earned a load increase here; 100lb is the logical next step next session.\n\n**Next session:** Bench needs a conversation — if 205@7 feels that clean on 5.8h sleep, 200–205lb is probably the right working weight going forward, but clear it with your plan rather than self-prescribing on compromised recovery days. Log your session RPE — it's a data point that matters.",
+      "aiFeedbackAt": "2026-07-16T02:18:05.698Z"
     }
   ],
   "recoveryLogs": [],
@@ -4771,37 +4773,37 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-13T00:52:01.915Z",
-    "vo2maxUsed": 45.6,
-    "runCount": 28,
+    "generatedAt": "2026-07-16T02:17:57.641Z",
+    "vo2maxUsed": 45.9,
+    "runCount": 29,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1692,
+        "seconds": 1690,
         "ciSeconds": 287,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3489,
+        "seconds": 3485,
         "ciSeconds": 770,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7662,
+        "seconds": 7654,
         "ciSeconds": 2212,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15746,
-        "ciSeconds": 6954,
+        "seconds": 15730,
+        "ciSeconds": 6953,
         "method": "Riegel"
       }
     },
     "medianTrainingPace": 645.1515151515152,
     "decayFactor": 1,
-    "daysInactive": 1,
-    "lastActivityDate": "2026-07-11",
-    "rawVO2": 45.56,
+    "daysInactive": 2,
+    "lastActivityDate": "2026-07-13",
+    "rawVO2": 45.88,
     "debugInfo": {
       "riegelPred": {
         "s5k": 1997,
@@ -4827,16 +4829,16 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1295,
-        "s10k": 2686,
-        "shalf": 6066,
-        "sfull": 12367
+        "s5k": 1288,
+        "s10k": 2670,
+        "shalf": 6032,
+        "sfull": 12301
       },
       "hrPred": {
-        "s5k": 1619,
-        "s10k": 3239,
-        "shalf": 6832,
-        "sfull": 13665
+        "s5k": 1621,
+        "s10k": 3242,
+        "shalf": 6840,
+        "sfull": 13681
       },
       "weights": {
         "riegel": 0.45,
@@ -6771,6 +6773,13 @@
       "inp": 2426,
       "out": 886,
       "cost": 0.020568
+    },
+    {
+      "ts": 1784168285698,
+      "type": "sessionFeedback",
+      "inp": 460,
+      "out": 220,
+      "cost": 0.00468
     }
   ],
   "checkins": [
