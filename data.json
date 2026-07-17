@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-16",
+  "lastUpdated": "2026-07-17",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -6038,6 +6038,50 @@
           "confidence": "high"
         }
       }
+    },
+    "2026-07-17": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "reasoning": "Bench is trending well: last session (2026-07-12) hit 205×6@7 across all three sets, meaning all sets landed at the top of the 5–8 rep range at RPE ≤8 — double-progression criteria are met and a load increase to 207.5lb is warranted. OHP also cleared the top of range at 95×8@7 across all three sets on 2026-07-12, so OHP advances to 97.5lb today. RPE history shows bench at 205lb has run actual RPE above predicted before (07-07: sets hit 9), so keeping a firm RPE-8 cap and stopping a set early if it trends hot is the priority — 3 working sets keeps total weekly bench volume conservative heading into the weekend.",
+      "mainWork": {
+        "summary": "2 main lifts · 2 accessories",
+        "lifts": {
+          "bench": {
+            "sets": 3,
+            "reps": "5–8",
+            "weight": 207.5,
+            "targetRPE": 8,
+            "variation": "Barbell Bench Press",
+            "coachNote": "Double-progression load jump: all three sets of 205lb hit 6 reps @7 last session — you earned this 2.5lb bump. Chase 6–7 reps each set; stop a set the moment bar speed slows noticeably. If any set feels like an 8+ on rep 5, rack it there and log it — protecting the RPE cap beats chasing reps. Rest 3 min between sets."
+          },
+          "ohp": {
+            "sets": 3,
+            "reps": "5–8",
+            "weight": 97.5,
+            "targetRPE": 8,
+            "variation": "Barbell Strict OHP",
+            "coachNote": "OHP cleared 95×8@7 across all three sets last session — criteria met for the 2.5lb jump to 97.5lb. Brace hard, ribs down, glutes squeezed; do not let your lower back extend to compensate at the top. Target 6–7 reps; if rep 5 feels like an 8 already, stop there. Rest 2.5–3 min. History shows OHP RPE spikes fast, so be conservative on set 1."
+          }
+        },
+        "accessories": [
+          "Incline DB Press 3×10 @70–75% effort — set incline to 30–45°, controlled 3-sec descent, press to lockout; this builds upper-chest volume without taxing the shoulder joint excessively",
+          "Cable Tricep Pushdown (straight bar or rope) 3×12 @moderate load — full elbow extension at the bottom, elbows pinned to sides, smooth tempo; tricep hypertrophy directly supports both bench and OHP lockout",
+          "DB Lateral Raise 3×15 @light-moderate — slight forward lean, lead with elbows, stop at shoulder height; shoulder health and OHP carryover; no momentum, keep RPE around 7 on last set"
+        ]
+      },
+      "workoutType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-07-17T22:56:45.656Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 40,
+          "reason": "Today is a quality strength session (push), so tomorrow (Saturday 2026-07-18) the 48-hour quality→quality window is not violated by an easy run — Zone 2 aerobic work is low-stress and actively supports VO2max development and sub-20 5K goals. Keep pace slow enough to hold HR strictly under 147bpm the entire run (likely 11:30–12:30 min/mile given recent data showing easy efforts drifting into 165–174bpm at current paces); this is true Zone 2 adaptation work, not a tempo effort.",
+          "confidence": "high"
+        }
+      }
     }
   },
   "coachingMemory": {
@@ -6973,6 +7017,13 @@
       "inp": 432,
       "out": 214,
       "cost": 0.004506
+    },
+    {
+      "ts": 1784329005655,
+      "type": "prescription",
+      "inp": 2360,
+      "out": 1010,
+      "cost": 0.02223
     }
   ],
   "checkins": [
