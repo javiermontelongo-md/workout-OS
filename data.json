@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-17",
+  "lastUpdated": "2026-07-18",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -865,6 +865,88 @@
       "ts": 1784171553827,
       "aiFeedback": "Pull-ups held RPE 7 for two sets, then jumped to 9 on S3 — that's the same pattern flagging in your logs and confirms fatigue accumulation within the session, not just set-to-set variance. Bodyweight was the right call given the sleep deficit, but S3 crept over the cap anyway; next poor-sleep session, consider stopping at 2 sets if RPE hits 9 before the final set. Barbell Row is a problem: you jumped straight to 115lb despite the explicit 100lb prescription to manage RPE, hit RPE 7 fine, but you've now undermined the data point we needed at the dialed-back load — and only completed 1 of 3 sets with no logged reason for stopping. Next session, follow the prescribed load exactly so we can actually calibrate your fatigue-adjusted baseline. Session RPE missing again — log it, it matters for tracking cumulative load.",
       "aiFeedbackAt": "2026-07-16T03:12:42.945Z"
+    },
+    {
+      "date": "2026-07-17",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 215,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 215,
+            "r": 5,
+            "rpe": 9
+          },
+          {
+            "w": 215,
+            "r": 5,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 115,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 105,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 105,
+            "r": 8,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "name": "Cable Tricep Pushdown (straight bar or rope)",
+          "prescribed": "3×12",
+          "weight": 50,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        },
+        {
+          "name": "DB Lateral Raise",
+          "prescribed": "3×15",
+          "weight": 15,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        }
+      ],
+      "ts": 1784344935852
     }
   ],
   "recoveryLogs": [],
@@ -879,10 +961,10 @@
     "mode": "NORMAL"
   },
   "currentLifts": {
-    "benchE1RM": 255,
+    "benchE1RM": 258,
     "squatE1RM": 215,
     "deadliftE1RM": 215,
-    "ohpE1RM": 123,
+    "ohpE1RM": 134,
     "pullups": 5,
     "pullupE1RM": 0,
     "rowE1RM": 169
