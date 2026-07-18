@@ -1399,6 +1399,24 @@ input[type=range]::-webkit-slider-thumb:hover {
       </div>
     </div>
   </div>
+
+  <!-- Double-progression staircase: working weight + reps per session for the selected lift -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
+      <div class="lbl">progression staircase</div>
+      <div id="staircase-sub" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:10px;">Working weight per session (steps) + reps at that weight (dots) — the double-progression view. Wildcard sets excluded.</div>
+    <div style="position:relative;height:200px;">
+      <canvas id="staircase-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- Accessory progress: every catalog accessory ever logged, first → latest -->
+  <div class="card">
+    <div class="lbl">accessory progress</div>
+    <div id="accessory-trends"></div>
+  </div>
   <div class="card ca ga" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">running trajectory</div>
@@ -2816,7 +2834,7 @@ function showTab(n){
   window.scrollTo(0,0);
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='week'){ renderCalendar(); renderSessionList(); }
-  if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
+  if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderStaircaseChart(); renderAccessoryTrends(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
   if(n==='program'){ renderAIFlowDiagram(); }
@@ -5416,32 +5434,6 @@ function getLiftHistory(liftKey,daysBack=60){
   return results.sort((a,b)=>a.date.localeCompare(b.date));
 }
 
-function detectBlockWeek(){
-  const labels=['Volume Accumulation','Strength Emphasis','Peak Intensity','Deload'];
-  const sessions=D?.sessions||[];
-  if(!sessions.length) return {weekNum:1,label:labels[0]};
-
-  // Reset signal: fewer than 3 lift sessions in the last 14 days → restart at Week 1
-  // This prevents the cycle from advancing through gaps in training.
-  const liftDays=['push','pull','legs','A','B','C','1','2','4','5']; // legacy numeric day formats included
-  const cutoff14=new Date(); cutoff14.setDate(cutoff14.getDate()-14);
-  const cutoff14Str=localDS(cutoff14);
-  const recentLifts=sessions.filter(s=>s.date>=cutoff14Str&&liftDays.includes(s.day||''));
-  if(recentLifts.length<3) return {weekNum:1,label:labels[0]};
-
-  // Anchor to first ever session and advance one phase per calendar week
-  const firstDate=new Date(sessions[0].date+'T12:00:00');
-  const now=new Date();
-  const weeksSinceStart=Math.floor((now-firstDate)/(7*24*60*60*1000));
-  const idx=weeksSinceStart%4;
-  return {weekNum:idx+1,label:labels[idx]};
-}
-
-function getBlockParams(blockWeek){
-  const p={1:{sets:5,reps:5,targetRPE:7},2:{sets:4,reps:4,targetRPE:8},3:{sets:3,reps:3,targetRPE:9},4:{sets:3,reps:5,targetRPE:6}};
-  return p[blockWeek.weekNum]||p[1];
-}
-
 function buildPredictions(currentE1RM,slope){
   const today=new Date();
   return [1,2,3,4].map(w=>{
@@ -5453,13 +5445,16 @@ function buildPredictions(currentE1RM,slope){
   });
 }
 
-function predictLift(liftKey,blockWeek){
+function predictLift(liftKey){
   const bw=D?.profile?.bodyweight||ATHLETE.weightLbs;
-  const baselines={bench:{e1RM:255,weight:190},ohp:{e1RM:120,weight:90},squat:{e1RM:215,weight:160},dl:{e1RM:215,weight:160},pullup:{e1RM:Math.round(bw*(1+5/30)/2.5)*2.5,weight:bw},row:{e1RM:135,weight:115}};
+  const baselines={bench:{e1RM:255},ohp:{e1RM:120},squat:{e1RM:215},dl:{e1RM:215},pullup:{e1RM:Math.round(bw*(1+5/30)/2.5)*2.5},row:{e1RM:169}};
   const bl=baselines[liftKey];
   const history=getLiftHistory(liftKey);
-  const {sets,reps,targetRPE}=getBlockParams(blockWeek);
-  if(!history.length) return {weight:bl.weight,sets,reps,targetRPE,trend:'flat',confidence:'low',predictedE1RMs:buildPredictions(bl.e1RM,0)};
+  // Sets/reps/weight/RPE come from the same engine that writes prescriptions,
+  // so the chart's "next session" always matches what the Program tab will say.
+  const engine=prescribeLift(liftKey,evaluateTrainingStatus(),detectDeload());
+  const {sets,reps,targetRPE}=engine;
+  if(!history.length) return {weight:engine.weight,sets,reps,targetRPE,trend:'flat',confidence:'low',predictedE1RMs:buildPredictions(bl.e1RM,0)};
   const totalW=history.reduce((s,h)=>s+h.recencyWeight,0);
   const wAvgE1RM=history.reduce((s,h)=>s+h.e1RM*h.recencyWeight,0)/totalW;
   const last6=history.slice(-6);
@@ -5477,17 +5472,13 @@ function predictLift(liftKey,blockWeek){
     slope=den?num/den:0;
   }
   const last=history[history.length-1];
-  const lastRPE=last.sessionRPE||7;
-  let nextW=last.weight;
-  if(lastRPE<7) nextW+=7.5; else if(lastRPE<=8) nextW+=2.5; else nextW=Math.max(nextW-5,bl.weight*0.7);
-  nextW=Math.round(nextW/2.5)*2.5;
   const trend=slope>1?'up':slope<-1?'down':'flat';
   const confidence=history.length<3?'low':history.length<7?'medium':'high';
   // Anchor the projection to your most recent actual e1RM (damped 30% toward the weighted
   // average to soften single-session noise), so the trajectory connects to and rises from
   // your last real lift instead of dipping below it from a lagging average.
   const anchorE1RM=Math.round((last.e1RM*0.7+wAvgE1RM*0.3)/2.5)*2.5;
-  return {weight:nextW,sets,reps,targetRPE,trend,confidence,predictedE1RMs:buildPredictions(anchorE1RM,slope)};
+  return {weight:engine.weight,sets,reps,targetRPE,trend,confidence,predictedE1RMs:buildPredictions(anchorE1RM,slope)};
 }
 
 function localDS(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -6982,13 +6973,13 @@ function evaluateTrainingStatus(){
     reasons.push(`Woke before 5 AM (${latestWakeTime}) — abbreviated sleep window. RPE capped at 7, volume 90%.`);
   }
 
-  const bw=detectBlockWeek();
-  if(bw.weekNum===4){
+  // Deload weeks are handled by the prescription engine (detectDeload) — flagged
+  // here so run/quality rules also respect the deload without double-applying
+  // volume cuts (the engine already sets 70% loads + 2×5 on lift days).
+  const deload=detectDeload();
+  if(deload.active){
     flags.push('DELOAD_WEEK');
     canDoQuality=false;
-    liftRPECap=Math.min(liftRPECap,6);
-    volumeModifier=Math.min(volumeModifier,0.60);
-    reasons.push('Week 4 deload — no quality, volume at 60%, RPE cap 6.');
   }
 
   let stressScore=0;
@@ -7463,7 +7454,7 @@ Give me honest, specific feedback on this session.`}]})});
 }
 
 async function confirmRPE(lift,actualRPE){
-  const pred=predictLift(lift, detectBlockWeek());
+  const pred=predictLift(lift);
   if(!D.rpeConfirmations) D.rpeConfirmations=[];
   D.rpeConfirmations.push({date:new Date().toISOString().split('T')[0],lift,predictedRPE:pred?.targetRPE||null,actualRPE,weight:pred?.weight||null,sets:pred?.sets||null,reps:pred?.reps||null});
   const pills=document.getElementById('rpe-pills-'+lift);
@@ -7486,7 +7477,7 @@ function renderPredictionChart(lift='bench'){
     document.querySelectorAll('.chart-lift-btn').forEach(b=>b.classList.remove('active'));
     const ab=document.getElementById('chart-'+lift);if(ab)ab.classList.add('active');
     const history=getLiftHistory(lift,120);
-    const planData=predictLift(lift, detectBlockWeek());
+    const planData=predictLift(lift);
     const actualPts=history.map(h=>h.e1RM);
     let predLabels=[],optVals=[],conVals=[];
     if(planData?.predictedE1RMs){
@@ -7544,6 +7535,70 @@ function setChartLift(lift){
   document.querySelectorAll('.chart-lift-btn').forEach(b=>b.classList.remove('active'));
   const btn=document.getElementById('chart-'+lift);if(btn)btn.classList.add('active');
   renderPredictionChart(lift);
+  renderStaircaseChart(lift);
+}
+// Double-progression staircase: working weight per session (stepped line) with
+// reps-at-that-weight on a second axis. Reads the same non-wildcard working sets
+// as the engine, so what you see is exactly what progression logic sees.
+function renderStaircaseChart(lift='bench'){
+  const canvas=document.getElementById('staircase-chart');
+  if(!canvas||typeof Chart==='undefined')return;
+  if(window._staircaseChart){window._staircaseChart.destroy();window._staircaseChart=null;}
+  const sub=document.getElementById('staircase-sub');
+  const bw=D?.profile?.bodyweight||ATHLETE.weightLbs;
+  const points=[];
+  (D?.sessions||[]).forEach(s=>{
+    const sets=_workingSets(s,lift);
+    if(!sets.length)return;
+    const w=_workingWeight(sets);
+    const atW=sets.filter(x=>(x.w||0)===w);
+    points.push({date:s.date,weight:lift==='pullup'?bw+w:w,reps:Math.min(...atW.map(x=>x.r)),sets:atW.length});
+  });
+  if(!points.length){
+    if(sub)sub.textContent='no logged sessions for '+lift;
+    return;
+  }
+  if(sub){
+    const first=points[0],last=points[points.length-1];
+    sub.textContent=`${LIFT_LABELS[lift]||lift}: ${first.weight}×${first.reps} → ${last.weight}×${last.reps} over ${points.length} sessions`;
+  }
+  const [lo,hi]=REP_RANGES[lift]||[5,10];
+  window._staircaseChart=new Chart(canvas,{type:'line',data:{labels:points.map(p=>p.date.slice(5)),datasets:[
+    {label:'Working weight (lb)',data:points.map(p=>p.weight),borderColor:'#6870c8',backgroundColor:'rgba(104,112,200,0.15)',stepped:true,pointRadius:4,pointBackgroundColor:'#6870c8',yAxisID:'yW',borderWidth:2},
+    {label:`Reps (range ${lo}–${hi})`,data:points.map(p=>p.reps),borderColor:'#2aa070',backgroundColor:'#2aa070',pointRadius:4,showLine:false,yAxisID:'yR'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#a8b4cc',font:{family:'DM Mono',size:10},boxWidth:12}},tooltip:{callbacks:{afterLabel:ctx=>ctx.datasetIndex===0?`${points[ctx.dataIndex].sets} working sets`:''}}},
+    scales:{yW:{position:'left',ticks:{color:'#7e8caa',font:{family:'DM Mono',size:10}},grid:{color:'rgba(104,110,210,0.08)'},title:{display:true,text:'lb',color:'#7e8caa'}},
+      yR:{position:'right',min:0,max:hi+3,ticks:{color:'#2aa070',font:{family:'DM Mono',size:10},stepSize:1},grid:{display:false}},
+      x:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:9},maxRotation:45},grid:{display:false}}}}});
+}
+// Accessory progress: first → latest logged weight×reps for every accessory
+// (catalog id or name match), so hypertrophy work finally has visible trends.
+function renderAccessoryTrends(){
+  const el=document.getElementById('accessory-trends');
+  if(!el)return;
+  const hist={};
+  (D?.sessions||[]).forEach(s=>{(s.accessories||[]).forEach(a=>{
+    if(!(a.weight||a.reps))return;
+    const key=a.id||String(a.name||'').toLowerCase();
+    if(!key)return;
+    (hist[key]=hist[key]||{name:a.name,entries:[]}).entries.push({date:s.date,weight:a.weight,sets:a.sets,reps:a.reps,wildcard:!!a.wildcard});
+  });});
+  const keys=Object.keys(hist);
+  if(!keys.length){
+    el.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;">No accessories logged yet — they\'ll appear here once you log sets from a prescription or wildcard.</div>';
+    return;
+  }
+  const fmt=e=>`${e.weight?e.weight+'lb':'BW'}${e.sets&&e.reps?' '+e.sets+'×'+e.reps:e.reps?' ×'+e.reps:''}`;
+  el.innerHTML=keys.map(k=>{
+    const h=hist[k];
+    const first=h.entries[0],last=h.entries[h.entries.length-1];
+    const delta=(first.weight&&last.weight)?last.weight-first.weight:null;
+    const deltaHtml=delta==null?'':delta>0?`<span style="color:var(--a2);">▲ +${delta}lb</span>`:delta<0?`<span style="color:var(--a4);">▼ ${delta}lb</span>`:`<span style="color:var(--t3);">—</span>`;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);">
+      <div style="min-width:0;"><div style="font-size:var(--fs-sm);color:var(--t);">${esc(h.name)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${h.entries.length} session${h.entries.length>1?'s':''} · latest ${last.date}</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">${fmt(first)} → ${fmt(last)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);">${deltaHtml}</div></div>
+    </div>`;
+  }).join('');
 }
 function toggleEquationDrawer(){
   const d=document.getElementById('eq-drawer');if(!d)return;
@@ -7772,7 +7827,7 @@ function showRPEConfirm(lift){
   const row=document.getElementById('rpe-confirm-'+lift),pillsEl=document.getElementById('rpe-pills-'+lift),predEl=document.getElementById('rpe-pred-'+lift);
   if(!row||!pillsEl)return;
   row.style.display='block';
-  const targetRPE=predictLift(lift, detectBlockWeek())?.targetRPE;
+  const targetRPE=predictLift(lift)?.targetRPE;
   if(predEl)predEl.textContent=targetRPE?`(predicted: RPE ${targetRPE})`:'';
   pillsEl.innerHTML=[5,6,7,8,9,10].map(r=>`<span class="rpe-pill${r===targetRPE?' predicted':''}" data-rpe="${r}" onclick="confirmRPE('${lift}',${r})">${r}</span>`).join('');
 }
@@ -8531,21 +8586,19 @@ function renderAIFlowDiagram(){
       detail(){
         const liftKeys=['bench','ohp','pullup','row','squat','dl'];
         const liftLabels={bench:'Bench Press',ohp:'Overhead Press',pullup:'Pullups',row:'Barbell Row',squat:'Squat',dl:'Deadlift'};
-        const bw=(()=>{const bk=detectBlockWeek();return bk;})();
-        const bp=getBlockParams(bw.weekNum);
+        const dl=detectDeload();
         const rows=[
           ...liftKeys.map(k=>{
             const best=D.currentLifts?.[k+'E1RM']||D.currentLifts?.[k]||0;
             const trend=(()=>{try{return liftTrend(k,D.sessions);}catch(e){return'—';}})();
-            return[liftLabels[k],best?best+'lb e1RM':'—',`Trend: ${trend}. The AI uses this to calculate today's working weight (typically 75–85% of e1RM).`];
+            return[liftLabels[k],best?best+'lb e1RM':'—',`Trend: ${trend}. The engine reads the last working sets to compute today's weight via double progression.`];
           }),
-          ['Block Week', bw.weekNum+' of 4', 'A 4-week progressive overload cycle. Week 4 is always a deload. Resets if fewer than 3 sessions in 14 days.'],
-          ['Block Params', `${bp.sets}×${bp.reps} @ RPE ${bp.targetRPE}`, 'Sets × reps × target RPE for this block week. Week 1 = volume base. Week 3 = intensity peak.'],
-          ['Last 8 sessions', (D.sessions||[]).length+' total logged', 'Sent as structured log: date, type, and per-set weight×reps@RPE for all 6 lifts + accessories.'],
-          ['RPE Confirmations', (D.rpeConfirmations||[]).length+' total', 'After each lift session you can confirm actual RPE vs prescribed. The last 20 are sent to the AI to calibrate future load recommendations.'],
+          ['Deload status', dl.active?'ACTIVE':'not due', 'Auto-deload: 6+ lift sessions in 21 days with no deload in 28+ → one week at 70% loads, 2×5, RPE ≤6.'],
+          ['Last sessions', (D.sessions||[]).length+' total logged', 'Stored with full per-set detail: date, type, and weight×reps@RPE for all 6 lifts + accessories. Wildcard sets are tagged and excluded from progression.'],
+          ['RPE Confirmations', (D.rpeConfirmations||[]).length+' total', 'After each lift session you can confirm actual RPE vs prescribed — shown alongside the engine trace.'],
           ['Clean pullups (max)', D.currentLifts?.pullups||'—', 'Live-computed from bodyweight-only sets. Used to scale pullup prescriptions.'],
         ];
-        return{title:'💪 Lift History — 6 compound movements tracked',desc:'Every logged session is stored with full per-set detail (weight × reps @ RPE). The AI receives the last 8 sessions and your current e1RM bests for all 6 lifts, plus trend direction computed deterministically before the AI sees anything.',rows};
+        return{title:'💪 Lift History — 6 compound movements tracked',desc:'Every logged session is stored with full per-set detail (weight × reps @ RPE). The deterministic engine reads each lift\'s last 1-2 sessions of working sets and applies double progression — no AI involved in any number.',rows};
       }
     },
     {
