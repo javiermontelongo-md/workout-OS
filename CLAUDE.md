@@ -77,17 +77,17 @@ TODAY · FUEL · PROGRAM · LOG SESSION · ACTIVITY · PROGRESS · SETTINGS
 ## Tab Roles
 - **TODAY**: check-in sliders (energy/soreness/motivation/stress/sleep/weight) + recovery snapshot charts + system activity log
 - **FUEL**: calendar-first layout — month grid at top, click any past/present day to load it for editing; edit card shows meal rows (time picker + food field), how-you-felt signals, macro summary, Save + AI buttons; weekly trend chart (14-day stacked bar macros + calorie line); AI flow diagram (desktop only). `_fuelEditDate` tracks selected date, defaults to today on tab open.
-- **PROGRAM**: workout-type dropdown (Push/Pull/Legs/Run/Cycling/Rest) + duration (30/60/90 min) + "Get Prescription" button + full prescription card + AI flow diagram (desktop only)
+- **PROGRAM**: workout-type dropdown (AUTO/Push/Pull/Legs/Run/Cycling/Rest) + duration (30/60/90 min) + "Get Prescription" (instant engine render + async Haiku garnish) + prescription card with per-lift last-time + why-trace + accessory chips + engine trace + AI flow diagram (desktop only)
 - **LOG SESSION**: lift set blocks + run log card; planned values pre-filled from `D.dailyPrescriptions[today]`; weight input placeholders match prescription (via DEF[] mutation + renderSets re-render in updateLogTabPlanned)
 - **ACTIVITY**: monthly calendar (May 2026 floor, current month ceiling, ← → arrows) with indigo lift dots + jade run dots, clickable to open session drawer; paginated session history list (10/page, newest-first); volume records; 7-day AI suggestions from last prescription's weekPlan
-- **PROGRESS**: e1RM prediction chart (with decay curve overlay + staleness badge) + run metrics + VO2max trend chart + race predictions (decay-adjusted) + body metrics chart
+- **PROGRESS**: e1RM prediction chart (decay curve + staleness badge) + progression staircase (working weight steps + reps dots, renderStaircaseChart) + accessory progress list (renderAccessoryTrends) + run metrics + VO2max trend + race predictions + body metrics chart
 - **SETTINGS**: GitHub/API config, appearance, font sizing, Training Rules collapsible drawer (replaces old RULES tab)
 
 ## Key data.json fields
 `sessions[]` · `runs[]` · `checkins[]` · `healthLogs[]` ·
 `healthLastSync` · `stravaLastSync` ·
 `runPrescriptions{}` · `dailyPrescriptions{}` ·
-`rpeConfirmations[]` · `coachingLog[]` · `bodyMetrics[]`
+`rpeConfirmations[]` · `coachingLog[]` · `bodyMetrics[]` · `lastDeload`
 
 ## Lift Keys
 `bench` · `ohp` · `pullup` · `row` · `squat` · `dl`
@@ -268,7 +268,7 @@ All line numbers are from origin/main. Verify before editing:
 | Line | Function | Purpose |
 |------|----------|---------|
 | ~3160 | liftTrend(key, sessions, weeks=4) | Computes 'improving'/'plateauing'/'declining'/'insufficient_data' for a lift key over N weeks |
-| ~4226 | generateDailyPrescription(workoutType, durationMins) | **Only AI entry point.** Direct API call (claude-sonnet-4-6, 2500 tokens). Triggered by "Get Prescription" button in Program tab. Produces todayPrescription + weekPlan[7]. Stores to D.dailyPrescriptions[today]. Calls renderPrescriptionCard, renderWeekSuggestions, updateLogTabPlanned, pushSilent. |
+| ~4226 | generateDailyPrescription(workoutType, durationMins) | Engine-first: renders buildEnginePrescription() output instantly, then optional _fetchPrescriptionGarnish() Haiku call (claude-haiku-4-5, 400 tokens) merges coach notes. 'auto' workoutType supported. Persists D.lastDeload when a deload prescription generates. |
 | 6604 | getLatestPrescription() | Returns the most recent dailyPrescription entry (any date) |
 | 6612 | renderLogFeedback() | Renders post-session feedback UI in LOG tab |
 | 6638 | generateSessionFeedback(ts) | AI-powered post-session feedback generation (async) |
@@ -277,7 +277,7 @@ All line numbers are from origin/main. Verify before editing:
 | Line | Function | Purpose |
 |------|----------|---------|
 | ~4038 | compute7DayMeans() | Rolling 7-day HRV/RHR averages + 60-day personal z-score baseline. Returns: hrv, rhr, count, hrvBaseline60, hrvSD60, hrv60Count, rhrBaseline60, rhrSD60, rhr60Count. Falls back to ATHLETE.hrvBaseline/rhrBaseline if <30 days of data. |
-| ~4083 | evaluateTrainingStatus() | Deterministic rule engine. Uses 60-day z-score baseline (not fixed % thresholds) for HRV/RHR. Called in generateDailyPrescription() and renderRulesTab(). Returns: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR, latestHRV, latestRHR, sleepHours, means. |
+| ~4083 | evaluateTrainingStatus() | Deterministic rule engine. Uses 60-day z-score baseline (not fixed % thresholds) for HRV/RHR. DELOAD_WEEK flag now comes from detectDeload() (engine), not a calendar block week. Called in generateDailyPrescription() and renderRulesTab(). Returns: canTrain, canDoQuality, canDoHeavyLifts, liftRPECap, volumeModifier, stressScore, activeFlags, reasons, mafHR, latestHRV, latestRHR, sleepHours, means. |
 
 ### System Health
 | Line | Function | Purpose |
@@ -367,10 +367,8 @@ All line numbers are from origin/main. Verify before editing:
 ### Prescription, Program & AI Flow
 | Line | Function | Purpose |
 |------|----------|---------|
-| ~3212 | detectBlockWeek() | Block week 1-4, resets on <3 sessions in 14 days. liftDays includes legacy numeric formats '1','2','4','5'. |
-| ~3233 | getBlockParams(blockWeek) | Sets/reps/targetRPE per block week |
 | ~3238 | buildPredictions(currentE1RM, slope) | 4-week e1RM projections (optimistic/conservative dashed lines) |
-| ~3249 | predictLift(liftKey, blockWeek) | Predicted e1RM for a lift — called by renderPredictionChart, showRPEConfirm, confirmRPE |
+| ~3249 | predictLift(liftKey) | Chart data for a lift — sets/reps/weight now come from prescribeLift() so charts match prescriptions; keeps regression slope + optimistic/conservative projections. Called by renderPredictionChart, showRPEConfirm, confirmRPE |
 | ~4526 | renderPredictionChart(lift) | e1RM prediction chart — includes decay curve overlay and staleness badge from getDecayedE1RM/buildStrengthDecayCurve |
 | ~4577 | setChartLift(lift) | Set active lift for prediction chart |
 | ~4582 | toggleEquationDrawer() | Toggle the e1RM equation reference drawer in PROGRESS tab |
@@ -418,39 +416,64 @@ All line numbers are from origin/main. Verify before editing:
 
 ---
 
-## AI Architecture
+## Prescription Architecture (rebuilt 2026-07-18)
 
-### Call Hierarchy
+### Deterministic engine — ALL numbers computed locally, zero AI
 ```
-generateDailyPrescription(workoutType, durationMins)  ← only AI call in the app
-  └── evaluateTrainingStatus()  ← hard rules (z-score engine)
-  └── compute7DayMeans()        ← 7-day biometrics + 60-day personal baseline
-  └── Direct Anthropic API (claude-sonnet-4-6, 2500 tokens)
-        Prompt includes (lift days only): D.rpeConfirmations.slice(-20)
-        → AI uses actual vs predicted RPE to calibrate load recommendations
-  └── Produces: todayPrescription + weekPlan[7]
-  └── Writes: D.dailyPrescriptions[today]
-  └── Calls: renderPrescriptionCard(), renderWeekSuggestions(),
-             updateLogTabPlanned(), pushSilent()
+buildEnginePrescription(workoutType, durationMins)   ← core; instant, works offline
+  ├── autoPickWorkoutType()      workoutType='auto' → days-since rotation with why-trace
+  ├── detectDeload()             6+ lift sessions/21d + no deload in 28d → deload week
+  │                              (D.lastDeload persisted by generateDailyPrescription;
+  │                               active 7 days; also flags DELOAD_WEEK in
+  │                               evaluateTrainingStatus → blocks quality runs)
+  ├── prescribeLift(lift, ts, deload)   double progression per lift:
+  │     · reads last 1-2 sessions of non-wildcard working sets
+  │     · all sets at top of REP_RANGES at RPE ≤8 → +LOAD_INC, reps reset to bottom
+  │     · 2 sessions below range bottom → reset to 90%
+  │     · RPE ≥9.5 → hold and consolidate
+  │     · deload override: 70% load, 2×5, RPE ≤6
+  │     · returns {weight,sets,reps,targetRPE,why[],last{date,daysAgo,display}}
+  ├── pickAccessories(dayType, count)   least-recently-done rotation from
+  │                                     ACCESSORY_CATALOG with target diversity
+  └── prescribeRun(kind, ts)     deterministic run/ride: 80/20 quality slot logic,
+                                 MAF cap, weekly mileage from Strava history
+
+Constants: REP_RANGES · LOAD_INC · START_WEIGHTS · BASE_SETS · LIFT_LABELS ·
+DAY_LIFTS · ACCESSORY_CATALOG (8-9 per day type, each {id,name,target,sets,reps})
 ```
 
-### evaluateTrainingStatus() Call Sites (2)
-1. generateDailyPrescription() — builds hard-rule context for the prompt
-2. renderRulesTab() — live status display in Settings Rules drawer
+### AI garnish — the ONLY AI call in the prescription path
+```
+generateDailyPrescription(workoutType, durationMins)
+  1. Renders engine prescription instantly (no API key needed)
+  2. _engineNextSession(type) → deterministic next-session rec
+  3. IF api key: _fetchPrescriptionGarnish() → claude-haiku-4-5-20251001,
+     max_tokens 400, prompt = engine decisions + biometrics (~700 tokens in)
+     Returns {reasoning, coachNote, liftNotes{lift:cue}, watchOutFor[]} — merged
+     into the card. Failure = silent skip, prescription unaffected.
+  ~$0.002/call vs ~$0.021 for the old Sonnet do-everything call.
+```
 
-### HRV/RHR Rule Engine (z-score, not fixed %)
-HRV and RHR thresholds are NOT fixed percentages — they use a rolling 60-day personal
-baseline (mean ± SD) computed by compute7DayMeans():
-- **HRV Acute Crash** (flag: HRV_ACUTE_CRASH): latest HRV < baseline − 1.5 SD → blocks quality + heavy, volume ×0.75, RPE cap 6
-- **HRV Warning** (flag: HRV_WARNING): latest HRV < baseline − 0.75 SD → volume ×0.85, RPE cap 7
-- **RHR Spike** (flag: RHR_SPIKE): latest RHR > baseline + 1.5 SD → blocks quality, volume ×0.85, RPE cap 7
-Requires ≥30 days of HRV/RHR data; falls back to ATHLETE.hrvBaseline/rhrBaseline if fewer.
-The ATHLETE constant no longer stores HRV_CRASH or HRV_WARNING constants (those were fixed %).
+### Prescription card (renderPrescriptionCard)
+Per lift: sets×reps @ weight + RPE cap + "Last: 115×8@7,... · 2d ago" +
+"↳ why" line. Accessory catalog chips (recommended pre-selected, tap to swap →
+toggleAccessory(id)). Engine trace block at bottom. Haiku coachNote/watchOutFor
+render when present. Rest days get a simple rest card.
 
-### coachingLog Write Sites (1)
-- generateDailyPrescription() → type: 'daily_prescription' → renderSystemLog()
+### Wildcard quick-add (LOG SESSION)
+wildcard-block card: dropdown of big-6 + full catalog → renderWildcardBlock().
+Lift wildcard sets merge into session[lift].sets tagged wc:true; accessory
+wildcards into session.accessories tagged wildcard:true.
+wc:true sets are EXCLUDED from: getLiftHistory, prescribeLift/_workingSets,
+saveSession updE, recalcE1RMs, renderStaircaseChart. This lets light rebuild
+sets (e.g. 2×5 squat @ 95 after push day) be logged without corrupting
+progression, stall detection, or e1RM.
 
----
+### Accessory logging & progress
+Prescribed accessories flow into LOG tab inputs (structured objects with id;
+legacy freeform strings still parse). Saved to sessions[].accessories
+{id?,name,prescribed,weight,sets,reps,notes}. renderAccessoryTrends() on
+PROGRESS shows first→latest with weight deltas, keyed by id (fallback name).
 
 ## ATHLETE Constant Fields
 ```
@@ -646,6 +669,12 @@ source:       'strava'
 - **calcRunMetrics()**: dead function — run metrics computed inline in renderRunMetricsSummary
 - **setRunChart()**: dead wrapper — renderRunChart() called directly
 - **formatSleepInput()**: dead function — sleep input handled without reformatting
+- **detectBlockWeek() + getBlockParams()**: 4-week block wave (Volume/Strength/Peak/Deload)
+  that drove chart targets but never prescriptions — replaced by the engine
+  (prescribeLift double progression + detectDeload auto-deload)
+- **Old Sonnet do-everything prescription call**: 2500-token claude-sonnet-4-6 call that
+  computed weights via prompt rules (and misapplied them; row data was never sent, causing
+  systematically lowballed row prescriptions) — replaced by deterministic engine + Haiku garnish
 - **Dead CSS clusters removed**: `ap-*` (adaptive plan), `spark-*` (sparklines), `pbw/pbl/pbb/pbf` (progress bars),
   `bbar/bfill` (bar fill), `ex-plan`, `cal-rest`, `cal-badge.run-*`, `ride-stat-box`,
   `prog-exercises/ex-note/collapsed-body`, `wn-dot`
