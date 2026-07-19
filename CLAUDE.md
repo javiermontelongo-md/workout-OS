@@ -98,38 +98,47 @@ TODAY · FUEL · PROGRAM · LOG SESSION · ACTIVITY · PROGRESS · SETTINGS
 
 ### Color Palette (`:root`)
 ```
+/* Design v2 (2026-07): deeper surfaces, luminous accents, real type hierarchy.
+   One-time localStorage migration key: wos-design-v = '2' (clears old size overrides). */
+
 /* Backgrounds */
---bg: #080a10        base page background
---s1: #0f1219        card surface (level 1)
---s2: #141824        inner surface (level 2)
---s3: #1a1f2e        elevated surface (level 3)
---s4: #1f2538        top surface (level 4)
+--bg: #06070d        base page background (+ fixed radial gradient wash on body)
+--s1: #0d101b        card surface (level 1)
+--s2: #131727        inner surface (level 2)
+--s3: #1a1f33        elevated surface (level 3)
+--s4: #232941        top surface (level 4)
 
 /* Borders */
---b:  rgba(104,110,210,0.25)   card outlines
---b2: rgba(104,110,210,0.42)   inner dividers
---b3: rgba(104,110,210,0.58)   emphasis borders
+--b:  rgba(124,131,247,0.14)   card outlines
+--b2: rgba(124,131,247,0.27)   inner dividers
+--b3: rgba(124,131,247,0.44)   emphasis borders
 
 /* Accent */
---a:  #6870c8   indigo   (primary CTA, active nav)
---a2: #2aa070   jade     (positive / run)
---a3: #3d88d4   blue     (info)
---a4: #c24d72   rose     (alert)
---a5: #a066d4   violet   (secondary accent)
---aw: #b86035   amber    (warning / if-too-hard)
---red: #e85d8a
+--a:  #7c86f8   periwinkle (primary CTA, active nav)
+--a2: #34c98e   jade       (positive / run)
+--a3: #4aa3f0   blue       (info)
+--a4: #ef6292   rose       (alert)
+--a5: #b388f5   violet     (secondary accent)
+--aw: #d9924f   amber      (warning / wildcard / deload)
+--red: #f0648f
 
 /* Text */
---t:  #e2eaf8   primary body text
---t2: #a8b4cc   secondary labels, subtext
---t3: #7e8caa   tertiary hints, timestamps
+--t:  #eef1fc   primary body text
+--t2: #aeb8d6   secondary labels, subtext
+--t3: #7b87a8   tertiary hints, timestamps
+
+/* Depth */
+--shadow-1 / --shadow-2   card resting/hover shadows (+1px inset top highlight)
+--ring                    focus ring for inputs (3px glow)
 ```
 
 ### Typography & Font System
 The app uses a two-level font system:
 
 **Base size** — controls body text. Set via font preset buttons (XS/S/M/L/XL) or saved
-to localStorage as `wos-fontsize`. Default: 19px.
+to localStorage as `wos-fontsize` (stores the PRESET KEY 14/17/19/22/26, not px —
+since design v2, base px ≠ key; M key 19 → base 17px). Content tiers scale with the
+preset; meta tiers (labels/badges/timestamps) scale less so hierarchy survives.
 
 **Component sizes** — per-component sliders in Settings override individual elements.
 Stored in localStorage as `wos-comp-fs` (desktop) and `wos-comp-fs-mobile`.
@@ -139,15 +148,16 @@ m_label, m_input, m_btn, m_cardtext (mobile).
 
 **CSS variables (`:root`)** — auto-managed by applyAppearance():
 ```
---fs-xs:           19px   (small labels, timestamps, mono tags)
---fs-sm:           22px   (secondary text, check-in labels)
---fs-presc-text:   13px   (prescription body text — separate slider)
---fs-presc-lift:   13px   (lift row text — separate slider)
+--fs-xs:           13px   (small labels, timestamps, mono tags)
+--fs-sm:           15px   (secondary text, check-in labels)
+--fs-presc-text:   15px   (prescription body text — separate slider)
+--fs-presc-lift:   15px   (lift row text — separate slider)
+Desktop M defaults: body 17 · h1 30 · nav 14 · lbl 12 · bdg 12 · sv 30 · btn 14
 ```
 
 **Font presets** (applyFontPreset):
 ```
-XS = 14px base   S = 17px   M = 19px (default)   L = 22px   XL = 26px
+Keys 14/17/19/22/26 → base px 14/15/17/19/22 (M = key 19 = 17px base, default)
 ```
 
 **Small text floor** — setSmallTextSize(px) independently controls --fs-xs and --fs-sm.
