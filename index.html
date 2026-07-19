@@ -1058,6 +1058,7 @@ input[type=range]::-webkit-slider-thumb:hover {
 <!-- v2026-05-22 -->
 <div id="panel-today" class="panel on">
   <div class="h1">Today's <span>training</span></div>
+  <div id="today-plan-strip"></div>
   <div class="card ca ia" id="today-checkin-snapshot">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">recovery snapshot</div>
@@ -1628,6 +1629,7 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
     <div id="presc-summary" style="min-height:28px;margin-bottom:4px;"></div>
     <div id="presc-gen-msg" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);min-height:16px;margin-bottom:6px;"></div>
+    <div id="deload-banner" style="display:none;"></div>
     <button class="btn bp" style="width:100%;margin-top:8px;" onclick="startLoggingSession()">Start logging this session</button>
   </div>
   <div style="margin-bottom:20px;">
@@ -2630,6 +2632,7 @@ function onLoad(){
   }catch(e){}
   initCheckinTab();
   renderSnapshotCharts();
+  renderTodayPlanStrip();
   rendered.today=true;
   renderSystemLog();
 }
@@ -2833,18 +2836,19 @@ function showTab(n){
   const p=document.getElementById('panel-'+n); if(p){ p.classList.add('on'); }
   window.scrollTo(0,0);
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
+  if(n==='today'){ renderTodayPlanStrip(); }
   if(n==='week'){ renderCalendar(); renderSessionList(); }
   if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderStaircaseChart(); renderAccessoryTrends(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
-  if(n==='program'){ renderAIFlowDiagram(); }
+  if(n==='program'){ renderDeloadBanner(); renderAIFlowDiagram(); }
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
   if(n==='log'){ renderSessHist(); updateLogTabPlanned(); renderLogFeedback(); }
   else if(n==='week'){ }
   else if(n==='progress'){ }
-  else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||getLatestPrescription(); renderPrescriptionCard(_pd); renderNextSessionRec(_pd?.nextSession||null); renderAIFlowDiagram(); }
+  else if(n==='program'){ const _pd=D.dailyPrescriptions?.[localDS(new Date())]||getLatestPrescription(); renderPrescriptionCard(_pd); renderNextSessionRec(_pd?.nextSession||null); renderDeloadBanner(); renderAIFlowDiagram(); }
 }
 
 // ============================================================
@@ -3115,16 +3119,20 @@ async function saveFuelDay(){
 }
 
 // AI_INPUT_PRICE and AI_OUTPUT_PRICE in $ per token (claude-sonnet-4-6 as of Jun 2026)
-const AI_IN_PRICE=3/1e6;
-const AI_OUT_PRICE=15/1e6;
+// Per-model API pricing ($/token). Prescriptions use Haiku; fuel/feedback features use Sonnet.
+const AI_PRICES={
+  'claude-sonnet-4-6':{inp:3/1e6,out:15/1e6},
+  'claude-haiku-4-5-20251001':{inp:1/1e6,out:5/1e6}
+};
 const AI_CALL_LABELS={macros:'Fuel: estimate macros',checkin:'Fuel: AI check-in',memory:'Fuel: memory update',prescription:'Program: get prescription'};
 
-function recordAIUsage(type,usage){
+function recordAIUsage(type,usage,model='claude-sonnet-4-6'){
   if(!D||!usage)return;
   if(!D.aiUsage)D.aiUsage=[];
   const inp=usage.input_tokens||0;
   const out=usage.output_tokens||0;
-  D.aiUsage.push({ts:Date.now(),type,inp,out,cost:+(inp*AI_IN_PRICE+out*AI_OUT_PRICE).toFixed(6)});
+  const p=AI_PRICES[model]||AI_PRICES['claude-sonnet-4-6'];
+  D.aiUsage.push({ts:Date.now(),type,inp,out,cost:+(inp*p.inp+out*p.out).toFixed(6)});
   // Prune to last 365 days
   const cutoff=Date.now()-365*86400000;
   D.aiUsage=D.aiUsage.filter(u=>u.ts>=cutoff);
@@ -4664,7 +4672,8 @@ function buildSessionDrawerContent(session,dateStr){
       const w=s.w?`${s.w} lb`:'BW';
       const r=s.r?`× ${s.r}`:'';
       const rpe=s.rpe?`@ RPE ${s.rpe}`:'';
-      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b);"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);width:20px;">S${i+1}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);flex:1;">${w} ${r}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">${rpe}</span></div>`;
+      const wcTag=s.wc?`<span title="Wildcard set — excluded from progression math" style="font-size:var(--fs-xs);">🃏</span>`:'';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--b);"><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);width:20px;">S${i+1}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t);flex:1;">${w} ${r} ${wcTag}</span><span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);">${rpe}</span></div>`;
     }).join('');
     const notes=session[l.key].notes?`<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);margin-top:8px;padding:8px;background:var(--s3);border-radius:6px;">${session[l.key].notes}</div>`:'';
     return `<div style="margin-bottom:18px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">${l.label}</div>${rows}${notes}</div>`;
@@ -4843,20 +4852,20 @@ function buildEditLiftBlock(key,label,ts,notes){
   const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
   const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
   const colHdr=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:4px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">WEIGHT</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">REPS</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);text-align:center;">RPE</div><div></div></div>`;
-  const rows=((window._EF&&window._EF[key])||[]).map((s,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${i}`,s.w,'lb')}${numInp(`edit-${key}-r-${i}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${i}`,s.rpe,'RPE')}<button onclick="removeEditSet('${key}',${i},${ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button></div>`).join('');
+  const rows=((window._EF&&window._EF[key])||[]).map((s,i)=>`<div title="${s.wc?'Wildcard set — excluded from progression math':''}" style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;${s.wc?'border-left:2px solid var(--aw);padding-left:5px;':''}">${numInp(`edit-${key}-w-${i}`,s.w,'lb')}${numInp(`edit-${key}-r-${i}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${i}`,s.rpe,'RPE')}<button onclick="removeEditSet('${key}',${i},${ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button></div>`).join('');
   return `<div id="edit-block-${key}" style="margin-bottom:16px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${label}</div>${colHdr}<div id="edit-sets-${key}">${rows}</div><button onclick="addEditSet('${key}',${ts})" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--a);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;margin-top:4px;width:100%;">+ Add set</button><input id="edit-${key}-notes" type="text" value="${esc(notes)}" placeholder="Notes..." style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b);color:var(--t2);border-radius:6px;padding:5px 8px;width:100%;box-sizing:border-box;margin-top:2px;"></div>`;
 }
 function _captureEditSets(key){
   if(!window._EF||!window._EF[key]) return;
   const g=id=>document.getElementById(id);
-  window._EF[key].forEach((_,j)=>{window._EF[key][j]={w:+g(`edit-${key}-w-${j}`)?.value||null,r:+g(`edit-${key}-r-${j}`)?.value||null,rpe:+g(`edit-${key}-rpe-${j}`)?.value||null};});
+  window._EF[key].forEach((s,j)=>{window._EF[key][j]={w:+g(`edit-${key}-w-${j}`)?.value||null,r:+g(`edit-${key}-r-${j}`)?.value||null,rpe:+g(`edit-${key}-rpe-${j}`)?.value||null,...(s.wc?{wc:true}:{})};});
 }
 function renderEditSets(key,ts){
   const cont=document.getElementById('edit-sets-'+key);
   if(!cont||!window._EF||!window._EF[key]) return;
   const esc=v=>v!=null?String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;'):'';
   const numInp=(id,val,ph)=>`<input id="${id}" type="number" value="${esc(val)}" placeholder="${ph}" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:5px 6px;width:100%;box-sizing:border-box;text-align:center;">`;
-  cont.innerHTML=window._EF[key].map((s,j)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;">${numInp(`edit-${key}-w-${j}`,s.w,'lb')}${numInp(`edit-${key}-r-${j}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${j}`,s.rpe,'RPE')}<button onclick="removeEditSet('${key}',${j},${ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button></div>`).join('');
+  cont.innerHTML=window._EF[key].map((s,j)=>`<div title="${s.wc?'Wildcard set — excluded from progression math':''}" style="display:grid;grid-template-columns:1fr 1fr 1fr 24px;gap:6px;margin-bottom:6px;align-items:center;${s.wc?'border-left:2px solid var(--aw);padding-left:5px;':''}">${numInp(`edit-${key}-w-${j}`,s.w,'lb')}${numInp(`edit-${key}-r-${j}`,s.r,'reps')}${numInp(`edit-${key}-rpe-${j}`,s.rpe,'RPE')}<button onclick="removeEditSet('${key}',${j},${ts})" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0;line-height:1;align-self:center;">×</button></div>`).join('');
 }
 function addEditSet(key,ts){
   if(!window._EF) window._EF={};
@@ -4899,7 +4908,7 @@ async function saveEditedSession(ts){
     const inForm=!!(window._EF&&window._EF[key]);
     if(!inForm&&!session[key]?.sets) return;
     const setCount=inForm?window._EF[key].length:session[key].sets.length;
-    const sets=Array.from({length:setCount},(_,i)=>({w:+g(`edit-${key}-w-${i}`)?.value||null,r:+g(`edit-${key}-r-${i}`)?.value||null,rpe:+g(`edit-${key}-rpe-${i}`)?.value||null}));
+    const sets=Array.from({length:setCount},(_,i)=>({w:+g(`edit-${key}-w-${i}`)?.value||null,r:+g(`edit-${key}-r-${i}`)?.value||null,rpe:+g(`edit-${key}-rpe-${i}`)?.value||null,...(window._EF?.[key]?.[i]?.wc?{wc:true}:{})}));
     // Existing lifts always update (allows clearing sets); newly picked lifts persist
     // only if the user actually entered something, so an empty pick leaves no phantom.
     if(session[key]||sets.some(x=>x.w||x.r||x.rpe)){
@@ -6771,7 +6780,9 @@ function onDayTypeChange(value){
   setTimeout(_restoreLogDraft, 0);
 }
 function startLoggingSession(){
-  const prescType=document.getElementById('presc-workout-type')?.value||'';
+  let prescType=document.getElementById('presc-workout-type')?.value||'';
+  // AUTO resolves to whatever the engine actually prescribed for today
+  if(prescType==='auto')prescType=D?.dailyPrescriptions?.[localDS(new Date())]?.workoutType||'';
   const typeMap={push:'A',pull:'B',legs:'C',run:'run',cycling:'run',rest:'rest'};
   const todayDay=typeMap[prescType]||prescType;
   window._logDate=localDS(new Date());
@@ -6980,6 +6991,7 @@ function evaluateTrainingStatus(){
   if(deload.active){
     flags.push('DELOAD_WEEK');
     canDoQuality=false;
+    reasons.push('Deload week — engine prescribes 70% loads at 2×5; quality runs blocked.');
   }
 
   let stressScore=0;
@@ -7043,6 +7055,8 @@ async function generateDailyPrescription(workoutType,durationMins){
     window._logDate=today; window._logManualType=null;
     updateLogTabPlanned();
     renderSystemLog();
+    renderDeloadBanner();
+    renderTodayPlanStrip();
     if(!D.coachingLog)D.coachingLog=[];
     D.coachingLog.push({ts:Date.now(),type:'daily_prescription',label:`${resolvedType} ${durationMins}min · ${today}`});
     if(D.coachingLog.length>50)D.coachingLog=D.coachingLog.slice(-50);
@@ -7110,7 +7124,7 @@ ACCESSORIES: ${accLine||'none'}
 Output ONLY JSON: {"reasoning":"2 sentences max on why today's numbers make sense for this athlete","coachNote":"1-2 sentences of specific, non-generic coaching for this exact session","liftNotes":{${mw.lifts?Object.keys(mw.lifts).map(k=>`"${k}":"one specific form or execution cue"`).join(','):''}},"watchOutFor":["max 2 short items"]}`;
   const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:400,system:'You are a concise strength and running coach. Output only valid JSON.',messages:[{role:'user',content:prompt}]})});
   const d=await r.json();
-  recordAIUsage('prescription',d.usage);
+  recordAIUsage('prescription',d.usage,'claude-haiku-4-5-20251001');
   if(d.error)throw new Error(d.error.message);
   const text=d.content?.[0]?.text||'';
   const s=text.indexOf('{'),e=text.lastIndexOf('}');
@@ -7263,6 +7277,72 @@ function addWildcard(){
   renderWildcardBlock();
 }
 function removeWildcard(i){window._logWildcards.splice(i,1);renderWildcardBlock();}
+// ── TODAY PLAN STRIP (Today tab) ─────────────────────────────
+// One-glance answer to "what am I doing today?": today's prescription if it
+// exists, otherwise the engine's AUTO pick as a preview — one tap to Program.
+function renderTodayPlanStrip(){
+  const el=document.getElementById('today-plan-strip');
+  if(!el)return;
+  const today=localDS(new Date());
+  const p=D?.dailyPrescriptions?.[today];
+  const TYPE_ICONS={push:'🏋️',pull:'💪',legs:'🦵',run:'🏃',cycling:'🚴',rest:'💤'};
+  const logged=(D?.sessions||[]).some(s=>s.date===today);
+  if(p){
+    const icon=TYPE_ICONS[p.workoutType]||'•';
+    const status=logged?`<span style="color:var(--a2);">✓ logged</span>`:`<button onclick="showTab('log')" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--a);border:1px solid var(--b2);border-radius:6px;padding:5px 12px;cursor:pointer;">Log it →</button>`;
+    el.innerHTML=`<div class="card" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;cursor:pointer;" onclick="if(event.target.tagName!=='BUTTON')showTab('program')">
+      <span style="font-size:20px;">${icon}</span>
+      <div style="flex:1;min-width:150px;">
+        <div style="font-size:var(--fs-sm);color:var(--t);font-weight:600;">${esc(p.summary||p.workoutType)}</div>
+        <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${esc(p.mainWork?.summary||'')} · ${p.durationMins}min</div>
+      </div>
+      ${status}
+    </div>`;
+    return;
+  }
+  const pick=autoPickWorkoutType();
+  const icon=TYPE_ICONS[pick.type]||'•';
+  el.innerHTML=`<div class="card" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;">
+    <span style="font-size:20px;">${icon}</span>
+    <div style="flex:1;min-width:150px;">
+      <div style="font-size:var(--fs-sm);color:var(--t);">Engine suggests: <span style="color:var(--a);font-weight:600;text-transform:capitalize;">${esc(pick.type)}</span></div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${esc(pick.why[0]||'')}</div>
+    </div>
+    <button onclick="showTab('program')" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--a);border:1px solid var(--b2);border-radius:6px;padding:5px 12px;cursor:pointer;">Get prescription →</button>
+  </div>`;
+}
+// ── DELOAD BANNER (Program tab) ──────────────────────────────
+function renderDeloadBanner(){
+  const el=document.getElementById('deload-banner');
+  if(!el)return;
+  const dl=detectDeload();
+  if(!dl.active){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='';
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:8px;background:rgba(184,96,53,0.08);border:1px solid rgba(184,96,53,0.3);border-radius:10px;">
+    <span style="font-size:16px;">🔋</span>
+    <div style="flex:1;min-width:180px;">
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--aw);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">Deload week ${D.lastDeload&&_daysAgo(D.lastDeload)<7?'active':'due'}</div>
+      <div style="font-size:var(--fs-xs);color:var(--t3);line-height:1.5;">${esc(dl.why||'')}</div>
+    </div>
+    <button onclick="skipDeload()" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap;">Skip deload</button>
+  </div>`;
+}
+// Skip = suppress the deload trigger for ~20 days (marks a deload as if it
+// happened 8 days ago — old enough to not be active, recent enough to not re-trigger).
+function skipDeload(){
+  D.lastDeload=localDS(new Date(Date.now()-8*86400000));
+  const today=localDS(new Date());
+  const p=D.dailyPrescriptions?.[today];
+  renderDeloadBanner();
+  if(p){
+    // Regenerate today's prescription without the deload override
+    const rt=p.requestedType||p.workoutType,dm=p.durationMins;
+    delete D.dailyPrescriptions[today];
+    generateDailyPrescription(rt,dm);
+  }else{
+    pushSilent();
+  }
+}
 function addWildcardSet(i){window._logWildcards[i].sets.push({w:'',r:'',rpe:''});renderWildcardBlock();}
 function removeWildcardSet(i,j){window._logWildcards[i].sets.splice(j,1);if(!window._logWildcards[i].sets.length)window._logWildcards.splice(i,1);renderWildcardBlock();}
 function renderCustomExercises(){
