@@ -443,13 +443,25 @@ buildEnginePrescription(workoutType, durationMins)   ← core; instant, works of
   │     · RPE ≥9.5 → hold and consolidate
   │     · deload override: 70% load, 2×5, RPE ≤6
   │     · returns {weight,sets,reps,targetRPE,why[],last{date,daysAgo,display}}
-  ├── pickAccessories(dayType, count)   least-recently-done rotation from
-  │                                     ACCESSORY_CATALOG with target diversity
+  ├── pickAccessories(dayType, count)   rotation from ACCESSORY_CATALOG v2:
+  │     muscle coverage first, staleness second, implement variety third
+  │     (each entry has muscle + impl: barbell/ez/db/cable/machine/bw).
+  │     Legacy freeform names count via normalizeAccessory().
   └── prescribeRun(kind, ts)     deterministic run/ride: 80/20 quality slot logic,
                                  MAF cap, weekly mileage from Strava history
 
 Constants: REP_RANGES · LOAD_INC · START_WEIGHTS · BASE_SETS · LIFT_LABELS ·
-DAY_LIFTS · ACCESSORY_CATALOG (8-9 per day type, each {id,name,target,sets,reps})
+DAY_LIFTS · ACCESSORY_CATALOG v2 (10-14 per day type, {id,name,muscle,impl,sets,reps})
+
+Exercise identity: normalizeAccessory(rawName) maps legacy freeform names
+("Cable Tricep Pushdown 3×12 — full elbow extension...") onto canonical catalog
+entries deterministically; accKeyFor(entry) = id → normalized name → raw fallback.
+Used by trends, rotation, glance rows, wildcard prefill.
+
+ASSISTED PULL-UPS: pullup set weight NEGATIVE = lb of machine assist
+(w=-50 → effective load bw-50). fmtLiftW() renders "BW−50 assist" everywhere.
+Progression +5 = 5lb less assist; stall reset = +10lb assist; deload = +20lb
+assist. e1RM/staircase use bw+w so negative w is handled natively.
 ```
 
 ### AI garnish — the ONLY AI call in the prescription path
@@ -478,6 +490,29 @@ wc:true sets are EXCLUDED from: getLiftHistory, prescribeLift/_workingSets,
 saveSession updE, recalcE1RMs, renderStaircaseChart. This lets light rebuild
 sets (e.g. 2×5 squat @ 95 after push day) be logged without corrupting
 progression, stall detection, or e1RM.
+
+### PROGRESS tab views
+- Lift ledger (#lift-ledger, updProgressStats): one row per big-6 — decay-aware
+  e1RM (/peak when rusty), days since last done, liftTrend arrow, best-ever set.
+  Replaced the old 12 stat tiles (pr-*/vol-* ids and computeVolumeBests deleted).
+- Cardio strip (#cardio-strip): easy pace, Z2 HR, weekly miles, max pull-ups, BW.
+- renderAllStaircases(): #staircase-grid, one compact stepped chart per big-6
+  (pull-ups plot effective bw+w load). Replaced single renderStaircaseChart.
+- renderAccessoryTrends(): normalized + grouped under muscle headers, <details>
+  rows expand to full session-by-session history, delta badges.
+
+### ACTIVITY calendar
+Cells show labeled chips (PUSH/PULL/LEGS · RUN 3.2 · RIDE 45m) instead of dots;
+summary line = lifts (tally by type) · runs+miles · rides+minutes · active days,
+plus a legend row. All in renderCalendar().
+
+### LOG SESSION glance + search
+- renderLiftGlances() (hooked in onDayTypeChange): "Last: 115×8@7,... · 4d ago"
+  under every visible lift block.
+- Accessory blocks show the same Last: line (normalized lookup).
+- Wildcard picker = search input (#wildcard-search) + scrollable grouped list
+  (#wildcard-list, renderWildcardPicker) over big-6 + full catalog with last
+  weights; addWildcard(val) takes "lift:key"/"acc:id".
 
 ### Accessory logging & progress
 Prescribed accessories flow into LOG tab inputs (structured objects with id;

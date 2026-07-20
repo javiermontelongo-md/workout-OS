@@ -1277,7 +1277,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div class="card lift-ia" id="pullup-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg g">💪 WEIGHTED PULL-UPS</span><span id="planned-pullup" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ BW</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
-    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:-6px;margin-bottom:6px;">lb added to harness (0 = bodyweight)</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:-6px;margin-bottom:6px;">assist machine = NEGATIVE lb (−50 = machine removes 50) · 0 = bodyweight · positive = added weight</div>
     <div id="pullup-sets"></div>
     <button class="addbtn" onclick="addSet('pullup')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="pullup-notes" placeholder="Notes..."></div>
@@ -1311,10 +1311,8 @@ input[type=range]::-webkit-slider-thumb:hover {
       <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">extra light sets — excluded from progression math</span>
     </div>
     <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:10px;">For slowly rebuilding a lift (e.g. light squats after push day) without confusing the engine.</div>
-    <div style="display:flex;gap:8px;margin-bottom:10px;">
-      <select id="wildcard-select" style="flex:1;font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);border:1px solid var(--b2);color:var(--t);border-radius:6px;padding:6px 8px;"></select>
-      <button onclick="addWildcard()" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--aw);border:1px solid rgba(217,146,79,0.3);border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap;">+ Add</button>
-    </div>
+    <input id="wildcard-search" type="text" placeholder="Search exercises… (bench, curl, leg press)" oninput="renderWildcardPicker(this.value)" style="margin-bottom:8px;">
+    <div id="wildcard-list" style="max-height:180px;overflow-y:auto;border:1px solid var(--b);border-radius:10px;margin-bottom:10px;"></div>
     <div id="wildcard-rows"></div>
   </div>
 
@@ -1376,23 +1374,13 @@ input[type=range]::-webkit-slider-thumb:hover {
 <!-- v2026-05-22 -->
 <div id="panel-progress" class="panel">
   <div class="h1">Strength &amp; cardio <span>progress</span></div>
-  <div class="g4 k2" style="margin-bottom:14px;">
-    <div class="stat"><div class="sv a" id="pr-bench">255</div><div class="sl">Bench e1RM (lb)</div></div>
-    <div class="stat"><div class="sv a" id="pr-squat">215</div><div class="sl">Squat e1RM (lb)</div></div>
-    <div class="stat"><div class="sv a" id="pr-dl">215</div><div class="sl">Deadlift e1RM (lb)</div></div>
-    <div class="stat"><div class="sv a" id="pr-ohp">120</div><div class="sl">OHP e1RM (lb)</div></div>
+  <div class="card ca ia" style="margin-bottom:14px;">
+    <div class="lbl">lift ledger</div>
+    <div id="lift-ledger"></div>
   </div>
-  <div class="g4 k2" style="margin-bottom:14px;">
-    <div class="stat"><div class="sv b" id="pr-pace">10:30</div><div class="sl">Easy pace (min/mi)</div></div>
-    <div class="stat"><div class="sv b" id="pr-hr">165</div><div class="sl">Zone 2 avg HR</div></div>
-    <div class="stat"><div class="sv g" id="pr-pu">5</div><div class="sl">Max clean pullups</div></div>
-    <div class="stat"><div class="sv" id="pr-bw">225</div><div class="sl">Bodyweight (lb)</div></div>
-  </div>
-  <div class="g4 k2" style="margin-bottom:14px;">
-    <div class="stat"><div class="sv a" id="vol-bench">—</div><div class="sl">Bench vol best</div></div>
-    <div class="stat"><div class="sv a" id="vol-squat">—</div><div class="sl">Squat vol best</div></div>
-    <div class="stat"><div class="sv a" id="vol-dl">—</div><div class="sl">DL vol best</div></div>
-    <div class="stat"><div class="sv a" id="vol-ohp">—</div><div class="sl">OHP vol best</div></div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="lbl">cardio &amp; body</div>
+    <div id="cardio-strip" style="display:flex;gap:22px;flex-wrap:wrap;"></div>
   </div>
   <div class="card ca ia" style="margin-bottom:14px;">
     <div style="margin-bottom:12px;">
@@ -1433,16 +1421,11 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
   </div>
 
-  <!-- Double-progression staircase: working weight + reps per session for the selected lift -->
+  <!-- Double-progression staircases: one per compound lift -->
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
-      <div class="lbl">progression staircase</div>
-      <div id="staircase-sub" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></div>
-    </div>
-    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:10px;">Working weight per session (steps) + reps at that weight (dots) — the double-progression view. Wildcard sets excluded.</div>
-    <div style="position:relative;height:200px;">
-      <canvas id="staircase-chart"></canvas>
-    </div>
+    <div class="lbl">progression staircases · all six lifts</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;">Working weight per session (steps) + reps at that weight (dots). Pull-ups show effective load (BW − assist). Wildcard sets excluded.</div>
+    <div class="g2" id="staircase-grid"></div>
   </div>
 
   <!-- Accessory progress: every catalog accessory ever logged, first → latest -->
@@ -2881,7 +2864,7 @@ function showTab(n){
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='today'){ renderTodayPlanStrip(); }
   if(n==='week'){ renderCalendar(); renderSessionList(); }
-  if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderStaircaseChart(); renderAccessoryTrends(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
+  if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderAllStaircases(); renderAccessoryTrends(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
   if(n==='program'){ renderDeloadBanner(); renderAIFlowDiagram(); }
@@ -4311,79 +4294,54 @@ function renderSessHist(){
   };
   render('sess-hist',10);
 }
-function computeVolumeBests(){
-  // For each lift: best working weight used for ≥3 reps (≥5 for upper body).
-  // Returns "weight×sets×reps" string — e.g. "190×5×5".
-  const minReps={bench:5,ohp:5,squat:5,dl:3};
-  const result={bench:null,ohp:null,squat:null,dl:null};
-  Object.keys(result).forEach(k=>{
-    let bestW=0,bestSets=0,bestReps=0;
-    (D.sessions||[]).forEach(s=>{
-      const valid=(s[k]?.sets||[]).filter(x=>x.w&&x.r>=minReps[k]);
-      if(!valid.length) return;
-      const maxW=Math.max(...valid.map(x=>x.w));
-      const atMax=valid.filter(x=>x.w===maxW);
-      const avgR=Math.round(atMax.reduce((s,x)=>s+x.r,0)/atMax.length);
-      if(maxW>bestW||(maxW===bestW&&atMax.length>bestSets)){
-        bestW=maxW; bestSets=atMax.length; bestReps=avgR;
-      }
-    });
-    result[k]=bestW?`${bestW}×${bestSets}×${bestReps}`:null;
-  });
-  return result;
-}
+// Lift ledger: one dense row per compound lift — current e1RM (decay-aware),
+// last done, trend, and all-time best set. Replaces the old 12-tile grid.
 function updProgressStats(){
   if(!D||!D.currentLifts) return;
-  const e=id=>document.getElementById(id);
-  ['bench','squat','dl','ohp'].forEach(lift=>{
-    const map={bench:'pr-bench',squat:'pr-squat',dl:'pr-dl',ohp:'pr-ohp'};
-    const el=e(map[lift]);if(!el)return;
-    const dk=getDecayedE1RM(lift);
-    const isDecayed=dk.decayFactor<0.99;
-    el.textContent=dk.decayed||dk.peak;
-    el.title=isDecayed?`Peak: ${dk.peak} lb · ${dk.daysInactive}d inactive · ${Math.round((1-dk.decayFactor)*100)}% decay applied`:``;
-    el.style.color=isDecayed?(dk.decayFactor<0.85?'var(--a4)':'var(--aw)'):'';
-    const slEl=el.closest('.stat')?.querySelector('.sl');
-    if(slEl&&isDecayed) slEl.textContent=`${lift==='dl'?'Deadlift':lift.charAt(0).toUpperCase()+lift.slice(1)} e1RM · peak ${dk.peak}`;
-  });
-
-  // Max clean pullups — max bodyweight-only reps across all logged sessions
-  const maxPU=(()=>{
-    let best=0;
-    (D.sessions||[]).forEach(s=>{
-      (s.pullup?.sets||[]).forEach(x=>{if((!x.w||x.w===0)&&x.r>best)best=x.r;});
-    });
-    return best||D.currentLifts.pullups||5;
-  })();
-  if(e('pr-pu'))e('pr-pu').textContent=maxPU;
-
-  // Easy pace — avg pace of last 20 easy/aerobic runs (pairs with the Zone 2 HR box), fallback to baseline
-  const paceRuns=(D.runs||[]).filter(r=>r.pace&&['easy','run_easy'].includes(r.runType||'')).slice(-20);
-  if(paceRuns.length>0){
-    const avgSec=Math.round(paceRuns.reduce((s,r)=>s+r.pace,0)/paceRuns.length);
-    const mm=Math.floor(avgSec/60);const ss=String(avgSec%60).padStart(2,'0');
-    if(e('pr-pace'))e('pr-pace').textContent=`${mm}:${ss}`;
-  } else {
-    if(e('pr-pace'))e('pr-pace').textContent=D.cardioBaseline?.pace||'10:30';
+  const ledger=document.getElementById('lift-ledger');
+  if(ledger){
+    const gridCols='minmax(90px,1.3fr) minmax(70px,.9fr) minmax(56px,.7fr) minmax(46px,.6fr) minmax(70px,1fr)';
+    const hdr=`<div style="display:grid;grid-template-columns:${gridCols};gap:8px;padding:4px 0 7px;border-bottom:1px solid var(--b2);font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.1em;"><span>LIFT</span><span>E1RM</span><span>LAST</span><span>TREND</span><span>BEST SET</span></div>`;
+    const names={bench:'Bench',ohp:'OHP',squat:'Squat',dl:'Deadlift',row:'Row',pullup:'Pull-ups'};
+    const rows=['bench','ohp','row','pullup','squat','dl'].map(l=>{
+      const dk=getDecayedE1RM(l);
+      const decayed=dk.decayFactor<0.99;
+      const hist=getLiftHistory(l,3650);
+      const best=hist.length?hist.reduce((b,h)=>h.e1RM>b.e1RM?h:b):null;
+      const lastSess=getLastLiftSessions(l,1)[0];
+      const trend=(()=>{try{return liftTrend(l,D.sessions);}catch(e){return null;}})();
+      const tArrow=trend==='improving'?'<span style="color:var(--a2);">▲</span>'
+        :trend==='declining'?'<span style="color:var(--a4);">▼</span>'
+        :trend==='plateauing'?'<span style="color:var(--aw);">▬</span>'
+        :'<span style="color:var(--t3);">·</span>';
+      const e1rmVal=dk.decayed||dk.peak||'—';
+      const e1rmColor=decayed?(dk.decayFactor<0.85?'var(--a4)':'var(--aw)'):'var(--a)';
+      const bestStr=best?(l==='pullup'?`${best.weight}×${best.reps}`:`${best.weight}×${best.reps}`):'—';
+      return `<div style="display:grid;grid-template-columns:${gridCols};gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--b);">
+        <span style="font-size:var(--fs-sm);color:var(--t);">${names[l]}</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-sm);font-weight:600;color:${e1rmColor};" title="${decayed?`Peak ${dk.peak} · ${dk.daysInactive}d inactive`:''}">${e1rmVal}${decayed?`<span style="font-size:var(--fs-xs);color:var(--t3);font-weight:400;"> /${dk.peak}</span>`:''}</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:${lastSess?(lastSess.daysAgo>14?'var(--a4)':lastSess.daysAgo>7?'var(--aw)':'var(--t2)'):'var(--t3)'};">${lastSess?lastSess.daysAgo+'d ago':'never'}</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-sm);">${tArrow}</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t2);">${bestStr}</span>
+      </div>`;
+    }).join('');
+    ledger.innerHTML=hdr+rows+`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding-top:7px;">e1RM shown decay-adjusted (amber &gt;7d rust, rose &gt;15%) · /peak when decayed · best set = highest-e1RM set ever logged</div>`;
   }
-
-  // Zone 2 avg HR — avg heartRateAvg of easy runs (runType 'easy' or 'run_easy'), fallback to baseline
-  const easyRuns=(D.runs||[]).filter(r=>r.heartRateAvg&&['easy','run_easy'].includes(r.runType||'')).slice(-20);
-  if(easyRuns.length>0){
-    const avgHR=Math.round(easyRuns.reduce((s,r)=>s+r.heartRateAvg,0)/easyRuns.length);
-    if(e('pr-hr'))e('pr-hr').textContent=avgHR;
-  } else {
-    if(e('pr-hr'))e('pr-hr').textContent=D.cardioBaseline?.avgHR||165;
+  // Cardio & body strip
+  const strip=document.getElementById('cardio-strip');
+  if(strip){
+    const paceRuns=(D.runs||[]).filter(r=>r.pace&&['easy','run_easy'].includes(r.runType||'')).slice(-20);
+    const avgSec=paceRuns.length?Math.round(paceRuns.reduce((s,r)=>s+r.pace,0)/paceRuns.length):null;
+    const pace=avgSec?`${Math.floor(avgSec/60)}:${String(avgSec%60).padStart(2,'0')}`:(D.cardioBaseline?.pace||'—');
+    const easyRuns=(D.runs||[]).filter(r=>r.heartRateAvg&&['easy','run_easy'].includes(r.runType||'')).slice(-20);
+    const z2=easyRuns.length?Math.round(easyRuns.reduce((s,r)=>s+r.heartRateAvg,0)/easyRuns.length):(D.cardioBaseline?.avgHR||'—');
+    const d7=localDS(new Date(Date.now()-7*86400000));
+    const wkMi=(D.runs||[]).filter(r=>r.date>d7&&r.type!=='ride'&&r.runType!=='cycling').reduce((s,r)=>s+(r.distance||0),0);
+    const maxPU=(()=>{let b=0;(D.sessions||[]).forEach(s=>{(s.pullup?.sets||[]).forEach(x=>{if((!x.w||x.w===0)&&x.r>b&&!x.wc)b=x.r;});});return b||D.currentLifts.pullups||0;})();
+    const latestBW=(D.bodyMetrics||[]).slice(-1)[0]?.weightLbs||D.profile?.bodyweight||'—';
+    const item=(v,l,c)=>`<div><div style="font-family:var(--mono);font-size:var(--fs-data);font-weight:600;color:${c};font-variant-numeric:tabular-nums;">${v}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.06em;">${l}</div></div>`;
+    strip.innerHTML=item(pace,'easy pace /mi','var(--a3)')+item(z2,'zone 2 avg HR','var(--a3)')+item(wkMi.toFixed(1),'miles this week','var(--a2)')+item(maxPU,'max clean pull-ups','var(--a2)')+item(latestBW,'bodyweight lb','var(--t)');
   }
-
-  // Bodyweight — most recent logged body metric, fallback to profile default
-  const latestBW=(D.bodyMetrics||[]).slice(-1)[0];
-  if(e('pr-bw'))e('pr-bw').textContent=latestBW?.weightLbs||D.profile?.bodyweight||225;
-  const vb=computeVolumeBests();
-  if(e('vol-bench'))e('vol-bench').textContent=vb.bench||'—';
-  if(e('vol-ohp'))e('vol-ohp').textContent=vb.ohp||'—';
-  if(e('vol-squat'))e('vol-squat').textContent=vb.squat||'—';
-  if(e('vol-dl'))e('vol-dl').textContent=vb.dl||'—';
 }
 
 // ============================================================
@@ -4434,8 +4392,10 @@ function renderCalendar(){
   const DAY_HDRS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
   let html=DAY_HDRS.map(h=>`<div class="cal-hdr">${h}</div>`).join('');
   for(let i=0;i<firstDOW;i++) html+=`<div class="cal-cell cal-empty"></div>`;
-  let liftCount=0,runCount=0,rideCount=0;
+  let liftCount=0,runCount=0,rideCount=0,activeDays=0,runMi=0,rideMin=0;
+  const typeTally={PUSH:0,PULL:0,LEGS:0};
   const isRunType=d=>['run','run_easy','run_quality','run_long'].includes(d);
+  const dayLabel=day=>({A:'PUSH',push:'PUSH',B:'PULL',pull:'PULL',C:'LEGS',legs:'LEGS'}[day]||'LIFT');
   for(let d=1;d<=daysInMonth;d++){
     const dateObj=new Date(tYear,tMonth,d);
     const ds=localDS(dateObj);
@@ -4445,16 +4405,25 @@ function renderCalendar(){
     const stravaActivities=!isFuture?(D.runs||[]).filter(r=>r.date===ds):[];
     const stravaRun=stravaActivities.find(r=>r.type!=='ride')||null;
     const stravaRide=stravaActivities.find(r=>r.type==='ride')||null;
-    const hasLift=sessions.some(s=>!isRunType(s.day));
+    const liftSessions=sessions.filter(s=>!isRunType(s.day));
+    const hasLift=liftSessions.length>0;
     const hasRun=sessions.some(s=>isRunType(s.day))||!!stravaRun;
     const hasRide=!!stravaRide;
-    if(hasLift) liftCount++;
+    if(hasLift){liftCount++;liftSessions.forEach(s=>{const L=dayLabel(s.day);if(typeTally[L]!=null)typeTally[L]++;});}
     if(hasRun) runCount++;
     if(hasRide) rideCount++;
-    const dots=(hasLift?'<span class="cal-dot lift"></span>':'')+(hasRun?'<span class="cal-dot run"></span>':'')+(hasRide?'<span class="cal-dot ride"></span>':'');
+    if(hasLift||hasRun||hasRide) activeDays++;
+    if(stravaRun?.distance) runMi+=stravaRun.distance;
+    if(stravaRide?.duration) rideMin+=stravaRide.duration/60;
+    // Labeled chips: what you did + the key number, readable without a legend
+    let chips='';
+    liftSessions.forEach(s=>{chips+=`<div class="cal-badge strength">${dayLabel(s.day)}</div>`;});
+    if(stravaRun)chips+=`<div class="cal-badge cardio">RUN${stravaRun.distance?' '+stravaRun.distance.toFixed(1):''}</div>`;
+    else if(hasRun)chips+=`<div class="cal-badge cardio">RUN</div>`;
+    if(stravaRide)chips+=`<div class="cal-badge planned" style="border-style:solid;">RIDE${stravaRide.duration?' '+Math.round(stravaRide.duration/60)+'m':''}</div>`;
     const clickable=sessions.length>0||!!stravaRun||!!stravaRide;
     const actCls=(hasLift?' has-lift':'')+(hasRun?' has-run':'')+(hasRide?' has-ride':'');
-    html+=`<div class="cal-cell${isToday?' today':''}${actCls}" data-date="${ds}"${clickable?' style="cursor:pointer;"':''}><div class="cal-date">${d}</div>${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
+    html+=`<div class="cal-cell${isToday?' today':''}${actCls}" data-date="${ds}"${clickable?' style="cursor:pointer;"':''}><div class="cal-date">${d}</div>${chips}</div>`;
   }
   grid.innerHTML=html;
   grid.onclick=null;
@@ -4462,10 +4431,19 @@ function renderCalendar(){
     const cell=e.target.closest('[data-date]');
     if(cell) handleDayCardClick(cell.dataset.date);
   };
-  const parts=[`${liftCount} strength`,`${runCount} runs`];
-  if(rideCount>0) parts.push(`${rideCount} ride${rideCount>1?'s':''}`);
-  sumEl.textContent=parts.join(' \xb7 ');
-  sumEl.style.color='var(--t3)';
+  // Stats-rich month summary + legend
+  const abbrev={PUSH:'P',PULL:'PL',LEGS:'L'};
+  const tallyStr=Object.entries(typeTally).filter(([,n])=>n).map(([k,n])=>`${n}${abbrev[k]}`).join('·');
+  const parts=[`<span style="color:var(--a);">${liftCount} lifts${tallyStr?` (${tallyStr})`:''}</span>`,
+    `<span style="color:var(--a2);">${runCount} runs · ${runMi.toFixed(1)}mi</span>`];
+  if(rideCount>0)parts.push(`<span style="color:var(--a5);">${rideCount} rides · ${Math.round(rideMin)}min</span>`);
+  parts.push(`<span style="color:var(--t2);">${activeDays} active days</span>`);
+  sumEl.innerHTML=`<div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:var(--fs-xs);">${parts.join('')}</div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">
+    <span><span class="cal-dot lift"></span> strength (P=push PL=pull L=legs)</span>
+    <span><span class="cal-dot run"></span> run (miles)</span>
+    <span><span class="cal-dot ride"></span> ride (minutes)</span>
+  </div>`;
 }
 function handleDayCardClick(dateStr){
   const sessions=getSessionsForDate(dateStr);
@@ -4712,7 +4690,7 @@ function buildSessionDrawerContent(session,dateStr){
   const liftSections=liftKeys.filter(l=>session[l.key]?.sets?.length>0).map(l=>{
     const sets=session[l.key].sets;
     const rows=sets.map((s,i)=>{
-      const w=s.w?`${s.w} lb`:'BW';
+      const w=l.key==='pullup'?fmtLiftW('pullup',s.w):(s.w?`${s.w} lb`:'BW');
       const r=s.r?`× ${s.r}`:'';
       const rpe=s.rpe?`@ RPE ${s.rpe}`:'';
       const wcTag=s.wc?`<span title="Wildcard set — excluded from progression math" style="font-size:var(--fs-xs);">🃏</span>`:'';
@@ -5148,42 +5126,117 @@ const START_WEIGHTS={bench:190,ohp:90,squat:160,dl:160,row:115,pullup:0};
 const BASE_SETS={bench:4,ohp:3,squat:4,dl:3,row:4,pullup:4};
 const LIFT_LABELS={bench:'Barbell Bench Press',ohp:'Barbell Strict OHP',squat:'Back Squat',dl:'Conventional Deadlift',row:'Barbell Bent-Over Row',pullup:'Pull-ups'};
 const DAY_LIFTS={push:['bench','ohp'],pull:['row','pullup'],legs:['squat','dl']};
+// Catalog v2: canonical exercise identities. `muscle` groups for coverage,
+// `impl` (barbell/ez/db/cable/machine/bw) so rotation can vary the implement
+// hitting the same muscle — evidence-based variety instead of the same
+// seated DB curl forever.
 const ACCESSORY_CATALOG={
   push:[
-    {id:'incline_db_press',name:'Incline DB Press',target:'upper chest',sets:3,reps:'8-12'},
-    {id:'db_shoulder_press',name:'Seated DB Shoulder Press',target:'delts',sets:3,reps:'8-12'},
-    {id:'cable_fly',name:'Cable Fly',target:'chest',sets:3,reps:'12-15'},
-    {id:'lateral_raise',name:'DB Lateral Raise',target:'side delts',sets:3,reps:'12-20'},
-    {id:'tricep_pushdown',name:'Cable Tricep Pushdown',target:'triceps',sets:3,reps:'10-15'},
-    {id:'overhead_tricep_ext',name:'Overhead Tricep Extension',target:'triceps long head',sets:3,reps:'10-12'},
-    {id:'dips',name:'Dips',target:'chest + triceps',sets:3,reps:'8-12'},
-    {id:'close_grip_bench',name:'Close-Grip Bench',target:'triceps + chest',sets:3,reps:'8-10'}
+    {id:'incline_db_press',name:'Incline DB Press',muscle:'chest',impl:'db',sets:3,reps:'8-12'},
+    {id:'flat_db_press',name:'Flat DB Press',muscle:'chest',impl:'db',sets:3,reps:'8-12'},
+    {id:'cable_fly',name:'Cable Fly',muscle:'chest',impl:'cable',sets:3,reps:'12-15'},
+    {id:'pec_deck',name:'Pec Deck Fly',muscle:'chest',impl:'machine',sets:3,reps:'12-15'},
+    {id:'dips',name:'Dips',muscle:'chest',impl:'bw',sets:3,reps:'8-12'},
+    {id:'db_shoulder_press',name:'Seated DB Shoulder Press',muscle:'shoulders',impl:'db',sets:3,reps:'8-12'},
+    {id:'machine_shoulder_press',name:'Machine Shoulder Press',muscle:'shoulders',impl:'machine',sets:3,reps:'10-12'},
+    {id:'lateral_raise',name:'DB Lateral Raise',muscle:'shoulders',impl:'db',sets:3,reps:'12-20'},
+    {id:'cable_lateral_raise',name:'Cable Lateral Raise',muscle:'shoulders',impl:'cable',sets:3,reps:'12-15'},
+    {id:'tricep_pushdown_rope',name:'Rope Tricep Pushdown',muscle:'triceps',impl:'cable',sets:3,reps:'10-15'},
+    {id:'tricep_pushdown_bar',name:'Straight-Bar Pushdown',muscle:'triceps',impl:'cable',sets:3,reps:'10-15'},
+    {id:'overhead_tricep_ext',name:'Overhead Tricep Extension',muscle:'triceps',impl:'cable',sets:3,reps:'10-12'},
+    {id:'skullcrusher',name:'EZ-Bar Skullcrusher',muscle:'triceps',impl:'ez',sets:3,reps:'8-12'},
+    {id:'close_grip_bench',name:'Close-Grip Bench',muscle:'triceps',impl:'barbell',sets:3,reps:'8-10'}
   ],
   pull:[
-    {id:'lat_pulldown',name:'Lat Pulldown',target:'lats',sets:3,reps:'8-12'},
-    {id:'seated_cable_row',name:'Seated Cable Row',target:'mid-back',sets:3,reps:'10-12'},
-    {id:'face_pull',name:'Face Pull',target:'rear delts + rotators',sets:3,reps:'15-20'},
-    {id:'rear_delt_fly',name:'Rear Delt Fly',target:'rear delts',sets:3,reps:'12-15'},
-    {id:'db_curl',name:'Incline DB Curl',target:'biceps',sets:3,reps:'10-12'},
-    {id:'hammer_curl',name:'Hammer Curl',target:'biceps + forearms',sets:3,reps:'10-12'},
-    {id:'straight_arm_pulldown',name:'Straight-Arm Pulldown',target:'lats',sets:3,reps:'12-15'},
-    {id:'db_shrug',name:'DB Shrug',target:'traps',sets:3,reps:'12-15'}
+    {id:'lat_pulldown',name:'Lat Pulldown',muscle:'back',impl:'cable',sets:3,reps:'8-12'},
+    {id:'seated_cable_row',name:'Seated Cable Row',muscle:'back',impl:'cable',sets:3,reps:'10-12'},
+    {id:'chest_supported_row',name:'Chest-Supported DB Row',muscle:'back',impl:'db',sets:3,reps:'10-12'},
+    {id:'single_arm_db_row',name:'Single-Arm DB Row',muscle:'back',impl:'db',sets:3,reps:'10-12ea'},
+    {id:'straight_arm_pulldown',name:'Straight-Arm Pulldown',muscle:'back',impl:'cable',sets:3,reps:'12-15'},
+    {id:'face_pull',name:'Cable Face Pull',muscle:'rear delts',impl:'cable',sets:3,reps:'15-20'},
+    {id:'rear_delt_fly',name:'Rear Delt Fly',muscle:'rear delts',impl:'db',sets:3,reps:'12-15'},
+    {id:'db_shrug',name:'DB Shrug',muscle:'traps',impl:'db',sets:3,reps:'12-15'},
+    {id:'ez_bar_curl',name:'Standing EZ-Bar Curl',muscle:'biceps',impl:'ez',sets:3,reps:'8-12'},
+    {id:'straight_bar_curl',name:'Straight-Bar Curl',muscle:'biceps',impl:'barbell',sets:3,reps:'8-10'},
+    {id:'seated_db_curl',name:'Seated DB Curl',muscle:'biceps',impl:'db',sets:3,reps:'10-12'},
+    {id:'incline_db_curl',name:'Incline DB Curl',muscle:'biceps',impl:'db',sets:3,reps:'10-12'},
+    {id:'hammer_curl',name:'DB Hammer Curl',muscle:'biceps',impl:'db',sets:3,reps:'10-12'},
+    {id:'cable_curl',name:'Cable Curl',muscle:'biceps',impl:'cable',sets:3,reps:'12-15'}
   ],
   legs:[
-    {id:'bulgarian_split_squat',name:'Bulgarian Split Squat',target:'quads + glutes',sets:3,reps:'8-10ea'},
-    {id:'leg_press',name:'Leg Press',target:'quads',sets:3,reps:'10-12'},
-    {id:'rdl',name:'Romanian Deadlift',target:'hamstrings',sets:3,reps:'8-10'},
-    {id:'leg_curl',name:'Leg Curl',target:'hamstrings',sets:3,reps:'10-12'},
-    {id:'leg_extension',name:'Leg Extension',target:'quads',sets:3,reps:'12-15'},
-    {id:'walking_lunge',name:'Walking Lunge',target:'quads + glutes',sets:3,reps:'10ea'},
-    {id:'calf_raise',name:'Standing Calf Raise',target:'calves',sets:3,reps:'12-15'},
-    {id:'hip_thrust',name:'Hip Thrust',target:'glutes',sets:3,reps:'8-12'},
-    {id:'copenhagen_plank',name:'Copenhagen Plank',target:'adductors',sets:3,reps:'20s ea'}
+    {id:'bulgarian_split_squat',name:'Bulgarian Split Squat',muscle:'quads',impl:'db',sets:3,reps:'8-10ea'},
+    {id:'leg_press',name:'Leg Press',muscle:'quads',impl:'machine',sets:3,reps:'10-12'},
+    {id:'leg_extension',name:'Leg Extension',muscle:'quads',impl:'machine',sets:3,reps:'12-15'},
+    {id:'goblet_squat',name:'Goblet Squat',muscle:'quads',impl:'db',sets:3,reps:'10-12'},
+    {id:'walking_lunge',name:'Walking Lunge',muscle:'quads',impl:'db',sets:3,reps:'10ea'},
+    {id:'rdl',name:'Romanian Deadlift',muscle:'hamstrings',impl:'barbell',sets:3,reps:'8-10'},
+    {id:'leg_curl',name:'Leg Curl',muscle:'hamstrings',impl:'machine',sets:3,reps:'10-12'},
+    {id:'hip_thrust',name:'Hip Thrust',muscle:'glutes',impl:'barbell',sets:3,reps:'8-12'},
+    {id:'calf_raise',name:'Standing Calf Raise',muscle:'calves',impl:'machine',sets:3,reps:'12-15'},
+    {id:'copenhagen_plank',name:'Copenhagen Plank',muscle:'core',impl:'bw',sets:3,reps:'20s ea'}
   ]
 };
 function getAccessoryById(id){
   for(const day in ACCESSORY_CATALOG){const hit=ACCESSORY_CATALOG[day].find(a=>a.id===id);if(hit)return hit;}
   return null;
+}
+// Map any legacy freeform accessory name ("Cable Tricep Pushdown 3×12 — full
+// elbow extension at bottom...") onto a canonical catalog entry. Deterministic —
+// no AI needed. Returns the catalog entry or null if unrecognized.
+function normalizeAccessory(raw){
+  if(!raw)return null;
+  let s=String(raw).toLowerCase()
+    .split('—')[0].split(' - ')[0]                 // drop essay descriptions
+    .replace(/\d+\s*[×x]\s*[\d\-]+\S*/g,' ')       // drop "3×12" fragments
+    .replace(/[()]/g,' ')                          // keep parenthetical words, drop parens
+    .replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
+  const rules=[
+    [/face pull/,'face_pull'],
+    [/pushdown|press.?down/, s.includes('straight')?'tricep_pushdown_bar':'tricep_pushdown_rope'],
+    [/skull/,'skullcrusher'],
+    [/overhead.*(tricep|extension)|tricep.*overhead/,'overhead_tricep_ext'],
+    [/close.?grip/,'close_grip_bench'],
+    [/\bdip/,'dips'],
+    [/pec deck/,'pec_deck'],
+    [/lateral raise/, s.includes('cable')?'cable_lateral_raise':'lateral_raise'],
+    [/shoulder press|overhead press/, s.includes('machine')?'machine_shoulder_press':'db_shoulder_press'],
+    [/incline.*(press)/,'incline_db_press'],
+    [/flat.*(press)/,'flat_db_press'],
+    [/\bfly|flye/, s.includes('rear')?'rear_delt_fly':'cable_fly'],
+    [/rear delt/,'rear_delt_fly'],
+    [/straight.?arm.*pulldown/,'straight_arm_pulldown'],
+    [/pulldown/,'lat_pulldown'],
+    [/chest.?supported.*row/,'chest_supported_row'],
+    [/(single|one).?arm.*row/,'single_arm_db_row'],
+    [/cable row|seated row/,'seated_cable_row'],
+    [/shrug/,'db_shrug'],
+    [/hammer/,'hammer_curl'],
+    [/incline.*curl/,'incline_db_curl'],
+    [/ez.*curl/,'ez_bar_curl'],
+    [/(straight|barbell) bar curl|barbell curl/,'straight_bar_curl'],
+    [/cable curl/,'cable_curl'],
+    [/curl/, s.includes('leg')?'leg_curl':'seated_db_curl'],
+    [/split squat/,'bulgarian_split_squat'],
+    [/goblet/,'goblet_squat'],
+    [/leg press/,'leg_press'],
+    [/leg ext/,'leg_extension'],
+    [/lunge/,'walking_lunge'],
+    [/rdl|romanian/,'rdl'],
+    [/hip thrust/,'hip_thrust'],
+    [/calf/,'calf_raise'],
+    [/copenhagen/,'copenhagen_plank']
+  ];
+  for(const [re,id] of rules){ if(re.test(s))return getAccessoryById(id); }
+  return null;
+}
+// Canonical identity for any logged accessory entry: explicit id wins, then
+// name normalization, then the cleaned raw name as its own (uncataloged) key.
+function accKeyFor(a){
+  if(a.id&&getAccessoryById(a.id))return {id:a.id,cat:getAccessoryById(a.id)};
+  const cat=normalizeAccessory(a.name);
+  if(cat)return {id:cat.id,cat};
+  const clean=String(a.name||'').split('—')[0].split(' - ')[0].replace(/\s+/g,' ').trim();
+  return {id:'raw:'+clean.toLowerCase(),cat:{id:null,name:clean||'Unknown',muscle:'other',impl:'?',sets:3,reps:''}};
 }
 // Working (non-wildcard) sets for a lift in one session. Wildcard sets (wc:true)
 // are light rebuild/practice sets and must never enter progression math.
@@ -5222,6 +5275,13 @@ function detectDeload(){
     return {active:true,start:today,why:`${recent.length} lift sessions in 21 days with no deload in ${sinceDeload>=999?'your training history':sinceDeload+' days'} → deload week: ~70% loads, 2×5, RPE ≤6`};
   return {active:false};
 }
+// Weight label for a lift. Pull-ups use the assist convention:
+// negative = lb of machine assist (BW−50), 0 = bodyweight, positive = added (BW+10).
+function fmtLiftW(lift,w){
+  if(lift!=='pullup')return (w||0)+'lb';
+  if(!w)return 'BW';
+  return w<0?`BW−${-w} assist`:`BW+${w}`;
+}
 // Core double-progression brain for one lift. Returns weight/sets/reps/targetRPE
 // plus a human-readable why-trace and the raw "last time" data.
 function prescribeLift(lift,ts,deload){
@@ -5232,7 +5292,7 @@ function prescribeLift(lift,ts,deload){
   const last=hist[0]||null;
   let weight,reps,targetRPE=8;
   let sets=BASE_SETS[lift];
-  const fmtSets=h=>h.sets.map(s=>`${lift==='pullup'&&!s.w?'BW':s.w}×${s.r}${s.rpe?'@'+s.rpe:''}`).join(', ');
+  const fmtSets=h=>h.sets.map(s=>`${lift==='pullup'?fmtLiftW('pullup',s.w):s.w}×${s.r}${s.rpe?'@'+s.rpe:''}`).join(', ');
   if(!last){
     weight=START_WEIGHTS[lift];reps=lo;
     why.push(`No logged history for ${LIFT_LABELS[lift]} — conservative starting weight`);
@@ -5246,22 +5306,28 @@ function prescribeLift(lift,ts,deload){
     const prev=hist[1];
     const prevStalled=prev&&(_workingWeight(prev.sets)>=w)&&Math.min(...prev.sets.filter(s=>(s.w||0)===_workingWeight(prev.sets)).map(s=>s.r))<lo;
     if(minReps<lo&&prevStalled){
-      weight=Math.round((w*0.9)/2.5)*2.5;reps=lo;
-      why.push(`Stalled 2 sessions below ${lo} reps → reset to 90% (${weight}lb) and rebuild`);
+      // Reset means EASIER: 90% of load for barbells; for assisted pull-ups, +10lb assist
+      weight=(lift==='pullup'&&w<=0)?w-10:Math.round((w*0.9)/2.5)*2.5;reps=lo;
+      why.push(`Stalled 2 sessions below ${lo} reps → reset to ${fmtLiftW(lift,weight)} and rebuild`);
     }else if(minReps>=hi&&maxRPE<=8){
       weight=w+inc;reps=lo;
-      why.push(`All sets hit the top of the ${lo}–${hi} range at RPE ≤8 → +${inc}lb, reps reset to ${lo}`);
+      why.push(lift==='pullup'&&w<0
+        ?`All sets hit the top of the ${lo}–${hi} range at RPE ≤8 → ${inc}lb LESS assist (${fmtLiftW('pullup',weight)}), reps reset to ${lo}`
+        :`All sets hit the top of the ${lo}–${hi} range at RPE ≤8 → +${inc}lb, reps reset to ${lo}`);
     }else if(maxRPE>=9.5){
       weight=w;reps=Math.max(lo,minReps);
-      why.push(`RPE hit ${maxRPE} last time → hold ${w===0?'BW':w+'lb'} and consolidate before pushing reps`);
+      why.push(`RPE hit ${maxRPE} last time → hold ${fmtLiftW(lift,w)} and consolidate before pushing reps`);
     }else{
       weight=w;reps=Math.min(minReps+1,hi);
-      why.push(`Double progression: hold ${w===0?'BW':w+'lb'}, push for ${reps} reps (top of range is ${hi})`);
+      why.push(`Double progression: hold ${fmtLiftW(lift,w)}, push for ${reps} reps (top of range is ${hi})`);
     }
   }
   if(deload?.active){
-    weight=Math.max(lift==='pullup'?0:45,Math.round((weight*0.7)/2.5)*2.5);sets=2;reps=5;targetRPE=6;
-    why.push('Deload override: 70% load, 2×5, RPE ≤6');
+    // Deload means EASIER: 70% barbell load; for assisted pull-ups, +20lb assist
+    if(lift==='pullup')weight=(weight<=0?weight-20:0);
+    else weight=Math.max(45,Math.round((weight*0.7)/2.5)*2.5);
+    sets=2;reps=5;targetRPE=6;
+    why.push(`Deload override: ${fmtLiftW(lift,weight)}, 2×5, RPE ≤6`);
   }
   if(ts.liftRPECap<targetRPE){
     targetRPE=ts.liftRPECap;
@@ -5274,27 +5340,44 @@ function prescribeLift(lift,ts,deload){
   }
   return {weight,sets,reps,targetRPE,variation:LIFT_LABELS[lift],why,last:last?{date:last.date,daysAgo:last.daysAgo,display:fmtSets(last)}:null};
 }
-// Deterministic accessory rotation: least-recently-done first (never done = first),
-// with target-muscle diversity so the same movement pattern isn't doubled up.
+// Deterministic accessory rotation. Priorities:
+//   1. muscle coverage — hit every muscle group of the day before repeating one
+//   2. staleness — least-recently-done first (never done = freshest)
+//   3. implement variety — if a muscle was last hit with DBs, prefer cable/EZ/etc.
+// Legacy freeform-named history counts via normalizeAccessory, so the rotation
+// knows what you've actually done even in old sessions.
 function pickAccessories(dayType,count){
   const pool=ACCESSORY_CATALOG[dayType]||[];
-  const lastDone={};
+  const lastDone={},lastImplByMuscle={};
   (D?.sessions||[]).forEach(s=>{(s.accessories||[]).forEach(a=>{
-    const hit=pool.find(p=>p.id===a.id||p.name.toLowerCase()===String(a.name||'').toLowerCase());
-    if(hit)lastDone[hit.id]=s.date;
+    const {id,cat}=accKeyFor(a);
+    if(!cat.id)return;
+    if(!lastDone[id]||s.date>lastDone[id])lastDone[id]=s.date;
+    const prev=lastImplByMuscle[cat.muscle];
+    if(!prev||s.date>prev.date)lastImplByMuscle[cat.muscle]={impl:cat.impl,date:s.date};
   });});
-  const scored=pool.map(a=>({...a,lastDone:lastDone[a.id]||null,score:lastDone[a.id]?_daysAgo(lastDone[a.id]):999}))
-    .sort((a,b)=>b.score-a.score);
+  const scored=pool.map(a=>{
+    const days=lastDone[a.id]?_daysAgo(lastDone[a.id]):999;
+    const freshImpl=lastImplByMuscle[a.muscle]&&lastImplByMuscle[a.muscle].impl!==a.impl;
+    return {...a,lastDoneDate:lastDone[a.id]||null,days,score:days+(freshImpl?30:0)};
+  }).sort((a,b)=>b.score-a.score);
   const picked=[];
+  // pass 1: one per muscle, stalest first
   for(const a of scored){
     if(picked.length>=count)break;
-    const t0=a.target.split(' ')[0];
-    if(picked.some(p=>p.target.split(' ')[0]===t0)&&scored.length>count)continue;
+    if(picked.some(p=>p.muscle===a.muscle))continue;
     picked.push(a);
   }
+  // pass 2: fill remaining slots by staleness
   for(const a of scored){ if(picked.length>=count)break; if(!picked.includes(a))picked.push(a); }
-  return picked.map(a=>({id:a.id,name:a.name,sets:a.sets,reps:a.reps,target:a.target,
-    reason:a.lastDone?`last done ${_daysAgo(a.lastDone)}d ago`:'never logged — new stimulus'}));
+  return picked.map(a=>{
+    const swap=lastImplByMuscle[a.muscle]&&lastImplByMuscle[a.muscle].impl!==a.impl;
+    const why=a.lastDoneDate
+      ?`${a.muscle} · last done ${a.days}d ago`
+      :swap?`${a.muscle} · new angle (${a.impl} vs recent ${lastImplByMuscle[a.muscle].impl})`
+      :`${a.muscle} · never logged`;
+    return {id:a.id,name:a.name,sets:a.sets,reps:a.reps,muscle:a.muscle,reason:why};
+  });
 }
 // Deterministic run/ride prescription from Strava history + hard rules.
 function prescribeRun(kind,ts){
@@ -6807,6 +6890,7 @@ function onDayTypeChange(value){
   if(sec)sec.style.display=showRun?'block':'none';
   // Wildcard quick-add is available on every training day type
   if(['A','B','C','run','run_easy','run_quality','run_long'].includes(value))renderWildcardBlock();
+  renderLiftGlances();
   if(runCard){
     runCard.style.display=showRun?'':'none';
     if(showRun){
@@ -7152,12 +7236,14 @@ async function _fetchPrescriptionGarnish(apiKey,presc){
   const ts=evaluateTrainingStatus();
   const means=compute7DayMeans();
   const mw=presc.mainWork||{};
-  const liftLines=mw.lifts?Object.entries(mw.lifts).map(([k,l])=>`${k}: ${l.sets}×${l.reps} @ ${l.weight===0?'BW':l.weight+'lb'} RPE≤${l.targetRPE} — ${(l.why||[]).join(' / ')}`).join('\n'):'';
+  const liftLines=mw.lifts?Object.entries(mw.lifts).map(([k,l])=>`${k}: ${l.sets}×${l.reps} @ ${k==='pullup'?fmtLiftW('pullup',l.weight):(l.weight===0?'BW':l.weight+'lb')} RPE≤${l.targetRPE} — ${(l.why||[]).join(' / ')}`).join('\n'):'';
   const runLine=mw.mainSet?`${mw.mainSet}${mw.paceTarget?' · Pace: '+mw.paceTarget:''}${mw.hrCeiling?' · HR cap: '+mw.hrCeiling:''}`:'';
   const accLine=(mw.accessories||[]).map(a=>`${a.name} ${a.sets}×${a.reps} (${a.reason})`).join(' · ');
   const prompt=`Today's ${presc.type} prescription was computed by a deterministic double-progression engine. Add ONLY the coaching layer around these fixed numbers.
 
 ATHLETE: 28yo PGY-1 IM resident, ${ATHLETE.weightLbs}lb. Goals: ${ATHLETE.goals.primary}, ${ATHLETE.goals.secondary}.
+PULL-UP NOTE: done on an ASSISTED machine — negative weight = lb of assist (BW−50 means the machine removes 50lb). Progress = less assist toward bodyweight, eventually added weight. Never tell him to do unassisted pull-ups he can't do yet.
+ACCESSORY PHILOSOPHY: the engine rotates muscle groups AND implements (DB/cable/EZ/machine) for well-rounded hypertrophy — if a pick looks unusual, that's the rotation working.
 RECOVERY: HRV ${means.hrv||'?'}ms · RHR ${means.rhr||'?'}bpm · sleep last night ${ts.sleepHours||'?'}h · flags: ${ts.activeFlags.join(', ')||'none'}
 ENGINE DECISIONS:
 ${(presc.engineWhy||[]).join('\n')||'(standard progression day)'}
@@ -7216,7 +7302,7 @@ function renderPrescriptionCard(prescription){
     const liftIcons={bench:'🏋️',ohp:'☝️',row:'🚣',pullup:'🔼',squat:'🦵',dl:'⬆️'};
     const liftRows=liftOrder.filter(k=>lifts[k]).map(k=>{
       const l=lifts[k];
-      const w=l.weight>0?l.weight+' lb':'Bodyweight';
+      const w=k==='pullup'?fmtLiftW('pullup',l.weight):(l.weight>0?l.weight+' lb':'Bodyweight');
       const lastLine=l.last?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:5px;padding-left:26px;">Last: ${esc(l.last.display)} · ${l.last.daysAgo}d ago</div>`:'';
       const whyLine=(l.why&&l.why.length)?`<div style="font-size:var(--fs-xs);color:var(--a3);margin-top:4px;line-height:1.55;padding-left:26px;">↳ ${esc(l.why[l.why.length-1])}</div>`:'';
       return `<div style="padding:10px 0;border-bottom:1px solid rgba(124,134,248,0.15);"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;"><span style="font-size:var(--fs-body);flex-shrink:0;">${liftIcons[k]||'•'}</span><div style="font-size:var(--fs-presc-lift);color:var(--t);font-weight:500;">${esc(l.variation||liftNames[k]||k)}</div></div><div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--mono);font-size:var(--fs-presc-lift);color:${color};font-weight:600;white-space:nowrap;">${l.sets}×${l.reps} @ ${w}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">RPE ${l.targetRPE}</div></div></div>${lastLine}${whyLine}${l.coachNote?`<div style="font-size:var(--fs-presc-text);color:var(--t3);margin-top:5px;line-height:1.6;padding-left:26px;">${esc(l.coachNote)}</div>`:''}</div>`;
@@ -7227,12 +7313,18 @@ function renderPrescriptionCard(prescription){
     let accessHtml='';
     if(structured||(!accessories.length&&ACCESSORY_CATALOG[type]&&prescription.engine)){
       const activeIds=new Set(accessories.map(a=>a.id));
-      const chips=(ACCESSORY_CATALOG[type]||[]).map(cat=>{
-        const active=activeIds.has(cat.id);
-        const sel=accessories.find(a=>a.id===cat.id);
-        return `<div onclick="toggleAccessory('${cat.id}')" style="cursor:pointer;padding:7px 11px;border-radius:9px;border:1px solid ${active?'rgba(179,136,245,0.5)':'var(--b)'};background:${active?'rgba(179,136,245,0.13)':'var(--s2)'};display:flex;flex-direction:column;gap:1px;min-width:0;"><div style="font-size:var(--fs-xs);color:${active?'var(--a5)':'var(--t2)'};font-weight:${active?'600':'400'};">${active?'✓ ':''}${esc(cat.name)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${cat.sets}×${cat.reps}${sel?.reason?' · '+esc(sel.reason):''}</div></div>`;
+      // Group the catalog chips under muscle headers so 14 options read as a menu
+      const byMuscle={};
+      (ACCESSORY_CATALOG[type]||[]).forEach(cat=>{(byMuscle[cat.muscle]=byMuscle[cat.muscle]||[]).push(cat);});
+      const groups=Object.entries(byMuscle).map(([muscle,cats])=>{
+        const chips=cats.map(cat=>{
+          const active=activeIds.has(cat.id);
+          const sel=accessories.find(a=>a.id===cat.id);
+          return `<div onclick="toggleAccessory('${cat.id}')" style="cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid ${active?'rgba(179,136,245,0.5)':'var(--b)'};background:${active?'rgba(179,136,245,0.13)':'var(--s2)'};display:flex;flex-direction:column;gap:1px;min-width:0;"><div style="font-size:var(--fs-xs);color:${active?'var(--a5)':'var(--t2)'};font-weight:${active?'600':'400'};">${active?'✓ ':''}${esc(cat.name)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${cat.sets}×${cat.reps}${sel?.reason?' · '+esc(sel.reason):''}</div></div>`;
+        }).join('');
+        return `<div style="margin-bottom:8px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;">${esc(muscle)}</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${chips}</div></div>`;
       }).join('');
-      accessHtml=`<div style="margin-top:12px;padding-top:10px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="font-size:var(--fs-sm);">➕</span><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;text-transform:uppercase;">Accessories</div><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">tap to swap · ✓ = recommended for variety</span></div><div style="display:flex;flex-wrap:wrap;gap:7px;">${chips}</div></div>`;
+      accessHtml=`<div style="margin-top:12px;padding-top:10px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;"><span style="font-size:var(--fs-sm);">➕</span><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;text-transform:uppercase;">Accessories</div><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">tap to swap · ✓ = engine pick (rotates muscles + implements)</span></div>${groups}</div>`;
     }else if(accessories.length){
       accessHtml=`<div style="margin-top:12px;padding-top:10px;"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="font-size:var(--fs-sm);">➕</span><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.15em;text-transform:uppercase;">Accessories</div></div>${accessories.map(a=>`<div style="font-size:var(--fs-presc-text);color:var(--t2);padding:3px 0;">· ${esc(a)}</div>`).join('')}</div>`;
     }
@@ -7260,7 +7352,7 @@ function toggleAccessory(id){
   else{
     const cat=getAccessoryById(id);
     if(!cat)return;
-    acc.push({id:cat.id,name:cat.name,sets:cat.sets,reps:cat.reps,target:cat.target,reason:'your pick'});
+    acc.push({id:cat.id,name:cat.name,sets:cat.sets,reps:cat.reps,muscle:cat.muscle,reason:'your pick'});
   }
   pushSilent();
   renderPrescriptionCard(p);
@@ -7270,16 +7362,45 @@ function toggleAccessory(id){
 // Light extra sets of any big-6 lift or catalog accessory. Lift sets are saved
 // tagged wc:true; accessory sets are saved with wildcard:true. Neither enters
 // progression, stall, or e1RM math.
+// "Last:" glance under each lift block in LOG SESSION — quick look at what you
+// actually did last time, right where you're typing today's numbers.
+function renderLiftGlances(){
+  const blockIdMap={bench:'bench-block',ohp:'ohp-block',squat:'squat-block',dl:'deadlift-block',pullup:'pullup-block',row:'row-block'};
+  Object.entries(blockIdMap).forEach(([lift,bid])=>{
+    const block=document.getElementById(bid);if(!block)return;
+    let g=block.querySelector('.lift-last-glance');
+    const hist=getLastLiftSessions(lift,1)[0];
+    if(!hist){if(g)g.remove();return;}
+    if(!g){g=document.createElement('div');g.className='lift-last-glance';const srh=block.querySelector('.srh');if(srh)block.insertBefore(g,srh);else block.appendChild(g);}
+    g.style.cssText='font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);margin:2px 0 8px;';
+    g.textContent=`Last: ${hist.sets.map(x=>`${lift==='pullup'?fmtLiftW('pullup',x.w):x.w}×${x.r}${x.rpe?'@'+x.rpe:''}`).join(', ')} · ${hist.daysAgo}d ago`;
+  });
+}
+// Searchable exercise picker: filters big-6 + full catalog, grouped by muscle,
+// each row shows your last logged numbers so picking is informed.
+function renderWildcardPicker(query){
+  const list=document.getElementById('wildcard-list');
+  if(!list)return;
+  const q=(query||'').toLowerCase().trim();
+  const items=[
+    ...Object.entries(LIFT_LABELS).map(([k,n])=>({val:'lift:'+k,name:n,group:'compound'})),
+    ...Object.entries(ACCESSORY_CATALOG).flatMap(([day,arr])=>arr.map(a=>({val:'acc:'+a.id,name:a.name,group:a.muscle})))
+  ].filter(it=>!q||it.name.toLowerCase().includes(q)||it.group.includes(q));
+  if(!items.length){list.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:10px;">No match</div>';return;}
+  let lastGroup=null,html='';
+  items.forEach(it=>{
+    if(it.group!==lastGroup){html+=`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.12em;text-transform:uppercase;padding:7px 10px 3px;">${esc(it.group)}</div>`;lastGroup=it.group;}
+    const [kind,key]=it.val.split(':');
+    const lastW=_lastWildcardWeight(kind,key);
+    html+=`<div onclick="addWildcard('${it.val}')" style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;cursor:pointer;border-bottom:1px solid rgba(124,131,247,0.06);" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background=''"><span style="font-size:var(--fs-xs);color:var(--t2);">${esc(it.name)}</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${lastW!==''?'last '+lastW+'lb':''}</span></div>`;
+  });
+  list.innerHTML=html;
+}
 function renderWildcardBlock(){
   const block=document.getElementById('wildcard-block');
-  const sel=document.getElementById('wildcard-select');
-  if(!block||!sel)return;
+  if(!block)return;
   block.style.display='';
-  if(!sel.options.length){
-    const liftOpts=Object.entries(LIFT_LABELS).map(([k,n])=>`<option value="lift:${k}">${n}</option>`).join('');
-    const accOpts=Object.entries(ACCESSORY_CATALOG).map(([day,list])=>list.map(a=>`<option value="acc:${a.id}">${a.name} (${day})</option>`).join('')).join('');
-    sel.innerHTML=liftOpts+accOpts;
-  }
+  renderWildcardPicker(document.getElementById('wildcard-search')?.value||'');
   const rows=(window._logWildcards||[]).map((wc,i)=>{
     const setRows=wc.sets.map((s,j)=>`<div class="srow"><input type="number" placeholder="lb" value="${s.w}" oninput="_logWildcards[${i}].sets[${j}].w=this.value;" style="text-align:center;"><input type="number" placeholder="reps" value="${s.r}" oninput="_logWildcards[${i}].sets[${j}].r=this.value;" style="text-align:center;"><input type="number" placeholder="RPE" min="1" max="10" value="${s.rpe}" oninput="_logWildcards[${i}].sets[${j}].rpe=this.value;" style="text-align:center;"><button class="rmbtn" onclick="removeWildcardSet(${i},${j})">x</button></div>`).join('');
     return `<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--b);">
@@ -7302,16 +7423,15 @@ function _lastWildcardWeight(kind,key){
       const sets=(ss[i][key]?.sets||[]).filter(x=>x.w);
       if(sets.length)return sets[sets.length-1].w;
     }else{
-      const hit=(ss[i].accessories||[]).find(a=>a.id===key&&a.weight);
+      const hit=(ss[i].accessories||[]).find(a=>a.weight&&accKeyFor(a).id===key);
       if(hit)return hit.weight;
     }
   }
   return '';
 }
-function addWildcard(){
-  const sel=document.getElementById('wildcard-select');
-  if(!sel?.value)return;
-  const [kind,key]=sel.value.split(':');
+function addWildcard(val){
+  if(!val)return;
+  const [kind,key]=val.split(':');
   if(!window._logWildcards)window._logWildcards=[];
   if(window._logWildcards.some(w=>w.kind===kind&&w.key===key))return;
   const name=kind==='lift'?LIFT_LABELS[key]:getAccessoryById(key)?.name;
@@ -7619,69 +7739,97 @@ function setChartLift(lift){
   document.querySelectorAll('.chart-lift-btn').forEach(b=>b.classList.remove('active'));
   const btn=document.getElementById('chart-'+lift);if(btn)btn.classList.add('active');
   renderPredictionChart(lift);
-  renderStaircaseChart(lift);
 }
-// Double-progression staircase: working weight per session (stepped line) with
-// reps-at-that-weight on a second axis. Reads the same non-wildcard working sets
-// as the engine, so what you see is exactly what progression logic sees.
-function renderStaircaseChart(lift='bench'){
-  const canvas=document.getElementById('staircase-chart');
-  if(!canvas||typeof Chart==='undefined')return;
-  if(window._staircaseChart){window._staircaseChart.destroy();window._staircaseChart=null;}
-  const sub=document.getElementById('staircase-sub');
+// Double-progression staircases — one compact chart per compound lift.
+// Working weight per session (stepped line, pull-ups = effective BW−assist)
+// with reps-at-that-weight dots. Same non-wildcard working sets the engine reads.
+function renderAllStaircases(){
+  const grid=document.getElementById('staircase-grid');
+  if(!grid||typeof Chart==='undefined')return;
+  if(!window._staircaseCharts)window._staircaseCharts={};
   const bw=D?.profile?.bodyweight||ATHLETE.weightLbs;
-  const points=[];
-  (D?.sessions||[]).forEach(s=>{
-    const sets=_workingSets(s,lift);
-    if(!sets.length)return;
-    const w=_workingWeight(sets);
-    const atW=sets.filter(x=>(x.w||0)===w);
-    points.push({date:s.date,weight:lift==='pullup'?bw+w:w,reps:Math.min(...atW.map(x=>x.r)),sets:atW.length});
-  });
-  if(!points.length){
-    if(sub)sub.textContent='no logged sessions for '+lift;
-    return;
-  }
-  if(sub){
+  const lifts=['bench','ohp','squat','dl','row','pullup'];
+  grid.innerHTML=lifts.map(l=>`<div style="background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:12px 14px;min-width:0;">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px;">
+      <span style="font-size:var(--fs-xs);color:var(--t);font-weight:600;">${esc(LIFT_LABELS[l])}</span>
+      <span id="stair-sub-${l}" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);"></span>
+    </div>
+    <div style="position:relative;height:150px;"><canvas id="stair-${l}"></canvas></div>
+  </div>`).join('');
+  lifts.forEach(lift=>{
+    if(window._staircaseCharts[lift]){window._staircaseCharts[lift].destroy();delete window._staircaseCharts[lift];}
+    const canvas=document.getElementById('stair-'+lift);
+    const sub=document.getElementById('stair-sub-'+lift);
+    const points=[];
+    (D?.sessions||[]).forEach(s=>{
+      const sets=_workingSets(s,lift);
+      if(!sets.length)return;
+      const w=_workingWeight(sets);
+      const atW=sets.filter(x=>(x.w||0)===w);
+      points.push({date:s.date,weight:lift==='pullup'?bw+w:w,reps:Math.min(...atW.map(x=>x.r)),sets:atW.length});
+    });
+    if(!points.length){
+      if(sub)sub.textContent='not logged yet';
+      canvas.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">No sessions — wildcard sets are a great way to start</div>';
+      return;
+    }
     const first=points[0],last=points[points.length-1];
-    sub.textContent=`${LIFT_LABELS[lift]||lift}: ${first.weight}×${first.reps} → ${last.weight}×${last.reps} over ${points.length} sessions`;
-  }
-  const [lo,hi]=REP_RANGES[lift]||[5,10];
-  window._staircaseChart=new Chart(canvas,{type:'line',data:{labels:points.map(p=>p.date.slice(5)),datasets:[
-    {label:'Working weight (lb)',data:points.map(p=>p.weight),borderColor:'#7c86f8',backgroundColor:'rgba(124,134,248,0.15)',stepped:true,pointRadius:4,pointBackgroundColor:'#7c86f8',yAxisID:'yW',borderWidth:2},
-    {label:`Reps (range ${lo}–${hi})`,data:points.map(p=>p.reps),borderColor:'#34c98e',backgroundColor:'#34c98e',pointRadius:4,showLine:false,yAxisID:'yR'}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#aeb8d6',font:{family:'DM Mono',size:10},boxWidth:12}},tooltip:{callbacks:{afterLabel:ctx=>ctx.datasetIndex===0?`${points[ctx.dataIndex].sets} working sets`:''}}},
-    scales:{yW:{position:'left',ticks:{color:'#7b87a8',font:{family:'DM Mono',size:10}},grid:{color:'rgba(124,134,248,0.08)'},title:{display:true,text:'lb',color:'#7b87a8'}},
-      yR:{position:'right',min:0,max:hi+3,ticks:{color:'#34c98e',font:{family:'DM Mono',size:10},stepSize:1},grid:{display:false}},
-      x:{ticks:{color:'#7b87a8',font:{family:'DM Mono',size:9},maxRotation:45},grid:{display:false}}}}});
+    if(sub)sub.textContent=`${first.weight}×${first.reps} → ${last.weight}×${last.reps} · ${points.length} sess`;
+    const [lo,hi]=REP_RANGES[lift]||[5,10];
+    window._staircaseCharts[lift]=new Chart(canvas,{type:'line',data:{labels:points.map(p=>p.date.slice(5)),datasets:[
+      {label:'lb',data:points.map(p=>p.weight),borderColor:'#7c86f8',backgroundColor:'rgba(124,134,248,0.15)',stepped:true,pointRadius:3,pointBackgroundColor:'#7c86f8',yAxisID:'yW',borderWidth:2},
+      {label:'reps',data:points.map(p=>p.reps),borderColor:'#34c98e',backgroundColor:'#34c98e',pointRadius:3,showLine:false,yAxisID:'yR'}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:ctx=>ctx.datasetIndex===0?`${points[ctx.dataIndex].sets} working sets`:`rep range ${lo}–${hi}`}}},
+      scales:{yW:{position:'left',ticks:{color:'#7b87a8',font:{family:'DM Mono',size:9},maxTicksLimit:5},grid:{color:'rgba(124,134,248,0.07)'}},
+        yR:{position:'right',min:0,max:hi+3,ticks:{color:'#34c98e',font:{family:'DM Mono',size:9},stepSize:2},grid:{display:false}},
+        x:{ticks:{color:'#7b87a8',font:{family:'DM Mono',size:8},maxRotation:0,maxTicksLimit:5},grid:{display:false}}}}});
+  });
 }
-// Accessory progress: first → latest logged weight×reps for every accessory
-// (catalog id or name match), so hypertrophy work finally has visible trends.
+// Accessory progress: every logged accessory normalized onto the canonical
+// catalog (legacy essay-names collapse into one identity), grouped under
+// muscle headers, each row expandable to its full session-by-session history.
 function renderAccessoryTrends(){
   const el=document.getElementById('accessory-trends');
   if(!el)return;
   const hist={};
   (D?.sessions||[]).forEach(s=>{(s.accessories||[]).forEach(a=>{
     if(!(a.weight||a.reps))return;
-    const key=a.id||String(a.name||'').toLowerCase();
-    if(!key)return;
-    (hist[key]=hist[key]||{name:a.name,entries:[]}).entries.push({date:s.date,weight:a.weight,sets:a.sets,reps:a.reps,wildcard:!!a.wildcard});
+    const {id,cat}=accKeyFor(a);
+    const h=(hist[id]=hist[id]||{name:cat.name,muscle:cat.muscle,entries:[]});
+    h.entries.push({date:s.date,weight:a.weight,sets:a.sets,reps:a.reps,wildcard:!!a.wildcard});
   });});
   const keys=Object.keys(hist);
   if(!keys.length){
     el.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:10px 0;">No accessories logged yet — they\'ll appear here once you log sets from a prescription or wildcard.</div>';
     return;
   }
+  keys.forEach(k=>hist[k].entries.sort((a,b)=>a.date.localeCompare(b.date)));
   const fmt=e=>`${e.weight?e.weight+'lb':'BW'}${e.sets&&e.reps?' '+e.sets+'×'+e.reps:e.reps?' ×'+e.reps:''}`;
-  el.innerHTML=keys.map(k=>{
-    const h=hist[k];
-    const first=h.entries[0],last=h.entries[h.entries.length-1];
-    const delta=(first.weight&&last.weight)?last.weight-first.weight:null;
-    const deltaHtml=delta==null?'':delta>0?`<span style="color:var(--a2);">▲ +${delta}lb</span>`:delta<0?`<span style="color:var(--a4);">▼ ${delta}lb</span>`:`<span style="color:var(--t3);">—</span>`;
-    return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);">
-      <div style="min-width:0;"><div style="font-size:var(--fs-sm);color:var(--t);">${esc(h.name)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${h.entries.length} session${h.entries.length>1?'s':''} · latest ${last.date}</div></div>
-      <div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t2);">${fmt(first)} → ${fmt(last)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);">${deltaHtml}</div></div>
-    </div>`;
+  const MUSCLE_ORDER=['chest','shoulders','triceps','back','rear delts','traps','biceps','quads','hamstrings','glutes','calves','core','other'];
+  const byMuscle={};
+  keys.forEach(k=>{(byMuscle[hist[k].muscle]=byMuscle[hist[k].muscle]||[]).push(k);});
+  el.innerHTML=MUSCLE_ORDER.filter(m=>byMuscle[m]).map(muscle=>{
+    const rows=byMuscle[muscle]
+      .sort((a,b)=>hist[b].entries.length-hist[a].entries.length)
+      .map(k=>{
+        const h=hist[k];
+        const first=h.entries[0],last=h.entries[h.entries.length-1];
+        const delta=(first.weight&&last.weight)?last.weight-first.weight:null;
+        const deltaHtml=delta==null||h.entries.length<2?'':delta>0?`<span style="color:var(--a2);font-family:var(--mono);font-size:var(--fs-xs);">▲ +${delta}lb</span>`:delta<0?`<span style="color:var(--a4);font-family:var(--mono);font-size:var(--fs-xs);">▼ ${delta}lb</span>`:`<span style="color:var(--t3);font-family:var(--mono);font-size:var(--fs-xs);">flat</span>`;
+        const summary=`<summary style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 4px;cursor:${h.entries.length>1?'pointer':'default'};list-style:none;">
+          <div style="min-width:0;display:flex;align-items:center;gap:7px;">
+            ${h.entries.length>1?'<span class="acc-chev" style="font-size:10px;color:var(--t3);transition:transform .2s;">▶</span>':'<span style="width:10px;"></span>'}
+            <div><div style="font-size:var(--fs-sm);color:var(--t);">${esc(h.name)}</div>
+            <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${h.entries.length} session${h.entries.length>1?'s':''} · latest ${last.date.slice(5)}</div></div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t2);">${h.entries.length>1?fmt(first)+' → ':''}${fmt(last)}</div>${deltaHtml}</div>
+        </summary>`;
+        const detail=h.entries.length>1?`<div style="padding:2px 4px 10px 21px;">${h.entries.map(e=>`<div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);padding:3px 0;border-bottom:1px solid rgba(124,131,247,0.07);"><span>${e.date}${e.wildcard?' 🃏':''}</span><span style="color:var(--t2);">${fmt(e)}</span></div>`).join('')}</div>`:'';
+        return h.entries.length>1
+          ?`<details style="border-bottom:1px solid var(--b);" ontoggle="this.querySelector('.acc-chev').style.transform=this.open?'rotate(90deg)':''">${summary}${detail}</details>`
+          :`<div style="border-bottom:1px solid var(--b);">${summary.replace('<summary','<div').replace('</summary>','</div>')}</div>`;
+      }).join('');
+    return `<div style="margin-bottom:14px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);letter-spacing:.14em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid var(--b2);margin-bottom:2px;">${esc(muscle)}</div>${rows}</div>`;
   }).join('');
 }
 function toggleEquationDrawer(){
@@ -7820,7 +7968,7 @@ function updateLogTabPlanned(){
   const upd=(id,lift)=>{
     const l=lifts[lift];if(!l)return;
     const el=document.getElementById(id);if(!el)return;
-    const w=l.weight>0?l.weight+'lb':'BW';
+    const w=lift==='pullup'?fmtLiftW('pullup',l.weight):(l.weight>0?l.weight+'lb':'BW');
     el.textContent=`Planned: ${l.sets}×${l.reps} @ ${w}`;
   };
   upd('planned-bench','bench');upd('planned-ohp','ohp');upd('planned-squat','squat');
@@ -7883,11 +8031,13 @@ function updateLogTabPlanned(){
           pReps=m?m[3]:'';
           prescLabel=`Planned: ${String(acc).replace(/^.+?\s+(\d+[×x]\d+)/,'$1')}`;
         }
+        const lastAcc=(()=>{const key=(typeof acc==='object'&&acc.id)?acc.id:accKeyFor({name}).id;const ss=D?.sessions||[];for(let j=ss.length-1;j>=0;j--){const hit=(ss[j].accessories||[]).find(x=>accKeyFor(x).id===key&&(x.weight||x.reps));if(hit)return {date:ss[j].date,w:hit.weight,s:hit.sets,r:hit.reps};}return null;})();
         aHtml+=`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--b);">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
             <span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);font-weight:600;text-transform:uppercase;">${name}</span>
             <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${prescLabel}</span>
           </div>
+          ${lastAcc?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);margin:-2px 0 8px;">Last: ${lastAcc.w?lastAcc.w+'lb':'BW'}${lastAcc.s&&lastAcc.r?' '+lastAcc.s+'×'+lastAcc.r:''} · ${_daysAgo(lastAcc.date)}d ago</div>`:''}
           <div class="srh"><span>WEIGHT (lb)</span><span>SETS</span><span>REPS</span><span></span></div>
           <div class="srow">
             <input type="number" id="acc-wt-${i}" placeholder="lb (opt.)" style="text-align:center;">
