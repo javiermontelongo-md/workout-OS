@@ -949,6 +949,80 @@
       "ts": 1784344935852,
       "aiFeedback": "**Bench:** S1 at 215lb was clean — 6 reps at RPE 8 is exactly what you want. But you loaded 7.5lb above the prescribed 207.5lb, and S2/S3 confirmed it: RPE 9 with rep drop to 5 is the same pattern that burned you on 07-07. The load jump wasn't earned yet. Next session, go back to 207.5lb and hit all three sets within the RPE cap before progressing.\n\n**OHP:** Something's off here — you jumped from 97.5lb target to 115lb on S1, then dropped 10lb for S2/S3. S1 at 115×5@8 suggests you tested a number that wasn't ready, then self-corrected. The S2/S3 data at 105lb is actually usable (6-8 reps, RPE 7), so 105lb appears to be a more honest working weight than where the prescription had you. Worth clarifying: is 97.5lb a typo, or did you intend to test a heavier opener?\n\n**Bottom line:** Two load decisions went above plan today and both produced RPE 9 outcomes. The self-regulation instinct mid-session (OHP drop-down) is good. Next session, bench at 207.5lb, three sets, RPE 8 hard cap — earn the jump cleanly.",
       "aiFeedbackAt": "2026-07-18T03:22:26.860Z"
+    },
+    {
+      "date": "2026-07-19",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 8
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 95,
+            "r": 7,
+            "rpe": 6
+          },
+          {
+            "w": 95,
+            "r": 10,
+            "rpe": 6
+          },
+          {
+            "w": 95,
+            "r": 10,
+            "rpe": 6
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "face_pull",
+          "name": "Face Pull",
+          "wildcard": true,
+          "weight": 30,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        },
+        {
+          "id": "db_curl",
+          "name": "Incline DB Curl",
+          "wildcard": true,
+          "weight": 25,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        }
+      ],
+      "ts": 1784513686663
     }
   ],
   "recoveryLogs": [],
