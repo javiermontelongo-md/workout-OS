@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-18",
+  "lastUpdated": "2026-07-20",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5195,6 +5195,11 @@
       "ts": 1782755157548,
       "type": "daily_prescription",
       "label": "push 60min · 2026-06-29"
+    },
+    {
+      "ts": 1784511882156,
+      "type": "daily_prescription",
+      "label": "pull 60min · 2026-07-19"
     }
   ],
   "runPrescriptions": {
@@ -6242,6 +6247,78 @@
           "confidence": "high"
         }
       }
+    },
+    "2026-07-19": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "engine": true,
+      "engineWhy": [
+        "7 lift sessions in 21 days with no deload in your training history → deload week: ~70% loads, 2×5, RPE ≤6",
+        "Accessories dropped for the deload week"
+      ],
+      "reasoning": "Deload week is mandatory after 7 sessions in 21 days with no previous deload; 70% loads at 2×5 RPE≤6 allow CNS recovery while maintaining movement quality. HRV is borderline (54.7ms) and RHR elevated—this volume reduction is protective given resident-level stress and sleep variability.",
+      "deloadStart": "2026-07-19",
+      "mainWork": {
+        "summary": "2 main lifts",
+        "lifts": {
+          "row": {
+            "weight": 80,
+            "sets": 2,
+            "reps": 5,
+            "targetRPE": 6,
+            "variation": "Barbell Bent-Over Row",
+            "why": [
+              "Last time (2026-07-15, 4d ago): 115×8@7, 115×8@7, 115×8@7",
+              "Double progression: hold 115lb, push for 9 reps (top of range is 10)",
+              "Deload override: 70% load, 2×5, RPE ≤6"
+            ],
+            "last": {
+              "date": "2026-07-15",
+              "daysAgo": 4,
+              "display": "115×8@7, 115×8@7, 115×8@7"
+            },
+            "coachNote": "Full scapular retraction at the top; brief pause (1sec) to confirm the pull is driven by back, not arms. At 80lb this should feel almost easy—use it to reset your row mechanics."
+          },
+          "pullup": {
+            "weight": 0,
+            "sets": 2,
+            "reps": 5,
+            "targetRPE": 6,
+            "variation": "Pull-ups",
+            "why": [
+              "Last time (2026-07-15, 4d ago): BW×6@7, BW×6@7, BW×6@9",
+              "Double progression: hold BW, push for 7 reps (top of range is 10)",
+              "Deload override: 70% load, 2×5, RPE ≤6"
+            ],
+            "last": {
+              "date": "2026-07-15",
+              "daysAgo": 4,
+              "display": "BW×6@7, BW×6@7, BW×6@9"
+            },
+            "coachNote": "Controlled 2-second descent with scapular depression at the bottom; elbows track close to ribs. BW is still plenty at RPE6; prioritize depth of stretch and lockout crisp."
+          }
+        },
+        "accessories": []
+      },
+      "workoutType": "pull",
+      "requestedType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-07-20T01:44:42.146Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 2 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "Treat this as a movement quality session, not a strength day. Focus on crisp bar path and full ROM; the low RPE means you have no excuse to get sloppy—this is where technique locks in for the next block.",
+      "watchOutFor": [
+        "Resident fatigue can mask overexertion—stick to RPE≤6 even if it feels 'too easy'",
+        "5K goal requires aerobic work; don't let this deload week become an excuse to skip your easy runs"
+      ]
     }
   },
   "coachingMemory": {
@@ -7191,6 +7268,13 @@
       "inp": 482,
       "out": 328,
       "cost": 0.006366
+    },
+    {
+      "ts": 1784511887276,
+      "type": "prescription",
+      "inp": 477,
+      "out": 342,
+      "cost": 0.002187
     }
   ],
   "checkins": [
@@ -7368,5 +7452,6 @@
         "checkedAt": "2026-06-15T06:03:20.641Z"
       }
     ]
-  }
+  },
+  "lastDeload": "2026-07-19"
 }
