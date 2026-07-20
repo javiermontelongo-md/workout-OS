@@ -5002,17 +5002,17 @@
       "sleepOnset": null,
       "wakeTime": null,
       "sleepMidpoint": null,
-      "steps": 935,
+      "steps": 2390,
       "exerciseMinutes": null,
       "activeCalories": null,
       "walkingHR": null,
-      "walkingSpeed": null,
+      "walkingSpeed": 2.35,
       "respiratoryRate": null,
       "vo2maxApple": null,
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-07-20T08:21:50.237Z",
+  "healthLastSync": "2026-07-20T15:27:50.699Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
