@@ -1033,6 +1033,90 @@
         }
       ],
       "ts": 1784513686663
+    },
+    {
+      "date": "2026-07-22",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 135,
+            "r": 3,
+            "rpe": 8
+          },
+          {
+            "w": 135,
+            "r": 3,
+            "rpe": 8
+          },
+          {
+            "w": 135,
+            "r": 3,
+            "rpe": 8
+          }
+        ],
+        "notes": "I want to go higher weights already with lower reps to build power. To many weals doing the same weight and low reps. I haven’t done an increase yet. "
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "dips",
+          "name": "Dips",
+          "wildcard": true,
+          "weight": null,
+          "sets": 3,
+          "reps": 8,
+          "notes": ""
+        },
+        {
+          "id": "tricep_pushdown_rope",
+          "name": "Rope Tricep Pushdown",
+          "wildcard": true,
+          "weight": 55,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        }
+      ],
+      "ts": 1784780345531
     }
   ],
   "recoveryLogs": [],
@@ -1047,10 +1131,10 @@
     "mode": "NORMAL"
   },
   "currentLifts": {
-    "benchE1RM": 258,
+    "benchE1RM": 263,
     "squatE1RM": 215,
     "deadliftE1RM": 215,
-    "ohpE1RM": 134,
+    "ohpE1RM": 149,
     "pullups": 5,
     "pullupE1RM": 0,
     "rowE1RM": 169
