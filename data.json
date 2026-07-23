@@ -1116,7 +1116,9 @@
           "notes": ""
         }
       ],
-      "ts": 1784780345531
+      "ts": 1784780345531,
+      "aiFeedback": "**Bench:** You ignored the deload prescription entirely — 225lb is 50% heavier than the 150lb target. With HRV at 50.7ms signaling accumulated fatigue, this works against recovery, not with it. RPE 7-8 confirms you're still loading a fatigued system.\n\n**OHP:** Same issue — 135lb for 3s versus 72.5lb for 5s prescribed. Holding RPE 8 across all three sets at reduced reps tells me 135lb is already near your working limit, so the \"I need heavier/more power\" instinct isn't matching the data here.\n\n**On your frustration with OHP progress:** That's legitimate and worth addressing — but the answer is a programmed progression plan, not deload week improvisation. Stalled OHP needs a structured solution next block, not heavier loads when your recovery metrics are already in the red.\n\n**Next session:** Log your session RPE. If this is still a deload week, hit the prescribed loads — your body can't adapt if you don't let it recover. If you're done with the deload, communicate that and we build the next block properly with OHP progression built in.",
+      "aiFeedbackAt": "2026-07-23T04:19:19.010Z"
     }
   ],
   "recoveryLogs": [],
@@ -5353,37 +5355,37 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-18T03:22:17.182Z",
-    "vo2maxUsed": 45.9,
-    "runCount": 29,
+    "generatedAt": "2026-07-23T04:19:07.390Z",
+    "vo2maxUsed": 46.1,
+    "runCount": 30,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1690,
-        "ciSeconds": 287,
+        "seconds": 1692,
+        "ciSeconds": 283,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3485,
-        "ciSeconds": 770,
+        "seconds": 3488,
+        "ciSeconds": 759,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7654,
-        "ciSeconds": 2212,
+        "seconds": 7660,
+        "ciSeconds": 2180,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15730,
-        "ciSeconds": 6953,
+        "seconds": 15742,
+        "ciSeconds": 6853,
         "method": "Riegel"
       }
     },
     "medianTrainingPace": 645.1515151515152,
     "decayFactor": 1,
     "daysInactive": 1,
-    "lastActivityDate": "2026-07-16",
-    "rawVO2": 45.88,
+    "lastActivityDate": "2026-07-21",
+    "rawVO2": 46.05,
     "debugInfo": {
       "riegelPred": {
         "s5k": 1997,
@@ -5409,16 +5411,16 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1288,
-        "s10k": 2670,
-        "shalf": 6032,
-        "sfull": 12301
+        "s5k": 1283,
+        "s10k": 2660,
+        "shalf": 6010,
+        "sfull": 12258
       },
       "hrPred": {
-        "s5k": 1621,
-        "s10k": 3242,
-        "shalf": 6840,
-        "sfull": 13681
+        "s5k": 1633,
+        "s10k": 3266,
+        "shalf": 6890,
+        "sfull": 13780
       },
       "weights": {
         "riegel": 0.45,
@@ -7642,6 +7644,13 @@
       "inp": 577,
       "out": 282,
       "cost": 0.001987
+    },
+    {
+      "ts": 1784780359010,
+      "type": "sessionFeedback",
+      "inp": 389,
+      "out": 272,
+      "cost": 0.005247
     }
   ],
   "checkins": [
