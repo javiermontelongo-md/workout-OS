@@ -5238,6 +5238,24 @@
       "weight": 230,
       "sets": 4,
       "reps": 4
+    },
+    {
+      "date": "2026-07-23",
+      "lift": "bench",
+      "predictedRPE": 6,
+      "actualRPE": 7,
+      "weight": 150,
+      "sets": 2,
+      "reps": 5
+    },
+    {
+      "date": "2026-07-23",
+      "lift": "ohp",
+      "predictedRPE": 6,
+      "actualRPE": 8,
+      "weight": 72.5,
+      "sets": 2,
+      "reps": 5
     }
   ],
   "scheduleOverrides": {
