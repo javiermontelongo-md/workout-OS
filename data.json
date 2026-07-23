@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-20",
+  "lastUpdated": "2026-07-23",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5377,6 +5377,11 @@
       "ts": 1784511882156,
       "type": "daily_prescription",
       "label": "pull 60min · 2026-07-19"
+    },
+    {
+      "ts": 1784776679286,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-07-22"
     }
   ],
   "runPrescriptions": {
@@ -6496,6 +6501,77 @@
         "Resident fatigue can mask overexertion—stick to RPE≤6 even if it feels 'too easy'",
         "5K goal requires aerobic work; don't let this deload week become an excuse to skip your easy runs"
       ]
+    },
+    "2026-07-22": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [
+        "Deload week (started 2026-07-19) — light loads through this week, resume normal progression after",
+        "Accessories dropped for the deload week"
+      ],
+      "reasoning": "Deload week (HRV 50.7ms, RHR 61bpm) calls for 30% load reduction to manage accumulated fatigue from recent 8–9 RPE bench work. Light compound-only format preserves movement quality while your body recovers before resuming normal progression.",
+      "mainWork": {
+        "summary": "2 main lifts",
+        "lifts": {
+          "bench": {
+            "weight": 150,
+            "sets": 2,
+            "reps": 5,
+            "targetRPE": 6,
+            "variation": "Barbell Bench Press",
+            "why": [
+              "Last time (2026-07-17, 5d ago): 215×6@8, 215×5@9, 215×5@9",
+              "Double progression: hold 215lb, push for 6 reps (top of range is 8)",
+              "Deload override: 150lb, 2×5, RPE ≤6"
+            ],
+            "last": {
+              "date": "2026-07-17",
+              "daysAgo": 5,
+              "display": "215×6@8, 215×5@9, 215×5@9"
+            },
+            "coachNote": "Chest to bar, full pause at sternum, elbows ~45° tucked—even at 150lb, dial in position."
+          },
+          "ohp": {
+            "weight": 72.5,
+            "sets": 2,
+            "reps": 5,
+            "targetRPE": 6,
+            "variation": "Barbell Strict OHP",
+            "why": [
+              "Last time (2026-07-17, 5d ago): 115×5@8, 105×6@7, 105×8@7",
+              "Double progression: hold 105lb, push for 7 reps (top of range is 8)",
+              "Deload override: 72.5lb, 2×5, RPE ≤6"
+            ],
+            "last": {
+              "date": "2026-07-17",
+              "daysAgo": 5,
+              "display": "115×5@8, 105×6@7, 105×8@7"
+            },
+            "coachNote": "Drive from leg drive; don't let hips shift. Rib cage stays down. Light load = no excuse for sloppy lockout."
+          }
+        },
+        "accessories": []
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-07-23T03:17:59.268Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 5 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "Treat these light loads as technique refinement—perfect bar path, pausing 1s at chest on bench. You're fresh; use that to ingrain mechanics rather than chase effort.",
+      "watchOutFor": [
+        "Don't ego-load during deload—the point is recovery; stay at RPE ≤6.",
+        "After deload ends, bench jumps back to 215lb; use this week to prime your CNS for that load."
+      ]
     }
   },
   "coachingMemory": {
@@ -7452,6 +7528,13 @@
       "inp": 477,
       "out": 342,
       "cost": 0.002187
+    },
+    {
+      "ts": 1784776683671,
+      "type": "prescription",
+      "inp": 577,
+      "out": 282,
+      "cost": 0.001987
     }
   ],
   "checkins": [
