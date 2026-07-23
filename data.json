@@ -952,7 +952,7 @@
     },
     {
       "date": "2026-07-19",
-      "day": "push",
+      "day": "pull",
       "type": "B",
       "notes": "",
       "bw": 227,
@@ -974,6 +974,11 @@
       },
       "pullup": {
         "sets": [
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 7
+          },
           {
             "w": null,
             "r": 5,
