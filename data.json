@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-23",
+  "lastUpdated": "2026-07-24",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5535,6 +5535,11 @@
       "ts": 1784776679286,
       "type": "daily_prescription",
       "label": "push 60min · 2026-07-22"
+    },
+    {
+      "ts": 1784936288206,
+      "type": "daily_prescription",
+      "label": "pull 60min · 2026-07-24"
     }
   ],
   "runPrescriptions": {
@@ -6725,6 +6730,77 @@
         "Don't ego-load during deload—the point is recovery; stay at RPE ≤6.",
         "After deload ends, bench jumps back to 215lb; use this week to prime your CNS for that load."
       ]
+    },
+    "2026-07-24": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "engine": true,
+      "engineWhy": [
+        "Deload week (started 2026-07-19) — light loads through this week, resume normal progression after",
+        "Accessories dropped for the deload week"
+      ],
+      "reasoning": "Deload week mandates light loads and low reps to allow CNS recovery while your HRV and 6.7h sleep suggest cumulative fatigue. These numbers (67.5lb rows, assisted pull-ups) are ~30% lighter than last week's work, perfect for active recovery without decondition.",
+      "mainWork": {
+        "summary": "2 main lifts",
+        "lifts": {
+          "row": {
+            "weight": 67.5,
+            "sets": 2,
+            "reps": 5,
+            "targetRPE": 6,
+            "variation": "Barbell Bent-Over Row",
+            "why": [
+              "Last time (2026-07-19, 5d ago): 95×7@6, 95×10@6, 95×10@6",
+              "Double progression: hold 95lb, push for 8 reps (top of range is 10)",
+              "Deload override: 67.5lb, 2×5, RPE ≤6"
+            ],
+            "last": {
+              "date": "2026-07-19",
+              "daysAgo": 5,
+              "display": "95×7@6, 95×10@6, 95×10@6"
+            },
+            "coachNote": "Full scapular retraction at the top; brief pause (1s) to groove the rowing pattern without momentum."
+          },
+          "pullup": {
+            "weight": -20,
+            "sets": 2,
+            "reps": 5,
+            "targetRPE": 6,
+            "variation": "Pull-ups",
+            "why": [
+              "Last time (2026-07-19, 5d ago): BW×5@7, BW×5@7, BW×5@7",
+              "Double progression: hold BW, push for 6 reps (top of range is 10)",
+              "Deload override: BW−20 assist, 2×5, RPE ≤6"
+            ],
+            "last": {
+              "date": "2026-07-19",
+              "daysAgo": 5,
+              "display": "BW×5@7, BW×5@7, BW×5@7"
+            },
+            "coachNote": "Controlled eccentric (3s lower) on the assisted machine—the lighter assist lets you practice clean mechanics before bodyweight demands."
+          }
+        },
+        "accessories": []
+      },
+      "workoutType": "pull",
+      "requestedType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-07-24T23:38:08.188Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 7 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "Stay relaxed and controlled—this week is about movement quality and parasympathetic reset before we resume normal progression. Hit RPE ≤6 and don't chase intensity; trust the process.",
+      "watchOutFor": [
+        "Don't creep intensity during deload; RPE≤6 means you should feel fresh at the end.",
+        "Sleep debt (6.7h) is real—prioritize 7–8h this week to maximize recovery."
+      ]
     }
   },
   "coachingMemory": {
@@ -7695,6 +7771,13 @@
       "inp": 389,
       "out": 272,
       "cost": 0.005247
+    },
+    {
+      "ts": 1784936292121,
+      "type": "prescription",
+      "inp": 582,
+      "out": 277,
+      "cost": 0.001967
     }
   ],
   "checkins": [
