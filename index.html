@@ -5260,19 +5260,32 @@ function _workingWeight(sets){
   sets.forEach(s=>{const w=s.w||0;counts[w]=(counts[w]||0)+1;});
   return +Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||b-a)[0];
 }
-// Auto-deload: sustained training (6+ lift sessions in 21 days) with no deload in
-// 28+ days triggers a deload week. D.lastDeload marks the week; it stays active 7 days.
+// Deload logic. A deload is a recovery intervention, so it fires on EVIDENCE of
+// accumulated fatigue — several main lifts grinding at once — NOT merely because
+// training has been frequent. The old trigger deloaded any consistent lifter (6 lift
+// sessions in 21 days was enough), which slashed thriving lifts to ~70% for no reason.
+// Single-lift stalls are already handled inside prescribeLift; this is the systemic case.
 function detectDeload(){
   const today=localDS(new Date());
+  // An active deload persists 7 days once it has officially started.
   if(D?.lastDeload&&_daysAgo(D.lastDeload)<7)
     return {active:true,why:`Deload week (started ${D.lastDeload}) — light loads through ${_daysAgo(D.lastDeload)===6?'today':'this week'}, resume normal progression after`};
-  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-21);
-  const cutoffStr=localDS(cutoff);
-  const liftDays=['push','pull','legs','A','B','C'];
-  const recent=(D?.sessions||[]).filter(s=>s.date>=cutoffStr&&liftDays.includes(s.day||s.type||''));
+  // Don't stack deloads: require at least 21 days since the last one.
   const sinceDeload=D?.lastDeload?_daysAgo(D.lastDeload):999;
-  if(recent.length>=6&&sinceDeload>=28)
-    return {active:true,start:today,why:`${recent.length} lift sessions in 21 days with no deload in ${sinceDeload>=999?'your training history':sinceDeload+' days'} → deload week: ~70% loads, 2×5, RPE ≤6`};
+  if(sinceDeload<21) return {active:false};
+  // A lift is "grinding" if, across its two most recent sessions at a non-dropping load,
+  // reps fell below the range floor OR RPE hit ≥9.5 — it stopped progressing and got
+  // maximally hard. Deload only when GLOBAL_STALL_COUNT main lifts grind together.
+  const isGrind=(hist,lo)=>{
+    if(!hist||hist.length<2) return false;
+    if(_workingWeight(hist[0].sets)<_workingWeight(hist[1].sets)) return false; // load already backed off
+    const test=h=>{const w=_workingWeight(h.sets);const at=h.sets.filter(s=>(s.w||0)===w);
+      return Math.min(...at.map(s=>s.r))<lo||Math.max(...at.map(s=>s.rpe||7))>=9.5;};
+    return test(hist[0])&&test(hist[1]);
+  };
+  const stalled=['bench','ohp','squat','dl','row'].filter(l=>isGrind(getLastLiftSessions(l,2),(REP_RANGES[l]||[5])[0]));
+  if(stalled.length>=(ATHLETE.GLOBAL_STALL_COUNT||3))
+    return {active:true,start:today,why:`${stalled.length} main lifts grinding (below-range reps or RPE ≥9.5 for 2 straight sessions: ${stalled.join(', ')}) → deload week: ~70% loads, 2×5, RPE ≤6`};
   return {active:false};
 }
 // Weight label for a lift. Pull-ups use the assist convention:
