@@ -1211,7 +1211,9 @@
           "notes": ""
         }
       ],
-      "ts": 1784939993815
+      "ts": 1784939993815,
+      "aiFeedback": "**You didn't follow the deload protocol.** Pull-ups were done unassisted at bodyweight instead of -20lb assistance, and rows were loaded at 135lb — exactly double the prescribed 67.5lb — for 7 reps instead of 5. That's not a deload, that's a normal training session.\n\nGiven your HRV flags and cumulative fatigue, this is a real concern. The deload exists to protect your next training block, not to be negotiated around.\n\n**Next session:** Hit the actual prescribed loads. If -20lb assistance and 67.5lb rows feel too easy, that's the point — trust the process.",
+      "aiFeedbackAt": "2026-07-25T00:39:59.813Z"
     }
   ],
   "recoveryLogs": [],
@@ -5501,7 +5503,7 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-23T04:19:07.390Z",
+    "generatedAt": "2026-07-25T00:39:55.157Z",
     "vo2maxUsed": 46.1,
     "runCount": 30,
     "methodLabel": "Riegel",
@@ -5529,7 +5531,7 @@
     },
     "medianTrainingPace": 645.1515151515152,
     "decayFactor": 1,
-    "daysInactive": 1,
+    "daysInactive": 3,
     "lastActivityDate": "2026-07-21",
     "rawVO2": 46.05,
     "debugInfo": {
@@ -7880,6 +7882,13 @@
       "inp": 582,
       "out": 277,
       "cost": 0.001967
+    },
+    {
+      "ts": 1784939999813,
+      "type": "sessionFeedback",
+      "inp": 373,
+      "out": 149,
+      "cost": 0.003354
     }
   ],
   "checkins": [
