@@ -1119,6 +1119,99 @@
       "ts": 1784780345531,
       "aiFeedback": "**Bench:** You ignored the deload prescription entirely — 225lb is 50% heavier than the 150lb target. With HRV at 50.7ms signaling accumulated fatigue, this works against recovery, not with it. RPE 7-8 confirms you're still loading a fatigued system.\n\n**OHP:** Same issue — 135lb for 3s versus 72.5lb for 5s prescribed. Holding RPE 8 across all three sets at reduced reps tells me 135lb is already near your working limit, so the \"I need heavier/more power\" instinct isn't matching the data here.\n\n**On your frustration with OHP progress:** That's legitimate and worth addressing — but the answer is a programmed progression plan, not deload week improvisation. Stalled OHP needs a structured solution next block, not heavier loads when your recovery metrics are already in the red.\n\n**Next session:** Log your session RPE. If this is still a deload week, hit the prescribed loads — your body can't adapt if you don't let it recover. If you're done with the deload, communicate that and we build the next block properly with OHP progression built in.",
       "aiFeedbackAt": "2026-07-23T04:19:19.010Z"
+    },
+    {
+      "date": "2026-07-24",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 6
+          },
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 6
+          },
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 6
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "lateral_raise",
+          "name": "DB Lateral Raise",
+          "wildcard": true,
+          "weight": 20,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        },
+        {
+          "id": "seated_db_curl",
+          "name": "Seated DB Curl",
+          "wildcard": true,
+          "weight": 35,
+          "sets": 3,
+          "reps": 10,
+          "notes": ""
+        },
+        {
+          "id": "seated_cable_row",
+          "name": "Seated Cable Row",
+          "wildcard": true,
+          "weight": 140,
+          "sets": 3,
+          "reps": 10,
+          "notes": ""
+        }
+      ],
+      "ts": 1784939993815
     }
   ],
   "recoveryLogs": [],
