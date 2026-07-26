@@ -497,6 +497,16 @@ runPhase(): reads OPTIONAL D.profile.raceDate / raceDistance.
   none set → "non-distance plan" mode (steady build, no taper) — Runna's own fallback.
   ≤14d taper · ≤28d peak · ≤70d build · else base
 estimateFTP(): best NP on a ride ≥20min × 0.95, cardio-decayed.
+
+TIME BUDGET: prescribeRun(kind, ts, durationMins) / prescribeRide(ts, durationMins).
+  Miles available = durationMins ÷ slowest easy pace. The budget only TRIMS —
+  it never inflates volume past the weekly ramp (so 60 and 90 min can yield the
+  same distance when the ramp, not time, is the binding constraint).
+  Quality sessions shrink warmup/cooldown FIRST, reps last. Rides scale their
+  interval structure to the slot and drop to Zone 2 below 45 min.
+CYCLING IN AUTO: autoPickWorkoutType returns 'cycling' when every lift and run
+  is within 2 days but there is ride history and no ride in ≥3 days. Never
+  invents cycling for someone with no ride history.
 ```
 
 ### e1RM anchor on lifts (added 2026-07-25)
