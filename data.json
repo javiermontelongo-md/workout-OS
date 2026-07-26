@@ -2088,9 +2088,25 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-07-25",
+      "stravaId": 19467282681,
+      "name": "Long run",
+      "type": "run",
+      "distance": 5,
+      "duration": 3594,
+      "pace": 718,
+      "elevationGain": 505,
+      "heartRateAvg": 170.2,
+      "heartRateMax": 191,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "long"
     }
   ],
-  "stravaLastSync": "2026-07-26T04:26:08.023Z",
+  "stravaLastSync": "2026-07-26T07:35:23.091Z",
   "adaptivePlanCache": {
     "narrative": "Week 1 of volume accumulation. Last bench session hit RPE 9-10 at 205lb for triples/quads, indicating significant overreach. Dropping to 192.5lb×4×4 to build sustainable volume at RPE 8. OHP showed good capacity at 100lb×7. Easy runs are being executed at threshold HR (165-174 bpm) instead of Zone 2 (130-145 bpm) — strict MAF HR compliance required.",
     "weeklyFocus": "Re-establish true Zone 2 easy running at MAF HR 147 ceiling and build bench volume at sustainable RPE 8",
