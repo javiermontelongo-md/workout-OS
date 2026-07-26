@@ -1647,6 +1647,22 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div id="deload-banner" style="display:none;"></div>
     <button class="btn bp" style="width:100%;margin-top:8px;" onclick="startLoggingSession()">Start logging this session</button>
   </div>
+  <div class="card" style="margin-bottom:18px;">
+    <div class="lbl">goal race</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.6;margin-bottom:10px;">Drives run periodisation — base → build → peak → taper. Inside 14 days the engine halves volume and holds intensity. Leave the date empty for a general-fitness plan with no taper.</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <input type="date" id="race-date" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;flex:1;min-width:150px;">
+      <select id="race-dist" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s2);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;">
+        <option value="5k">5K</option>
+        <option value="10k">10K</option>
+        <option value="half">Half marathon</option>
+        <option value="full">Marathon</option>
+      </select>
+      <button class="btn bp" onclick="saveRaceGoal()" style="font-size:var(--fs-sm);padding:6px 14px;">Save</button>
+      <button onclick="clearRaceGoal()" style="font-family:var(--mono);font-size:var(--fs-xs);background:var(--s3);color:var(--t2);border:1px solid var(--b2);border-radius:6px;padding:7px 12px;cursor:pointer;">Clear</button>
+    </div>
+    <div id="race-goal-status" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.7;margin-top:10px;"></div>
+  </div>
   <div style="margin-bottom:20px;">
     <div id="prog-date-header" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;"></div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -2867,7 +2883,7 @@ function showTab(n){
   if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderAllStaircases(); renderAccessoryTrends(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
-  if(n==='program'){ renderDeloadBanner(); renderAIFlowDiagram(); }
+  if(n==='program'){ renderDeloadBanner(); renderRaceGoal(); renderAIFlowDiagram(); }
   if(!rendered[n]){ renderTab(n); rendered[n]=true; }
 }
 function renderTab(n){
@@ -7725,6 +7741,42 @@ function renderTodayPlanStrip(){
   </div>`;
 }
 // ── DELOAD BANNER (Program tab) ──────────────────────────────
+// ── GOAL RACE ────────────────────────────────────────────────────────────────
+// Optional D.profile.raceDate / raceDistance feed runPhase(), which sets the
+// periodisation phase and the taper multiplier for every run prescription.
+function renderRaceGoal(){
+  const dEl=document.getElementById('race-date');
+  const sEl=document.getElementById('race-dist');
+  const st=document.getElementById('race-goal-status');
+  if(!dEl||!D)return;
+  dEl.value=D.profile?.raceDate||'';
+  if(sEl&&D.profile?.raceDistance)sEl.value=D.profile.raceDistance;
+  if(!st)return;
+  const ph=runPhase();
+  const plan=weeklyRunTarget();
+  const DIST={'5k':'5K','10k':'10K',half:'Half marathon',full:'Marathon'};
+  const parts=[`Phase: <span style="color:var(--a);">${esc(ph.label)}</span>`];
+  if(D.profile?.raceDate)parts.push(`Target: ${esc(DIST[D.profile?.raceDistance]||'race')} on ${esc(D.profile.raceDate)}`);
+  parts.push(`This week's run target: <span style="color:var(--a2);">${plan.target} mi</span>${plan.downWeek?' (recovery week)':''}${ph.taper?' — taper: volume halved, intensity held':''}`);
+  st.innerHTML=parts.join('<br>');
+}
+async function saveRaceGoal(){
+  if(!D)return;
+  const d=document.getElementById('race-date')?.value||'';
+  const dist=document.getElementById('race-dist')?.value||'5k';
+  if(!D.profile)D.profile={};
+  if(d){D.profile.raceDate=d;D.profile.raceDistance=dist;}
+  else{delete D.profile.raceDate;delete D.profile.raceDistance;}
+  renderRaceGoal();
+  try{await pushSilent();}catch(e){console.warn('saveRaceGoal push failed:',e);}
+}
+async function clearRaceGoal(){
+  if(!D)return;
+  if(D.profile){delete D.profile.raceDate;delete D.profile.raceDistance;}
+  const dEl=document.getElementById('race-date');if(dEl)dEl.value='';
+  renderRaceGoal();
+  try{await pushSilent();}catch(e){console.warn('clearRaceGoal push failed:',e);}
+}
 function renderDeloadBanner(){
   const el=document.getElementById('deload-banner');
   if(!el)return;
