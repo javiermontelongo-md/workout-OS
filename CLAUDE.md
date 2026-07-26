@@ -432,7 +432,13 @@ All line numbers are from origin/main. Verify before editing:
 ```
 buildEnginePrescription(workoutType, durationMins)   ← core; instant, works offline
   ├── autoPickWorkoutType()      workoutType='auto' → days-since rotation with why-trace
-  ├── detectDeload()             6+ lift sessions/21d + no deload in 28d → deload week
+  ├── detectDeload()             EVIDENCE-based (fixed 2026-07-25): fires only when
+  │                              GLOBAL_STALL_COUNT (3) main lifts are grinding —
+  │                              below-range reps or RPE ≥9.5 across their last TWO
+  │                              sessions at a non-dropping load — and ≥21d since the
+  │                              last deload. The old trigger was frequency-based
+  │                              (6 sessions/21d + none in 28d), which deloaded any
+  │                              consistent lifter and slashed bench 215→150.
   │                              (D.lastDeload persisted by generateDailyPrescription;
   │                               active 7 days; also flags DELOAD_WEEK in
   │                               evaluateTrainingStatus → blocks quality runs)
@@ -447,8 +453,7 @@ buildEnginePrescription(workoutType, durationMins)   ← core; instant, works of
   │     muscle coverage first, staleness second, implement variety third
   │     (each entry has muscle + impl: barbell/ez/db/cable/machine/bw).
   │     Legacy freeform names count via normalizeAccessory().
-  └── prescribeRun(kind, ts)     deterministic run/ride: 80/20 quality slot logic,
-                                 MAF cap, weekly mileage from Strava history
+  └── prescribeRun(kind, ts)     endurance engine — see "Endurance Engine" below
 
 Constants: REP_RANGES · LOAD_INC · START_WEIGHTS · BASE_SETS · LIFT_LABELS ·
 DAY_LIFTS · ACCESSORY_CATALOG v2 (10-14 per day type, {id,name,muscle,impl,sets,reps})
@@ -463,6 +468,44 @@ ASSISTED PULL-UPS: pullup set weight NEGATIVE = lb of machine assist
 Progression +5 = 5lb less assist; stall reset = +10lb assist; deload = +20lb
 assist. e1RM/staircase use bw+w so negative w is handled natively.
 ```
+
+### Endurance Engine (Runna-modelled, added 2026-07-25)
+Runna's own docs describe a coach-built, RULES-BASED system — paces anchored to an
+estimated race fitness, weekly volume held under a "controlled double constraint"
+(two ceilings, more conservative wins). Runna publishes no formulas, so the math
+uses the most authoritative public sources. Fully deterministic; no AI.
+
+| Concern | Source | Implementation |
+|---------|--------|----------------|
+| Pace zones | Daniels–Gilbert VDOT | `dgVO2` / `dgPctMax` / `dgVelocity` / `paceAtPctVDOT` |
+| Fitness anchor | best real effort, decayed | `estimateRunVDOT()` → `{vdot, why}` |
+| Volume ramp | ACSM ~10%/wk, graded | `weeklyRunTarget()` double constraint |
+| Taper | Bosquet meta-analysis | `runPhase()` → volume ×0.5 inside 14d, intensity held |
+| Distribution | 80/20 polarised (Seiler) | `pickRunSession()` |
+| Cycling | Coggan 7-zone %FTP | `COGGAN_ZONES`, `estimateFTP()`, `prescribeRide()` |
+
+```
+DANIELS_PCT = {easyLo:.62, easyHi:.72, marathon:.84, threshold:.88,
+               interval:.98, repetition:1.05}   // fractions of VDOT
+weeklyRunTarget(): base = max(last7d, prev7d)
+  Constraint A  %-cap graded by volume: <10mi→15%, <20→12%, <30→10%, else 8%
+  Constraint B  absolute +3mi
+  target = min(A,B); every 4th week ×0.75; taper ×0.5
+Session caps: long ≤30% of week (and ≤ recent longest +1mi)
+              threshold ≤10% of week · intervals ≤8% of week  (Daniels)
+runPhase(): reads OPTIONAL D.profile.raceDate / raceDistance.
+  none set → "non-distance plan" mode (steady build, no taper) — Runna's own fallback.
+  ≤14d taper · ≤28d peak · ≤70d build · else base
+estimateFTP(): best NP on a ride ≥20min × 0.95, cardio-decayed.
+```
+
+### e1RM anchor on lifts (added 2026-07-25)
+The lifting analogue of anchoring paces to VDOT. After double progression picks a
+load, `prescribeLift` checks it against the %e1RM band implied by the rep/RPE
+target (Epley inverse, backed off by RIR = 10 − targetRPE) and clamps to
+0.88–1.12× expected. Independently catches lowball/overload bugs — verified to
+raise a pathological 150lb bench to 177.5lb. Deloads and pull-ups are exempt
+(deloads are meant to be light; pull-up "weight" is assist/added load).
 
 ### AI garnish — the ONLY AI call in the prescription path
 ```

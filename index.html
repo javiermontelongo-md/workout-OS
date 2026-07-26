@@ -5351,6 +5351,29 @@ function prescribeLift(lift,ts,deload){
     if(newSets<sets)why.push(`Volume ×${ts.volumeModifier} from recovery flags: ${sets}→${newSets} sets`);
     sets=newSets;
   }
+  // ── e1RM ANCHOR ───────────────────────────────────────────────────────────
+  // The lifting analogue of anchoring run paces to VDOT: a prescribed load must
+  // land in a sensible %e1RM band for its rep/RPE target, or the session is
+  // either pointlessly light or unsafe. Epley inverse gives the rep-max load;
+  // reps-in-reserve (10 − target RPE) backs it off to the intended effort.
+  // Deloads are deliberately light, so they are exempt. Pull-ups are skipped —
+  // their "weight" is assist/added load, not an absolute bar weight.
+  if(!deload?.active&&lift!=='pullup'){
+    const e1rm=getDecayedE1RM(lift)?.decayed||0;
+    const rir=Math.max(0,10-targetRPE);
+    const expected=e1rm?e1rm/(1+(reps+rir)/30):0;
+    if(expected>0&&weight>0){
+      const ratio=weight/expected;
+      const lo=Math.round(expected*0.88/2.5)*2.5,hi=Math.round(expected*1.12/2.5)*2.5;
+      if(ratio<0.88){
+        why.push(`Anchor check: ${fmtLiftW(lift,weight)} is only ${Math.round(ratio*100)}% of the ${Math.round(expected)}lb your ${e1rm}lb e1RM supports for ${reps} reps @RPE${targetRPE} → raised to ${fmtLiftW(lift,lo)}`);
+        weight=lo;
+      }else if(ratio>1.12){
+        why.push(`Anchor check: ${fmtLiftW(lift,weight)} is ${Math.round(ratio*100)}% of the ${Math.round(expected)}lb your ${e1rm}lb e1RM supports for ${reps} reps @RPE${targetRPE} → capped at ${fmtLiftW(lift,hi)}`);
+        weight=hi;
+      }
+    }
+  }
   return {weight,sets,reps,targetRPE,variation:LIFT_LABELS[lift],why,last:last?{date:last.date,daysAgo:last.daysAgo,display:fmtSets(last)}:null};
 }
 // Deterministic accessory rotation. Priorities:
@@ -5392,51 +5415,265 @@ function pickAccessories(dayType,count){
     return {id:a.id,name:a.name,sets:a.sets,reps:a.reps,muscle:a.muscle,reason:why};
   });
 }
-// Deterministic run/ride prescription from Strava history + hard rules.
-function prescribeRun(kind,ts){
-  const why=[];
-  const acts=(D?.runs||[]).filter(r=>r.date);
-  const runs=acts.filter(r=>r.type!=='ride'&&r.runType!=='cycling');
-  const rides=acts.filter(r=>r.type==='ride'||r.runType==='cycling');
+// ============================================================
+// ENDURANCE ENGINE — modelled on Runna's approach
+// Runna's own docs describe a coach-built, RULES-BASED system: paces are
+// derived from an estimated race fitness, and weekly volume is held under a
+// "controlled double constraint" (two ceilings, whichever is more conservative).
+// Runna does not publish its formulas, so the math below uses the most
+// authoritative public sources:
+//   · Paces        — Daniels–Gilbert VDOT equations (Daniels' Running Formula)
+//   · Volume ramp  — graded %-cap anchored on the ACSM ~10%/week guideline
+//   · Taper        — Bosquet et al. meta-analysis: ~2wk, volume −50%, intensity held
+//   · Distribution — 80/20 polarised (Seiler)
+//   · Cycling      — Coggan 7-zone %FTP model (Allen & Coggan)
+// Everything here is deterministic: same data in, same session out, with a
+// why-trace. No AI is involved in choosing distance, pace, or structure.
+// ============================================================
+// Daniels–Gilbert oxygen cost of running: velocity (m/min) → VO2 (ml/kg/min).
+function dgVO2(v){ return -4.60 + 0.182258*v + 0.000104*v*v; }
+// Fraction of VO2max sustainable for a race lasting t minutes.
+function dgPctMax(t){ return 0.8 + 0.1894393*Math.exp(-0.012778*t) + 0.2989558*Math.exp(-0.1932605*t); }
+// Invert the oxygen-cost quadratic: VO2 → velocity (m/min).
+function dgVelocity(vo2){
+  const a=0.000104,b=0.182258,c=-(4.60+vo2);
+  const disc=b*b-4*a*c;
+  return disc<0?0:(-b+Math.sqrt(disc))/(2*a);
+}
+// VDOT implied by covering `meters` in `minutes`.
+function vdotFromPerformance(meters,minutes){
+  if(!(meters>0)||!(minutes>0))return null;
+  const pct=dgPctMax(minutes);
+  if(!(pct>0))return null;
+  const val=dgVO2(meters/minutes)/pct;
+  return (isFinite(val)&&val>0)?val:null;
+}
+// Daniels training intensities, as a fraction of VDOT.
+const DANIELS_PCT={easyLo:0.62,easyHi:0.72,marathon:0.84,threshold:0.88,interval:0.98,repetition:1.05};
+// Pace (seconds per mile) to run at a given fraction of VDOT.
+function paceAtPctVDOT(vdot,pct){
+  const v=dgVelocity(vdot*pct);
+  return v>0?Math.round(1609.34/v*60):null;
+}
+function fmtPaceSec(s){ return s?`${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`:'—'; }
+// Current running fitness as a VDOT, derived from the best real performance in
+// the recent window (Runna anchors paces to an estimated race time; a genuine
+// best effort is the honest proxy). Decays if you have not run lately.
+function estimateRunVDOT(){
+  const all=(D?.runs||[]).filter(r=>r.date&&r.type!=='ride'&&r.runType!=='cycling'&&r.runType!=='walk'&&r.distance>=1.5&&r.duration>0);
+  if(!all.length)return {vdot:null,source:null,why:'No runs ≥1.5mi logged — cannot estimate running fitness yet'};
+  const recent=all.filter(r=>_daysAgo(r.date)<=42);
+  const pool=recent.length?recent:all.slice(-8);
+  let best=null,bestRun=null;
+  pool.forEach(r=>{
+    const v=vdotFromPerformance(r.distance*1609.34,r.duration/60);
+    if(v&&(best===null||v>best)){best=v;bestRun=r;}
+  });
+  if(best===null)return {vdot:null,source:null,why:'No run had usable distance/time data'};
+  const stale=_daysAgo(pool[pool.length-1].date);
+  const decay=fitnessDecayFactor(pool[pool.length-1].date,'cardio');
+  const vdot=Math.round(best*decay*10)/10;
+  const why=`VDOT ${vdot} from best recent effort (${bestRun.date}: ${bestRun.distance.toFixed(1)}mi @ ${fmtPaceSec(bestRun.duration/bestRun.distance)}/mi)`
+    +(decay<0.99?` · decayed ${Math.round((1-decay)*100)}% for ${stale}d off`:'');
+  return {vdot,source:bestRun,why,decay};
+}
+// The full Daniels pace table for a VDOT, in sec/mile.
+function runTrainingPaces(vdot){
+  if(!vdot)return null;
+  return {
+    easyLo:paceAtPctVDOT(vdot,DANIELS_PCT.easyHi),   // faster end of easy
+    easyHi:paceAtPctVDOT(vdot,DANIELS_PCT.easyLo),   // slower end of easy
+    marathon:paceAtPctVDOT(vdot,DANIELS_PCT.marathon),
+    threshold:paceAtPctVDOT(vdot,DANIELS_PCT.threshold),
+    interval:paceAtPctVDOT(vdot,DANIELS_PCT.interval),
+    repetition:paceAtPctVDOT(vdot,DANIELS_PCT.repetition)
+  };
+}
+// Goal-race periodisation. Reads optional D.profile.raceDate / raceDistance.
+// With no race set, Runna's equivalent is a "non-distance plan" — steady
+// percentage build with no taper — which is what the null branch returns.
+function runPhase(){
+  const rd=D?.profile?.raceDate;
+  if(!rd)return {phase:'base',label:'General fitness (no goal race set)',daysOut:null,volMult:1,taper:false};
+  const daysOut=Math.round((new Date(rd+'T12:00:00')-new Date())/86400000);
+  if(daysOut<0)return {phase:'base',label:'Race complete — rebuilding base',daysOut,volMult:1,taper:false};
+  if(daysOut<=14)return {phase:'taper',label:`Taper — ${daysOut}d to race`,daysOut,volMult:0.5,taper:true};
+  if(daysOut<=28)return {phase:'peak',label:`Peak — ${daysOut}d to race`,daysOut,volMult:1,taper:false};
+  if(daysOut<=70)return {phase:'build',label:`Build — ${daysOut}d to race`,daysOut,volMult:1,taper:false};
+  return {phase:'base',label:`Base — ${daysOut}d to race`,daysOut,volMult:1,taper:false};
+}
+// Weekly mileage target under Runna's "double constraint": a graded percentage
+// ceiling AND an absolute mileage ceiling — whichever is more conservative wins.
+// Lower-volume runners get a slightly higher % (Runna states the ramp is
+// proportional so low- and high-mileage runners progress at a fair rate).
+function weeklyRunTarget(){
+  const runs=(D?.runs||[]).filter(r=>r.type!=='ride'&&r.runType!=='cycling'&&r.runType!=='walk');
   const d7=localDS(new Date(Date.now()-7*86400000)),d14=localDS(new Date(Date.now()-14*86400000));
-  const wk=runs.filter(r=>r.date>d7),prevWk=runs.filter(r=>r.date>d14&&r.date<=d7);
-  const wkMi=wk.reduce((s,r)=>s+(r.distance||0),0),prevMi=prevWk.reduce((s,r)=>s+(r.distance||0),0);
-  const fmtPace=s=>`${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
-  if(kind==='cycling'){
-    const durs=rides.slice(-5).map(r=>r.duration).filter(Boolean);
-    const dur=durs.length?Math.round(durs.reduce((a,b)=>a+b,0)/durs.length/60/5)*5:45;
-    why.push(rides.length?`Median of last rides ≈ ${dur}min — hold Zone 2`:`No ride history — start at ${dur}min Zone 2`);
-    return {runType:'cycling',mainSet:`${dur}min steady Zone 2 spin. Stay seated, high cadence (85-95rpm), HR 130-145. This is aerobic base that spares your run legs.`,
-      totalDistance:null,paceTarget:null,hrCeiling:145,effort:'conversational the whole ride',why};
+  const thisWk=runs.filter(r=>r.date>d7),prevWk=runs.filter(r=>r.date>d14&&r.date<=d7);
+  const thisMi=thisWk.reduce((s,r)=>s+(r.distance||0),0);
+  const prevMi=prevWk.reduce((s,r)=>s+(r.distance||0),0);
+  const base=Math.max(thisMi,prevMi);
+  const why=[];
+  why.push(`Last 7d: ${thisMi.toFixed(1)}mi · previous 7d: ${prevMi.toFixed(1)}mi`);
+  // Sessions per week, inferred from actual recent frequency (2–6).
+  const last14=runs.filter(r=>_daysAgo(r.date)<=14).length;
+  const daysPerWeek=Math.min(6,Math.max(2,Math.round(last14/2)||3));
+  const phase=runPhase();
+  if(base<1)return {target:6,base,daysPerWeek:3,phase,why:[...why,'Little/no run history → conservative 6mi starter week']};
+  // Constraint A — graded percentage ceiling (ACSM ~10%/wk, eased for low volume).
+  const pct=base<10?0.15:base<20?0.12:base<30?0.10:0.08;
+  const capPct=base*(1+pct);
+  // Constraint B — absolute ceiling, so a big week can't compound.
+  const capAbs=base+3;
+  let target=Math.min(capPct,capAbs);
+  why.push(`Ramp ceiling: +${Math.round(pct*100)}% (${capPct.toFixed(1)}mi) vs +3mi absolute (${capAbs.toFixed(1)}mi) → take the more conservative ${target.toFixed(1)}mi`);
+  // Every 4th week is a recovery week (−25%), counted from your first logged run.
+  const firstRun=runs[0]?.date;
+  const weeksIn=firstRun?Math.floor(_daysAgo(firstRun)/7):0;
+  const downWeek=firstRun&&weeksIn%4===3;
+  if(downWeek){target*=0.75;why.push(`Week ${weeksIn%4+1} of the 4-week cycle → recovery week, volume ×0.75`);}
+  // Taper overrides everything (Bosquet: hold intensity, cut volume ~half).
+  if(phase.volMult!==1){target*=phase.volMult;why.push(`${phase.label} → volume ×${phase.volMult} (intensity held, Bosquet taper)`);}
+  else if(phase.daysOut!=null)why.push(phase.label);
+  return {target:Math.round(target*4)/4,base,daysPerWeek,phase,downWeek,why};
+}
+// Which session does today call for? Mirrors Runna's weekly template: one long
+// run, up to one or two quality sessions, everything else easy — with recovery
+// spacing and the hard-rule engine able to veto quality.
+function pickRunSession(ts){
+  const runs=(D?.runs||[]).filter(r=>r.type!=='ride'&&r.runType!=='cycling'&&r.runType!=='walk');
+  const lastOf=t=>{const h=runs.filter(r=>(Array.isArray(t)?t:[t]).includes(r.runType)).slice(-1)[0];return h?_daysAgo(h.date):999;};
+  const qualDays=lastOf(['intervals','tempo','quality','threshold']);
+  const longDays=lastOf('long');
+  const legs=(D?.sessions||[]).filter(s=>['legs','C'].includes(s.day||s.type||''));
+  const legsDays=legs.length?_daysAgo(legs[legs.length-1].date):999;
+  const anyRunDays=runs.length?_daysAgo(runs[runs.length-1].date):999;
+  const why=[];
+  if(!ts.canDoQuality){
+    why.push(`Hard rules block quality today (${ts.activeFlags.join(', ')||'recovery flags'}) → easy only`);
+    return {kind:'easy',why};
   }
-  const easyRuns=runs.slice(-15).filter(r=>r.pace&&(r.heartRateAvg||0)<=152&&r.distance>=1.5);
-  const capped=easyRuns.length?Math.round(easyRuns.reduce((s,r)=>s+r.pace,0)/easyRuns.length):null;
-  const lastQuality=runs.filter(r=>['intervals','tempo','quality'].includes(r.runType)).slice(-1)[0];
-  const lastLong=runs.filter(r=>r.runType==='long').slice(-1)[0];
-  const qualDays=lastQuality?_daysAgo(lastQuality.date):999;
-  const longDays=lastLong?_daysAgo(lastLong.date):999;
-  const legsSessions=(D?.sessions||[]).filter(s=>['legs','C'].includes(s.day||s.type||''));
-  const legsDays=legsSessions.length?_daysAgo(legsSessions[legsSessions.length-1].date):999;
-  why.push(`Last 7 days: ${wkMi.toFixed(1)}mi · previous week ${prevMi.toFixed(1)}mi`);
-  let runType='easy',mainSet,dist,paceTarget;
-  if(ts.canDoQuality&&qualDays>=7&&longDays>=3&&legsDays>=1&&wk.length>=2){
-    runType=lastQuality?.runType==='tempo'?'intervals':'tempo';
-    why.push(`No quality run in ${qualDays>=999?'recent history':qualDays+' days'} + recovery clear → 20% quality slot (${runType})`);
-    if(runType==='intervals'){
-      mainSet='6×400m at 5K effort (hard but repeatable) with equal-time easy jog recoveries. 1mi easy warmup + 1mi easy cooldown.';
-      dist='4-5 miles total';paceTarget=null;
-    }else{
-      mainSet='1mi easy warmup, then 2mi at comfortably-hard tempo (could speak short phrases only), 1mi easy cooldown.';
-      dist='4 miles total';paceTarget=capped?`tempo ≈ ${fmtPace(Math.max(capped-90,360))}/mi`:null;
-    }
-    return {runType,mainSet,totalDistance:dist,paceTarget,hrCeiling:null,effort:runType==='intervals'?'hard but repeatable — last rep same speed as first':'comfortably hard',why};
+  if(anyRunDays===0){why.push('Already ran today → recovery shakeout only');return {kind:'recovery',why};}
+  // Long run: once every ~7 days, needs 48h from quality and a day off legs.
+  if(longDays>=7&&qualDays>=2&&legsDays>=1){
+    why.push(`No long run in ${longDays>=999?'recent history':longDays+'d'} → long run slot`);
+    return {kind:'long',why};
   }
-  const target=Math.min(Math.max(wkMi/3,2.5),5).toFixed(1).replace(/\.0$/,'');
-  why.push(`80/20 polarization → Zone 2 easy run, ~1/3 of weekly volume (${target}mi), HR hard-capped at ${ts.mafHR}bpm`);
-  if(capped)why.push(`Recent sub-152bpm runs average ${fmtPace(capped)}/mi — expect around that or slower to hold the cap`);
-  else why.push(`No recent runs under 152bpm — pace is irrelevant today, walk-jog if needed to stay under ${ts.mafHR}`);
-  return {runType:'easy',mainSet:`${target} miles fully conversational. HR is the only metric that matters — stay under ${ts.mafHR}bpm even if that means walking hills.`,
-    totalDistance:`${target} miles`,paceTarget:capped?`~${fmtPace(capped)}-${fmtPace(capped+60)}/mi`:'whatever keeps HR down',hrCeiling:ts.mafHR,effort:'fully conversational',why};
+  // Quality: 80/20 means ~1 in 5 sessions; require 72h since last quality.
+  if(qualDays>=3&&longDays>=2&&legsDays>=1&&anyRunDays>=1){
+    const lastQ=runs.filter(r=>['intervals','tempo','quality','threshold'].includes(r.runType)).slice(-1)[0];
+    const kind=lastQ&&['tempo','threshold','quality'].includes(lastQ.runType)?'intervals':'threshold';
+    why.push(`Quality clear (last quality ${qualDays>=999?'never':qualDays+'d ago'}, long ${longDays>=999?'never':longDays+'d'}, legs ${legsDays}d) → 20% slot, alternating to ${kind}`);
+    return {kind,why};
+  }
+  why.push(`Within recovery windows (quality ${qualDays}d, long ${longDays}d, legs ${legsDays}d) → easy aerobic`);
+  return {kind:'easy',why};
+}
+// Deterministic run/ride prescription. Distances come from the weekly volume
+// plan, paces from the VDOT table, structure from the session type.
+function prescribeRun(kind,ts){
+  if(kind==='cycling')return prescribeRide(ts);
+  const why=[];
+  const fit=estimateRunVDOT();
+  const plan=weeklyRunTarget();
+  const paces=runTrainingPaces(fit.vdot);
+  const sess=pickRunSession(ts);
+  why.push(fit.why);
+  why.push(...plan.why);
+  why.push(...sess.why);
+  const wk=plan.target,dpw=plan.daysPerWeek;
+  const r25=x=>Math.max(1,Math.round(x*4)/4);
+  const mi=x=>`${(+x).toFixed(2).replace(/\.?0+$/,'')} mi`;
+  // Easy-pace band always respects the MAF/Zone-2 HR ceiling.
+  const easyBand=paces?`${fmtPaceSec(paces.easyLo)}–${fmtPaceSec(paces.easyHi)}/mi`:'conversational effort';
+  if(paces)why.push(`Daniels paces @ VDOT ${fit.vdot} — E ${easyBand} · T ${fmtPaceSec(paces.threshold)}/mi · I ${fmtPaceSec(paces.interval)}/mi · R ${fmtPaceSec(paces.repetition)}/mi`);
+  else why.push('No VDOT yet — running by heart rate and feel until a qualifying run is logged');
+  if(sess.kind==='recovery'){
+    const d=r25(Math.min(3,wk*0.15));
+    return {runType:'easy',mainSet:`${mi(d)} recovery shakeout — flat, fully conversational, no watch pressure. Purpose is circulation, not fitness.`,
+      totalDistance:mi(d),paceTarget:paces?`${fmtPaceSec(paces.easyHi)}/mi or slower`:'very easy',hrCeiling:ts.mafHR,effort:'very easy — should feel almost too slow',why};
+  }
+  if(sess.kind==='long'){
+    // Long run capped at 30% of weekly volume (standard endurance guidance),
+    // and never more than +1mi beyond your recent longest.
+    const longest=Math.max(...[0,...(D?.runs||[]).filter(r=>r.runType==='long'&&_daysAgo(r.date)<=28).map(r=>r.distance||0)]);
+    let d=wk*0.30;
+    if(longest>0)d=Math.min(d,longest+1);
+    d=r25(Math.max(d,3));
+    why.push(`Long run = 30% of ${wk}mi week${longest>0?`, capped at recent longest ${longest.toFixed(1)}mi +1`:''} → ${mi(d)}`);
+    return {runType:'long',mainSet:`${mi(d)} steady long run at easy pace. Last mile may drift slightly quicker if it still feels conversational. Fuel if you pass 75 minutes.`,
+      totalDistance:mi(d),paceTarget:easyBand,hrCeiling:ts.mafHR+5,effort:'conversational throughout — this is aerobic volume, not a test',why};
+  }
+  if(sess.kind==='threshold'){
+    // Daniels caps T volume at ~10% of weekly mileage.
+    const tMiles=r25(Math.min(Math.max(wk*0.10,1.5),5));
+    const wu=r25(Math.min(1.5,wk*0.08)),cd=wu;
+    const reps=tMiles>=3?2:1;
+    const per=r25(tMiles/reps);
+    const body=reps>1
+      ?`${reps} × ${mi(per)} at threshold with 2 min easy jog between`
+      :`${mi(tMiles)} continuous at threshold`;
+    why.push(`Threshold volume = 10% of the ${wk}mi week → ${mi(tMiles)} at T pace (Daniels' T-volume cap)`);
+    return {runType:'tempo',mainSet:`${mi(wu)} easy warmup · ${body} · ${mi(cd)} easy cooldown. Threshold is "comfortably hard" — you could say a short sentence, not hold a conversation.`,
+      totalDistance:mi(wu+tMiles+cd),paceTarget:paces?`${fmtPaceSec(paces.threshold)}/mi (T)`:'comfortably hard',hrCeiling:null,effort:'comfortably hard — controlled, repeatable, never a race',why};
+  }
+  if(sess.kind==='intervals'){
+    // Daniels caps I volume at ~8% of weekly mileage.
+    const iMiles=Math.min(Math.max(wk*0.08,0.75),3);
+    const repDist=0.25; // 400m
+    const reps=Math.max(4,Math.min(10,Math.round(iMiles/repDist)));
+    const wu=r25(Math.min(1.5,wk*0.08)),cd=wu;
+    const total=r25(wu+cd+reps*repDist*2);
+    why.push(`Interval volume = 8% of the ${wk}mi week → ${reps}×400m at I pace (Daniels' I-volume cap)`);
+    return {runType:'intervals',mainSet:`${mi(wu)} easy warmup · ${reps} × 400m at interval pace with equal-time easy jog recovery · ${mi(cd)} easy cooldown. Last rep should match the first — if you slow down, stop the session.`,
+      totalDistance:mi(total),paceTarget:paces?`${fmtPaceSec(Math.round(paces.interval*0.25))} per 400m (${fmtPaceSec(paces.interval)}/mi pace)`:'hard but repeatable',hrCeiling:null,effort:'hard but repeatable — even splits beat a fast first rep',why};
+  }
+  // Default: easy aerobic, the 80% of 80/20.
+  const d=r25(Math.min(Math.max(wk/Math.max(dpw,2),2),wk*0.25));
+  why.push(`Easy run = ${wk}mi week ÷ ${dpw} sessions → ${mi(d)}, the 80% side of 80/20`);
+  return {runType:'easy',mainSet:`${mi(d)} fully conversational. Heart rate is the governing metric — stay under ${ts.mafHR}bpm even if that means walking the hills.`,
+    totalDistance:mi(d),paceTarget:easyBand,hrCeiling:ts.mafHR,effort:'fully conversational — full sentences the whole way',why};
+}
+// ── CYCLING: Coggan 7-zone %FTP model ────────────────────────────────────────
+const COGGAN_ZONES={z1:[0,0.55],z2:[0.56,0.75],z3:[0.76,0.90],z4:[0.91,1.05],z5:[1.06,1.20],z6:[1.21,1.50]};
+// FTP from the best sustained normalised power on a ride ≥20 min (×0.95, the
+// standard 20-minute-test correction). Falls back to HR-only prescription.
+function estimateFTP(){
+  const rides=(D?.runs||[]).filter(r=>(r.type==='ride'||r.runType==='cycling')&&r.duration>=1200);
+  let best=0,src=null;
+  rides.forEach(r=>{const w=r.weightedAvgWatts||r.averageWatts||0;if(w>best){best=w;src=r;}});
+  if(!best)return {ftp:null,why:'No ride ≥20min with power data — prescribing by heart rate instead'};
+  const decay=fitnessDecayFactor(src.date,'cardio');
+  const ftp=Math.round(best*0.95*decay);
+  return {ftp,src,why:`FTP ≈ ${ftp}W from best 20min+ ride (${src.date}, ${Math.round(best)}W NP × 0.95${decay<0.99?` × ${decay.toFixed(2)} decay`:''})`};
+}
+function prescribeRide(ts){
+  const why=[];
+  const rides=(D?.runs||[]).filter(r=>r.type==='ride'||r.runType==='cycling');
+  const f=estimateFTP();
+  why.push(f.why);
+  const durs=rides.slice(-5).map(r=>r.duration).filter(Boolean);
+  const dur=durs.length?Math.round(durs.reduce((a,b)=>a+b,0)/durs.length/60/5)*5:45;
+  const lastHard=rides.filter(r=>['tempo','threshold','intervals'].includes(r.runType)).slice(-1)[0];
+  const hardDays=lastHard?_daysAgo(lastHard.date):999;
+  const z=(lo,hi)=>f.ftp?`${Math.round(f.ftp*lo)}–${Math.round(f.ftp*hi)}W`:null;
+  why.push(`Typical recent ride ≈ ${dur}min`);
+  // Rides are the aerobic-support modality for a runner: default Zone 2, and
+  // only go threshold when running quality is also clear (protects run legs).
+  if(ts.canDoQuality&&hardDays>=5){
+    const zone=COGGAN_ZONES.z4;
+    why.push(`No hard ride in ${hardDays>=999?'recent history':hardDays+'d'} and recovery clear → Coggan Zone 4 threshold work`);
+    return {runType:'cycling',
+      mainSet:`15min Zone 2 warmup · 2 × 12min at threshold${z(zone[0],zone[1])?` (${z(zone[0],zone[1])})`:''} with 5min easy spin between · 10min cooldown. Seated, smooth, 85–95rpm.`,
+      totalDistance:null,paceTarget:z(zone[0],zone[1])?`Z4 ${z(zone[0],zone[1])} (91–105% FTP)`:'comfortably hard, ~85% max HR',
+      hrCeiling:null,effort:'comfortably hard — sustainable, not a sprint',why};
+  }
+  const zone=COGGAN_ZONES.z2;
+  why.push('Zone 2 endurance ride — aerobic base that spares the run legs (80/20 easy side)');
+  return {runType:'cycling',
+    mainSet:`${dur}min steady Zone 2${z(zone[0],zone[1])?` (${z(zone[0],zone[1])})`:''}. Seated, high cadence 85–95rpm, HR ${Math.min(145,ts.mafHR)}bpm or below.`,
+    totalDistance:null,paceTarget:z(zone[0],zone[1])?`Z2 ${z(zone[0],zone[1])} (56–75% FTP)`:'conversational',
+    hrCeiling:Math.min(145,ts.mafHR),effort:'conversational the whole ride',why};
 }
 // AUTO mode: pick today's best workout type deterministically, with a why-trace.
 function autoPickWorkoutType(){
