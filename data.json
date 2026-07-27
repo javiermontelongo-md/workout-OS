@@ -5337,7 +5337,7 @@
       "date": "2026-07-25",
       "restingHR": 65,
       "hrv": 46.92440959386664,
-      "wristTemp": -0.99,
+      "wristTemp": -1.29,
       "sleepHours": 5.8,
       "sleepDeep": 0.5094608059856627,
       "sleepREM": 1.110767624543773,
@@ -5378,7 +5378,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-07-27T00:46:38.788Z",
+  "healthLastSync": "2026-07-27T02:42:26.827Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
