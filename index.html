@@ -5313,42 +5313,97 @@ function fmtLiftW(lift,w){
 }
 // Core double-progression brain for one lift. Returns weight/sets/reps/targetRPE
 // plus a human-readable why-trace and the raw "last time" data.
+// ── PERIODISED STRENGTH ──────────────────────────────────────────────────────
+// Main lifts do NOT progress linearly. They run a 4-week block cycle — the
+// structure standard in competitive powerlifting (accumulation → intensification
+// → realization → deload) — with loads set as a % of an estimated 1RM and an RPE
+// target that autoregulates the actual weight. Helms et al. found RPE/RIR-based
+// prescription equal or superior to fixed %1RM, so percentages set the SHAPE of
+// the wave and RPE governs the day. This is the lifting analogue of the running
+// engine's easy / threshold / interval / long rotation.
+// Which week of the 4-week block are we in? Anchored to the start of the current
+// unbroken training streak and advanced one phase per calendar week. A lapse in
+// training resets to week 1 rather than letting the cycle drift through the gap
+// and land you on a peak week off the back of two weeks of nothing.
+function detectBlockWeek(){
+  const labels=['Accumulation','Intensification','Realization','Deload'];
+  const liftDays=['push','pull','legs','A','B','C'];
+  const sessions=(D?.sessions||[]).filter(s=>liftDays.includes(s.day||s.type||''));
+  if(!sessions.length)return {weekNum:1,label:labels[0]};
+  const cutoff=localDS(new Date(Date.now()-14*86400000));
+  if(sessions.filter(s=>s.date>=cutoff).length<3)return {weekNum:1,label:labels[0],reset:true};
+  // Walk back through the streak while consecutive sessions are ≤10 days apart.
+  let anchor=sessions[sessions.length-1].date;
+  for(let i=sessions.length-1;i>0;i--){
+    const gap=Math.round((new Date(sessions[i].date+'T12:00:00')-new Date(sessions[i-1].date+'T12:00:00'))/86400000);
+    if(gap>10)break;
+    anchor=sessions[i-1].date;
+  }
+  const idx=Math.floor(_daysAgo(anchor)/7)%4;
+  return {weekNum:idx+1,label:labels[idx],anchor};
+}
+const BLOCK_SCHEME={
+  1:{pct:0.75, sets:4, reps:'5-6', rpe:7, label:'Accumulation — volume'},
+  2:{pct:0.825,sets:4, reps:'3-4', rpe:8, label:'Intensification — heavier, less volume'},
+  3:{pct:0.90, sets:3, reps:'2-3', rpe:9, label:'Realization — peak intensity'},
+  4:{pct:0.60, sets:2, reps:'5',   rpe:5, label:'Deload — restore'}
+};
+// A set of r reps taken to RPE R had (10−R) reps in reserve, so the true rep-max
+// is r+(10−R). Epley on THAT is a far better 1RM estimate than Epley on performed
+// reps alone, which ignores how hard the set actually was. RIR is capped at 4 so
+// a very easy set can't extrapolate wildly.
+function estimateOneRM(lift){
+  const bw=D?.profile?.bodyweight||ATHLETE.weightLbs;
+  const hist=getLastLiftSessions(lift,6);
+  let best=0,src=null;
+  hist.forEach(h=>h.sets.forEach(s=>{
+    if(!s.r)return;
+    const load=lift==='pullup'?bw+(s.w||0):s.w;
+    if(!load)return;
+    const rir=s.rpe?Math.max(0,Math.min(4,10-s.rpe)):2;
+    const est=load*(1+(s.r+rir)/30);
+    if(est>best){best=est;src={date:h.date,w:s.w,r:s.r,rpe:s.rpe,est};}
+  }));
+  const decayed=getDecayedE1RM(lift)?.decayed||0;
+  const oneRM=Math.max(best,decayed);
+  return {oneRM:Math.round(oneRM/2.5)*2.5,src,usedRPE:best>=decayed};
+}
 function prescribeLift(lift,ts,deload){
   const [lo,hi]=REP_RANGES[lift];
-  const inc=LOAD_INC[lift];
   const why=[];
   const hist=getLastLiftSessions(lift,2);
   const last=hist[0]||null;
-  let weight,reps,targetRPE=8;
-  let sets=BASE_SETS[lift];
+  const bw=D?.profile?.bodyweight||ATHLETE.weightLbs;
+  const block=detectBlockWeek();
+  const scheme=BLOCK_SCHEME[block.weekNum]||BLOCK_SCHEME[1];
+  const est=estimateOneRM(lift);
+  let weight,reps=scheme.reps,targetRPE=scheme.rpe,sets=scheme.sets;
   const fmtSets=h=>h.sets.map(s=>`${lift==='pullup'?fmtLiftW('pullup',s.w):s.w}×${s.r}${s.rpe?'@'+s.rpe:''}`).join(', ');
-  if(!last){
+  if(last)why.push(`Last time (${last.date}, ${last.daysAgo}d ago): ${fmtSets(last)}`);
+  why.push(`Block week ${block.weekNum}/4 — ${scheme.label}: ${Math.round(scheme.pct*100)}% of 1RM, ${scheme.sets}×${scheme.reps} @ RPE ${scheme.rpe}`);
+  if(!est.oneRM){
     weight=START_WEIGHTS[lift];reps=lo;
     why.push(`No logged history for ${LIFT_LABELS[lift]} — conservative starting weight`);
   }else{
-    const w=_workingWeight(last.sets);
-    const atW=last.sets.filter(s=>(s.w||0)===w);
-    const minReps=Math.min(...atW.map(s=>s.r));
-    const maxRPE=Math.max(...atW.map(s=>s.rpe||7));
-    why.push(`Last time (${last.date}, ${last.daysAgo}d ago): ${fmtSets(last)}`);
-    // Stall: two straight sessions below the bottom of the rep range at this weight
-    const prev=hist[1];
-    const prevStalled=prev&&(_workingWeight(prev.sets)>=w)&&Math.min(...prev.sets.filter(s=>(s.w||0)===_workingWeight(prev.sets)).map(s=>s.r))<lo;
-    if(minReps<lo&&prevStalled){
-      // Reset means EASIER: 90% of load for barbells; for assisted pull-ups, +10lb assist
-      weight=(lift==='pullup'&&w<=0)?w-10:Math.round((w*0.9)/2.5)*2.5;reps=lo;
-      why.push(`Stalled 2 sessions below ${lo} reps → reset to ${fmtLiftW(lift,weight)} and rebuild`);
-    }else if(minReps>=hi&&maxRPE<=8){
-      weight=w+inc;reps=lo;
-      why.push(lift==='pullup'&&w<0
-        ?`All sets hit the top of the ${lo}–${hi} range at RPE ≤8 → ${inc}lb LESS assist (${fmtLiftW('pullup',weight)}), reps reset to ${lo}`
-        :`All sets hit the top of the ${lo}–${hi} range at RPE ≤8 → +${inc}lb, reps reset to ${lo}`);
-    }else if(maxRPE>=9.5){
-      weight=w;reps=Math.max(lo,minReps);
-      why.push(`RPE hit ${maxRPE} last time → hold ${fmtLiftW(lift,w)} and consolidate before pushing reps`);
-    }else{
-      weight=w;reps=Math.min(minReps+1,hi);
-      why.push(`Double progression: hold ${fmtLiftW(lift,w)}, push for ${reps} reps (top of range is ${hi})`);
+    why.push(est.usedRPE&&est.src
+      ? `Estimated 1RM ${est.oneRM}lb from ${lift==='pullup'?fmtLiftW('pullup',est.src.w):est.src.w+'lb'}×${est.src.r}${est.src.rpe?`@RPE${est.src.rpe} (${10-est.src.rpe} reps in reserve)`:''} on ${est.src.date}`
+      : `Estimated 1RM ${est.oneRM}lb from your decay-adjusted best`);
+    const target=est.oneRM*scheme.pct;
+    // Pull-ups are prescribed as assist/added load relative to bodyweight.
+    weight=lift==='pullup'?Math.round((target-bw)/2.5)*2.5:Math.round(target/2.5)*2.5;
+    why.push(`${Math.round(scheme.pct*100)}% × ${est.oneRM}lb → ${fmtLiftW(lift,weight)}`);
+    // Safety net: never jump more than 10% above the heaviest load actually
+    // handled for this lift in the last 8 weeks. Guards against one optimistic
+    // RPE entry inflating the 1RM estimate and spiking the prescription.
+    const recent=getLastLiftSessions(lift,8).filter(h=>h.daysAgo<=56);
+    const heaviest=Math.max(0,...recent.flatMap(h=>h.sets.map(s=>lift==='pullup'?bw+(s.w||0):(s.w||0))));
+    if(heaviest>0){
+      const absolute=lift==='pullup'?bw+weight:weight;
+      if(absolute>heaviest*1.10){
+        const capped=Math.round(heaviest*1.10/2.5)*2.5;
+        weight=lift==='pullup'?capped-bw:capped;
+        why.push(`Capped at +10% over your heaviest recent load (${Math.round(heaviest)}lb in the last 8 weeks) → ${fmtLiftW(lift,weight)}`);
+      }
     }
   }
   if(deload?.active){
@@ -5358,7 +5413,10 @@ function prescribeLift(lift,ts,deload){
     sets=2;reps=5;targetRPE=6;
     why.push(`Deload override: ${fmtLiftW(lift,weight)}, 2×5, RPE ≤6`);
   }
-  if(ts.liftRPECap<targetRPE){
+  // Only let the RPE cap bite when a recovery flag actually raised it. The cap
+  // sits at 8 by default, which would otherwise clamp a planned realization week
+  // (RPE 9) every single cycle even on a perfectly recovered day.
+  if(ts.activeFlags?.length&&ts.liftRPECap<targetRPE){
     targetRPE=ts.liftRPECap;
     why.push(`Recovery flags cap RPE at ${ts.liftRPECap} (${ts.activeFlags.join(', ')})`);
   }
@@ -5367,30 +5425,7 @@ function prescribeLift(lift,ts,deload){
     if(newSets<sets)why.push(`Volume ×${ts.volumeModifier} from recovery flags: ${sets}→${newSets} sets`);
     sets=newSets;
   }
-  // ── e1RM ANCHOR ───────────────────────────────────────────────────────────
-  // The lifting analogue of anchoring run paces to VDOT: a prescribed load must
-  // land in a sensible %e1RM band for its rep/RPE target, or the session is
-  // either pointlessly light or unsafe. Epley inverse gives the rep-max load;
-  // reps-in-reserve (10 − target RPE) backs it off to the intended effort.
-  // Deloads are deliberately light, so they are exempt. Pull-ups are skipped —
-  // their "weight" is assist/added load, not an absolute bar weight.
-  if(!deload?.active&&lift!=='pullup'){
-    const e1rm=getDecayedE1RM(lift)?.decayed||0;
-    const rir=Math.max(0,10-targetRPE);
-    const expected=e1rm?e1rm/(1+(reps+rir)/30):0;
-    if(expected>0&&weight>0){
-      const ratio=weight/expected;
-      const lo=Math.round(expected*0.88/2.5)*2.5,hi=Math.round(expected*1.12/2.5)*2.5;
-      if(ratio<0.88){
-        why.push(`Anchor check: ${fmtLiftW(lift,weight)} is only ${Math.round(ratio*100)}% of the ${Math.round(expected)}lb your ${e1rm}lb e1RM supports for ${reps} reps @RPE${targetRPE} → raised to ${fmtLiftW(lift,lo)}`);
-        weight=lo;
-      }else if(ratio>1.12){
-        why.push(`Anchor check: ${fmtLiftW(lift,weight)} is ${Math.round(ratio*100)}% of the ${Math.round(expected)}lb your ${e1rm}lb e1RM supports for ${reps} reps @RPE${targetRPE} → capped at ${fmtLiftW(lift,hi)}`);
-        weight=hi;
-      }
-    }
-  }
-  return {weight,sets,reps,targetRPE,variation:LIFT_LABELS[lift],why,last:last?{date:last.date,daysAgo:last.daysAgo,display:fmtSets(last)}:null};
+  return {weight,sets,reps,targetRPE,variation:LIFT_LABELS[lift],blockWeek:block.weekNum,blockLabel:scheme.label,oneRM:est.oneRM,why,last:last?{date:last.date,daysAgo:last.daysAgo,display:fmtSets(last)}:null};
 }
 // Deterministic accessory rotation. Priorities:
 //   1. muscle coverage — hit every muscle group of the day before repeating one
@@ -5398,6 +5433,11 @@ function prescribeLift(lift,ts,deload){
 //   3. implement variety — if a muscle was last hit with DBs, prefer cable/EZ/etc.
 // Legacy freeform-named history counts via normalizeAccessory, so the rotation
 // knows what you've actually done even in old sessions.
+// Full catalog for a day type in RECOMMENDED ORDER: one per muscle group first
+// (stalest muscle first, so every group gets covered before any is repeated),
+// then everything else by staleness. pickAccessories just takes the top N, so
+// the dropdown in the log tab and the engine's picks always agree on ordering.
+function rankedAccessories(dayType){ return pickAccessories(dayType,Infinity); }
 function pickAccessories(dayType,count){
   const pool=ACCESSORY_CATALOG[dayType]||[];
   const lastDone={},lastImplByMuscle={};
@@ -5428,8 +5468,28 @@ function pickAccessories(dayType,count){
       ?`${a.muscle} · last done ${a.days}d ago`
       :swap?`${a.muscle} · new angle (${a.impl} vs recent ${lastImplByMuscle[a.muscle].impl})`
       :`${a.muscle} · never logged`;
-    return {id:a.id,name:a.name,sets:a.sets,reps:a.reps,muscle:a.muscle,reason:why};
+    return {id:a.id,name:a.name,sets:a.sets,reps:a.reps,muscle:a.muscle,impl:a.impl,days:a.days,lastDoneDate:a.lastDoneDate,reason:why};
   });
+}
+// Last logged weight/sets/reps for an accessory, by catalog id. Powers both the
+// "Last:" line and the input prefill so you never have to remember what you used.
+function lastAccessoryLog(id){
+  const ss=D?.sessions||[];
+  for(let i=ss.length-1;i>=0;i--){
+    const hit=(ss[i].accessories||[]).find(x=>accKeyFor(x).id===id&&(x.weight||x.reps));
+    if(hit)return {date:ss[i].date,daysAgo:_daysAgo(ss[i].date),weight:hit.weight,sets:hit.sets,reps:hit.reps};
+  }
+  return null;
+}
+// Swap the accessory in a log-tab slot for another from the same day's catalog.
+function swapLogAccessory(i,id){
+  const list=window._logAccessories||[];
+  if(!list[i])return;
+  const day=window._logAccessoryDay||'push';
+  const pick=(rankedAccessories(day)||[]).find(a=>a.id===id);
+  if(!pick)return;
+  list[i]={id:pick.id,name:pick.name,sets:pick.sets,reps:pick.reps,muscle:pick.muscle,reason:pick.reason};
+  renderLogAccessories();
 }
 // ============================================================
 // ENDURANCE ENGINE — modelled on Runna's approach
@@ -8355,50 +8415,61 @@ function updateLogTabPlanned(){
   });
 
   // ── ACCESSORIES ─────────────────────────────────────────────
+  window._logAccessories=presc.mainWork?.accessories||[];
+  window._logAccessoryDay=presc.workoutType||presc.type||'push';
+  renderLogAccessories();
+}
+// Renders the accessory slots in the LOG tab. Each slot is a dropdown of every
+// accessory for that day type in recommended order, so you can swap freely, plus
+// weight/sets/reps prefilled from the last time you logged that exact movement.
+function renderLogAccessories(){
   const accBlock=document.getElementById('accessories-block');
-  const accessories=presc.mainWork?.accessories||[];
-  window._logAccessories=accessories;
-  if(accBlock){
-    if(accessories.length){
-      let aHtml=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="bdg" style="background:rgba(179,136,245,0.12);color:var(--a5);border:1px solid rgba(179,136,245,0.25);">ACCESSORIES</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${accessories.length} prescribed</span></div>`;
-      accessories.forEach((acc,i)=>{
-        let name,pSets,pReps,prescLabel;
-        if(typeof acc==='object'){
-          // Structured catalog accessory from the engine
-          name=acc.name;pSets=String(acc.sets||'');pReps=String(acc.reps||'').match(/^\d+/)?.[0]||'';
-          prescLabel=`Planned: ${acc.sets}×${acc.reps}${acc.reason?' · '+acc.reason:''}`;
-        }else{
-          // Legacy freeform string "Name 3×10 @ weight (note)"
-          const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+@[^(]+)?(?:\s+\((.+)\))?$/);
-          name=m?m[1].trim():String(acc);
-          pSets=m?m[2]:'';
-          pReps=m?m[3]:'';
-          prescLabel=`Planned: ${String(acc).replace(/^.+?\s+(\d+[×x]\d+)/,'$1')}`;
-        }
-        const lastAcc=(()=>{const key=(typeof acc==='object'&&acc.id)?acc.id:accKeyFor({name}).id;const ss=D?.sessions||[];for(let j=ss.length-1;j>=0;j--){const hit=(ss[j].accessories||[]).find(x=>accKeyFor(x).id===key&&(x.weight||x.reps));if(hit)return {date:ss[j].date,w:hit.weight,s:hit.sets,r:hit.reps};}return null;})();
-        aHtml+=`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--b);">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-            <span style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a5);font-weight:600;text-transform:uppercase;">${name}</span>
-            <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${prescLabel}</span>
-          </div>
-          ${lastAcc?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);margin:-2px 0 8px;">Last: ${lastAcc.w?lastAcc.w+'lb':'BW'}${lastAcc.s&&lastAcc.r?' '+lastAcc.s+'×'+lastAcc.r:''} · ${_daysAgo(lastAcc.date)}d ago</div>`:''}
-          <div class="srh"><span>WEIGHT (lb)</span><span>SETS</span><span>REPS</span><span></span></div>
-          <div class="srow">
-            <input type="number" id="acc-wt-${i}" placeholder="lb (opt.)" style="text-align:center;">
-            <input type="number" id="acc-sets-${i}" placeholder="${pSets||'3'}" style="text-align:center;">
-            <input type="number" id="acc-reps-${i}" placeholder="${pReps||'10'}" style="text-align:center;">
-            <span></span>
-          </div>
-          <div class="ig" style="margin-top:8px;margin-bottom:0;"><input type="text" id="acc-note-${i}" placeholder="Notes..."></div>
-        </div>`;
-      });
-      accBlock.innerHTML=aHtml;
-      accBlock.style.display='';
-    } else {
-      accBlock.style.display='none';
-      window._logAccessories=[];
+  if(!accBlock)return;
+  const accessories=window._logAccessories||[];
+  if(!accessories.length){accBlock.style.display='none';return;}
+  const day=window._logAccessoryDay||'push';
+  const ranked=rankedAccessories(day)||[];
+  const rankOf=id=>{const i=ranked.findIndex(a=>a.id===id);return i<0?null:i+1;};
+  let aHtml=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;"><span class="bdg" style="background:rgba(179,136,245,0.12);color:var(--a5);border:1px solid rgba(179,136,245,0.25);">ACCESSORIES</span><span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${accessories.length} prescribed · ordered for muscle balance · swap any slot</span></div>`;
+  accessories.forEach((acc,i)=>{
+    let name,pSets,pReps,prescLabel,id=null;
+    if(typeof acc==='object'){
+      name=acc.name;id=acc.id||accKeyFor(acc).id;
+      pSets=String(acc.sets||'');pReps=String(acc.reps||'').match(/^\d+/)?.[0]||'';
+      prescLabel=`Planned: ${acc.sets}×${acc.reps}${acc.reason?' · '+acc.reason:''}`;
+    }else{
+      const m=String(acc).match(/^(.+?)\s+(\d+)[×x](\d+)(?:\s+@[^(]+)?(?:\s+\((.+)\))?$/);
+      name=m?m[1].trim():String(acc);
+      id=accKeyFor({name}).id;
+      pSets=m?m[2]:'';pReps=m?m[3]:'';
+      prescLabel=`Planned: ${String(acc).replace(/^.+?\s+(\d+[×x]\d+)/,'$1')}`;
     }
-  }
+    const lastAcc=id?lastAccessoryLog(id):null;
+    const opts=ranked.map((a,idx)=>{
+      const l=lastAccessoryLog(a.id);
+      const tag=idx<4?`#${idx+1} `:'';
+      const hist=l?` · last ${l.weight?l.weight+'lb':'BW'} ${l.daysAgo}d ago`:' · never done';
+      return `<option value="${a.id}"${a.id===id?' selected':''}>${tag}${esc(a.name)} (${a.muscle})${hist}</option>`;
+    }).join('');
+    aHtml+=`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--b);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a5);font-weight:600;">SLOT ${i+1}${rankOf(id)?` · recommended #${rankOf(id)}`:''}</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${prescLabel}</span>
+      </div>
+      <select onchange="swapLogAccessory(${i},this.value)" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:7px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;">${opts}</select>
+      ${lastAcc?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);margin:-2px 0 8px;">Last: ${lastAcc.weight?lastAcc.weight+'lb':'BW'}${lastAcc.sets&&lastAcc.reps?' '+lastAcc.sets+'×'+lastAcc.reps:''} · ${lastAcc.daysAgo}d ago — prefilled below</div>`:`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin:-2px 0 8px;">No history for this movement yet</div>`}
+      <div class="srh"><span>WEIGHT (lb)</span><span>SETS</span><span>REPS</span><span></span></div>
+      <div class="srow">
+        <input type="number" id="acc-wt-${i}" value="${lastAcc&&lastAcc.weight!=null?lastAcc.weight:''}" placeholder="lb (opt.)" style="text-align:center;">
+        <input type="number" id="acc-sets-${i}" value="${lastAcc&&lastAcc.sets?lastAcc.sets:''}" placeholder="${pSets||'3'}" style="text-align:center;">
+        <input type="number" id="acc-reps-${i}" value="${lastAcc&&lastAcc.reps?lastAcc.reps:''}" placeholder="${pReps||'10'}" style="text-align:center;">
+        <span></span>
+      </div>
+      <div class="ig" style="margin-top:8px;margin-bottom:0;"><input type="text" id="acc-note-${i}" placeholder="Notes..."></div>
+    </div>`;
+  });
+  accBlock.innerHTML=aHtml;
+  accBlock.style.display='';
 }
 
 function showRPEConfirm(lift){

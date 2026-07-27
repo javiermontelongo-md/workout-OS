@@ -442,17 +442,33 @@ buildEnginePrescription(workoutType, durationMins)   ← core; instant, works of
   │                              (D.lastDeload persisted by generateDailyPrescription;
   │                               active 7 days; also flags DELOAD_WEEK in
   │                               evaluateTrainingStatus → blocks quality runs)
-  ├── prescribeLift(lift, ts, deload)   double progression per lift:
-  │     · reads last 1-2 sessions of non-wildcard working sets
-  │     · all sets at top of REP_RANGES at RPE ≤8 → +LOAD_INC, reps reset to bottom
-  │     · 2 sessions below range bottom → reset to 90%
-  │     · RPE ≥9.5 → hold and consolidate
-  │     · deload override: 70% load, 2×5, RPE ≤6
-  │     · returns {weight,sets,reps,targetRPE,why[],last{date,daysAgo,display}}
+  ├── prescribeLift(lift, ts, deload)   BLOCK PERIODISATION (rebuilt 2026-07-26).
+  │     Main lifts no longer progress linearly. They run a 4-week wave:
+  │       detectBlockWeek() → BLOCK_SCHEME[1..4]
+  │       wk1 Accumulation  75%  4×5-6 @RPE7
+  │       wk2 Intensification 82.5% 4×3-4 @RPE8
+  │       wk3 Realization   90%  3×2-3 @RPE9
+  │       wk4 Deload        60%  2×5   @RPE5
+  │     · estimateOneRM(lift): RPE-adjusted Epley — a set of r reps at RPE R had
+  │       (10−R) RIR, so the true rep-max is r+(10−R). RIR capped at 4. Falls back
+  │       to decayed e1RM. This is why 225×5@RPE7 reads as a 285lb 1RM, not 263.
+  │     · load = pct × 1RM, rounded to 2.5lb; pull-ups convert to assist vs bodyweight
+  │     · SAFETY NET: never >110% of the heaviest load actually handled in 8 weeks
+  │     · RPE cap only applies when ts.activeFlags is non-empty — the cap sits at 8
+  │       by default and would otherwise clamp every realization week
+  │     · deload override still wins: 70% load, 2×5, RPE ≤6
+  │     · returns {weight,sets,reps,targetRPE,blockWeek,blockLabel,oneRM,why[],last}
+  │     NOTE: reps may be a RANGE STRING ("5-6"); _midReps() handles it downstream.
   ├── pickAccessories(dayType, count)   rotation from ACCESSORY_CATALOG v2:
   │     muscle coverage first, staleness second, implement variety third
   │     (each entry has muscle + impl: barbell/ez/db/cable/machine/bw).
   │     Legacy freeform names count via normalizeAccessory().
+  │     rankedAccessories(dayType) = pickAccessories(dayType, Infinity) — the FULL
+  │     catalog in the same recommended order, so the log-tab dropdown and the
+  │     engine's picks can never disagree.
+  │     lastAccessoryLog(id) → {date,daysAgo,weight,sets,reps} of the last time
+  │     that exact movement was logged. Drives the "Last:" line AND the input
+  │     prefill in renderLogAccessories(); swapLogAccessory(i,id) swaps a slot.
   └── prescribeRun(kind, ts)     endurance engine — see "Endurance Engine" below
 
 Constants: REP_RANGES · LOAD_INC · START_WEIGHTS · BASE_SETS · LIFT_LABELS ·
