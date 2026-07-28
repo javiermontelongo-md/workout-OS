@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-25",
+  "lastUpdated": "2026-07-28",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5601,54 +5601,54 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-25T00:39:55.157Z",
-    "vo2maxUsed": 46.1,
-    "runCount": 30,
+    "generatedAt": "2026-07-28T00:28:07.911Z",
+    "vo2maxUsed": 45.4,
+    "runCount": 31,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1692,
+        "seconds": 1686,
         "ciSeconds": 283,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3488,
-        "ciSeconds": 759,
+        "seconds": 3476,
+        "ciSeconds": 760,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7660,
+        "seconds": 7630,
         "ciSeconds": 2180,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15742,
-        "ciSeconds": 6853,
+        "seconds": 15673,
+        "ciSeconds": 6850,
         "method": "Riegel"
       }
     },
-    "medianTrainingPace": 645.1515151515152,
+    "medianTrainingPace": 647.5049900199601,
     "decayFactor": 1,
-    "daysInactive": 3,
-    "lastActivityDate": "2026-07-21",
-    "rawVO2": 46.05,
+    "daysInactive": 1,
+    "lastActivityDate": "2026-07-26",
+    "rawVO2": 45.44,
     "debugInfo": {
       "riegelPred": {
-        "s5k": 1997,
-        "s10k": 4164,
-        "shalf": 9187,
-        "sfull": 19155,
+        "s5k": 1955,
+        "s10k": 4076,
+        "shalf": 8992,
+        "sfull": 18749,
         "anchor": {
-          "date": "2026-07-08",
-          "stravaId": 19236887949,
-          "name": "Panhandle run with hill sprints at the end of",
+          "date": "2026-07-17",
+          "stravaId": 19357206272,
+          "name": "Evening Run",
           "type": "run",
-          "distance": 3.3,
-          "duration": 2129,
-          "pace": 644,
-          "elevationGain": 341,
-          "heartRateAvg": 167.4,
-          "heartRateMax": 189,
+          "distance": 5.01,
+          "duration": 3244,
+          "pace": 648,
+          "elevationGain": 372,
+          "heartRateAvg": 168.7,
+          "heartRateMax": 183,
           "averageWatts": null,
           "weightedAvgWatts": null,
           "source": "strava",
@@ -5657,16 +5657,16 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1283,
-        "s10k": 2660,
-        "shalf": 6010,
-        "sfull": 12258
+        "s5k": 1300,
+        "s10k": 2696,
+        "shalf": 6090,
+        "sfull": 12411
       },
       "hrPred": {
-        "s5k": 1633,
-        "s10k": 3266,
-        "shalf": 6890,
-        "sfull": 13780
+        "s5k": 1665,
+        "s10k": 3330,
+        "shalf": 7026,
+        "sfull": 14051
       },
       "weights": {
         "riegel": 0.45,
@@ -5674,7 +5674,7 @@
         "hr": 0.25
       },
       "vo2maxSource": "Apple Watch",
-      "medianPace": 645.1515151515152
+      "medianPace": 647.5049900199601
     }
   },
   "coachingLog": [
@@ -5742,6 +5742,11 @@
       "ts": 1784936288206,
       "type": "daily_prescription",
       "label": "pull 60min · 2026-07-24"
+    },
+    {
+      "ts": 1785198505148,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-07-27"
     }
   ],
   "runPrescriptions": {
@@ -7003,6 +7008,116 @@
         "Don't creep intensity during deload; RPE≤6 means you should feel fresh at the end.",
         "Sleep debt (6.7h) is real—prioritize 7–8h this week to maximize recovery."
       ]
+    },
+    "2026-07-27": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "Back-off day to 75% intensity after last week's RPE 8 work; accumulation block prioritizes volume and movement quality while HRV/RHR/sleep are all solid for work capacity. OHP drops significantly because last session hit a wall at 135×3—today's 117.5 resets the rep range upward, signaling a reload week before intensity climbs again.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "weight": 215,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 285,
+            "why": [
+              "Last time (2026-07-22, 5d ago): 225×5@8, 225×5@7, 225×5@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 285lb from 225lb×5@RPE7 (3 reps in reserve) on 2026-07-22",
+              "75% × 285lb → 215lb"
+            ],
+            "last": {
+              "date": "2026-07-22",
+              "daysAgo": 5,
+              "display": "225×5@8, 225×5@7, 225×5@7"
+            },
+            "coachNote": "Pause 1 second at chest on every rep; this removes momentum cheating and locks in tension when weight feels lighter than expected."
+          },
+          "ohp": {
+            "weight": 117.5,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 157.5,
+            "why": [
+              "Last time (2026-07-22, 5d ago): 135×3@8, 135×3@8, 135×3@8",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 157.5lb from 135lb×3@RPE8 (2 reps in reserve) on 2026-07-22",
+              "75% × 157.5lb → 117.5lb"
+            ],
+            "last": {
+              "date": "2026-07-22",
+              "daysAgo": 5,
+              "display": "135×3@8, 135×3@8, 135×3@8"
+            },
+            "coachNote": "Elbows forward 15–20°, not flared. Uncontrolled elbow drift is your weak link with strict form—cue 'elbows under the bar' before each rep."
+          }
+        },
+        "accessories": [
+          {
+            "id": "flat_db_press",
+            "name": "Flat DB Press",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "chest",
+            "impl": "db",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "chest · new angle (db vs recent bw)"
+          },
+          {
+            "id": "machine_shoulder_press",
+            "name": "Machine Shoulder Press",
+            "sets": 3,
+            "reps": "10-12",
+            "muscle": "shoulders",
+            "impl": "machine",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "shoulders · new angle (machine vs recent db)"
+          },
+          {
+            "id": "skullcrusher",
+            "name": "EZ-Bar Skullcrusher",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "triceps",
+            "impl": "ez",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "triceps · new angle (ez vs recent cable)"
+          }
+        ]
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-07-28T00:28:25.128Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 2 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're in the hard part of the block: volume feels easy but IS the work. Hit all reps with crisp tempo (2sec lowering), especially on bench—don't chase RPE 7 by grinding. Save aggression for week 3.",
+      "watchOutFor": [
+        "Accumulation phase traps: 215 will feel light after 225×5@8 last week—don't add weight or sprint reps, stay disciplined.",
+        "OHP rep quality: if reps 5–6 get loose, stop there; rep 4 is not a failure, it's a ceiling."
+      ]
     }
   },
   "coachingMemory": {
@@ -7987,6 +8102,13 @@
       "inp": 373,
       "out": 149,
       "cost": 0.003354
+    },
+    {
+      "ts": 1785198511811,
+      "type": "prescription",
+      "inp": 710,
+      "out": 354,
+      "cost": 0.00248
     }
   ],
   "checkins": [
