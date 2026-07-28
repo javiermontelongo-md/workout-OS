@@ -467,8 +467,13 @@ buildEnginePrescription(workoutType, durationMins)   ← core; instant, works of
   │     catalog in the same recommended order, so the log-tab dropdown and the
   │     engine's picks can never disagree.
   │     lastAccessoryLog(id) → {date,daysAgo,weight,sets,reps} of the last time
-  │     that exact movement was logged. Drives the "Last:" line AND the input
-  │     prefill in renderLogAccessories(); swapLogAccessory(i,id) swaps a slot.
+  │     that exact movement was logged. Drives the "LAST" chip in
+  │     renderLogAccessories(); swapLogAccessory(i,id) swaps a slot.
+  │     prescribeAccessory(acc) → deterministic TARGET via double progression:
+  │       hold the load until the TOP of the catalog rep range is hit, then add
+  │       ACC_INC[impl] (db/cable/ez/barbell 5lb, machine 10lb, bw 0) and reset
+  │       reps to the bottom. Accessories progress by reps first, load second.
+  │       Both the log-tab slots and the Program-tab chips show TARGET vs LAST.
   └── prescribeRun(kind, ts)     endurance engine — see "Endurance Engine" below
 
 Constants: REP_RANGES · LOAD_INC · START_WEIGHTS · BASE_SETS · LIFT_LABELS ·

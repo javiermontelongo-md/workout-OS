@@ -1433,6 +1433,15 @@ input[type=range]::-webkit-slider-thumb:hover {
     <div class="lbl">accessory progress</div>
     <div id="accessory-trends"></div>
   </div>
+  <div class="card ca ia" style="margin-bottom:14px;">
+    <div style="margin-bottom:6px;">
+      <div class="lbl" style="margin:0 0 4px;">strength projection · 6 main lifts</div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.6;">Solid = your logged e1RM. Dashed = what the engine projects if you keep training each split twice a week. Projection uses your own measured rate of gain, clamped to a physiologically plausible ceiling.</div>
+    </div>
+    <div style="position:relative;height:260px;margin-top:10px;"><canvas id="strength-proj-chart"></canvas></div>
+    <div id="strength-proj-legend" style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;"></div>
+    <div id="strength-proj-table" style="margin-top:12px;"></div>
+  </div>
   <div class="card ca ga" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="lbl" style="margin:0;">running trajectory</div>
@@ -2880,7 +2889,7 @@ function showTab(n){
   document.querySelectorAll(`.tab[onclick*="'${n}'"],.ni[onclick*="'${n}'"]`).forEach(t=>t.classList.add('on'));
   if(n==='today'){ renderTodayPlanStrip(); }
   if(n==='week'){ renderCalendar(); renderSessionList(); }
-  if(n==='progress'){ updProgressStats(); renderPredictionChart(); renderAllStaircases(); renderAccessoryTrends(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
+  if(n==='progress'){ updProgressStats(); renderStrengthProjection(); renderPredictionChart(); renderAllStaircases(); renderAccessoryTrends(); renderRunMetricsSummary(); renderRunChart(); renderCyclingChart(); renderVO2TrendChart(); renderBodyChart('weight'); renderRacePredictions(); renderBikeRacePredictions(); }
   if(n==='settings'){ _syncAppearanceUI(); renderAIUsage(); renderSystemHealth(); }
   if(n==='fuel'){ initFuelLog(); renderFuelFlowDiagram(); }
   if(n==='program'){ renderDeloadBanner(); renderRaceGoal(); renderAIFlowDiagram(); }
@@ -5481,6 +5490,36 @@ function lastAccessoryLog(id){
   }
   return null;
 }
+// Smallest sensible jump per implement — you cannot add 2.5lb to a dumbbell.
+const ACC_INC={db:5,cable:5,machine:10,ez:5,barbell:5,bw:0};
+// Deterministic accessory target, same double-progression logic the main lifts
+// used to run on: hold the load until you hit the TOP of the catalog rep range,
+// then add the smallest increment that implement allows and reset to the bottom.
+// Accessories are hypertrophy work, so they progress by reps first, load second.
+function prescribeAccessory(acc){
+  const cat=(acc&&acc.id)?getAccessoryById(acc.id):null;
+  const repsStr=String((cat&&cat.reps)||acc?.reps||'10-12');
+  const m=repsStr.match(/(\d+)\s*[-–]\s*(\d+)/);
+  const lo=m?+m[1]:(parseInt(repsStr)||10);
+  const hi=m?+m[2]:lo;
+  const sets=(cat&&cat.sets)||acc?.sets||3;
+  const impl=(cat&&cat.impl)||'db';
+  const inc=ACC_INC[impl]??5;
+  const last=(acc&&acc.id)?lastAccessoryLog(acc.id):null;
+  if(!last||last.weight==null){
+    return {sets,reps:lo===hi?String(lo):`${lo}-${hi}`,weight:null,last,
+      why:last?'Logged before without a load — repeat it and record the weight this time'
+               :`First time — pick a load you control for ${hi} reps at about RPE 8`};
+  }
+  const lastReps=+last.reps||0;
+  if(lastReps>=hi&&inc>0){
+    return {sets,reps:String(lo),weight:last.weight+inc,last,
+      why:`Hit ${lastReps} reps at ${last.weight}lb (top of ${lo}–${hi}) → +${inc}lb, reps reset to ${lo}`};
+  }
+  const nextReps=Math.min(Math.max(lastReps+1,lo),hi);
+  return {sets,reps:String(nextReps),weight:last.weight,last,
+    why:`Hold ${last.weight}lb and push for ${nextReps} reps (top of range is ${hi})`};
+}
 // Swap the accessory in a log-tab slot for another from the same day's catalog.
 function swapLogAccessory(i,id){
   const list=window._logAccessories||[];
@@ -6939,6 +6978,93 @@ function renderBikeRacePredChart(dist) {
   }
 }
 
+// ── STRENGTH PROJECTION ──────────────────────────────────────────────────────
+// Deterministic forward model. Uses the measured trend in your own logged e1RM,
+// clamped to a physiologically plausible weekly gain rate (nobody adds 5lb/week
+// forever), then walks the 4-week block cycle forward so the projected working
+// weight shows the real wave you'd be prescribed rather than a straight line.
+const PROJ_COLORS={bench:'#7c86f8',squat:'#2aa070',dl:'#e85d8a',ohp:'#f5a524',row:'#3d88d4',pullup:'#a066d4'};
+const PROJ_LIFTS=['bench','squat','dl','ohp','row','pullup'];
+function projectLiftForward(lift,weeks=12){
+  const cur=estimateOneRM(lift).oneRM;
+  if(!cur)return null;
+  const hist=getLiftHistory(lift,180);
+  const upper=['bench','ohp','row','pullup'].includes(lift);
+  const capRate=upper?0.006:0.010;            // ceiling: 0.6%/wk upper, 1.0%/wk lower
+  let rate=upper?0.0025:0.004;                // conservative default with thin data
+  if(hist.length>=3){
+    const t0=new Date(hist[0].date+'T12:00:00');
+    const xs=hist.map(h=>(new Date(h.date+'T12:00:00')-t0)/(7*86400000));
+    const ys=hist.map(h=>h.e1RM);
+    const n=xs.length,xm=xs.reduce((a,b)=>a+b,0)/n,ym=ys.reduce((a,b)=>a+b,0)/n;
+    const den=xs.reduce((s,x)=>s+(x-xm)**2,0);
+    if(den>0)rate=(xs.reduce((s,x,i)=>s+(x-xm)*(ys[i]-ym),0)/den)/cur;
+  }
+  rate=Math.max(0,Math.min(capRate,rate));
+  const bw0=detectBlockWeek().weekNum;
+  const pts=[];
+  for(let w=1;w<=weeks;w++){
+    const oneRM=cur*(1+rate*w);
+    const bw=((bw0-1+w)%4)+1;
+    pts.push({week:w,oneRM:Math.round(oneRM/2.5)*2.5,blockWeek:bw,
+      prescribed:Math.round(oneRM*BLOCK_SCHEME[bw].pct/2.5)*2.5});
+  }
+  return {lift,current:cur,ratePerWeek:rate,pts};
+}
+function renderStrengthProjection(){
+  const canvas=document.getElementById('strength-proj-chart');
+  if(!canvas||typeof Chart==='undefined')return;
+  if(window._strProjChart){window._strProjChart.destroy();window._strProjChart=null;}
+  const PAST=12,FUT=12;
+  const labels=[];
+  for(let w=-PAST;w<=FUT;w++){
+    const d=new Date(Date.now()+w*7*86400000);
+    labels.push((d.getMonth()+1)+'/'+d.getDate());
+  }
+  const datasets=[],legend=[],rows=[];
+  PROJ_LIFTS.forEach(lift=>{
+    const proj=projectLiftForward(lift,FUT);
+    if(!proj)return;
+    const color=PROJ_COLORS[lift];
+    // Past: bucket logged e1RM into the week it happened.
+    const actual=new Array(labels.length).fill(null);
+    getLiftHistory(lift,PAST*7).forEach(h=>{
+      const idx=PAST-Math.floor(_daysAgo(h.date)/7);
+      if(idx>=0&&idx<=PAST)actual[idx]=Math.max(actual[idx]||0,h.e1RM);
+    });
+    actual[PAST]=actual[PAST]||proj.current;   // anchor "today" so the lines join
+    const future=new Array(labels.length).fill(null);
+    future[PAST]=actual[PAST];
+    proj.pts.forEach(p=>{future[PAST+p.week]=p.oneRM;});
+    datasets.push({label:LIFT_LABELS[lift]+' (actual)',data:actual,borderColor:color,backgroundColor:color,
+      borderWidth:2,pointRadius:3,tension:0.25,spanGaps:true});
+    datasets.push({label:LIFT_LABELS[lift]+' (projected)',data:future,borderColor:color,borderDash:[5,4],
+      borderWidth:1.5,pointRadius:0,tension:0.25,spanGaps:true});
+    legend.push(`<span style="color:${color};">── ${LIFT_LABELS[lift].replace(/Barbell |Conventional |Back /,'')}</span>`);
+    const at=w=>proj.pts.find(p=>p.week===w)?.oneRM||'—';
+    rows.push(`<tr><td style="padding:4px 8px;color:${color};">${LIFT_LABELS[lift].replace(/Barbell |Conventional |Back /,'')}</td><td style="padding:4px 8px;text-align:right;color:var(--t);">${proj.current}</td><td style="padding:4px 8px;text-align:right;color:var(--t2);">${at(4)}</td><td style="padding:4px 8px;text-align:right;color:var(--t2);">${at(8)}</td><td style="padding:4px 8px;text-align:right;color:var(--a2);">${at(12)}</td><td style="padding:4px 8px;text-align:right;color:var(--t3);">+${(proj.ratePerWeek*100).toFixed(2)}%/wk</td></tr>`);
+  });
+  if(!datasets.length){
+    canvas.parentElement.innerHTML='<div style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--t3);padding:20px 0;">Log some lifts to see projections</div>';
+    return;
+  }
+  const lg=document.getElementById('strength-proj-legend');
+  if(lg)lg.innerHTML=legend.join('')+'<span style="color:var(--t3);">· · dashed = projected</span>';
+  const tb=document.getElementById('strength-proj-table');
+  if(tb)tb.innerHTML=`<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:var(--fs-xs);"><thead><tr style="color:var(--t3);text-transform:uppercase;letter-spacing:.08em;"><th style="text-align:left;padding:4px 8px;">Lift</th><th style="text-align:right;padding:4px 8px;">Now</th><th style="text-align:right;padding:4px 8px;">+4wk</th><th style="text-align:right;padding:4px 8px;">+8wk</th><th style="text-align:right;padding:4px 8px;">+12wk</th><th style="text-align:right;padding:4px 8px;">Rate</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+  const todayPlugin={id:'projToday',afterDraw(c){
+    const meta=c.getDatasetMeta(0);if(!meta.data[PAST])return;
+    const x=meta.data[PAST].x,{top,bottom}=c.chartArea,ctx=c.ctx;
+    ctx.save();ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);
+    ctx.strokeStyle='rgba(168,180,204,0.35)';ctx.setLineDash([4,4]);ctx.lineWidth=1;ctx.stroke();ctx.restore();
+  }};
+  window._strProjChart=new Chart(canvas,{type:'line',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y==null?null:`${c.dataset.label}: ${c.parsed.y} lb`}}},
+      scales:{x:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:11},maxTicksLimit:9,maxRotation:0},grid:{color:'rgba(104,112,200,0.08)'}},
+              y:{ticks:{color:'#7e8caa',font:{family:'DM Mono',size:11},callback:v=>v+' lb'},grid:{color:'rgba(104,112,200,0.08)'}}}},
+    plugins:[todayPlugin]});
+}
 function renderRunMetricsSummary(){
   // Only updates the sync date label — stat cards removed (redundant with race predictions below)
   const syncEl=document.getElementById('run-last-sync');
@@ -7688,7 +7814,11 @@ function renderPrescriptionCard(prescription){
         const chips=cats.map(cat=>{
           const active=activeIds.has(cat.id);
           const sel=accessories.find(a=>a.id===cat.id);
-          return `<div onclick="toggleAccessory('${cat.id}')" style="cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid ${active?'rgba(179,136,245,0.5)':'var(--b)'};background:${active?'rgba(179,136,245,0.13)':'var(--s2)'};display:flex;flex-direction:column;gap:1px;min-width:0;"><div style="font-size:var(--fs-xs);color:${active?'var(--a5)':'var(--t2)'};font-weight:${active?'600':'400'};">${active?'✓ ':''}${esc(cat.name)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${cat.sets}×${cat.reps}${sel?.reason?' · '+esc(sel.reason):''}</div></div>`;
+          const tg=prescribeAccessory({id:cat.id,name:cat.name,sets:cat.sets,reps:cat.reps});
+          const load=tg.weight!=null
+            ?`<span style="color:var(--a2);">${tg.weight}lb ${tg.sets}×${tg.reps}</span>${tg.last?.weight!=null?` <span style="color:var(--t3);">(last ${tg.last.weight}lb×${tg.last.reps||'?'}, ${tg.last.daysAgo}d)</span>`:''}`
+            :`${cat.sets}×${cat.reps} <span style="color:var(--t3);">· no history yet</span>`;
+          return `<div onclick="toggleAccessory('${cat.id}')" style="cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid ${active?'rgba(179,136,245,0.5)':'var(--b)'};background:${active?'rgba(179,136,245,0.13)':'var(--s2)'};display:flex;flex-direction:column;gap:1px;min-width:0;"><div style="font-size:var(--fs-xs);color:${active?'var(--a5)':'var(--t2)'};font-weight:${active?'600':'400'};">${active?'✓ ':''}${esc(cat.name)}</div><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${load}${sel?.reason?' · '+esc(sel.reason):''}</div></div>`;
         }).join('');
         return `<div style="margin-bottom:8px;"><div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;">${esc(muscle)}</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${chips}</div></div>`;
       }).join('');
@@ -8444,7 +8574,8 @@ function renderLogAccessories(){
       pSets=m?m[2]:'';pReps=m?m[3]:'';
       prescLabel=`Planned: ${String(acc).replace(/^.+?\s+(\d+[×x]\d+)/,'$1')}`;
     }
-    const lastAcc=id?lastAccessoryLog(id):null;
+    const tgt=prescribeAccessory({id,name,sets:pSets,reps:pReps});
+    const lastAcc=tgt.last;
     const opts=ranked.map((a,idx)=>{
       const l=lastAccessoryLog(a.id);
       const tag=idx<4?`#${idx+1} `:'';
@@ -8457,12 +8588,16 @@ function renderLogAccessories(){
         <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);">${prescLabel}</span>
       </div>
       <select onchange="swapLogAccessory(${i},this.value)" style="font-family:var(--mono);font-size:var(--fs-sm);background:var(--s3);color:var(--t);border:1px solid var(--b2);border-radius:6px;padding:7px 8px;width:100%;box-sizing:border-box;margin-bottom:8px;">${opts}</select>
-      ${lastAcc?`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a3);margin:-2px 0 8px;">Last: ${lastAcc.weight?lastAcc.weight+'lb':'BW'}${lastAcc.sets&&lastAcc.reps?' '+lastAcc.sets+'×'+lastAcc.reps:''} · ${lastAcc.daysAgo}d ago — prefilled below</div>`:`<div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin:-2px 0 8px;">No history for this movement yet</div>`}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:-2px 0 8px;">
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--a2);background:rgba(42,160,112,.10);border:1px solid rgba(42,160,112,.28);border-radius:6px;padding:3px 8px;">TARGET ${tgt.weight!=null?tgt.weight+'lb':'—'} · ${tgt.sets}×${tgt.reps}</span>
+        <span style="font-family:var(--mono);font-size:var(--fs-xs);color:${lastAcc?'var(--a3)':'var(--t3)'};background:${lastAcc?'rgba(61,136,212,.10)':'transparent'};border:1px solid ${lastAcc?'rgba(61,136,212,.28)':'var(--b)'};border-radius:6px;padding:3px 8px;">LAST ${lastAcc?`${lastAcc.weight!=null?lastAcc.weight+'lb':'BW'}${lastAcc.sets&&lastAcc.reps?' · '+lastAcc.sets+'×'+lastAcc.reps:''} · ${lastAcc.daysAgo}d ago`:'never logged'}</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);line-height:1.5;margin-bottom:8px;">${esc(tgt.why)}</div>
       <div class="srh"><span>WEIGHT (lb)</span><span>SETS</span><span>REPS</span><span></span></div>
       <div class="srow">
-        <input type="number" id="acc-wt-${i}" value="${lastAcc&&lastAcc.weight!=null?lastAcc.weight:''}" placeholder="lb (opt.)" style="text-align:center;">
-        <input type="number" id="acc-sets-${i}" value="${lastAcc&&lastAcc.sets?lastAcc.sets:''}" placeholder="${pSets||'3'}" style="text-align:center;">
-        <input type="number" id="acc-reps-${i}" value="${lastAcc&&lastAcc.reps?lastAcc.reps:''}" placeholder="${pReps||'10'}" style="text-align:center;">
+        <input type="number" id="acc-wt-${i}" value="${tgt.weight!=null?tgt.weight:''}" placeholder="lb (opt.)" style="text-align:center;">
+        <input type="number" id="acc-sets-${i}" value="${tgt.sets||''}" placeholder="${pSets||'3'}" style="text-align:center;">
+        <input type="number" id="acc-reps-${i}" value="${_midReps(tgt.reps)||''}" placeholder="${pReps||'10'}" style="text-align:center;">
         <span></span>
       </div>
       <div class="ig" style="margin-top:8px;margin-bottom:0;"><input type="text" id="acc-note-${i}" placeholder="Notes..."></div>
