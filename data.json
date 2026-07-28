@@ -1214,6 +1214,91 @@
       "ts": 1784939993815,
       "aiFeedback": "**You didn't follow the deload protocol.** Pull-ups were done unassisted at bodyweight instead of -20lb assistance, and rows were loaded at 135lb — exactly double the prescribed 67.5lb — for 7 reps instead of 5. That's not a deload, that's a normal training session.\n\nGiven your HRV flags and cumulative fatigue, this is a real concern. The deload exists to protect your next training block, not to be negotiated around.\n\n**Next session:** Hit the actual prescribed loads. If -20lb assistance and 67.5lb rows feel too easy, that's the point — trust the process.",
       "aiFeedbackAt": "2026-07-25T00:39:59.813Z"
+    },
+    {
+      "date": "2026-07-27",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 225,
+            "r": 4,
+            "rpe": 9
+          },
+          {
+            "w": 215,
+            "r": 3,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 95,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 95,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 95,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 95,
+            "r": 6,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "skullcrusher",
+          "name": "EZ-Bar Skullcrusher",
+          "prescribed": "3×8-12",
+          "weight": 37.5,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        }
+      ],
+      "ts": 1785203695701
     }
   ],
   "recoveryLogs": [],
@@ -5396,7 +5481,7 @@
     {
       "date": "2026-07-27",
       "restingHR": 64,
-      "hrv": 60.23894182412609,
+      "hrv": 65.18605243674385,
       "wristTemp": null,
       "sleepHours": 7.9,
       "sleepDeep": 1.1274907662802272,
@@ -5406,17 +5491,17 @@
       "sleepOnset": "23:12",
       "wakeTime": "07:20",
       "sleepMidpoint": 3.2699999999999996,
-      "steps": 5296,
-      "exerciseMinutes": 34,
-      "activeCalories": 704,
+      "steps": 3748,
+      "exerciseMinutes": 29,
+      "activeCalories": 502,
       "walkingHR": 95,
-      "walkingSpeed": 2.86,
+      "walkingSpeed": 2.92,
       "respiratoryRate": 17.453488372093023,
       "vo2maxApple": null,
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-07-28T01:51:56.309Z",
+  "healthLastSync": "2026-07-28T00:27:53.748Z",
   "rpeConfirmations": [
     {
       "date": "2026-05-20",
@@ -5610,7 +5695,7 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-28T00:28:07.911Z",
+    "generatedAt": "2026-07-28T01:33:36.330Z",
     "vo2maxUsed": 45.4,
     "runCount": 31,
     "methodLabel": "Riegel",
