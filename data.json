@@ -1298,7 +1298,9 @@
           "notes": ""
         }
       ],
-      "ts": 1785203695701
+      "ts": 1785203695701,
+      "aiFeedback": "**Bench Press** was a problem. You loaded 225 instead of 215—that 10lb overshoot compounded throughout the set. RPE 8 on sets 1-2 was manageable, but you hit RPE 9 by set 3 *and* lost a rep, then dropped weight on set 4 and still only got 3 reps at RPE 9. That's a fatigued nervous system, not a back-off day. You accumulated more stress than intended on a session explicitly designed to reduce it.\n\n**OHP** executed cleanly—4×6 at RPE 7 is exactly what a reload week looks like. No notes there.\n\n**Next session:** Don't repeat this bench mistake. Load the prescribed weight. If 215×5-6 feels like RPE 6-7, that's correct—that's the point of a back-off week. Watch whether bench fatigue carries into your next pressing session; if RPE is still elevated at proper loads, consider whether recovery is fully absorbed before pushing intensity again.",
+      "aiFeedbackAt": "2026-07-28T01:55:05.075Z"
     }
   ],
   "recoveryLogs": [],
@@ -5695,7 +5697,7 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-28T01:33:36.330Z",
+    "generatedAt": "2026-07-28T01:54:57.967Z",
     "vo2maxUsed": 45.4,
     "runCount": 31,
     "methodLabel": "Riegel",
@@ -8203,6 +8205,13 @@
       "inp": 710,
       "out": 354,
       "cost": 0.00248
+    },
+    {
+      "ts": 1785203705075,
+      "type": "sessionFeedback",
+      "inp": 407,
+      "out": 239,
+      "cost": 0.004806
     }
   ],
   "checkins": [
