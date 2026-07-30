@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-28",
+  "lastUpdated": "2026-07-30",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5903,6 +5903,11 @@
       "ts": 1785198505148,
       "type": "daily_prescription",
       "label": "push 60min · 2026-07-27"
+    },
+    {
+      "ts": 1785380965689,
+      "type": "daily_prescription",
+      "label": "pull 60min · 2026-07-29"
     }
   ],
   "runPrescriptions": {
@@ -7274,6 +7279,116 @@
         "Accumulation phase traps: 215 will feel light after 225×5@8 last week—don't add weight or sprint reps, stay disciplined.",
         "OHP rep quality: if reps 5–6 get loose, stop there; rep 4 is not a failure, it's a ceiling."
       ]
+    },
+    "2026-07-29": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "You're in block week 1 accumulation after a solid baseline 5 days ago; dropping 5lb of assist on pull-ups mirrors the row progression (135→140) and keeps RPE capped at 7 to build volume without overreaching. Your HRV and sleep are clean, so the engine is confident pushing density.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "row": {
+            "weight": 140,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bent-Over Row",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 185,
+            "why": [
+              "Last time (2026-07-24, 5d ago): 135×7@6, 135×7@6, 135×7@6",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 185lb from 135lb×7@RPE6 (4 reps in reserve) on 2026-07-24",
+              "75% × 185lb → 140lb"
+            ],
+            "last": {
+              "date": "2026-07-24",
+              "daysAgo": 5,
+              "display": "135×7@6, 135×7@6, 135×7@6"
+            },
+            "coachNote": "Drive through your midfoot, pack your lats hard at the top, and pause 0.5–1s to feel the squeeze; don't let momentum carry the load."
+          },
+          "pullup": {
+            "weight": -5,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Pull-ups",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 295,
+            "why": [
+              "Last time (2026-07-24, 5d ago): BW×5@7, BW×5@7, BW×5@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 295lb from BW×6@RPE7 (3 reps in reserve) on 2026-07-15",
+              "75% × 295lb → BW−5 assist"
+            ],
+            "last": {
+              "date": "2026-07-24",
+              "daysAgo": 5,
+              "display": "BW×5@7, BW×5@7, BW×5@7"
+            },
+            "coachNote": "Control the descent; a 2–3s eccentric on the way down builds strength and teaches your lats to stabilize the assist. Dead-stop at the bottom, then pull explosively."
+          }
+        },
+        "accessories": [
+          {
+            "id": "chest_supported_row",
+            "name": "Chest-Supported DB Row",
+            "sets": 3,
+            "reps": "10-12",
+            "muscle": "back",
+            "impl": "db",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "back · new angle (db vs recent cable)"
+          },
+          {
+            "id": "rear_delt_fly",
+            "name": "Rear Delt Fly",
+            "sets": 3,
+            "reps": "12-15",
+            "muscle": "rear delts",
+            "impl": "db",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "rear delts · new angle (db vs recent cable)"
+          },
+          {
+            "id": "ez_bar_curl",
+            "name": "Standing EZ-Bar Curl",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "biceps",
+            "impl": "ez",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "biceps · new angle (ez vs recent db)"
+          }
+        ]
+      },
+      "workoutType": "pull",
+      "requestedType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-07-30T03:09:25.669Z",
+      "nextSession": {
+        "primary": {
+          "type": "legs",
+          "label": "Legs — Strength & Stability",
+          "duration": 60,
+          "reason": "Ran yesterday → least-recent lift day is legs (never logged)",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're chasing a sub-20 5K and higher VO2max—pull sessions like today feed work capacity and power-to-weight ratio. Stay disciplined hitting all 4 sets at RPE ≤7; don't chase the unassisted bar yet.",
+      "watchOutFor": [
+        "PGY-1 fatigue creep—if you're sleep-deprived mid-call, drop to RPE 6 instead of pushing to 7.",
+        "Assist machine calibration can drift; confirm the pin is set correctly before your first warm-up set."
+      ]
     }
   },
   "coachingMemory": {
@@ -8272,6 +8387,13 @@
       "inp": 407,
       "out": 239,
       "cost": 0.004806
+    },
+    {
+      "ts": 1785380970704,
+      "type": "prescription",
+      "inp": 711,
+      "out": 338,
+      "cost": 0.002401
     }
   ],
   "checkins": [
