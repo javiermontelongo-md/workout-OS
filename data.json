@@ -1403,7 +1403,9 @@
           "notes": ""
         }
       ],
-      "ts": 1785601014884
+      "ts": 1785601014884,
+      "aiFeedback": "**Pull-ups drifted hard.** RPE 7 on Set 1 to RPE 9 on Sets 2-4 is a significant jump — that's overreaching territory for accumulation week 1, not volume building. The -5lb assist drop was likely too aggressive given this is your first block week; BW pull-ups at RPE 9 for three straight sets will accumulate fatigue faster than planned.\n\n**Rows missed target weight** (135 vs. 140lb) but you still overshot RPE — hitting 8-9 while doing 7 reps means you were working harder than prescribed even at lighter load. Next session, lock in 140lb but cap strictly at 5 reps until RPE stabilizes at 7-8.\n\n**Next session watch:** Pull-up fatigue will carry. If RPE on Set 1 opens above 7, add assistance back or drop a set — don't grind through another 3×RPE 9. Log your session RPE; with this accumulation of stress, tracking that number matters.",
+      "aiFeedbackAt": "2026-08-01T16:17:05.162Z"
     }
   ],
   "recoveryLogs": [],
@@ -5920,7 +5922,7 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-08-01T16:16:11.258Z",
+    "generatedAt": "2026-08-01T16:16:57.736Z",
     "vo2maxUsed": 46.3,
     "runCount": 32,
     "methodLabel": "Riegel",
@@ -8557,6 +8559,13 @@
       "inp": 711,
       "out": 338,
       "cost": 0.002401
+    },
+    {
+      "ts": 1785601025162,
+      "type": "sessionFeedback",
+      "inp": 408,
+      "out": 245,
+      "cost": 0.004899
     }
   ],
   "checkins": [
