@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-30",
+  "lastUpdated": "2026-08-01",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -1301,6 +1301,109 @@
       "ts": 1785203695701,
       "aiFeedback": "**Bench Press** was a problem. You loaded 225 instead of 215—that 10lb overshoot compounded throughout the set. RPE 8 on sets 1-2 was manageable, but you hit RPE 9 by set 3 *and* lost a rep, then dropped weight on set 4 and still only got 3 reps at RPE 9. That's a fatigued nervous system, not a back-off day. You accumulated more stress than intended on a session explicitly designed to reduce it.\n\n**OHP** executed cleanly—4×6 at RPE 7 is exactly what a reload week looks like. No notes there.\n\n**Next session:** Don't repeat this bench mistake. Load the prescribed weight. If 215×5-6 feels like RPE 6-7, that's correct—that's the point of a back-off week. Watch whether bench fatigue carries into your next pressing session; if RPE is still elevated at proper loads, consider whether recovery is fully absorbed before pushing intensity again.",
       "aiFeedbackAt": "2026-07-28T01:55:05.075Z"
+    },
+    {
+      "date": "2026-07-29",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 9
+          },
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 9
+          },
+          {
+            "w": null,
+            "r": 5,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 8
+          },
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 8
+          },
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 9
+          },
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "chest_supported_row",
+          "name": "Chest-Supported DB Row",
+          "prescribed": "3×10-12",
+          "weight": null,
+          "sets": 3,
+          "reps": 11,
+          "notes": ""
+        },
+        {
+          "id": "rear_delt_fly",
+          "name": "Rear Delt Fly",
+          "prescribed": "3×12-15",
+          "weight": null,
+          "sets": 3,
+          "reps": 14,
+          "notes": ""
+        },
+        {
+          "id": "ez_bar_curl",
+          "name": "Standing EZ-Bar Curl",
+          "prescribed": "3×8-12",
+          "weight": null,
+          "sets": 3,
+          "reps": 10,
+          "notes": ""
+        }
+      ],
+      "ts": 1785601014884
     }
   ],
   "recoveryLogs": [],
@@ -2241,7 +2344,7 @@
       "runType": "cycling"
     }
   ],
-  "stravaLastSync": "2026-08-01T16:00:23.450Z",
+  "stravaLastSync": "2026-08-01T14:25:54.896Z",
   "adaptivePlanCache": {
     "narrative": "Week 1 of volume accumulation. Last bench session hit RPE 9-10 at 205lb for triples/quads, indicating significant overreach. Dropping to 192.5lb×4×4 to build sustainable volume at RPE 8. OHP showed good capacity at 100lb×7. Easy runs are being executed at threshold HR (165-174 bpm) instead of Zone 2 (130-145 bpm) — strict MAF HR compliance required.",
     "weeklyFocus": "Re-establish true Zone 2 easy running at MAF HR 147 ceiling and build bench volume at sustainable RPE 8",
@@ -5817,54 +5920,54 @@
     "2026-06-02": "B"
   },
   "racePredictions": {
-    "generatedAt": "2026-07-28T01:54:57.967Z",
-    "vo2maxUsed": 45.4,
-    "runCount": 31,
+    "generatedAt": "2026-08-01T16:16:11.258Z",
+    "vo2maxUsed": 46.3,
+    "runCount": 32,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1686,
-        "ciSeconds": 283,
+        "seconds": 1699,
+        "ciSeconds": 286,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3476,
-        "ciSeconds": 760,
+        "seconds": 3502,
+        "ciSeconds": 766,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7630,
-        "ciSeconds": 2180,
+        "seconds": 7689,
+        "ciSeconds": 2199,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15673,
-        "ciSeconds": 6850,
+        "seconds": 15800,
+        "ciSeconds": 6911,
         "method": "Riegel"
       }
     },
-    "medianTrainingPace": 647.5049900199601,
+    "medianTrainingPace": 645.1515151515152,
     "decayFactor": 1,
     "daysInactive": 1,
-    "lastActivityDate": "2026-07-26",
-    "rawVO2": 45.44,
+    "lastActivityDate": "2026-07-30",
+    "rawVO2": 46.29,
     "debugInfo": {
       "riegelPred": {
-        "s5k": 1955,
-        "s10k": 4076,
-        "shalf": 8992,
-        "sfull": 18749,
+        "s5k": 1997,
+        "s10k": 4164,
+        "shalf": 9187,
+        "sfull": 19155,
         "anchor": {
-          "date": "2026-07-17",
-          "stravaId": 19357206272,
-          "name": "Evening Run",
+          "date": "2026-07-08",
+          "stravaId": 19236887949,
+          "name": "Panhandle run with hill sprints at the end of",
           "type": "run",
-          "distance": 5.01,
-          "duration": 3244,
-          "pace": 648,
-          "elevationGain": 372,
-          "heartRateAvg": 168.7,
-          "heartRateMax": 183,
+          "distance": 3.3,
+          "duration": 2129,
+          "pace": 644,
+          "elevationGain": 341,
+          "heartRateAvg": 167.4,
+          "heartRateMax": 189,
           "averageWatts": null,
           "weightedAvgWatts": null,
           "source": "strava",
@@ -5873,16 +5976,16 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1300,
-        "s10k": 2696,
-        "shalf": 6090,
-        "sfull": 12411
+        "s5k": 1278,
+        "s10k": 2651,
+        "shalf": 5989,
+        "sfull": 12215
       },
       "hrPred": {
-        "s5k": 1665,
-        "s10k": 3330,
-        "shalf": 7026,
-        "sfull": 14051
+        "s5k": 1667,
+        "s10k": 3333,
+        "shalf": 7032,
+        "sfull": 14064
       },
       "weights": {
         "riegel": 0.45,
@@ -5890,7 +5993,7 @@
         "hr": 0.25
       },
       "vo2maxSource": "Apple Watch",
-      "medianPace": 647.5049900199601
+      "medianPace": 645.1515151515152
     }
   },
   "coachingLog": [
