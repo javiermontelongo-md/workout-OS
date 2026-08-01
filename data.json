@@ -6073,6 +6073,11 @@
       "ts": 1785380965689,
       "type": "daily_prescription",
       "label": "pull 60min · 2026-07-29"
+    },
+    {
+      "ts": 1785601053482,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-08-01"
     }
   ],
   "runPrescriptions": {
@@ -7554,6 +7559,116 @@
         "PGY-1 fatigue creep—if you're sleep-deprived mid-call, drop to RPE 6 instead of pushing to 7.",
         "Assist machine calibration can drift; confirm the pin is set correctly before your first warm-up set."
       ]
+    },
+    "2026-08-01": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "Block week 2 intensification drops volume and increases load to 83% 1RM after a solid baseline 4 days ago; recovery metrics are clean (HRV 53ms, 7.6h sleep) so the athlete can handle the density. Accessory rotation (flat DB → machine → cable) targets the same muscle groups via fresh angles for hypertrophy without redundancy.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "weight": 235,
+            "sets": 4,
+            "reps": "3-4",
+            "targetRPE": 8,
+            "variation": "Barbell Bench Press",
+            "blockWeek": 2,
+            "blockLabel": "Intensification — heavier, less volume",
+            "oneRM": 285,
+            "why": [
+              "Last time (2026-07-27, 4d ago): 225×5@8, 225×5@8, 225×4@9, 215×3@9",
+              "Block week 2/4 — Intensification — heavier, less volume: 83% of 1RM, 4×3-4 @ RPE 8",
+              "Estimated 1RM 285lb from 225lb×5@RPE7 (3 reps in reserve) on 2026-07-22",
+              "83% × 285lb → 235lb"
+            ],
+            "last": {
+              "date": "2026-07-27",
+              "daysAgo": 4,
+              "display": "225×5@8, 225×5@8, 225×4@9, 215×3@9"
+            },
+            "coachNote": "Feet hard into floor, scapulae retracted and pinned to bench before unracking—this locks your base and transfers leg drive into the bar."
+          },
+          "ohp": {
+            "weight": 130,
+            "sets": 4,
+            "reps": "3-4",
+            "targetRPE": 8,
+            "variation": "Barbell Strict OHP",
+            "blockWeek": 2,
+            "blockLabel": "Intensification — heavier, less volume",
+            "oneRM": 157.5,
+            "why": [
+              "Last time (2026-07-27, 4d ago): 95×6@7, 95×6@7, 95×6@7, 95×6@7",
+              "Block week 2/4 — Intensification — heavier, less volume: 83% of 1RM, 4×3-4 @ RPE 8",
+              "Estimated 1RM 157.5lb from 135lb×3@RPE8 (2 reps in reserve) on 2026-07-22",
+              "83% × 157.5lb → 130lb"
+            ],
+            "last": {
+              "date": "2026-07-27",
+              "daysAgo": 4,
+              "display": "95×6@7, 95×6@7, 95×6@7, 95×6@7"
+            },
+            "coachNote": "Brace your core hard and keep the bar path straight overhead (not forward); a slight forward lean is fine, but don't let the load drift in front of your center of gravity."
+          }
+        },
+        "accessories": [
+          {
+            "id": "flat_db_press",
+            "name": "Flat DB Press",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "chest",
+            "impl": "db",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "chest · new angle (db vs recent bw)"
+          },
+          {
+            "id": "machine_shoulder_press",
+            "name": "Machine Shoulder Press",
+            "sets": 3,
+            "reps": "10-12",
+            "muscle": "shoulders",
+            "impl": "machine",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "shoulders · new angle (machine vs recent db)"
+          },
+          {
+            "id": "overhead_tricep_ext",
+            "name": "Overhead Tricep Extension",
+            "sets": 3,
+            "reps": "10-12",
+            "muscle": "triceps",
+            "impl": "cable",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "triceps · new angle (cable vs recent ez)"
+          }
+        ]
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-08-01T16:17:33.469Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 3 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're in the heavy-singles-and-doubles phase now—quality over reps. Treat each set like a 3-rep max attempt: full focus, full rest (2–3min between compounds), and bail if RPE creeps past 8. Save the gas for your VO2max work this week.",
+      "watchOutFor": [
+        "RPE creep: fatigue from residency + a heavier bench day can sneak your perceived effort up; stop a rep early if form breaks.",
+        "DB press stability: you're switching from BW pull-ups to dumbbells mid-session; ensure each rep is controlled, especially in the bottom position."
+      ]
     }
   },
   "coachingMemory": {
@@ -8566,6 +8681,13 @@
       "inp": 408,
       "out": 245,
       "cost": 0.004899
+    },
+    {
+      "ts": 1785601058862,
+      "type": "prescription",
+      "inp": 724,
+      "out": 360,
+      "cost": 0.002524
     }
   ],
   "checkins": [
