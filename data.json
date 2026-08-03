@@ -84,7 +84,9 @@
           "notes": ""
         }
       ],
-      "ts": 1785733000614
+      "ts": 1785733000614,
+      "aiFeedback": "**Bench Press: Excellent.** Hit all 4 sets at target load, progressed from 3 to 4 reps across the block, and RPE stayed flat at 7 — that's strength expression, not just survival. You're ahead of where week 2 intensification needs you.\n\n**OHP: Red flag, but you managed it right.** Self-loading to 135lb (104% of target) then straining your back cutting it at 2 sets is exactly the kind of small mistake that derails blocks. Don't rationalize the 5lb add — you were already at the top of the rep range prescription.\n\n**Accessories look light.** Lateral raises at 3×3 are doing almost nothing for hypertrophy; that should be 3×12-15. Fix that next session.\n\n**Next session:** Back strain is the story. Assess before loading — if there's any residual tightness, pull OHP load back to 130lb and treat it as a technical drill day, not a strength day.",
+      "aiFeedbackAt": "2026-08-03T04:56:55.727Z"
     }
   ],
   "checks": {},
@@ -5743,7 +5745,83 @@
   ],
   "healthLastSync": "2026-08-03T00:59:51.661Z",
   "bodyMetrics": [],
-  "racePredictions": null,
+  "racePredictions": {
+    "generatedAt": "2026-08-03T04:56:47.947Z",
+    "vo2maxUsed": 46.6,
+    "runCount": 33,
+    "methodLabel": "Riegel",
+    "predictions": {
+      "s5k": {
+        "seconds": 1681,
+        "ciSeconds": 283,
+        "method": "Riegel"
+      },
+      "s10k": {
+        "seconds": 3465,
+        "ciSeconds": 757,
+        "method": "Riegel"
+      },
+      "shalf": {
+        "seconds": 7606,
+        "ciSeconds": 2174,
+        "method": "Riegel"
+      },
+      "sfull": {
+        "seconds": 15626,
+        "ciSeconds": 6830,
+        "method": "Riegel"
+      }
+    },
+    "medianTrainingPace": 647.5049900199601,
+    "decayFactor": 1,
+    "daysInactive": 0,
+    "lastActivityDate": "2026-08-02",
+    "rawVO2": 46.58,
+    "debugInfo": {
+      "riegelPred": {
+        "s5k": 1955,
+        "s10k": 4076,
+        "shalf": 8992,
+        "sfull": 18749,
+        "anchor": {
+          "date": "2026-07-17",
+          "stravaId": 19357206272,
+          "name": "Evening Run",
+          "type": "run",
+          "distance": 5.01,
+          "duration": 3244,
+          "pace": 648,
+          "elevationGain": 372,
+          "heartRateAvg": 168.7,
+          "heartRateMax": 183,
+          "averageWatts": null,
+          "weightedAvgWatts": null,
+          "source": "strava",
+          "runType": "intervals"
+        },
+        "anchorType": "median of last 5 runs"
+      },
+      "vdotPred": {
+        "s5k": 1271,
+        "s10k": 2637,
+        "shalf": 5958,
+        "sfull": 12150
+      },
+      "hrPred": {
+        "s5k": 1680,
+        "s10k": 3359,
+        "shalf": 7088,
+        "sfull": 14175
+      },
+      "weights": {
+        "riegel": 0.45,
+        "vdot": 0.3,
+        "hr": 0.25
+      },
+      "vo2maxSource": "Apple Watch",
+      "medianPace": 647.5049900199601
+    }
+  },
   "coachingLog": [],
   "fuelLog": [
     {
@@ -6717,6 +6795,13 @@
       "inp": 724,
       "out": 360,
       "cost": 0.002524
+    },
+    {
+      "ts": 1785733015727,
+      "type": "sessionFeedback",
+      "inp": 392,
+      "out": 236,
+      "cost": 0.004716
     }
   ],
   "groceryList": {
