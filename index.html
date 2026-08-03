@@ -1277,7 +1277,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <div class="card lift-ia" id="pullup-block">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="bdg g">💪 WEIGHTED PULL-UPS</span><span id="planned-pullup" style="font-family:var(--mono);font-size:var(--fs-sm);color:var(--a);">Planned: 5x5 @ BW</span></div>
     <div class="srh"><span>WEIGHT (lb)</span><span>REPS</span><span>RPE</span><span></span></div>
-    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:-6px;margin-bottom:6px;">assist machine = NEGATIVE lb (−50 = machine removes 50) · 0 = bodyweight · positive = added weight</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-top:-6px;margin-bottom:6px;">enter the TOTAL load you moved — bodyweight for a strict rep, bodyweight + belt when loaded, bodyweight − assist when using the machine</div>
     <div id="pullup-sets"></div>
     <button class="addbtn" onclick="addSet('pullup')">+ Add set</button>
     <div class="ig" style="margin-top:10px;margin-bottom:0;"><label>Notes</label><input type="text" id="pullup-notes" placeholder="Notes..."></div>
@@ -1424,7 +1424,7 @@ input[type=range]::-webkit-slider-thumb:hover {
   <!-- Double-progression staircases: one per compound lift -->
   <div class="card">
     <div class="lbl">progression staircases · all six lifts</div>
-    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;">Working weight per session (steps) + reps at that weight (dots). Pull-ups show effective load (BW − assist). Wildcard sets excluded.</div>
+    <div style="font-family:var(--mono);font-size:var(--fs-xs);color:var(--t3);margin-bottom:12px;">Working weight per session (steps) + reps at that weight (dots). Pull-ups use the total load you logged. Wildcard sets excluded.</div>
     <div class="g2" id="staircase-grid"></div>
   </div>
 
@@ -5327,8 +5327,7 @@ function detectDeload(){
     return {active:true,start:today,why:`${stalled.length} main lifts grinding (below-range reps or RPE ≥9.5 for 2 straight sessions: ${stalled.join(', ')}) → deload week: ~70% loads, 2×5, RPE ≤6`};
   return {active:false};
 }
-// Weight label for a lift. Pull-ups use the assist convention:
-// negative = lb of machine assist (BW−50), 0 = bodyweight, positive = added (BW+10).
+// Weight label for a lift — every lift, pull-ups included, is an absolute load.
 function fmtLiftW(lift,w){
   // Pull-ups are logged as the TOTAL load you moved — bodyweight for a strict
   // bodyweight rep, bodyweight+belt when loaded, bodyweight−assist when assisted.
@@ -5413,7 +5412,6 @@ function prescribeLift(lift,ts,deload){
       ? `Estimated 1RM ${est.oneRM}lb from ${est.src.w}lb×${est.src.r}${est.src.rpe?`@RPE${est.src.rpe} (${10-est.src.rpe} reps in reserve)`:''} on ${est.src.date}`
       : `Estimated 1RM ${est.oneRM}lb from your decay-adjusted best`);
     const target=est.oneRM*scheme.pct;
-    // Pull-ups are prescribed as assist/added load relative to bodyweight.
     weight=Math.round(target/2.5)*2.5;
     why.push(`${Math.round(scheme.pct*100)}% × ${est.oneRM}lb → ${fmtLiftW(lift,weight)}`);
     // Safety net: never jump more than 10% above the heaviest load actually
@@ -5431,7 +5429,7 @@ function prescribeLift(lift,ts,deload){
     }
   }
   if(deload?.active){
-    // Deload means EASIER: 70% barbell load; for assisted pull-ups, +20lb assist
+    // Deload means EASIER: 70% of the working load.
     weight=Math.max(lift==='pullup'?45:45,Math.round((weight*0.7)/2.5)*2.5);
     sets=2;reps=5;targetRPE=6;
     why.push(`Deload override: ${fmtLiftW(lift,weight)}, 2×5, RPE ≤6`);
@@ -7800,7 +7798,7 @@ async function _fetchPrescriptionGarnish(apiKey,presc){
   const prompt=`Today's ${presc.type} prescription was computed by a deterministic double-progression engine. Add ONLY the coaching layer around these fixed numbers.
 
 ATHLETE: 28yo PGY-1 IM resident, ${ATHLETE.weightLbs}lb. Goals: ${ATHLETE.goals.primary}, ${ATHLETE.goals.secondary}.
-PULL-UP NOTE: done on an ASSISTED machine — negative weight = lb of assist (BW−50 means the machine removes 50lb). Progress = less assist toward bodyweight, eventually added weight. Never tell him to do unassisted pull-ups he can't do yet.
+PULL-UP NOTE: pull-up loads are absolute total load (bodyweight, or bodyweight minus machine assist, or bodyweight plus belt). Never tell him to do unassisted pull-ups he cannot do yet.
 ACCESSORY PHILOSOPHY: the engine rotates muscle groups AND implements (DB/cable/EZ/machine) for well-rounded hypertrophy — if a pick looks unusual, that's the rotation working.
 RECOVERY: HRV ${means.hrv||'?'}ms · RHR ${means.rhr||'?'}bpm · sleep last night ${ts.sleepHours||'?'}h · flags: ${ts.activeFlags.join(', ')||'none'}
 ENGINE DECISIONS:
@@ -8312,7 +8310,6 @@ function renderPredictionChart(lift='bench'){
       datasets.push({label:'Optimistic',data:optPadded,borderColor:'rgba(255,183,77,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:'+1',backgroundColor:'rgba(255,183,77,0.08)',tension:0.3,spanGaps:true},{label:'Conservative',data:conPadded,borderColor:'rgba(79,195,247,0.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,tension:0.3,spanGaps:true});
     }
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const isPU=lift==='pullup';
     const todayStr=localDS(new Date());
     const todayPlugin={id:'todayLine',afterDraw(chart){
       const idx=labels.indexOf(todayStr);
@@ -8325,7 +8322,7 @@ function renderPredictionChart(lift='bench'){
       c.save();c.beginPath();c.moveTo(x,top);c.lineTo(x,bottom);
       c.strokeStyle='rgba(168,180,204,0.35)';c.setLineDash([4,4]);c.lineWidth=1;c.stroke();c.restore();
     }};
-    window._e1rmChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label(ctx){const v=ctx.parsed.y;if(v===null)return null;if(isPU)return `${ctx.dataset.label}: ${v} lb (BW+added)`;return `${ctx.dataset.label}: ${v} lb`;}}}},scales:{x:{ticks:{color:'#7b87a8',font:{family:'DM Mono',size:13},maxTicksLimit:7,maxRotation:0,callback(val){const l=this.getLabelForValue(val);if(!l)return'';const[,m,d]=l.split('-');return months[parseInt(m)-1]+' '+parseInt(d);}},grid:{color:'rgba(124,134,248,0.08)'}},y:{ticks:{color:'#7b87a8',font:{family:'DM Mono',size:13},callback:v=>v+' lb'},grid:{color:'rgba(124,134,248,0.08)'}}}},plugins:[todayPlugin]});
+    window._e1rmChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label(ctx){const v=ctx.parsed.y;if(v===null)return null;return `${ctx.dataset.label}: ${v} lb`;}}}},scales:{x:{ticks:{color:'#7b87a8',font:{family:'DM Mono',size:13},maxTicksLimit:7,maxRotation:0,callback(val){const l=this.getLabelForValue(val);if(!l)return'';const[,m,d]=l.split('-');return months[parseInt(m)-1]+' '+parseInt(d);}},grid:{color:'rgba(124,134,248,0.08)'}},y:{ticks:{color:'#7b87a8',font:{family:'DM Mono',size:13},callback:v=>v+' lb'},grid:{color:'rgba(124,134,248,0.08)'}}}},plugins:[todayPlugin]});
   }catch(e){
     console.warn('Chart render failed:',e);
     const ctx=canvas.getContext('2d');ctx.font='12px monospace';ctx.fillStyle='#4a5068';
@@ -8339,7 +8336,7 @@ function setChartLift(lift){
   renderPredictionChart(lift);
 }
 // Double-progression staircases — one compact chart per compound lift.
-// Working weight per session (stepped line, pull-ups = effective BW−assist)
+// Working weight per session (stepped line; all lifts use absolute load)
 // with reps-at-that-weight dots. Same non-wildcard working sets the engine reads.
 function renderAllStaircases(){
   const grid=document.getElementById('staircase-grid');
