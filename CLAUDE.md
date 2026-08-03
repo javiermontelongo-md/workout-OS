@@ -484,10 +484,11 @@ Exercise identity: normalizeAccessory(rawName) maps legacy freeform names
 entries deterministically; accKeyFor(entry) = id → normalized name → raw fallback.
 Used by trends, rotation, glance rows, wildcard prefill.
 
-ASSISTED PULL-UPS: pullup set weight NEGATIVE = lb of machine assist
-(w=-50 → effective load bw-50). fmtLiftW() renders "BW−50 assist" everywhere.
-Progression +5 = 5lb less assist; stall reset = +10lb assist; deload = +20lb
-assist. e1RM/staircase use bw+w so negative w is handled natively.
+PULL-UPS (changed 2026-07-28): logged as ABSOLUTE TOTAL LOAD, same units as
+every other lift. Bodyweight rep = your bodyweight (e.g. 230); belt = bw+belt;
+assisted = bw−assist, and you do that subtraction yourself. The old negative-
+assist convention and the "BW"/"BW−50 assist" labels are gone; fmtLiftW() is now
+just `${w}lb` for all lifts. START_WEIGHTS.pullup = 230.
 ```
 
 ### Endurance Engine (Runna-modelled, added 2026-07-25)
@@ -529,6 +530,13 @@ CYCLING IN AUTO: autoPickWorkoutType returns 'cycling' when every lift and run
   is within 2 days but there is ride history and no ride in ≥3 days. Never
   invents cycling for someone with no ride history.
 ```
+
+### recalcE1RMs seeds NOTHING (fixed 2026-07-28)
+It used to `Object.assign` hardcoded defaults (squat 215, dl 215, row 135…)
+before replaying sessions, which invented e1RMs for lifts that had never been
+performed — the ledger read "Squat 172.5 /215 · never logged" and the projection
+chart drew lines off phantom data. Unlogged lifts now compute to 0 and every
+surface renders "—" / "not logged yet".
 
 ### e1RM anchor on lifts (added 2026-07-25)
 The lifting analogue of anchoring paces to VDOT. After double progression picks a
