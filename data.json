@@ -7482,7 +7482,7 @@
       "sleepOnset": null,
       "wakeTime": null,
       "sleepMidpoint": null,
-      "steps": 16,
+      "steps": 82,
       "exerciseMinutes": null,
       "activeCalories": null,
       "walkingHR": null,
@@ -7492,7 +7492,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-08-08T15:03:14.245Z",
+  "healthLastSync": "2026-08-08T16:41:16.958Z",
   "bodyMetrics": [
     {
       "date": "2026-06-10",
