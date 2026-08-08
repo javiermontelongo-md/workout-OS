@@ -2414,6 +2414,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "intervals"
+    },
+    {
+      "date": "2026-08-08",
+      "stravaId": 19658516742,
+      "name": "Morning Ride",
+      "type": "ride",
+      "distance": 3.44,
+      "duration": 1373,
+      "pace": null,
+      "elevationGain": 155,
+      "heartRateAvg": 111.7,
+      "heartRateMax": 179,
+      "averageWatts": 75,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -2442,7 +2458,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-08-08T17:29:44.132Z",
+  "stravaLastSync": "2026-08-08T18:37:00.994Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
