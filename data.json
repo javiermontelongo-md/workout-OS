@@ -2430,6 +2430,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-08-08",
+      "stravaId": 19660034615,
+      "name": "First time with cleats on",
+      "type": "ride",
+      "distance": 22.74,
+      "duration": 7346,
+      "pace": null,
+      "elevationGain": 1841,
+      "heartRateAvg": 157.6,
+      "heartRateMax": 195,
+      "averageWatts": 126.5,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -2458,7 +2474,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-08-08T20:29:43.051Z",
+  "stravaLastSync": "2026-08-08T21:29:48.257Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
