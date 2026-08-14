@@ -1492,6 +1492,99 @@
       "ts": 1785733000614,
       "aiFeedback": "**Bench Press: Excellent.** Hit all 4 sets at target load, progressed from 3 to 4 reps across the block, and RPE stayed flat at 7 — that's strength expression, not just survival. You're ahead of where week 2 intensification needs you.\n\n**OHP: Red flag, but you managed it right.** Self-loading to 135lb (104% of target) then straining your back cutting it at 2 sets is exactly the kind of small mistake that derails blocks. Don't rationalize the 5lb add — you were already at the top of the rep range prescription.\n\n**Accessories look light.** Lateral raises at 3×3 are doing almost nothing for hypertrophy; that should be 3×12-15. Fix that next session.\n\n**Next session:** Back strain is the story. Assess before loading — if there's any residual tightness, pull OHP load back to 130lb and treat it as a technical drill day, not a strength day.",
       "aiFeedbackAt": "2026-08-03T04:56:55.727Z"
+    },
+    {
+      "date": "2026-08-09",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": 230,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 230,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 230,
+            "r": 5,
+            "rpe": 8
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 135,
+            "r": 3,
+            "rpe": 6
+          },
+          {
+            "w": 155,
+            "r": 3,
+            "rpe": 6
+          },
+          {
+            "w": 165,
+            "r": 3,
+            "rpe": 6
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "straight_arm_pulldown",
+          "name": "Straight-Arm Pulldown",
+          "prescribed": "3×12-15",
+          "weight": null,
+          "sets": 3,
+          "reps": 14,
+          "notes": ""
+        },
+        {
+          "id": "straight_bar_curl",
+          "name": "Straight-Bar Curl",
+          "prescribed": "3×8-10",
+          "weight": null,
+          "sets": 3,
+          "reps": 9,
+          "notes": ""
+        },
+        {
+          "id": "db_shrug",
+          "name": "DB Shrug",
+          "prescribed": "3×12-15",
+          "weight": null,
+          "sets": 3,
+          "reps": 14,
+          "notes": ""
+        }
+      ],
+      "ts": 1786668113841
     }
   ],
   "checks": {},
@@ -2471,7 +2564,7 @@
     "lastCalculated": null
   },
   "profile": {
-    "bodyweight": 225,
+    "bodyweight": 227,
     "phase": "Fat loss + strength base",
     "blockWeek": 1,
     "mode": "NORMAL"
@@ -2481,8 +2574,8 @@
     "squatE1RM": 215,
     "deadliftE1RM": 215,
     "ohpE1RM": 149,
-    "pullupE1RM": 0,
-    "rowE1RM": 135,
+    "pullupE1RM": 268,
+    "rowE1RM": 182,
     "pullups": 5
   },
   "cardioBaseline": {
