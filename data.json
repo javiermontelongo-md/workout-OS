@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-08-10",
+  "lastUpdated": "2026-08-14",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -4192,6 +4192,116 @@
         "Overreaching on a call week—scale to 3×3 @ RPE 8 if you're post-overnight shift.",
         "Straight-arm pulldown form breaks down when fatigued; set it last or reduce volume if row/pullup tax CNS hard."
       ]
+    },
+    "2026-08-13": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "Block week 1 accumulation phase targets 75% of estimated 1RM to build volume capacity; 12 days post last session allows full recovery for a resident with marginal sleep (6.8h), and HRV/RHR are neutral. Bench drop from 235×4@7 to 217.5×5-6@7 is intentional deload into volume block—OHP similarly stepped back to accumulate quality reps.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "weight": 217.5,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 290,
+            "why": [
+              "Last time (2026-08-01, 12d ago): 235×3@7, 235×3@7, 235×4@7, 235×4@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 290lb from 235lb×4@RPE7 (3 reps in reserve) on 2026-08-01",
+              "75% × 290lb → 217.5lb"
+            ],
+            "last": {
+              "date": "2026-08-01",
+              "daysAgo": 12,
+              "display": "235×3@7, 235×3@7, 235×4@7, 235×4@7"
+            },
+            "coachNote": "Feet hard into floor, leg drive on every rep—this load should feel light enough that you're thinking about chest tension, not grinding."
+          },
+          "ohp": {
+            "weight": 117.5,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 157.5,
+            "why": [
+              "Last time (2026-08-01, 12d ago): 135×3@8, 135×3@8",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 157.5lb from 135lb×3@RPE8 (2 reps in reserve) on 2026-08-01",
+              "75% × 157.5lb → 117.5lb"
+            ],
+            "last": {
+              "date": "2026-08-01",
+              "daysAgo": 12,
+              "display": "135×3@8, 135×3@8"
+            },
+            "coachNote": "Brace ribs down before each rep; avoid flaring the elbows wide. Narrow grip width here, so feel triceps contribute but keep shoulders healthy."
+          }
+        },
+        "accessories": [
+          {
+            "id": "flat_db_press",
+            "name": "Flat DB Press",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "chest",
+            "impl": "db",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "chest · new angle (db vs recent bw)"
+          },
+          {
+            "id": "machine_shoulder_press",
+            "name": "Machine Shoulder Press",
+            "sets": 3,
+            "reps": "10-12",
+            "muscle": "shoulders",
+            "impl": "machine",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "shoulders · new angle (machine vs recent db)"
+          },
+          {
+            "id": "close_grip_bench",
+            "name": "Close-Grip Bench",
+            "sets": 3,
+            "reps": "8-10",
+            "muscle": "triceps",
+            "impl": "barbell",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "triceps · new angle (barbell vs recent cable)"
+          }
+        ]
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-08-14T00:41:17.149Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 11 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're in the money-making phase: chase reps at RPE≤7, not ego loads. Hit 6 reps if they feel smooth; stop at 5 if form degrades. Accessory rotation (DB press, machine shoulder, close-grip barbell) prevents accommodation and hits your arms/shoulders from new angles—don't overthink the variety.",
+      "watchOutFor": [
+        "Resident fatigue: if grip or lockout slows on rep 4+, RPE may creep; dial back next set rather than grind.",
+        "Close-grip bench on triceps—elbows take load; stop a rep or two before ANY elbow irritation surfaces."
+      ]
     }
   },
   "rpeConfirmations": [
@@ -7934,6 +8044,11 @@
       "ts": 1786326092779,
       "type": "daily_prescription",
       "label": "pull 60min · 2026-08-09"
+    },
+    {
+      "ts": 1786668077167,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-08-13"
     }
   ],
   "fuelLog": [
@@ -8922,6 +9037,13 @@
       "inp": 767,
       "out": 326,
       "cost": 0.002397
+    },
+    {
+      "ts": 1786668083571,
+      "type": "prescription",
+      "inp": 690,
+      "out": 372,
+      "cost": 0.00255
     }
   ],
   "groceryList": {
