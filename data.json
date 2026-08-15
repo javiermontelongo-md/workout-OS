@@ -2557,6 +2557,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-08-14",
+      "stravaId": 19746511475,
+      "name": "Ring of fire",
+      "type": "ride",
+      "distance": 14.2,
+      "duration": 3949,
+      "pace": null,
+      "elevationGain": 1020,
+      "heartRateAvg": 161,
+      "heartRateMax": 189,
+      "averageWatts": 144.1,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -2585,7 +2601,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-08-15T02:51:41.509Z",
+  "stravaLastSync": "2026-08-15T03:38:29.961Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
