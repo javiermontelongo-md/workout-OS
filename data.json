@@ -1692,6 +1692,104 @@
       "ts": 1786931583122,
       "aiFeedback": "**Bench:** You self-selected 225lb instead of the prescribed 217.5lb and hit it clean—RPE 7 across three sets with a reasonable drift to 8 on S4. That's a good sign for where your strength is sitting, but note you're 3.4% above target load for an accumulation block designed to build volume tolerance, not test it. Not a problem once, but don't let this become a habit of drifting above prescription early in a block.\n\n**OHP:** Textbook execution—flat RPE 7 across all four sets at near-target load. No complaints.\n\n**Next session:** Keep bench at 217.5lb as written. The point of week 1 accumulation is controlled stress, and you've already shown you have capacity to spare—let the volume do its job without inflating load. Log your session RPE; that data matters across a 12-day gap.",
       "aiFeedbackAt": "2026-08-17T01:53:12.656Z"
+    },
+    {
+      "date": "2026-08-16",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 6
+          },
+          {
+            "w": 135,
+            "r": 8,
+            "rpe": 6
+          },
+          {
+            "w": 155,
+            "r": 6,
+            "rpe": 8
+          },
+          {
+            "w": 155,
+            "r": 6,
+            "rpe": 9
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "single_arm_db_row",
+          "name": "Single-Arm DB Row",
+          "prescribed": "3×10-12ea",
+          "weight": null,
+          "sets": 3,
+          "reps": 11,
+          "notes": ""
+        },
+        {
+          "id": "cable_curl",
+          "name": "Cable Curl",
+          "prescribed": "3×12-15",
+          "weight": null,
+          "sets": 3,
+          "reps": 14,
+          "notes": ""
+        },
+        {
+          "id": "face_pull",
+          "name": "Cable Face Pull",
+          "prescribed": "3×15-20",
+          "weight": 30,
+          "sets": 3,
+          "reps": 15,
+          "notes": ""
+        }
+      ],
+      "ts": 1787001542211
     }
   ],
   "checks": {},
@@ -2714,7 +2812,7 @@
     "deadliftE1RM": 215,
     "ohpE1RM": 149,
     "pullupE1RM": 268,
-    "rowE1RM": 182,
+    "rowE1RM": 186,
     "pullups": 5
   },
   "cardioBaseline": {
