@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-08-14",
+  "lastUpdated": "2026-08-17",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -1587,6 +1587,109 @@
       "ts": 1786668113841,
       "aiFeedback": "**Pull-ups:** You missed the target badly — 230lb for 3×5 @ RPE 8 when the plan called for 252.5lb for 2-3 reps. You had more in the tank (RPE 8 at 5 reps means you could've loaded significantly heavier), and the higher rep scheme suggests you defaulted to a comfort zone rather than pushing intensity. Next session, hit 252.5lb as prescribed — the data supports you're ready for it.\n\n**Barbell Row:** You essentially did a ramp-up and never hit the work set. 135-155-165 @ RPE 6 across the board means 165lb felt easy — you stopped right when you should have started working. Target load was 160lb for all three sets, not as a top set.\n\n**Bottom line:** This was a significant undershoot on a peak intensity week where loading matters most. Log your session RPE — it's critical data in week 3/4. Next session, trust the program and hit the prescribed loads from the first work set.",
       "aiFeedbackAt": "2026-08-14T00:42:05.068Z"
+    },
+    {
+      "date": "2026-08-13",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 8
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 115,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 115,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 115,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 115,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "flat_db_press",
+          "name": "Flat DB Press",
+          "prescribed": "3×8-12",
+          "weight": null,
+          "sets": 3,
+          "reps": 10,
+          "notes": ""
+        },
+        {
+          "id": "machine_shoulder_press",
+          "name": "Machine Shoulder Press",
+          "prescribed": "3×10-12",
+          "weight": null,
+          "sets": 3,
+          "reps": 11,
+          "notes": ""
+        },
+        {
+          "id": "close_grip_bench",
+          "name": "Close-Grip Bench",
+          "prescribed": "3×8-10",
+          "weight": null,
+          "sets": 3,
+          "reps": 9,
+          "notes": ""
+        }
+      ],
+      "ts": 1786931583122
     }
   ],
   "checks": {},
