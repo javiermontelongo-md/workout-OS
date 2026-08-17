@@ -4746,6 +4746,116 @@
         "HRV_WARNING active—if any set feels sluggish or form breaks, end session and prioritize sleep tonight",
         "Resident schedule likely means irregular nutrition; dial in post-workout protein (30g+) to support accessory hypertrophy"
       ]
+    },
+    "2026-08-17": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "Block week 4/4 deload after 4 consecutive hard days; HRV warning confirms CNS fatigue, so 60% 1RM restores capacity without stimulus debt. Resident schedule demands efficient recovery—light loading with crisp reps rebuilds motor control.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "weight": 175,
+            "sets": 2,
+            "reps": "5",
+            "targetRPE": 5,
+            "variation": "Barbell Bench Press",
+            "blockWeek": 4,
+            "blockLabel": "Deload — restore",
+            "oneRM": 290,
+            "why": [
+              "Last time (2026-08-13, 4d ago): 225×5@7, 225×5@7, 225×5@7, 225×5@8",
+              "Block week 4/4 — Deload — restore: 60% of 1RM, 2×5 @ RPE 5",
+              "Estimated 1RM 290lb from 235lb×4@RPE7 (3 reps in reserve) on 2026-08-01",
+              "60% × 290lb → 175lb"
+            ],
+            "last": {
+              "date": "2026-08-13",
+              "daysAgo": 4,
+              "display": "225×5@7, 225×5@7, 225×5@7, 225×5@8"
+            },
+            "coachNote": "Pause 1 second at chest; elbows ~45° angle. Light weight = chance to groove the path without fatigue masking bad positions."
+          },
+          "ohp": {
+            "weight": 95,
+            "sets": 2,
+            "reps": "5",
+            "targetRPE": 5,
+            "variation": "Barbell Strict OHP",
+            "blockWeek": 4,
+            "blockLabel": "Deload — restore",
+            "oneRM": 157.5,
+            "why": [
+              "Last time (2026-08-13, 4d ago): 115×5@7, 115×5@7, 115×5@7, 115×5@7",
+              "Block week 4/4 — Deload — restore: 60% of 1RM, 2×5 @ RPE 5",
+              "Estimated 1RM 157.5lb from 135lb×3@RPE8 (2 reps in reserve) on 2026-08-01",
+              "60% × 157.5lb → 95lb"
+            ],
+            "last": {
+              "date": "2026-08-13",
+              "daysAgo": 4,
+              "display": "115×5@7, 115×5@7, 115×5@7, 115×5@7"
+            },
+            "coachNote": "Strict neutral spine, no excessive arch. Rib cage down. At 95lb you should feel zero strain—if pressing feels grindy, stop the set."
+          }
+        },
+        "accessories": [
+          {
+            "id": "cable_fly",
+            "name": "Cable Fly",
+            "sets": 3,
+            "reps": "12-15",
+            "muscle": "chest",
+            "impl": "cable",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "chest · new angle (cable vs recent db)"
+          },
+          {
+            "id": "db_shoulder_press",
+            "name": "Seated DB Shoulder Press",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "shoulders",
+            "impl": "db",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "shoulders · new angle (db vs recent machine)"
+          },
+          {
+            "id": "tricep_pushdown_bar",
+            "name": "Straight-Bar Pushdown",
+            "sets": 3,
+            "reps": "10-15",
+            "muscle": "triceps",
+            "impl": "cable",
+            "days": 31,
+            "lastDoneDate": "2026-07-17",
+            "reason": "triceps · last done 31d ago"
+          }
+        ]
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-08-17T21:19:18.004Z",
+      "nextSession": {
+        "primary": {
+          "type": "legs",
+          "label": "Legs — Strength & Stability",
+          "duration": 60,
+          "reason": "Ran yesterday → least-recent lift day is legs (never logged)",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "Today is a restoration day, not a strength day. Move weight with perfect tempo (2s down, explosive up), treat it like technique work. Your HRV is flagging; nail sleep and hydration tonight—this deload only works if you don't pile other stress on top.",
+      "watchOutFor": [
+        "HRV_WARNING + PGY-1 stress: don't compensate by going harder; trust the deload",
+        "Accessories are new angles—keep weight moderate; focus on the stretch and squeeze, not load"
+      ]
     }
   },
   "rpeConfirmations": [
@@ -8595,6 +8705,11 @@
       "ts": 1786932521200,
       "type": "daily_prescription",
       "label": "pull 60min · 2026-08-16"
+    },
+    {
+      "ts": 1787001558022,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-08-17"
     }
   ],
   "fuelLog": [
@@ -9618,6 +9733,13 @@
       "inp": 385,
       "out": 233,
       "cost": 0.00465
+    },
+    {
+      "ts": 1787001562599,
+      "type": "prescription",
+      "inp": 695,
+      "out": 304,
+      "cost": 0.002215
     }
   ],
   "groceryList": {
