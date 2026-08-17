@@ -1789,7 +1789,9 @@
           "notes": ""
         }
       ],
-      "ts": 1787001542211
+      "ts": 1787001542211,
+      "aiFeedback": "**Pull-ups: Locked in.** 3×5 @ RPE 7 across all sets is exactly what a HRV-reduced day calls for — consistent effort, clean ceiling, no drift. Nothing to fix here.\n\n**Barbell Row: This needs attention.** You ran 4 sets against a 3-set protocol, then jumped from 135lb to 155lb mid-session — RPE climbed from 6 to 9, which blows past the ≤7 cap on a day explicitly designed to protect CNS recovery. The load increase wasn't warranted by the reps either; 7-8 reps at RPE 6 means 135lb was appropriate, not a cue to add weight. This undermined the session's entire purpose.\n\n**Next session:** Log your session RPE — it matters for tracking whether this day actually served recovery. On the row, commit to the prescribed load and stop at 3 sets regardless of how easy it feels early. Easy *is* the goal right now.",
+      "aiFeedbackAt": "2026-08-17T21:19:12.491Z"
     }
   ],
   "checks": {},
@@ -8422,37 +8424,37 @@
     }
   ],
   "racePredictions": {
-    "generatedAt": "2026-08-17T01:53:04.694Z",
-    "vo2maxUsed": 45.5,
+    "generatedAt": "2026-08-17T21:19:03.567Z",
+    "vo2maxUsed": 46.3,
     "runCount": 34,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1692,
-        "ciSeconds": 285,
+        "seconds": 1686,
+        "ciSeconds": 284,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3488,
-        "ciSeconds": 765,
+        "seconds": 3476,
+        "ciSeconds": 762,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7656,
-        "ciSeconds": 2195,
+        "seconds": 7629,
+        "ciSeconds": 2188,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15726,
-        "ciSeconds": 6896,
+        "seconds": 15674,
+        "ciSeconds": 6874,
         "method": "Riegel"
       }
     },
     "medianTrainingPace": 647.5049900199601,
     "decayFactor": 1,
-    "daysInactive": 0,
+    "daysInactive": 1,
     "lastActivityDate": "2026-08-16",
-    "rawVO2": 45.45,
+    "rawVO2": 46.27,
     "debugInfo": {
       "riegelPred": {
         "s5k": 1955,
@@ -8478,10 +8480,10 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1298,
-        "s10k": 2691,
-        "shalf": 6078,
-        "sfull": 12389
+        "s5k": 1278,
+        "s10k": 2651,
+        "shalf": 5989,
+        "sfull": 12215
       },
       "hrPred": {
         "s5k": 1693,
@@ -9609,6 +9611,13 @@
       "inp": 733,
       "out": 365,
       "cost": 0.002558
+    },
+    {
+      "ts": 1787001552491,
+      "type": "sessionFeedback",
+      "inp": 385,
+      "out": 233,
+      "cost": 0.00465
     }
   ],
   "groceryList": {
