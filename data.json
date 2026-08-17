@@ -4534,6 +4534,118 @@
         "Resident fatigue: if grip or lockout slows on rep 4+, RPE may creep; dial back next set rather than grind.",
         "Close-grip bench on triceps—elbows take load; stop a rep or two before ANY elbow irritation surfaces."
       ]
+    },
+    "2026-08-16": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "HRV warning triggers 25% volume reduction (4→3 sets) while maintaining intensity at 75% 1RM to preserve stimulus without overloading recovering CNS. Load drops ~7–8% from last week but RPE cap stays ≤7, allowing technical practice on a subacute fatigue day.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "row": {
+            "weight": 152.5,
+            "sets": 3,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bent-Over Row",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 202.5,
+            "why": [
+              "Last time (2026-08-09, 7d ago): 135×3@6, 155×3@6, 165×3@6",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 202.5lb from 165lb×3@RPE6 (4 reps in reserve) on 2026-08-09",
+              "75% × 202.5lb → 152.5lb",
+              "Volume ×0.85 from recovery flags: 4→3 sets"
+            ],
+            "last": {
+              "date": "2026-08-09",
+              "daysAgo": 7,
+              "display": "135×3@6, 155×3@6, 165×3@6"
+            },
+            "coachNote": "Pack your scapula down and back before the pull; row to your sternum, not your hip. Pause 0.5s at the chest to kill momentum and load the back."
+          },
+          "pullup": {
+            "weight": 225,
+            "sets": 3,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Pull-ups",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 300,
+            "why": [
+              "Last time (2026-08-09, 7d ago): 230lb×5@8, 230lb×5@8, 230lb×5@8",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 300lb from 230lb×6@RPE7 (3 reps in reserve) on 2026-07-15",
+              "75% × 300lb → 225lb",
+              "Volume ×0.85 from recovery flags: 4→3 sets"
+            ],
+            "last": {
+              "date": "2026-08-09",
+              "daysAgo": 7,
+              "display": "230lb×5@8, 230lb×5@8, 230lb×5@8"
+            },
+            "coachNote": "Full stretch at bottom (shoulders packed, not dead-hang), then think 'elbows to hips'—this keeps tension on lats and prevents arm-dominant reps. Control the descent (2–3s) to manage joint stress on a recovery day."
+          }
+        },
+        "accessories": [
+          {
+            "id": "single_arm_db_row",
+            "name": "Single-Arm DB Row",
+            "sets": 3,
+            "reps": "10-12ea",
+            "muscle": "back",
+            "impl": "db",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "back · new angle (db vs recent cable)"
+          },
+          {
+            "id": "cable_curl",
+            "name": "Cable Curl",
+            "sets": 3,
+            "reps": "12-15",
+            "muscle": "biceps",
+            "impl": "cable",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "biceps · new angle (cable vs recent barbell)"
+          },
+          {
+            "id": "face_pull",
+            "name": "Cable Face Pull",
+            "sets": 3,
+            "reps": "15-20",
+            "muscle": "rear delts",
+            "impl": "cable",
+            "days": 28,
+            "lastDoneDate": "2026-07-19",
+            "reason": "rear delts · last done 28d ago"
+          }
+        ]
+      },
+      "workoutType": "pull",
+      "requestedType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-08-17T02:08:41.175Z",
+      "nextSession": {
+        "primary": {
+          "type": "legs",
+          "label": "Legs — Strength & Stability",
+          "duration": 60,
+          "reason": "Ran today → least-recent lift day is legs (never logged)",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're running a 5K goal on limited sleep (6.7h) and resident fatigue—treat the 225lb pullup and 152.5lb row as *position work*, not max-effort days. Hit your sets clean, leave 2–3 reps in the tank, and let the accessories drive the hypertrophy signal.",
+      "watchOutFor": [
+        "HRV_WARNING active—if any set feels sluggish or form breaks, end session and prioritize sleep tonight",
+        "Resident schedule likely means irregular nutrition; dial in post-workout protein (30g+) to support accessory hypertrophy"
+      ]
     }
   },
   "rpeConfirmations": [
@@ -8347,6 +8459,11 @@
       "ts": 1786668077167,
       "type": "daily_prescription",
       "label": "push 60min · 2026-08-13"
+    },
+    {
+      "ts": 1786932521200,
+      "type": "daily_prescription",
+      "label": "pull 60min · 2026-08-16"
     }
   ],
   "fuelLog": [
@@ -9356,6 +9473,13 @@
       "inp": 431,
       "out": 208,
       "cost": 0.004413
+    },
+    {
+      "ts": 1786932526505,
+      "type": "prescription",
+      "inp": 733,
+      "out": 365,
+      "cost": 0.002558
     }
   ],
   "groceryList": {
