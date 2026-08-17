@@ -1689,7 +1689,9 @@
           "notes": ""
         }
       ],
-      "ts": 1786931583122
+      "ts": 1786931583122,
+      "aiFeedback": "**Bench:** You self-selected 225lb instead of the prescribed 217.5lb and hit it clean—RPE 7 across three sets with a reasonable drift to 8 on S4. That's a good sign for where your strength is sitting, but note you're 3.4% above target load for an accumulation block designed to build volume tolerance, not test it. Not a problem once, but don't let this become a habit of drifting above prescription early in a block.\n\n**OHP:** Textbook execution—flat RPE 7 across all four sets at near-target load. No complaints.\n\n**Next session:** Keep bench at 217.5lb as written. The point of week 1 accumulation is controlled stress, and you've already shown you have capacity to spare—let the volume do its job without inflating load. Log your session RPE; that data matters across a 12-day gap.",
+      "aiFeedbackAt": "2026-08-17T01:53:12.656Z"
     }
   ],
   "checks": {},
@@ -8179,36 +8181,36 @@
     }
   ],
   "racePredictions": {
-    "generatedAt": "2026-08-14T00:41:55.495Z",
+    "generatedAt": "2026-08-17T01:53:04.694Z",
     "vo2maxUsed": 45.5,
-    "runCount": 33,
+    "runCount": 34,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1689,
-        "ciSeconds": 284,
+        "seconds": 1692,
+        "ciSeconds": 285,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3481,
-        "ciSeconds": 761,
+        "seconds": 3488,
+        "ciSeconds": 765,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7642,
-        "ciSeconds": 2184,
+        "seconds": 7656,
+        "ciSeconds": 2195,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15698,
-        "ciSeconds": 6861,
+        "seconds": 15726,
+        "ciSeconds": 6896,
         "method": "Riegel"
       }
     },
     "medianTrainingPace": 647.5049900199601,
     "decayFactor": 1,
-    "daysInactive": 3,
-    "lastActivityDate": "2026-08-10",
+    "daysInactive": 0,
+    "lastActivityDate": "2026-08-16",
     "rawVO2": 45.45,
     "debugInfo": {
       "riegelPred": {
@@ -8241,10 +8243,10 @@
         "sfull": 12389
       },
       "hrPred": {
-        "s5k": 1680,
-        "s10k": 3359,
-        "shalf": 7088,
-        "sfull": 14175
+        "s5k": 1693,
+        "s10k": 3387,
+        "shalf": 7145,
+        "sfull": 14290
       },
       "weights": {
         "riegel": 0.45,
@@ -9347,6 +9349,13 @@
       "inp": 361,
       "out": 242,
       "cost": 0.004713
+    },
+    {
+      "ts": 1786931592655,
+      "type": "sessionFeedback",
+      "inp": 431,
+      "out": 208,
+      "cost": 0.004413
     }
   ],
   "groceryList": {
