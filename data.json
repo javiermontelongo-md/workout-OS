@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-08-17",
+  "lastUpdated": "2026-08-18",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -1792,6 +1792,109 @@
       "ts": 1787001542211,
       "aiFeedback": "**Pull-ups: Locked in.** 3×5 @ RPE 7 across all sets is exactly what a HRV-reduced day calls for — consistent effort, clean ceiling, no drift. Nothing to fix here.\n\n**Barbell Row: This needs attention.** You ran 4 sets against a 3-set protocol, then jumped from 135lb to 155lb mid-session — RPE climbed from 6 to 9, which blows past the ≤7 cap on a day explicitly designed to protect CNS recovery. The load increase wasn't warranted by the reps either; 7-8 reps at RPE 6 means 135lb was appropriate, not a cue to add weight. This undermined the session's entire purpose.\n\n**Next session:** Log your session RPE — it matters for tracking whether this day actually served recovery. On the row, commit to the prescribed load and stop at 3 sets regardless of how easy it feels early. Easy *is* the goal right now.",
       "aiFeedbackAt": "2026-08-17T21:19:12.491Z"
+    },
+    {
+      "date": "2026-08-17",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 5
+          },
+          {
+            "w": 235,
+            "r": 3,
+            "rpe": 7
+          },
+          {
+            "w": 235,
+            "r": 3,
+            "rpe": 7
+          },
+          {
+            "w": 235,
+            "r": 3,
+            "rpe": 7
+          }
+        ],
+        "notes": "The hrv doesn’t feel accurate to me"
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 115,
+            "r": 6,
+            "rpe": 6
+          },
+          {
+            "w": 125,
+            "r": 6,
+            "rpe": 6
+          },
+          {
+            "w": 125,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 125,
+            "r": 5,
+            "rpe": 8
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "cable_fly",
+          "name": "Cable Fly",
+          "prescribed": "3×12-15",
+          "weight": null,
+          "sets": 3,
+          "reps": 14,
+          "notes": ""
+        },
+        {
+          "id": "db_shoulder_press",
+          "name": "Seated DB Shoulder Press",
+          "prescribed": "3×8-12",
+          "weight": null,
+          "sets": 3,
+          "reps": 10,
+          "notes": ""
+        },
+        {
+          "id": "tricep_pushdown_bar",
+          "name": "Straight-Bar Pushdown",
+          "prescribed": "3×10-15",
+          "weight": 50,
+          "sets": 3,
+          "reps": 13,
+          "notes": ""
+        }
+      ],
+      "ts": 1787025447061
     }
   ],
   "checks": {},
@@ -2812,7 +2915,7 @@
     "benchE1RM": 266,
     "squatE1RM": 215,
     "deadliftE1RM": 215,
-    "ohpE1RM": 149,
+    "ohpE1RM": 150,
     "pullupE1RM": 268,
     "rowE1RM": 186,
     "pullups": 5
@@ -2822,7 +2925,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-08-18T03:44:38.228Z",
+  "stravaLastSync": "2026-08-18T02:55:19.613Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
