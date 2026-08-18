@@ -1894,7 +1894,9 @@
           "notes": ""
         }
       ],
-      "ts": 1787025447061
+      "ts": 1787025447061,
+      "aiFeedback": "**You blew past the deload targets on both lifts.** Bench was prescribed at 175lb; you opened at 225lb and climbed to 235lb for three working sets. OHP was prescribed at 95lb and you ran it to 125lb with RPE 8s at the end. This wasn't a deload—this was a moderate training session.\n\n**The HRV skepticism is worth examining, but the RPE data argues against you.** OHP finishing at RPE 8 after a block of four hard days is exactly what CNS fatigue looks like in practice—you feel okay until the bar tells you otherwise. Doubting the HRV signal and then self-selecting loads 35-40% over prescription is a pattern to watch.\n\n**Next session:** If you're entering a new block, log session RPE and treat the first week as a true on-ramp rather than picking up where hard days left off. Your strength is clearly there—protect it by actually recovering when the plan calls for it.",
+      "aiFeedbackAt": "2026-08-18T03:57:36.419Z"
     }
   ],
   "checks": {},
@@ -8637,7 +8639,7 @@
     }
   ],
   "racePredictions": {
-    "generatedAt": "2026-08-17T21:19:03.567Z",
+    "generatedAt": "2026-08-18T03:57:29.687Z",
     "vo2maxUsed": 46.3,
     "runCount": 34,
     "methodLabel": "Riegel",
@@ -9843,6 +9845,13 @@
       "inp": 695,
       "out": 304,
       "cost": 0.002215
+    },
+    {
+      "ts": 1787025456418,
+      "type": "sessionFeedback",
+      "inp": 401,
+      "out": 229,
+      "cost": 0.004638
     }
   ],
   "groceryList": {
