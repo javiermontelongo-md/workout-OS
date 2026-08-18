@@ -2899,6 +2899,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "intervals"
+    },
+    {
+      "date": "2026-08-18",
+      "stravaId": 19797424568,
+      "name": "Morning Run",
+      "type": "run",
+      "distance": 5.01,
+      "duration": 3357,
+      "pace": 671,
+      "elevationGain": 326,
+      "heartRateAvg": 169.3,
+      "heartRateMax": 187,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "intervals"
     }
   ],
   "runBaseline": {
@@ -2927,7 +2943,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-08-18T17:26:38.629Z",
+  "stravaLastSync": "2026-08-18T18:37:43.364Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
