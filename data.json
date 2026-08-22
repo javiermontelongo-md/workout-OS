@@ -1960,7 +1960,9 @@
         ],
         "notes": ""
       },
-      "ts": 1787431068335
+      "ts": 1787431068335,
+      "aiFeedback": "**Pull-ups:** Solid work — 3x5 at body weight (238lb) holding steady RPE 8 across all sets shows good consistency without degradation. That's a strong baseline. Next session, consider adding 2.5-5lb via belt or vest to keep progressive overload moving.\n\n**Barbell Row:** 135lb × 7 at RPE 7 is leaving room on the table — if all three sets felt that manageable, you should be adding weight or reps next session. Push to 150lb or hit 8-9 reps before bumping load.\n\n**Log your session RPE** — it's a data point, use it.",
+      "aiFeedbackAt": "2026-08-22T20:37:55.135Z"
     }
   ],
   "checks": {},
@@ -8832,54 +8834,54 @@
     }
   ],
   "racePredictions": {
-    "generatedAt": "2026-08-18T03:57:29.687Z",
-    "vo2maxUsed": 46.3,
-    "runCount": 34,
+    "generatedAt": "2026-08-22T20:37:49.920Z",
+    "vo2maxUsed": 46.7,
+    "runCount": 35,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1686,
-        "ciSeconds": 284,
+        "seconds": 1704,
+        "ciSeconds": 287,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3476,
-        "ciSeconds": 762,
+        "seconds": 3512,
+        "ciSeconds": 769,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7629,
-        "ciSeconds": 2188,
+        "seconds": 7709,
+        "ciSeconds": 2209,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15674,
-        "ciSeconds": 6874,
+        "seconds": 15840,
+        "ciSeconds": 6940,
         "method": "Riegel"
       }
     },
-    "medianTrainingPace": 647.5049900199601,
+    "medianTrainingPace": 660.2,
     "decayFactor": 1,
-    "daysInactive": 1,
-    "lastActivityDate": "2026-08-16",
-    "rawVO2": 46.27,
+    "daysInactive": 3,
+    "lastActivityDate": "2026-08-19",
+    "rawVO2": 46.73,
     "debugInfo": {
       "riegelPred": {
-        "s5k": 1955,
-        "s10k": 4076,
-        "shalf": 8992,
-        "sfull": 18749,
+        "s5k": 1993,
+        "s10k": 4156,
+        "shalf": 9170,
+        "sfull": 19119,
         "anchor": {
-          "date": "2026-07-17",
-          "stravaId": 19357206272,
-          "name": "Evening Run",
+          "date": "2026-08-02",
+          "stravaId": 19573645385,
+          "name": "☀️☀️☀️",
           "type": "run",
-          "distance": 5.01,
-          "duration": 3244,
-          "pace": 648,
-          "elevationGain": 372,
-          "heartRateAvg": 168.7,
-          "heartRateMax": 183,
+          "distance": 5,
+          "duration": 3301,
+          "pace": 660,
+          "elevationGain": 337,
+          "heartRateAvg": 169.7,
+          "heartRateMax": 187,
           "averageWatts": null,
           "weightedAvgWatts": null,
           "source": "strava",
@@ -8888,16 +8890,16 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1278,
-        "s10k": 2651,
-        "shalf": 5989,
-        "sfull": 12215
+        "s5k": 1269,
+        "s10k": 2632,
+        "shalf": 5947,
+        "sfull": 12129
       },
       "hrPred": {
-        "s5k": 1693,
-        "s10k": 3387,
-        "shalf": 7145,
-        "sfull": 14290
+        "s5k": 1705,
+        "s10k": 3410,
+        "shalf": 7195,
+        "sfull": 14390
       },
       "weights": {
         "riegel": 0.45,
@@ -8905,7 +8907,7 @@
         "hr": 0.25
       },
       "vo2maxSource": "Apple Watch",
-      "medianPace": 647.5049900199601
+      "medianPace": 660.2
     }
   },
   "coachingLog": [
@@ -10045,6 +10047,13 @@
       "inp": 401,
       "out": 229,
       "cost": 0.004638
+    },
+    {
+      "ts": 1787431075135,
+      "type": "sessionFeedback",
+      "inp": 229,
+      "out": 154,
+      "cost": 0.002997
     }
   ],
   "groceryList": {
