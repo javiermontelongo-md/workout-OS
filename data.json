@@ -3029,6 +3029,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-08-23",
+      "stravaId": 19870348714,
+      "name": "Long ride through Sausalito",
+      "type": "ride",
+      "distance": 37.02,
+      "duration": 10674,
+      "pace": null,
+      "elevationGain": 2295,
+      "heartRateAvg": 149.6,
+      "heartRateMax": 195,
+      "averageWatts": 128.8,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3057,7 +3073,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-08-23T19:21:38.979Z",
+  "stravaLastSync": "2026-08-23T20:22:30.033Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
