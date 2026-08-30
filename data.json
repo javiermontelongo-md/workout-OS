@@ -3045,6 +3045,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-08-30",
+      "stravaId": 19967970874,
+      "name": "Lunch Run",
+      "type": "run",
+      "distance": 5,
+      "duration": 3446,
+      "pace": 689,
+      "elevationGain": 248,
+      "heartRateAvg": 167.8,
+      "heartRateMax": 186,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "intervals"
     }
   ],
   "runBaseline": {
@@ -3073,7 +3089,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-08-30T17:57:02.402Z",
+  "stravaLastSync": "2026-08-30T20:50:38.839Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
