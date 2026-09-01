@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-08-22",
+  "lastUpdated": "2026-09-01",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5139,6 +5139,116 @@
         "HRV_WARNING + PGY-1 stress: don't compensate by going harder; trust the deload",
         "Accessories are new angles—keep weight moderate; focus on the stretch and squeeze, not load"
       ]
+    },
+    "2026-08-31": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "14 days post-last session with solid recovery metrics (HRV 45ms, RHR 62) supports repeating accumulation block work at 75% 1RM. PGY-1 schedule demands efficient, submaximal volume—this hits hypertrophy and work capacity without central nervous system tax before your 5K block.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "weight": 220,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 292.5,
+            "why": [
+              "Last time (2026-08-17, 14d ago): 225×5@5, 235×3@7, 235×3@7, 235×3@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 292.5lb from 225lb×5@RPE5 (5 reps in reserve) on 2026-08-17",
+              "75% × 292.5lb → 220lb"
+            ],
+            "last": {
+              "date": "2026-08-17",
+              "daysAgo": 14,
+              "display": "225×5@5, 235×3@7, 235×3@7, 235×3@7"
+            },
+            "coachNote": "220lb should feel easy at RPE 6–7; if it doesn't, stop at RPE 6.5 and bank the reps. Drive through mid-foot, retract scaps hard into the bench, and pause 1s at chest to own the bottom position."
+          },
+          "ohp": {
+            "weight": 125,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 167.5,
+            "why": [
+              "Last time (2026-08-17, 14d ago): 115×6@6, 125×6@6, 125×5@8, 125×5@8",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 167.5lb from 125lb×6@RPE6 (4 reps in reserve) on 2026-08-17",
+              "75% × 167.5lb → 125lb"
+            ],
+            "last": {
+              "date": "2026-08-17",
+              "daysAgo": 14,
+              "display": "115×6@6, 125×6@6, 125×5@8, 125×5@8"
+            },
+            "coachNote": "125lb is maintenance volume from 2 weeks ago; keep your lats engaged (slight posterior pelvic tilt) to avoid lower back compensation. Press straight up, not forward."
+          }
+        },
+        "accessories": [
+          {
+            "id": "pec_deck",
+            "name": "Pec Deck Fly",
+            "sets": 3,
+            "reps": "12-15",
+            "muscle": "chest",
+            "impl": "machine",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "chest · new angle (machine vs recent cable)"
+          },
+          {
+            "id": "cable_lateral_raise",
+            "name": "Cable Lateral Raise",
+            "sets": 3,
+            "reps": "12-15",
+            "muscle": "shoulders",
+            "impl": "cable",
+            "days": 999,
+            "lastDoneDate": null,
+            "reason": "shoulders · new angle (cable vs recent db)"
+          },
+          {
+            "id": "skullcrusher",
+            "name": "EZ-Bar Skullcrusher",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "triceps",
+            "impl": "ez",
+            "days": 35,
+            "lastDoneDate": "2026-07-27",
+            "reason": "triceps · last done 35d ago"
+          }
+        ]
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-09-01T04:04:24.808Z",
+      "nextSession": {
+        "primary": {
+          "type": "legs",
+          "label": "Legs — Strength & Stability",
+          "duration": 60,
+          "reason": "Ran yesterday → least-recent lift day is legs (never logged)",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're in block 1/4 accumulation; treat RPE≤7 as a ceiling, not a target. At 225lb BW with IM call shifts, nail the bench and OHP reps, then exit—the accessory rotation (pec deck→cable raise→skull crusher) handles arm/shoulder balance without needing heavy iron today.",
+      "watchOutFor": [
+        "Resident fatigue bias: 'light weight' can feel heavy after call. Honor RPE ≤7 honestly—no ego loading.",
+        "Pec deck and cable raises rotate angles; expect different muscle fiber activation. Reps may feel easier or harder than the DB/cable versions you did last block."
+      ]
     }
   },
   "rpeConfirmations": [
@@ -9310,6 +9420,11 @@
       "ts": 1787001558022,
       "type": "daily_prescription",
       "label": "push 60min · 2026-08-17"
+    },
+    {
+      "ts": 1788235464822,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-08-31"
     }
   ],
   "fuelLog": [
@@ -10354,6 +10469,13 @@
       "inp": 229,
       "out": 154,
       "cost": 0.002997
+    },
+    {
+      "ts": 1788235471079,
+      "type": "prescription",
+      "inp": 708,
+      "out": 388,
+      "cost": 0.002648
     }
   ],
   "groceryList": {
