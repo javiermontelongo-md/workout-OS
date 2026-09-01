@@ -3061,6 +3061,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "intervals"
+    },
+    {
+      "date": "2026-08-31",
+      "stravaId": 19984511861,
+      "name": "Evening Ride",
+      "type": "ride",
+      "distance": 2.56,
+      "duration": 1245,
+      "pace": null,
+      "elevationGain": 153,
+      "heartRateAvg": 110.2,
+      "heartRateMax": 153,
+      "averageWatts": 48.4,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3089,7 +3105,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-08-31T23:07:14.466Z",
+  "stravaLastSync": "2026-09-01T03:54:13.582Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
