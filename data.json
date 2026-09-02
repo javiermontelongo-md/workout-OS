@@ -3077,6 +3077,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-09-01",
+      "stravaId": 19998476607,
+      "name": "Afternoon Ride",
+      "type": "ride",
+      "distance": 13.93,
+      "duration": 4136,
+      "pace": null,
+      "elevationGain": 1033,
+      "heartRateAvg": 159.1,
+      "heartRateMax": 197,
+      "averageWatts": 164.7,
+      "weightedAvgWatts": 198,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3105,7 +3121,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-09-01T23:49:33.865Z",
+  "stravaLastSync": "2026-09-02T03:13:41.124Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
