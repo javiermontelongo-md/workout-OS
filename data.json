@@ -2060,7 +2060,9 @@
           "notes": ""
         }
       ],
-      "ts": 1788503073344
+      "ts": 1788503073344,
+      "aiFeedback": "**Bench Press: Miss.** You hit 225lb but only 3 reps per set against a 5-6 rep target—that's a significant volume shortfall (9 reps vs. 18-24 planned). RPE 7 tells you the weight wasn't the problem; something else cut reps short. After 14 days off, this warrants attention—note whether it was fatigue, setup, or mental deceleration.\n\n**OHP: Solid execution.** You completed all 4 sets at or near target load with consistent RPE 7 across the board. The S1 warm-down to 115lb was a smart adjustment and you earned the full 125lb for sets 2-4.\n\n**Next session:** Keep bench at 225lb but commit to hitting 5+ reps each set before considering any load increase. Log your session RPE—with a 14-day gap and inconsistent rep execution, that data matters for managing fatigue heading into your 5K block.",
+      "aiFeedbackAt": "2026-09-04T06:24:42.304Z"
     }
   ],
   "checks": {},
@@ -9424,37 +9426,37 @@
     }
   ],
   "racePredictions": {
-    "generatedAt": "2026-08-22T20:37:49.920Z",
-    "vo2maxUsed": 46.7,
-    "runCount": 35,
+    "generatedAt": "2026-09-04T06:24:34.876Z",
+    "vo2maxUsed": 46.6,
+    "runCount": 36,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1704,
-        "ciSeconds": 287,
+        "seconds": 1707,
+        "ciSeconds": 282,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3512,
-        "ciSeconds": 769,
+        "seconds": 3520,
+        "ciSeconds": 756,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7709,
-        "ciSeconds": 2209,
+        "seconds": 7725,
+        "ciSeconds": 2169,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15840,
-        "ciSeconds": 6940,
+        "seconds": 15871,
+        "ciSeconds": 6815,
         "method": "Riegel"
       }
     },
     "medianTrainingPace": 660.2,
     "decayFactor": 1,
-    "daysInactive": 3,
-    "lastActivityDate": "2026-08-19",
-    "rawVO2": 46.73,
+    "daysInactive": 2,
+    "lastActivityDate": "2026-09-01",
+    "rawVO2": 46.58,
     "debugInfo": {
       "riegelPred": {
         "s5k": 1993,
@@ -9480,16 +9482,16 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1269,
-        "s10k": 2632,
-        "shalf": 5947,
-        "sfull": 12129
+        "s5k": 1271,
+        "s10k": 2637,
+        "shalf": 5958,
+        "sfull": 12150
       },
       "hrPred": {
-        "s5k": 1705,
-        "s10k": 3410,
-        "shalf": 7195,
-        "sfull": 14390
+        "s5k": 1717,
+        "s10k": 3434,
+        "shalf": 7244,
+        "sfull": 14488
       },
       "weights": {
         "riegel": 0.45,
@@ -10656,6 +10658,13 @@
       "inp": 708,
       "out": 388,
       "cost": 0.002648
+    },
+    {
+      "ts": 1788503082304,
+      "type": "sessionFeedback",
+      "inp": 401,
+      "out": 229,
+      "cost": 0.004638
     }
   ],
   "groceryList": {
