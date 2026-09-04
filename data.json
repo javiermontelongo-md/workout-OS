@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-09-01",
+  "lastUpdated": "2026-09-04",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -1963,6 +1963,104 @@
       "ts": 1787431068335,
       "aiFeedback": "**Pull-ups:** Solid work — 3x5 at body weight (238lb) holding steady RPE 8 across all sets shows good consistency without degradation. That's a strong baseline. Next session, consider adding 2.5-5lb via belt or vest to keep progressive overload moving.\n\n**Barbell Row:** 135lb × 7 at RPE 7 is leaving room on the table — if all three sets felt that manageable, you should be adding weight or reps next session. Push to 150lb or hit 8-9 reps before bumping load.\n\n**Log your session RPE** — it's a data point, use it.",
       "aiFeedbackAt": "2026-08-22T20:37:55.135Z"
+    },
+    {
+      "date": "2026-08-31",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 225,
+            "r": 3,
+            "rpe": 7
+          },
+          {
+            "w": 225,
+            "r": 3,
+            "rpe": 7
+          },
+          {
+            "w": 225,
+            "r": 3,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 115,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 125,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 125,
+            "r": 6,
+            "rpe": 7
+          },
+          {
+            "w": 125,
+            "r": 6,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "pec_deck",
+          "name": "Pec Deck Fly",
+          "prescribed": "3×12-15",
+          "weight": null,
+          "sets": 3,
+          "reps": 14,
+          "notes": ""
+        },
+        {
+          "id": "cable_lateral_raise",
+          "name": "Cable Lateral Raise",
+          "prescribed": "3×12-15",
+          "weight": null,
+          "sets": 3,
+          "reps": 14,
+          "notes": ""
+        },
+        {
+          "id": "skullcrusher",
+          "name": "EZ-Bar Skullcrusher",
+          "prescribed": "3×8-12",
+          "weight": 42.5,
+          "sets": 3,
+          "reps": 8,
+          "notes": ""
+        }
+      ],
+      "ts": 1788503073344
     }
   ],
   "checks": {},
