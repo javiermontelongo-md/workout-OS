@@ -5365,6 +5365,118 @@
         "Resident fatigue bias: 'light weight' can feel heavy after call. Honor RPE ≤7 honestly—no ego loading.",
         "Pec deck and cable raises rotate angles; expect different muscle fiber activation. Reps may feel easier or harder than the DB/cable versions you did last block."
       ]
+    },
+    "2026-09-03": {
+      "type": "pull",
+      "duration": 60,
+      "summary": "Pull — Back & Biceps",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "Sleep deprivation (5.6h) and low HRV (49.75ms) triggered a 25% volume reduction (4→3 sets) while maintaining intensity at 75% 1RM to preserve adaptation without accumulating fatigue. Row load increased 12.6% from last session; pullup decreased 7.6% to respect the recovery flags while staying in accumulation block.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "row": {
+            "weight": 152.5,
+            "sets": 3,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bent-Over Row",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 202.5,
+            "why": [
+              "Last time (2026-08-21, 13d ago): 135×7@7, 135×7@7, 135×7@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 202.5lb from 165lb×3@RPE6 (4 reps in reserve) on 2026-08-09",
+              "75% × 202.5lb → 152.5lb",
+              "Volume ×0.85 from recovery flags: 4→3 sets"
+            ],
+            "last": {
+              "date": "2026-08-21",
+              "daysAgo": 13,
+              "display": "135×7@7, 135×7@7, 135×7@7"
+            },
+            "coachNote": "Drive elbows back and down into your ribs with a 1-second pause at the chest; avoid letting the bar drift away from your body on the concentric."
+          },
+          "pullup": {
+            "weight": 220,
+            "sets": 3,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Pull-ups",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 292.5,
+            "why": [
+              "Last time (2026-08-21, 13d ago): 238lb×5@8, 238lb×5@8, 238lb×5@8",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 292.5lb from 238lb×5@RPE8 (2 reps in reserve) on 2026-08-21",
+              "75% × 292.5lb → 220lb",
+              "Volume ×0.85 from recovery flags: 4→3 sets"
+            ],
+            "last": {
+              "date": "2026-08-21",
+              "daysAgo": 13,
+              "display": "238lb×5@8, 238lb×5@8, 238lb×5@8"
+            },
+            "coachNote": "At 220lb (likely 5lb assist or small band depending on machine), control the negative for a full 2-second eccentric—build strength where you're weak, not just lock-out strength."
+          }
+        },
+        "accessories": [
+          {
+            "id": "lat_pulldown",
+            "name": "Lat Pulldown",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "back",
+            "impl": "cable",
+            "days": 70,
+            "lastDoneDate": "2026-06-25",
+            "reason": "back · last done 70d ago"
+          },
+          {
+            "id": "hammer_curl",
+            "name": "DB Hammer Curl",
+            "sets": 3,
+            "reps": "10-12",
+            "muscle": "biceps",
+            "impl": "db",
+            "days": 55,
+            "lastDoneDate": "2026-07-10",
+            "reason": "biceps · last done 55d ago"
+          },
+          {
+            "id": "rear_delt_fly",
+            "name": "Rear Delt Fly",
+            "sets": 3,
+            "reps": "12-15",
+            "muscle": "rear delts",
+            "impl": "db",
+            "days": 36,
+            "lastDoneDate": "2026-07-29",
+            "reason": "rear delts · last done 36d ago"
+          }
+        ]
+      },
+      "workoutType": "pull",
+      "requestedType": "pull",
+      "durationMins": 60,
+      "generatedAt": "2026-09-04T06:24:50.283Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 4 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're running on fumes with 5.6h sleep—treat this as a technical/movement quality day, not a grinder. Focus on crisp bar speed and perfect rep structure; that matters more than RPE today given your HRV.",
+      "watchOutFor": [
+        "SLEEP WARNING active—if RPE creeps above 7 by set 2, bail and call it a day",
+        "Lat pulldown is 70d overdue; start conservative on loading and prioritize mind-muscle connection over weight"
+      ]
     }
   },
   "rpeConfirmations": [
@@ -9607,6 +9719,11 @@
       "ts": 1788235464822,
       "type": "daily_prescription",
       "label": "push 60min · 2026-08-31"
+    },
+    {
+      "ts": 1788503090298,
+      "type": "daily_prescription",
+      "label": "pull 60min · 2026-09-03"
     }
   ],
   "fuelLog": [
@@ -10665,6 +10782,13 @@
       "inp": 401,
       "out": 229,
       "cost": 0.004638
+    },
+    {
+      "ts": 1788503095315,
+      "type": "prescription",
+      "inp": 738,
+      "out": 338,
+      "cost": 0.002428
     }
   ],
   "groceryList": {
