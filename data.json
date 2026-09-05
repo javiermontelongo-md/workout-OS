@@ -3193,6 +3193,22 @@
       "weightedAvgWatts": 198,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-09-04",
+      "stravaId": 20039905176,
+      "name": "Quick hawk b4 night shift",
+      "type": "ride",
+      "distance": 18.31,
+      "duration": 5585,
+      "pace": null,
+      "elevationGain": 1402,
+      "heartRateAvg": 168.9,
+      "heartRateMax": 199,
+      "averageWatts": 169.6,
+      "weightedAvgWatts": 197,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3221,7 +3237,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-09-04T23:45:55.491Z",
+  "stravaLastSync": "2026-09-05T03:17:33.901Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
