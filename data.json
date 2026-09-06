@@ -5592,6 +5592,116 @@
         "SLEEP WARNING active—if RPE creeps above 7 by set 2, bail and call it a day",
         "Lat pulldown is 70d overdue; start conservative on loading and prioritize mind-muscle connection over weight"
       ]
+    },
+    "2026-09-05": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "You're in block 1 accumulation (75% intensity, volume-focused) after a deload week—perfect for building work capacity before your 5K push, and your HRV is solid. Backing off from the triple-at-RPE7 grind last session lets you hit cleaner reps and chase volume, which drives VO2max gains.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "weight": 220,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 292.5,
+            "why": [
+              "Last time (2026-08-31, 5d ago): 225×3@7, 225×3@7, 225×3@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 292.5lb from 225lb×5@RPE5 (5 reps in reserve) on 2026-08-17",
+              "75% × 292.5lb → 220lb"
+            ],
+            "last": {
+              "date": "2026-08-31",
+              "daysAgo": 5,
+              "display": "225×3@7, 225×3@7, 225×3@7"
+            },
+            "coachNote": "Pause 1 count at chest to kill momentum; this eliminates the bounce and forces your anterior chain to drive the load, which transfers better to running stability."
+          },
+          "ohp": {
+            "weight": 125,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 167.5,
+            "why": [
+              "Last time (2026-08-31, 5d ago): 115×6@7, 125×6@7, 125×6@7, 125×6@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 167.5lb from 125lb×6@RPE6 (4 reps in reserve) on 2026-08-17",
+              "75% × 167.5lb → 125lb"
+            ],
+            "last": {
+              "date": "2026-08-31",
+              "daysAgo": 5,
+              "display": "115×6@7, 125×6@7, 125×6@7, 125×6@7"
+            },
+            "coachNote": "Rib cage packed, core braced, zero arch—you're a runner first. Strict overhead position builds shoulder resilience for mileage."
+          }
+        },
+        "accessories": [
+          {
+            "id": "incline_db_press",
+            "name": "Incline DB Press",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "chest",
+            "impl": "db",
+            "days": 88,
+            "lastDoneDate": "2026-06-09",
+            "reason": "chest · last done 88d ago"
+          },
+          {
+            "id": "tricep_pushdown_rope",
+            "name": "Rope Tricep Pushdown",
+            "sets": 3,
+            "reps": "10-15",
+            "muscle": "triceps",
+            "impl": "cable",
+            "days": 45,
+            "lastDoneDate": "2026-07-22",
+            "reason": "triceps · last done 45d ago"
+          },
+          {
+            "id": "lateral_raise",
+            "name": "DB Lateral Raise",
+            "sets": 3,
+            "reps": "12-20",
+            "muscle": "shoulders",
+            "impl": "db",
+            "days": 35,
+            "lastDoneDate": "2026-08-01",
+            "reason": "shoulders · last done 35d ago"
+          }
+        ]
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-09-06T00:05:29.585Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 6 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're a resident—sleep is already your limiter, not this session. Treat 5-6 reps as a tempo target; if you hit 6 clean on set 1, you *own* set 2. Don't chase RPE7 if it means form leaks or you're grinding by rep 5.",
+      "watchOutFor": [
+        "Fatigue + PGY-1 schedule = CNS tax. If set 3 OHP feels heavy relative to set 2, stop and reset—this is accumulation, not a max-out day.",
+        "Lateral raises last done 35d ago—keep weight modest (12–15lb) and chase the 12–20 rep range, not the load."
+      ]
     }
   },
   "rpeConfirmations": [
@@ -9883,6 +9993,11 @@
       "ts": 1788503090298,
       "type": "daily_prescription",
       "label": "pull 60min · 2026-09-03"
+    },
+    {
+      "ts": 1788653129600,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-09-05"
     }
   ],
   "fuelLog": [
@@ -10955,6 +11070,13 @@
       "inp": 428,
       "out": 281,
       "cost": 0.005499
+    },
+    {
+      "ts": 1788653135407,
+      "type": "prescription",
+      "inp": 695,
+      "out": 366,
+      "cost": 0.002525
     }
   ],
   "groceryList": {
