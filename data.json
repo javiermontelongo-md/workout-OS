@@ -2165,7 +2165,9 @@
           "notes": ""
         }
       ],
-      "ts": 1788653103040
+      "ts": 1788653103040,
+      "aiFeedback": "**Pull-ups:** Exceeded load target by 8% (238 vs 220lb) across 4 sets instead of the prescribed 3 — solid execution, but that extra set contradicts the recovery protocol. RPE held steady at 7 until set 4 crept to 8, which is exactly what you'd expect when adding volume on a compromised day. Next session, respect the set cap or accept that fatigue debt is accumulating.\n\n**Barbell Row:** Underloaded by 11.5% (135 vs 152.5lb) but extended to 7 reps across all 4 sets — again, one set over target. The load-rep tradeoff roughly balances volume, but the pattern of ignoring set prescriptions needs attention.\n\n**Bottom line:** You performed well mechanically — consistent RPEs, clean rep ranges — but ran 4 sets on both main lifts when the plan called for 3. On a sleep-deprived, low-HRV day, that's the exact mistake the reduction was designed to prevent. Log your session RPE next time; without it, fatigue tracking is blind. Next session, hit set targets precisely and watch whether pull-up RPE at 238lb holds below 8.",
+      "aiFeedbackAt": "2026-09-06T00:05:13.021Z"
     }
   ],
   "checks": {},
@@ -9695,7 +9697,7 @@
     }
   ],
   "racePredictions": {
-    "generatedAt": "2026-09-04T06:24:34.876Z",
+    "generatedAt": "2026-09-06T00:05:04.601Z",
     "vo2maxUsed": 46.6,
     "runCount": 36,
     "methodLabel": "Riegel",
@@ -9723,8 +9725,8 @@
     },
     "medianTrainingPace": 660.2,
     "decayFactor": 1,
-    "daysInactive": 2,
-    "lastActivityDate": "2026-09-01",
+    "daysInactive": 1,
+    "lastActivityDate": "2026-09-04",
     "rawVO2": 46.58,
     "debugInfo": {
       "riegelPred": {
@@ -10946,6 +10948,13 @@
       "inp": 738,
       "out": 338,
       "cost": 0.002428
+    },
+    {
+      "ts": 1788653113020,
+      "type": "sessionFeedback",
+      "inp": 428,
+      "out": 281,
+      "cost": 0.005499
     }
   ],
   "groceryList": {
