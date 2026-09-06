@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-09-04",
+  "lastUpdated": "2026-09-06",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -2063,6 +2063,109 @@
       "ts": 1788503073344,
       "aiFeedback": "**Bench Press: Miss.** You hit 225lb but only 3 reps per set against a 5-6 rep target—that's a significant volume shortfall (9 reps vs. 18-24 planned). RPE 7 tells you the weight wasn't the problem; something else cut reps short. After 14 days off, this warrants attention—note whether it was fatigue, setup, or mental deceleration.\n\n**OHP: Solid execution.** You completed all 4 sets at or near target load with consistent RPE 7 across the board. The S1 warm-down to 115lb was a smart adjustment and you earned the full 125lb for sets 2-4.\n\n**Next session:** Keep bench at 225lb but commit to hitting 5+ reps each set before considering any load increase. Log your session RPE—with a 14-day gap and inconsistent rep execution, that data matters for managing fatigue heading into your 5K block.",
       "aiFeedbackAt": "2026-09-04T06:24:42.304Z"
+    },
+    {
+      "date": "2026-09-03",
+      "day": "B",
+      "type": "B",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [
+          {
+            "w": 238,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 238,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 238,
+            "r": 5,
+            "rpe": 7
+          },
+          {
+            "w": 238,
+            "r": 5,
+            "rpe": 8
+          }
+        ],
+        "notes": ""
+      },
+      "row": {
+        "sets": [
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 7
+          },
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 7
+          },
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 7
+          },
+          {
+            "w": 135,
+            "r": 7,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "seated_cable_row",
+          "name": "Seated Cable Row",
+          "prescribed": "3×10-12",
+          "weight": 140,
+          "sets": 3,
+          "reps": 11,
+          "notes": ""
+        },
+        {
+          "id": "seated_db_curl",
+          "name": "Seated DB Curl",
+          "prescribed": "3×10-12",
+          "weight": 45,
+          "sets": 3,
+          "reps": 7,
+          "notes": ""
+        },
+        {
+          "id": "rear_delt_fly",
+          "name": "Rear Delt Fly",
+          "prescribed": "3×12-15",
+          "weight": null,
+          "sets": 3,
+          "reps": 14,
+          "notes": ""
+        }
+      ],
+      "ts": 1788653103040
     }
   ],
   "checks": {},
@@ -5441,26 +5544,20 @@
         },
         "accessories": [
           {
-            "id": "lat_pulldown",
-            "name": "Lat Pulldown",
+            "id": "seated_cable_row",
+            "name": "Seated Cable Row",
             "sets": 3,
-            "reps": "8-12",
+            "reps": "10-12",
             "muscle": "back",
-            "impl": "cable",
-            "days": 70,
-            "lastDoneDate": "2026-06-25",
-            "reason": "back · last done 70d ago"
+            "reason": "back · last done 43d ago"
           },
           {
-            "id": "hammer_curl",
-            "name": "DB Hammer Curl",
+            "id": "seated_db_curl",
+            "name": "Seated DB Curl",
             "sets": 3,
             "reps": "10-12",
             "muscle": "biceps",
-            "impl": "db",
-            "days": 55,
-            "lastDoneDate": "2026-07-10",
-            "reason": "biceps · last done 55d ago"
+            "reason": "biceps · last done 43d ago"
           },
           {
             "id": "rear_delt_fly",
