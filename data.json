@@ -3330,6 +3330,22 @@
       "weightedAvgWatts": 215,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-09-08",
+      "stravaId": 20099436127,
+      "name": "wake up, hawk, night shift, sleep",
+      "type": "ride",
+      "distance": 19.21,
+      "duration": 5761,
+      "pace": null,
+      "elevationGain": 1509,
+      "heartRateAvg": 161,
+      "heartRateMax": 190,
+      "averageWatts": 177,
+      "weightedAvgWatts": 200,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3358,7 +3374,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-09-09T08:42:38.168Z",
+  "stravaLastSync": "2026-09-09T13:28:06.108Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
