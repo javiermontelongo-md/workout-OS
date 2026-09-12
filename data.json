@@ -9954,13 +9954,13 @@
       "exerciseMinutes": 9,
       "activeCalories": 353,
       "walkingHR": 89,
-      "walkingSpeed": 3.46,
+      "walkingSpeed": 3.05,
       "respiratoryRate": null,
       "vo2maxApple": null,
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-09-12T00:16:29.437Z",
+  "healthLastSync": "2026-09-12T00:17:40.992Z",
   "bodyMetrics": [
     {
       "date": "2026-06-10",
