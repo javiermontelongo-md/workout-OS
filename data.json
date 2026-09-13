@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-09-06",
+  "lastUpdated": "2026-09-13",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -2168,6 +2168,94 @@
       "ts": 1788653103040,
       "aiFeedback": "**Pull-ups:** Exceeded load target by 8% (238 vs 220lb) across 4 sets instead of the prescribed 3 — solid execution, but that extra set contradicts the recovery protocol. RPE held steady at 7 until set 4 crept to 8, which is exactly what you'd expect when adding volume on a compromised day. Next session, respect the set cap or accept that fatigue debt is accumulating.\n\n**Barbell Row:** Underloaded by 11.5% (135 vs 152.5lb) but extended to 7 reps across all 4 sets — again, one set over target. The load-rep tradeoff roughly balances volume, but the pattern of ignoring set prescriptions needs attention.\n\n**Bottom line:** You performed well mechanically — consistent RPEs, clean rep ranges — but ran 4 sets on both main lifts when the plan called for 3. On a sleep-deprived, low-HRV day, that's the exact mistake the reduction was designed to prevent. Log your session RPE next time; without it, fatigue tracking is blind. Next session, hit set targets precisely and watch whether pull-up RPE at 238lb holds below 8.",
       "aiFeedbackAt": "2026-09-06T00:05:13.021Z"
+    },
+    {
+      "date": "2026-09-05",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 225,
+            "r": 4,
+            "rpe": 8
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 8
+          },
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 8
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 115,
+            "r": 7,
+            "rpe": 7
+          },
+          {
+            "w": 115,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "incline_db_press",
+          "name": "Incline DB Press",
+          "prescribed": "3×8-12",
+          "weight": 110,
+          "sets": 3,
+          "reps": 9,
+          "notes": ""
+        },
+        {
+          "id": "tricep_pushdown_rope",
+          "name": "Rope Tricep Pushdown",
+          "prescribed": "3×10-15",
+          "weight": 55,
+          "sets": 3,
+          "reps": 13,
+          "notes": ""
+        },
+        {
+          "id": "lateral_raise",
+          "name": "DB Lateral Raise",
+          "prescribed": "3×12-20",
+          "weight": 20,
+          "sets": 3,
+          "reps": 12,
+          "notes": ""
+        }
+      ],
+      "ts": 1789309410054
     }
   ],
   "checks": {},
