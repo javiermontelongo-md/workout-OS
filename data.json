@@ -3434,6 +3434,22 @@
       "weightedAvgWatts": 200,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-09-20",
+      "stravaId": 20262107064,
+      "name": "First group ride to mill valley",
+      "type": "ride",
+      "distance": 28.46,
+      "duration": 9117,
+      "pace": null,
+      "elevationGain": 1543,
+      "heartRateAvg": 142.3,
+      "heartRateMax": 196,
+      "averageWatts": 146.1,
+      "weightedAvgWatts": 179,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3462,7 +3478,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-09-20T23:52:55.336Z",
+  "stravaLastSync": "2026-09-21T03:40:58.392Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
