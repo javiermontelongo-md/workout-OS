@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-09-13",
+  "lastUpdated": "2026-09-25",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -5838,6 +5838,116 @@
         "Fatigue + PGY-1 schedule = CNS tax. If set 3 OHP feels heavy relative to set 2, stop and reset—this is accumulation, not a max-out day.",
         "Lateral raises last done 35d ago—keep weight modest (12–15lb) and chase the 12–20 rep range, not the load."
       ]
+    },
+    "2026-09-24": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "Recovery metrics are clean (HRV 51ms, RHR 63, 7.6h sleep) supporting standard progression into block 1 accumulation phase. Load drops 5lb from last session's RPE 8 attempts, allowing controlled 4×5-6 work at RPE 7 to build volume without accruing fatigue during a busy PGY-1 schedule.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "weight": 220,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 292.5,
+            "why": [
+              "Last time (2026-09-05, 19d ago): 225×4@8, 225×5@8, 225×5@8",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 292.5lb from 225lb×5@RPE5 (5 reps in reserve) on 2026-08-17",
+              "75% × 292.5lb → 220lb"
+            ],
+            "last": {
+              "date": "2026-09-05",
+              "daysAgo": 19,
+              "display": "225×4@8, 225×5@8, 225×5@8"
+            },
+            "coachNote": "Lower the bar to mid-chest with elbows at 45°, pause 1 second, then drive through mid-foot hard—maintain leg drive across all reps to stabilize at 220."
+          },
+          "ohp": {
+            "weight": 125,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 167.5,
+            "why": [
+              "Last time (2026-09-05, 19d ago): 115×7@7, 115×5@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 167.5lb from 125lb×6@RPE6 (4 reps in reserve) on 2026-08-17",
+              "75% × 167.5lb → 125lb"
+            ],
+            "last": {
+              "date": "2026-09-05",
+              "daysAgo": 19,
+              "display": "115×7@7, 115×5@7"
+            },
+            "coachNote": "Brace core before descent, lower to collarbone level only (not behind neck), and avoid hip drive initiation; strict overhead work at 125 builds shoulder stability for running economy."
+          }
+        },
+        "accessories": [
+          {
+            "id": "dips",
+            "name": "Dips",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "chest",
+            "impl": "bw",
+            "days": 64,
+            "lastDoneDate": "2026-07-22",
+            "reason": "chest · last done 64d ago"
+          },
+          {
+            "id": "machine_shoulder_press",
+            "name": "Machine Shoulder Press",
+            "sets": 3,
+            "reps": "10-12",
+            "muscle": "shoulders",
+            "impl": "machine",
+            "days": 42,
+            "lastDoneDate": "2026-08-13",
+            "reason": "shoulders · last done 42d ago"
+          },
+          {
+            "id": "close_grip_bench",
+            "name": "Close-Grip Bench",
+            "sets": 3,
+            "reps": "8-10",
+            "muscle": "triceps",
+            "impl": "barbell",
+            "days": 42,
+            "lastDoneDate": "2026-08-13",
+            "reason": "triceps · last done 42d ago"
+          }
+        ]
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-09-25T04:56:01.485Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 25 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're 19 days out from last heavy session—treat this week as a structured deload block disguised as work. Hit the prescribed RPE ceiling, not beyond; this sets up the intensity jumps in weeks 3-4 when you'll need them for 5K prep.",
+      "watchOutFor": [
+        "Residency fatigue: if form breaks on rep 4-5, stop at 5 and call it a session—no ego grinding at RPE 7.",
+        "Dips last done 64d ago: use assistance or band if needed; the rotation logic is sound, but respect the deload phase."
+      ]
     }
   },
   "rpeConfirmations": [
@@ -10552,6 +10662,11 @@
       "ts": 1788653129600,
       "type": "daily_prescription",
       "label": "push 60min · 2026-09-05"
+    },
+    {
+      "ts": 1790312161500,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-09-24"
     }
   ],
   "fuelLog": [
@@ -11631,6 +11746,13 @@
       "inp": 695,
       "out": 366,
       "cost": 0.002525
+    },
+    {
+      "ts": 1790312167793,
+      "type": "prescription",
+      "inp": 679,
+      "out": 367,
+      "cost": 0.002514
     }
   ],
   "groceryList": {
