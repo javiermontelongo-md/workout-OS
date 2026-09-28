@@ -3466,6 +3466,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "intervals"
+    },
+    {
+      "date": "2026-09-27",
+      "stravaId": 20358657823,
+      "name": "Hawk",
+      "type": "ride",
+      "distance": 18.48,
+      "duration": 5607,
+      "pace": null,
+      "elevationGain": 1470,
+      "heartRateAvg": 160.3,
+      "heartRateMax": 192,
+      "averageWatts": 182.4,
+      "weightedAvgWatts": 208,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3494,7 +3510,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-09-27T23:45:12.794Z",
+  "stravaLastSync": "2026-09-28T04:02:51.362Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
