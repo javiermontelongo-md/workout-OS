@@ -10899,8 +10899,8 @@
     },
     {
       "date": "2026-10-12",
-      "restingHR": null,
-      "hrv": 51.65864958758728,
+      "restingHR": 54,
+      "hrv": 52.84920810863777,
       "wristTemp": null,
       "sleepHours": 6.9,
       "sleepDeep": 1.3758212467696933,
@@ -10910,9 +10910,9 @@
       "sleepOnset": "23:34",
       "wakeTime": "06:29",
       "sleepMidpoint": 3.030000000000001,
-      "steps": null,
+      "steps": 113,
       "exerciseMinutes": null,
-      "activeCalories": 33,
+      "activeCalories": 172,
       "walkingHR": null,
       "walkingSpeed": null,
       "respiratoryRate": 17.342105263157894,
@@ -10920,7 +10920,7 @@
       "source": "apple_health"
     }
   ],
-  "healthLastSync": "2026-10-12T13:55:41.203Z",
+  "healthLastSync": "2026-10-12T15:01:12.831Z",
   "bodyMetrics": [
     {
       "date": "2026-06-10",
