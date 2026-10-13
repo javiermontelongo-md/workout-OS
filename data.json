@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-09-25",
+  "lastUpdated": "2026-10-13",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -6012,6 +6012,116 @@
         "Residency fatigue: if form breaks on rep 4-5, stop at 5 and call it a session—no ego grinding at RPE 7.",
         "Dips last done 64d ago: use assistance or band if needed; the rotation logic is sound, but respect the deload phase."
       ]
+    },
+    "2026-10-12": {
+      "type": "push",
+      "duration": 60,
+      "summary": "Push — Upper Strength",
+      "engine": true,
+      "engineWhy": [],
+      "reasoning": "You're 37d post-heavy doubles and entering block week 1 accumulation—220lb bench and 125lb OHP sit at 75% 1RM, perfect volume density for VO2max work without compromising strength recovery. HRV and sleep are solid; you can push these RPE 7s cleanly.",
+      "mainWork": {
+        "summary": "2 main lifts · 3 accessories",
+        "lifts": {
+          "bench": {
+            "weight": 220,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Bench Press",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 292.5,
+            "why": [
+              "Last time (2026-09-05, 37d ago): 225×4@8, 225×5@8, 225×5@8",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 292.5lb from 225lb×5@RPE5 (5 reps in reserve) on 2026-08-17",
+              "75% × 292.5lb → 220lb"
+            ],
+            "last": {
+              "date": "2026-09-05",
+              "daysAgo": 37,
+              "display": "225×4@8, 225×5@8, 225×5@8"
+            },
+            "coachNote": "Pause 1 second at chest on all reps—builds positional strength and forces you to own the bottom, where form breaks first when fatigued."
+          },
+          "ohp": {
+            "weight": 125,
+            "sets": 4,
+            "reps": "5-6",
+            "targetRPE": 7,
+            "variation": "Barbell Strict OHP",
+            "blockWeek": 1,
+            "blockLabel": "Accumulation — volume",
+            "oneRM": 167.5,
+            "why": [
+              "Last time (2026-09-05, 37d ago): 115×7@7, 115×5@7",
+              "Block week 1/4 — Accumulation — volume: 75% of 1RM, 4×5-6 @ RPE 7",
+              "Estimated 1RM 167.5lb from 125lb×6@RPE6 (4 reps in reserve) on 2026-08-17",
+              "75% × 167.5lb → 125lb"
+            ],
+            "last": {
+              "date": "2026-09-05",
+              "daysAgo": 37,
+              "display": "115×7@7, 115×5@7"
+            },
+            "coachNote": "Lead each rep with your chest/ribs forward, not backward; this locks your core and prevents lumbar compensation, critical at 125lb when tired."
+          }
+        },
+        "accessories": [
+          {
+            "id": "dips",
+            "name": "Dips",
+            "sets": 3,
+            "reps": "8-12",
+            "muscle": "chest",
+            "impl": "bw",
+            "days": 82,
+            "lastDoneDate": "2026-07-22",
+            "reason": "chest · last done 82d ago"
+          },
+          {
+            "id": "machine_shoulder_press",
+            "name": "Machine Shoulder Press",
+            "sets": 3,
+            "reps": "10-12",
+            "muscle": "shoulders",
+            "impl": "machine",
+            "days": 60,
+            "lastDoneDate": "2026-08-13",
+            "reason": "shoulders · last done 60d ago"
+          },
+          {
+            "id": "close_grip_bench",
+            "name": "Close-Grip Bench",
+            "sets": 3,
+            "reps": "8-10",
+            "muscle": "triceps",
+            "impl": "barbell",
+            "days": 60,
+            "lastDoneDate": "2026-08-13",
+            "reason": "triceps · last done 60d ago"
+          }
+        ]
+      },
+      "workoutType": "push",
+      "requestedType": "push",
+      "durationMins": 60,
+      "generatedAt": "2026-10-13T00:57:55.209Z",
+      "nextSession": {
+        "primary": {
+          "type": "run",
+          "label": "Zone 2 Easy Run",
+          "duration": 60,
+          "reason": "No run in 12 days — sub-20 5K goal makes run frequency the priority",
+          "confidence": "medium"
+        }
+      },
+      "coachNote": "You're a PGY-1 on call rotation—this session is short and dense by design. Hit bench and OHP fresh, then dips/accessories as finishers. If fatigue spikes mid-session, drop to RPE 6 rather than grinding; your CNS needs reserves for your actual job.",
+      "watchOutFor": [
+        "Dips load: use machine assist or light weight—dips will feel heavier after bench and OHP.",
+        "Close-grip bench shoulder position: elbows 45° from torso, not pinned. Triceps are the target, not shoulder rotator cuff impingement."
+      ]
     }
   },
   "rpeConfirmations": [
@@ -11127,6 +11237,11 @@
       "ts": 1790312161500,
       "type": "daily_prescription",
       "label": "push 60min · 2026-09-24"
+    },
+    {
+      "ts": 1791853075225,
+      "type": "daily_prescription",
+      "label": "push 60min · 2026-10-12"
     }
   ],
   "fuelLog": [
@@ -12213,6 +12328,13 @@
       "inp": 679,
       "out": 367,
       "cost": 0.002514
+    },
+    {
+      "ts": 1791853080478,
+      "type": "prescription",
+      "inp": 679,
+      "out": 337,
+      "cost": 0.002364
     }
   ],
   "groceryList": {
