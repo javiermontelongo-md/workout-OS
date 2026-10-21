@@ -3530,6 +3530,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "intervals"
+    },
+    {
+      "date": "2026-10-20",
+      "stravaId": 20669438972,
+      "name": "Carrera de noche",
+      "type": "run",
+      "distance": 3.14,
+      "duration": 1971,
+      "pace": 629,
+      "elevationGain": 179,
+      "heartRateAvg": 175.4,
+      "heartRateMax": 196,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "intervals"
     }
   ],
   "runBaseline": {
@@ -3558,7 +3574,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-10-21T01:20:00.350Z",
+  "stravaLastSync": "2026-10-21T07:08:46.598Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
