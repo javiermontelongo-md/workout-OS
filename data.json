@@ -3546,6 +3546,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "intervals"
+    },
+    {
+      "date": "2026-10-23",
+      "stravaId": 20704212605,
+      "name": "Carrera a la hora del almuerzo",
+      "type": "run",
+      "distance": 0.03,
+      "duration": 18,
+      "pace": 703,
+      "elevationGain": 0,
+      "heartRateAvg": 86.9,
+      "heartRateMax": 91,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "easy"
     }
   ],
   "runBaseline": {
@@ -3574,7 +3590,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-10-23T18:06:59.944Z",
+  "stravaLastSync": "2026-10-23T21:51:52.203Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
