@@ -3562,6 +3562,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "easy"
+    },
+    {
+      "date": "2026-10-24",
+      "stravaId": 20719768104,
+      "name": "Bicicleta por la tarde",
+      "type": "ride",
+      "distance": 22.47,
+      "duration": 6971,
+      "pace": null,
+      "elevationGain": 1995,
+      "heartRateAvg": 155,
+      "heartRateMax": 189,
+      "averageWatts": 177.8,
+      "weightedAvgWatts": 202,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3590,7 +3606,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-10-25T00:53:07.730Z",
+  "stravaLastSync": "2026-10-25T05:45:12.661Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
