@@ -3578,6 +3578,54 @@
       "weightedAvgWatts": 202,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-10-26",
+      "stravaId": 20810643060,
+      "name": "Carrera de tarde",
+      "type": "run",
+      "distance": 4.19,
+      "duration": 2640,
+      "pace": 631,
+      "elevationGain": 194,
+      "heartRateAvg": 168.4,
+      "heartRateMax": 198,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "intervals"
+    },
+    {
+      "date": "2026-10-29",
+      "stravaId": 20810643162,
+      "name": "Carrera nocturna",
+      "type": "run",
+      "distance": 0,
+      "duration": 0,
+      "pace": null,
+      "elevationGain": 0,
+      "heartRateAvg": null,
+      "heartRateMax": 95,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "easy"
+    },
+    {
+      "date": "2026-10-31",
+      "stravaId": 20810643888,
+      "name": "Bicicleta por la tarde",
+      "type": "ride",
+      "distance": 24.82,
+      "duration": 7999,
+      "pace": null,
+      "elevationGain": 2083,
+      "heartRateAvg": 149.4,
+      "heartRateMax": 183,
+      "averageWatts": 168.3,
+      "weightedAvgWatts": 190,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3606,7 +3654,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-10-31T22:14:23.084Z",
+  "stravaLastSync": "2026-11-01T01:54:15.471Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
