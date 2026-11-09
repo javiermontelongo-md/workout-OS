@@ -2328,7 +2328,9 @@
           "notes": ""
         }
       ],
-      "ts": 1794191476362
+      "ts": 1794191476362,
+      "aiFeedback": "**Bench and OHP both landed exactly where they needed to.** 225lb × 5 at RPE 7 is slightly above prescribed load but the effort matches—no issue there. OHP hit the top of the rep range at target weight, clean execution.\n\n**Critical gap: only one working set logged for both main lifts.** Targets called for 4×5-6—you're missing three sets of bench and three sets of OHP. Either the remaining sets weren't logged or weren't completed, and that's a significant volume deficit for week 1 accumulation.\n\n**Next session: confirm all four sets are accounted for.** If RPE held at 7 across sets, you have room to push—don't leave volume on the table this early in the block.",
+      "aiFeedbackAt": "2026-11-09T02:31:23.288Z"
     }
   ],
   "checks": {},
@@ -11868,54 +11870,54 @@
     }
   ],
   "racePredictions": {
-    "generatedAt": "2026-09-06T00:05:04.601Z",
-    "vo2maxUsed": 46.6,
-    "runCount": 36,
+    "generatedAt": "2026-11-09T02:31:17.763Z",
+    "vo2maxUsed": 43,
+    "runCount": 45,
     "methodLabel": "Riegel",
     "predictions": {
       "s5k": {
-        "seconds": 1707,
-        "ciSeconds": 282,
+        "seconds": 1714,
+        "ciSeconds": 291,
         "method": "Riegel"
       },
       "s10k": {
-        "seconds": 3520,
-        "ciSeconds": 756,
+        "seconds": 3567,
+        "ciSeconds": 788,
         "method": "Riegel"
       },
       "shalf": {
-        "seconds": 7725,
-        "ciSeconds": 2169,
+        "seconds": 7928,
+        "ciSeconds": 2291,
         "method": "Riegel"
       },
       "sfull": {
-        "seconds": 15871,
-        "ciSeconds": 6815,
+        "seconds": 16404,
+        "ciSeconds": 7251,
         "method": "Riegel"
       }
     },
-    "medianTrainingPace": 660.2,
+    "medianTrainingPace": 630.071599045346,
     "decayFactor": 1,
-    "daysInactive": 1,
-    "lastActivityDate": "2026-09-04",
-    "rawVO2": 46.58,
+    "daysInactive": 3,
+    "lastActivityDate": "2026-11-05",
+    "rawVO2": 42.99,
     "debugInfo": {
       "riegelPred": {
-        "s5k": 1993,
-        "s10k": 4156,
-        "shalf": 9170,
-        "sfull": 19119,
+        "s5k": 1949,
+        "s10k": 4063,
+        "shalf": 8965,
+        "sfull": 18693,
         "anchor": {
-          "date": "2026-08-02",
-          "stravaId": 19573645385,
-          "name": "☀️☀️☀️",
+          "date": "2026-10-20",
+          "stravaId": 20669438972,
+          "name": "Carrera de noche",
           "type": "run",
-          "distance": 5,
-          "duration": 3301,
-          "pace": 660,
-          "elevationGain": 337,
-          "heartRateAvg": 169.7,
-          "heartRateMax": 187,
+          "distance": 3.14,
+          "duration": 1971,
+          "pace": 629,
+          "elevationGain": 179,
+          "heartRateAvg": 175.4,
+          "heartRateMax": 196,
           "averageWatts": null,
           "weightedAvgWatts": null,
           "source": "strava",
@@ -11924,24 +11926,19 @@
         "anchorType": "median of last 5 runs"
       },
       "vdotPred": {
-        "s5k": 1271,
-        "s10k": 2637,
-        "shalf": 5958,
-        "sfull": 12150
+        "s5k": 1362,
+        "s10k": 2824,
+        "shalf": 6373,
+        "sfull": 12971
       },
-      "hrPred": {
-        "s5k": 1717,
-        "s10k": 3434,
-        "shalf": 7244,
-        "sfull": 14488
-      },
+      "hrPred": null,
       "weights": {
-        "riegel": 0.45,
-        "vdot": 0.3,
-        "hr": 0.25
+        "riegel": 0.6,
+        "vdot": 0.39999999999999997,
+        "hr": 0
       },
       "vo2maxSource": "Apple Watch",
-      "medianPace": 660.2
+      "medianPace": 630.071599045346
     }
   },
   "coachingLog": [
@@ -13162,6 +13159,13 @@
       "inp": 679,
       "out": 337,
       "cost": 0.002364
+    },
+    {
+      "ts": 1794191483288,
+      "type": "sessionFeedback",
+      "inp": 290,
+      "out": 175,
+      "cost": 0.003495
     }
   ],
   "groceryList": {
