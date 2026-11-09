@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "lastUpdated": "2026-10-13",
+  "lastUpdated": "2026-11-09",
   "sessions": [
     {
       "date": "2026-05-10",
@@ -2256,6 +2256,79 @@
         }
       ],
       "ts": 1789309410054
+    },
+    {
+      "date": "2026-10-12",
+      "day": "A",
+      "type": "A",
+      "notes": "",
+      "bw": 227,
+      "bench": {
+        "sets": [
+          {
+            "w": 225,
+            "r": 5,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "ohp": {
+        "sets": [
+          {
+            "w": 125,
+            "r": 6,
+            "rpe": 7
+          }
+        ],
+        "notes": ""
+      },
+      "squat": {
+        "sets": [],
+        "notes": ""
+      },
+      "dl": {
+        "sets": [],
+        "notes": ""
+      },
+      "pullup": {
+        "sets": [],
+        "notes": ""
+      },
+      "row": {
+        "sets": [],
+        "notes": ""
+      },
+      "accessories": [
+        {
+          "id": "dips",
+          "name": "Dips",
+          "prescribed": "3×8-12",
+          "weight": null,
+          "sets": 3,
+          "reps": 10,
+          "notes": ""
+        },
+        {
+          "id": "machine_shoulder_press",
+          "name": "Machine Shoulder Press",
+          "prescribed": "3×10-12",
+          "weight": null,
+          "sets": 3,
+          "reps": 11,
+          "notes": ""
+        },
+        {
+          "id": "close_grip_bench",
+          "name": "Close-Grip Bench",
+          "prescribed": "3×8-10",
+          "weight": null,
+          "sets": 3,
+          "reps": 9,
+          "notes": ""
+        }
+      ],
+      "ts": 1794191476362
     }
   ],
   "checks": {},
