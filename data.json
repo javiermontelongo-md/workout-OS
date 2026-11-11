@@ -3749,6 +3749,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-11-10",
+      "stravaId": 20940970927,
+      "name": "Long ride w/ muk muk",
+      "type": "ride",
+      "distance": 29.78,
+      "duration": 7927,
+      "pace": null,
+      "elevationGain": 1478,
+      "heartRateAvg": 166.2,
+      "heartRateMax": 195,
+      "averageWatts": 175.3,
+      "weightedAvgWatts": 193,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3777,7 +3793,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-11-11T01:02:38.435Z",
+  "stravaLastSync": "2026-11-11T08:55:18.534Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
