@@ -3765,6 +3765,22 @@
       "weightedAvgWatts": 193,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-11-14",
+      "stravaId": 20988833621,
+      "name": "Bicicleta por la mañana",
+      "type": "ride",
+      "distance": 18.46,
+      "duration": 5717,
+      "pace": null,
+      "elevationGain": 1471,
+      "heartRateAvg": 160.2,
+      "heartRateMax": 192,
+      "averageWatts": 167.3,
+      "weightedAvgWatts": 195,
+      "source": "strava",
+      "runType": "cycling"
     }
   ],
   "runBaseline": {
@@ -3793,7 +3809,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-11-14T14:48:54.191Z",
+  "stravaLastSync": "2026-11-14T19:44:53.114Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
