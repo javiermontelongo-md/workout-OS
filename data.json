@@ -3781,6 +3781,22 @@
       "weightedAvgWatts": 195,
       "source": "strava",
       "runType": "cycling"
+    },
+    {
+      "date": "2026-11-19",
+      "stravaId": 21053634490,
+      "name": "Ocean beach run",
+      "type": "run",
+      "distance": 3.13,
+      "duration": 1978,
+      "pace": 633,
+      "elevationGain": 306,
+      "heartRateAvg": 163.4,
+      "heartRateMax": 193,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "tempo"
     }
   ],
   "runBaseline": {
@@ -3809,7 +3825,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-11-19T23:24:52.551Z",
+  "stravaLastSync": "2026-11-20T05:58:42.025Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
