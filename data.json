@@ -3813,6 +3813,22 @@
       "weightedAvgWatts": null,
       "source": "strava",
       "runType": "tempo"
+    },
+    {
+      "date": "2026-11-27",
+      "stravaId": 21148839632,
+      "name": "Carrera de tarde",
+      "type": "run",
+      "distance": 3.12,
+      "duration": 2042,
+      "pace": 655,
+      "elevationGain": 177,
+      "heartRateAvg": 175.3,
+      "heartRateMax": 201,
+      "averageWatts": null,
+      "weightedAvgWatts": null,
+      "source": "strava",
+      "runType": "intervals"
     }
   ],
   "runBaseline": {
@@ -3841,7 +3857,7 @@
     "distance": 4,
     "avgHR": 165
   },
-  "stravaLastSync": "2026-11-28T01:11:26.106Z",
+  "stravaLastSync": "2026-11-28T09:51:33.575Z",
   "runPrescriptions": {
     "2026-05-26": {
       "recommendedType": "quality",
